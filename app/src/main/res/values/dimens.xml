@@ -1,0 +1,22 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+
+
+    <!--elements sizes     -->
+    <dimen name="default_line_height">18dp</dimen>
+    <dimen name="default_elevation">10dp</dimen>
+    <dimen name="default_corner_radius">7dp</dimen>
+    <dimen name="default_horizontal_spacer">15dp</dimen>
+
+
+    <!--font sizes     -->
+    <dimen name="movie_title_movie_details_page">22sp</dimen>
+    <dimen name="cast_crew_movie_details_page">20sp</dimen>
+    <dimen name="header_newsPage">18sp</dimen>
+</resources>
