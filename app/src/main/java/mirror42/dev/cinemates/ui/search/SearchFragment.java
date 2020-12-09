@@ -13,19 +13,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates20.MyValues;
-import mirror42.dev.cinemates20.NavGraphDirections;
-import mirror42.dev.cinemates20.R;
-import mirror42.dev.cinemates20.adapters.RecycleAdapterSearchPage;
-import mirror42.dev.cinemates20.asyncTasks.DownloadMoviesList;
-import mirror42.dev.cinemates20.listeners.RecyclerSearchListener;
-import mirror42.dev.cinemates20.tmdbAPI.Movie;
+import mirror42.dev.cinemates.MyValues;
+import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapters.RecycleAdapterSearchPage;
+import mirror42.dev.cinemates.asyncTasks.DownloadMoviesList;
+import mirror42.dev.cinemates.listeners.RecyclerSearchListener;
+import mirror42.dev.cinemates.tmdbAPI.Movie;
+
+//import mirror42.dev.cinemates.NavGraphDirections;
 
 public class SearchFragment extends Fragment implements DownloadMoviesList.DownloadListener, View.OnClickListener, RecyclerSearchListener.OnClick_RecycleSearchListener {
     private final String TAG = this.getClass().getSimpleName();
@@ -66,10 +66,10 @@ public class SearchFragment extends Fragment implements DownloadMoviesList.Downl
         this.view = view;
         //
         String query = null;
-        editText_search = view.findViewById(R.id.editText_search);
+        editText_search = view.findViewById(R.id.edittext_search_fragment);
 
         //
-        button_search = view.findViewById(R.id.button_search);
+        button_search = view.findViewById(R.id.button_search_fragment);
         button_search.setOnClickListener(this);
 
 
@@ -191,7 +191,7 @@ public class SearchFragment extends Fragment implements DownloadMoviesList.Downl
 
     private void createRecycle() {
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_search);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_search_fragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
@@ -206,8 +206,8 @@ public class SearchFragment extends Fragment implements DownloadMoviesList.Downl
     @Override
     public void onItemClick(View view, int position) {
         try {
-            NavGraphDirections.ActionGlobalMovieDetailsFragment action = SearchFragmentDirections.actionGlobalMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
-            NavHostFragment.findNavController(mirror42.dev.cinemates20.fragments.SearchFragment.this).navigate(action);
+//            NavGraphDirections.ActionGlobalMovieDetailsFragment action = SearchFragmentDirections.actionGlobalMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
+//            NavHostFragment.findNavController(mirror42.dev.cinemates20.fragments.SearchFragment.this).navigate(action);
         } catch (Exception e) {
             e.printStackTrace();
         }

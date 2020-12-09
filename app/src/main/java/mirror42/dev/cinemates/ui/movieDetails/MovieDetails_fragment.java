@@ -13,21 +13,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapters.RecycleAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.asyncTasks.DownloadMovieDetails;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
-import mirror42.dev.cinemates.tmdbAPI.Person;
 
 
 public class MovieDetails_fragment extends Fragment implements DownloadMovieDetails.DownloadListener, View.OnClickListener {
@@ -74,7 +69,7 @@ public class MovieDetails_fragment extends Fragment implements DownloadMovieDeta
 
 
 
-        addToListButton = view.findViewById(R.id.button_plus_movieDetails);
+        addToListButton = view.findViewById(R.id.button_movie_details_fragment_add_to_list);
         addToListButton.setOnClickListener(this);
 
 
@@ -82,37 +77,37 @@ public class MovieDetails_fragment extends Fragment implements DownloadMovieDeta
 
 
         if(getArguments() != null) {
-            MovieDetails_fragmentArgs args = MovieDetails_fragmentArgs.fromBundle(getArguments());
-            Movie movie = args.getMovie();
-
-            if(movie != null) {
-
-                // getting main activity
-                // and hding action bar
-//                MainActivity main = (MainActivity) getActivity();
-//                if(main!=null && main.getSupportActionBar()!=null) {
-//                    main.getSupportActionBar().hide();
-
-//                }
-
-
-                int movieID = movie.getTmdbID();
-                // starting async task here because of google suggestions
-                DownloadMovieDetails downloadMovieDetails = new DownloadMovieDetails(this);
-                downloadMovieDetails.execute(movieID);
-
-                // defining HORIZONTAL layout manager for recycler
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-
-                // defining Recycler view
-                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_actors_movieDetails);
-                recyclerView.setLayoutManager(linearLayoutManager);
-
-                // assigning adapter to recycle
-                recycleAdapterActorsHorizontalList = new RecycleAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
-                recyclerView.setAdapter(recycleAdapterActorsHorizontalList);
-            }// inner if
+//            MovieDetails_fragmentArgs args = MovieDetails_fragmentArgs.fromBundle(getArguments());
+//            Movie movie = args.getMovie();
+//
+//            if(movie != null) {
+//
+//                // getting main activity
+//                // and hiding action bar
+////                MainActivity main = (MainActivity) getActivity();
+////                if(main!=null && main.getSupportActionBar()!=null) {
+////                    main.getSupportActionBar().hide();
+//
+////                }
+//
+//
+//                int movieID = movie.getTmdbID();
+//                // starting async task here because of google suggestions
+//                DownloadMovieDetails downloadMovieDetails = new DownloadMovieDetails(this);
+//                downloadMovieDetails.execute(movieID);
+//
+//                // defining HORIZONTAL layout manager for recycler
+//                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+//                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//
+//                // defining Recycler view
+//                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
+//                recyclerView.setLayoutManager(linearLayoutManager);
+//
+//                // assigning adapter to recycle
+//                recycleAdapterActorsHorizontalList = new RecycleAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
+//                recyclerView.setAdapter(recycleAdapterActorsHorizontalList);
+//            }// inner if
         }// outer if
     }// end onViewCreated()
 
@@ -124,14 +119,14 @@ public class MovieDetails_fragment extends Fragment implements DownloadMovieDeta
     public void onDownloadComplete(Movie movie, MyValues.DownloadStatus status) {
         if (status == MyValues.DownloadStatus.OK) {
             Toast.makeText(getContext(), "Movie details retrieved! :D", Toast.LENGTH_LONG).show();
-            ImageView backdrop = view.findViewById(R.id.imageView_backdrop_movieDetails);
-            TextView title = view.findViewById(R.id.textView_movieTitle_movieDetails);
-            TextView releaseDate = view.findViewById(R.id.textView_movieReleaseDate_movieDetails);
-            TextView overview = view.findViewById(R.id.textView_overview_movieDetails);
-            ImageView poster = view.findViewById(R.id.imageView_poster_movieDetails);
-            TextView duration = view.findViewById(R.id.textView_duration_movieDetails);
-            TextView genres = view.findViewById(R.id.textView_genre_movieDetails);
-            TextView releaseStatus = view.findViewById(R.id.textView_releaseStatus_movieDetails);
+            ImageView backdrop = view.findViewById(R.id.imageview_movie_details_fragment_backdrop);
+            TextView title = view.findViewById(R.id.textView_movie_details_fragment_movie_title);
+            TextView releaseDate = view.findViewById(R.id.textView_movie_details_fragment_release_date);
+            TextView overview = view.findViewById(R.id.textView_movie_details_fragment_overview);
+            ImageView poster = view.findViewById(R.id.imageView_movie_details_fragment_poster);
+            TextView duration = view.findViewById(R.id.textView_movie_details_fragment_duration);
+            TextView genres = view.findViewById(R.id.textView_movie_details_fragment_genres);
+            TextView releaseStatus = view.findViewById(R.id.textView_movie_details_fragment_release_status);
 
 
             title.setText(movie.getTitle());
