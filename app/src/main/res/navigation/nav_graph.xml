@@ -14,6 +14,11 @@
     <fragment
         android:id="@+id/main_fragment"
         android:name="mirror42.dev.cinemates.MainFragment"
-        android:label="fragment_main"
+        android:label="Main Fragment"
         tools:layout="@layout/fragment_main" />
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="mirror42.dev.cinemates.ui.search.SearchFragment"
+        android:label="Cerca"
+        tools:layout="@layout/fragment_search" />
 </navigation>

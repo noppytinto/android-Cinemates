@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import mirror42.dev.cinemates.ui.home.HomeFragment;
+import mirror42.dev.cinemates.ui.search.SearchFragment;
 
 
 public class ViewpagerAdapterFragmentMain extends FragmentStateAdapter {
@@ -21,7 +22,7 @@ public class ViewpagerAdapterFragmentMain extends FragmentStateAdapter {
 //            case 1:
 //                return new ExploreFragment();
             default :
-                return new HomeFragment();
+                return new SearchFragment();
         }
     }
 
