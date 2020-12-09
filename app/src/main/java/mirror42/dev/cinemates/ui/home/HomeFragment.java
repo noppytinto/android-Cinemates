@@ -21,6 +21,10 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
 
 
+
+
+    //------------------------------------------------------------------------ LIFECYCLE METHODS
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView() called");
@@ -48,4 +52,4 @@ public class HomeFragment extends Fragment {
 
     }
 
-}
+}// end HomeFragment class
