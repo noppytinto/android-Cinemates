@@ -94,6 +94,14 @@ public class RecycleAdapterSearchPage extends RecyclerView.Adapter<SearchRecordV
 
         holder.textViewSearchRecordMovieTitle.setText(movieItem.getTitle());
         holder.textViewSearchRecordOverview.setText(movieItem.getOverview());
+
+
+//        if(position == moviesList.size()-1) {
+//
+//        }
+
+
+
     }
 
 
