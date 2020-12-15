@@ -62,15 +62,15 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardview_search_record"
-                android:layout_width="98dp"
+                android:layout_width="110dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintCircleRadius="@dimen/default_corner_radius"
                 app:cardBackgroundColor="@color/primary_blue"
                 app:cardCornerRadius="@dimen/default_corner_radius"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintCircleRadius="@dimen/default_corner_radius"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
