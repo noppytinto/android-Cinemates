@@ -16,11 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.MainFragmentDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapters.RecycleAdapterSearchPage;
 import mirror42.dev.cinemates.listeners.RecyclerSearchListener;
@@ -68,8 +70,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<Movie> moviesList) {
-                recycleAdapterSearchPage.loadNewData(moviesList);
+            public void onChanged(@Nullable ArrayList<Movie> movies) {
+                moviesList = movies;
+                recycleAdapterSearchPage.loadNewData(movies);
             }
         });
 
@@ -181,7 +184,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
 
         // adding recycle listener for touch detection
         recyclerView.addOnItemTouchListener(new RecyclerSearchListener(getContext(), recyclerView, this));
-        recycleAdapterSearchPage = new RecycleAdapterSearchPage(moviesList, getContext());
+        recycleAdapterSearchPage = new RecycleAdapterSearchPage(new ArrayList<Movie>(), getContext());
         recyclerView.setAdapter(recycleAdapterSearchPage);
     }
 
@@ -189,8 +192,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
     @Override
     public void onItemClick(View view, int position) {
         try {
-//            NavGraphDirections.ActionGlobalMovieDetailsFragment action = SearchFragmentDirections.actionGlobalMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
-//            NavHostFragment.findNavController(mirror42.dev.cinemates20.fragments.SearchFragment.this).navigate(action);
+            MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
+                    action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
+            NavHostFragment.findNavController(SearchFragment.this).navigate(action);
         } catch (Exception e) {
             e.printStackTrace();
         }
