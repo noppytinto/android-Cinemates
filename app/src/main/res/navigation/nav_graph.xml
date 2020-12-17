@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_search" />
     <fragment
         android:id="@+id/movieDetails_fragment"
-        android:name="mirror42.dev.cinemates.ui.movieDetails.MovieDetails_fragment"
+        android:name="mirror42.dev.cinemates.ui.movieDetails.MovieDetailsFragment"
         android:label="fragment_movie_details"
         tools:layout="@layout/fragment_movie_details" >
         <argument

@@ -25,12 +25,12 @@ import mirror42.dev.cinemates.asyncTasks.DownloadMovieDetails;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 
-public class MovieDetails_fragment extends Fragment implements DownloadMovieDetails.DownloadListener, View.OnClickListener {
+public class MovieDetailsFragment extends Fragment implements DownloadMovieDetails.DownloadListener, View.OnClickListener {
     private RecycleAdapterActorsHorizontalList recycleAdapterActorsHorizontalList;
     private View view;
     private FloatingActionButton addToListButton;
 
-    public MovieDetails_fragment() {
+    public MovieDetailsFragment() {
         // Required empty public constructor
     }
 
