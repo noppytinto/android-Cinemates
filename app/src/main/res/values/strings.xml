@@ -44,6 +44,15 @@
     <string name="login">login</string>
     <string name="notifications">Notifiche</string>
     <string name="home">Home</string>
+    <string name="movie">film</string>
+    <string name="person">persona</string>
+    <string name="director">regista</string>
+    <string name="actor">attore</string>
+    <string name="searc_with_ellipsis">Cerca...</string>
+    <string name="search_movie_ellipsis">Cerca film...</string>
+    <string name="search_actor_ellipsis">Cerca attore...</string>
+    <string name="search_director_ellipsis">Cerca regista...</string>
+    <string name="search_person_ellipsis">Cerca persona...</string>
 
 
 </resources>

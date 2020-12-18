@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/filter_toggle_bg"
+        android:drawable="@android:color/transparent" />
+
+    <item android:id="@+id/filter_toggle_ic"
+        android:drawable="@drawable/filter_toggle_icons" />
+</layer-list>

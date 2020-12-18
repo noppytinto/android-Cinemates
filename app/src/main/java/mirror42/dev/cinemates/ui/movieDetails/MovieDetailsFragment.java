@@ -13,16 +13,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapters.RecycleAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.asyncTasks.DownloadMovieDetails;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.Person;
 
 
 public class MovieDetailsFragment extends Fragment implements DownloadMovieDetails.DownloadListener, View.OnClickListener {
@@ -77,37 +82,37 @@ public class MovieDetailsFragment extends Fragment implements DownloadMovieDetai
 
 
         if(getArguments() != null) {
-//            MovieDetails_fragmentArgs args = MovieDetails_fragmentArgs.fromBundle(getArguments());
-//            Movie movie = args.getMovie();
-//
-//            if(movie != null) {
-//
-//                // getting main activity
-//                // and hiding action bar
-////                MainActivity main = (MainActivity) getActivity();
-////                if(main!=null && main.getSupportActionBar()!=null) {
-////                    main.getSupportActionBar().hide();
-//
-////                }
-//
-//
-//                int movieID = movie.getTmdbID();
-//                // starting async task here because of google suggestions
-//                DownloadMovieDetails downloadMovieDetails = new DownloadMovieDetails(this);
-//                downloadMovieDetails.execute(movieID);
-//
-//                // defining HORIZONTAL layout manager for recycler
-//                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-//                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//
-//                // defining Recycler view
-//                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
-//                recyclerView.setLayoutManager(linearLayoutManager);
-//
-//                // assigning adapter to recycle
-//                recycleAdapterActorsHorizontalList = new RecycleAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
-//                recyclerView.setAdapter(recycleAdapterActorsHorizontalList);
-//            }// inner if
+            MovieDetailsFragmentArgs args = MovieDetailsFragmentArgs.fromBundle(getArguments());
+            Movie movie = args.getMovie();
+
+            if(movie != null) {
+
+                // getting main activity
+                // and hiding action bar
+//                MainActivity main = (MainActivity) getActivity();
+//                if(main!=null && main.getSupportActionBar()!=null) {
+//                    main.getSupportActionBar().hide();
+
+//                }
+
+
+                int movieID = movie.getTmdbID();
+                // starting async task here because of google suggestions
+                DownloadMovieDetails downloadMovieDetails = new DownloadMovieDetails(this);
+                downloadMovieDetails.execute(movieID);
+
+                // defining HORIZONTAL layout manager for recycler
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+                // defining Recycler view
+                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+                // assigning adapter to recycle
+                recycleAdapterActorsHorizontalList = new RecycleAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
+                recyclerView.setAdapter(recycleAdapterActorsHorizontalList);
+            }// inner if
         }// outer if
     }// end onViewCreated()
 

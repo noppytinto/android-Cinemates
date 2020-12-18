@@ -282,15 +282,15 @@
                 android:id="@+id/button_movie_details_fragment_add_to_list"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="125dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginTop="195dp"
+                android:layout_marginEnd="20dp"
                 android:backgroundTint="@color/yellow"
                 android:elevation="@dimen/default_elevation"
                 android:shadowColor="@color/black"
                 android:src="@drawable/add_icon_black"
                 app:fabCustomSize="50dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageview_movie_details_fragment_backdrop"
+                app:layout_constraintTop_toTopOf="parent"
                 app:maxImageSize="30dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

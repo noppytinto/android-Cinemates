@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,15 +32,21 @@ import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 //import mirror42.dev.cinemates.NavGraphDirections;
 
-public class SearchFragment extends Fragment implements View.OnClickListener, RecyclerSearchListener.OnClick_RecycleSearchListener {
+public class SearchFragment extends Fragment implements View.OnClickListener, RecyclerSearchListener.OnClick_RecycleSearchListener, CompoundButton.OnCheckedChangeListener {
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
     private ArrayList<Movie> moviesList;
-    private Button button_search;
+    private Button buttonSearch;
     private EditText editText_search;
     private String query;
     private RecycleAdapterSearchPage recycleAdapterSearchPage;
     private View view;
+    private ToggleButton buttonFilter;
+    private Button buttonFilterPerson;
+    private Button buttonFilterDirector;
+    private Button buttonFilterActor;
+    private Button buttonFilterMovie;
+    private Button buttonFilterSelected;
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
 
@@ -63,10 +71,35 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
         this.view = view;
         Log.d(TAG, "onViewCreated() called");
         editText_search = view.findViewById(R.id.editText_searchFragment);
-        button_search = view.findViewById(R.id.button_searchFragment);
-        button_search.setOnClickListener(this);
+        buttonSearch = view.findViewById(R.id.button_search_searchFragment);
+        buttonFilter = view.findViewById(R.id.button_filter_searchFragment);
+        buttonFilterPerson = view.findViewById(R.id.button_person_filter);
+        buttonFilterDirector = view.findViewById(R.id.button_director_filter);
+        buttonFilterActor = view.findViewById(R.id.button_actor_filter);
+        buttonFilterMovie = view.findViewById(R.id.button_movie_filter);
+        buttonFilterSelected = view.findViewById(R.id.button_selected_filter);
+        buttonFilterMovie.setVisibility(View.GONE);
+        buttonFilterActor.setVisibility(View.GONE);
+        buttonFilterDirector.setVisibility(View.GONE);
+        buttonFilterPerson.setVisibility(View.GONE);
+        buttonFilterSelected.setVisibility(View.GONE);
+
+
+        // setting listeners
+        buttonFilter.setOnCheckedChangeListener(this);
+        buttonSearch.setOnClickListener(this);
+        buttonFilterPerson.setOnClickListener(this);
+        buttonFilterDirector.setOnClickListener(this);
+        buttonFilterActor.setOnClickListener(this);
+        buttonFilterMovie.setOnClickListener(this);
+        buttonFilterSelected.setOnClickListener(this);
+
+
+        //
         initRecycleView();
 
+
+        //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
             @Override
@@ -165,12 +198,64 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
  */
     @Override
     public void onClick(View v) {
-        Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
-        button_search.startAnimation(buttonAnim);
-        query = editText_search.getText().toString();
-        searchViewModel.init(query);
+        if(v.getId() == buttonSearch.getId()) {
+            Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
+            buttonSearch.startAnimation(buttonAnim);
+            query = editText_search.getText().toString();
+            searchViewModel.init(query);
+
+        }
+        else if(v.getId() == buttonFilterMovie.getId()) {
+            buttonFilter.setVisibility(View.GONE);
+            setupSelectedFiler(getResources().getString(R.string.movie));
+            buttonFilter.setChecked(false);
+        }
+        else if(v.getId() == buttonFilterActor.getId()) {
+            buttonFilter.setVisibility(View.GONE);
+            setupSelectedFiler(getResources().getString(R.string.actor));
+            buttonFilter.setChecked(false);
+        }
+        else if(v.getId() == buttonFilterDirector.getId()) {
+            buttonFilter.setVisibility(View.GONE);
+            setupSelectedFiler(getResources().getString(R.string.director));
+            buttonFilter.setChecked(false);
+        }
+        else if(v.getId() == buttonFilterPerson.getId()) {
+            buttonFilter.setVisibility(View.GONE);
+            setupSelectedFiler(getResources().getString(R.string.person));
+            buttonFilter.setChecked(false);
+        }
+        else if(v.getId() == buttonFilterSelected.getId()) {
+            buttonFilterSelected.setVisibility(View.GONE);
+            buttonFilter.setVisibility(View.VISIBLE);
+            buttonFilter.setChecked(false);
+        }
 
     }
+
+
+    private void setupSelectedFiler(String filterName) {
+        buttonFilterSelected.setText(filterName);
+        buttonFilterSelected.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            // The toggle is enabled
+            buttonFilterMovie.setVisibility(View.VISIBLE);
+            buttonFilterActor.setVisibility(View.VISIBLE);
+            buttonFilterDirector.setVisibility(View.VISIBLE);
+            buttonFilterPerson.setVisibility(View.VISIBLE);
+        } else {
+            // The toggle is disabled
+            buttonFilterMovie.setVisibility(View.GONE);
+            buttonFilterActor.setVisibility(View.GONE);
+            buttonFilterDirector.setVisibility(View.GONE);
+            buttonFilterPerson.setVisibility(View.GONE);
+        }
+    }
+
 
 
 
