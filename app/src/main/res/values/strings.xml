@@ -45,7 +45,7 @@
     <string name="notifications">Notifiche</string>
     <string name="home">Home</string>
     <string name="movie">film</string>
-    <string name="person">persona</string>
+    <string name="user">utente</string>
     <string name="director">regista</string>
     <string name="actor">attore</string>
     <string name="searc_with_ellipsis">Cerca...</string>
@@ -53,6 +53,7 @@
     <string name="search_actor_ellipsis">Cerca attore...</string>
     <string name="search_director_ellipsis">Cerca regista...</string>
     <string name="search_person_ellipsis">Cerca persona...</string>
+    <string name="filter_by">Filtra per</string>
 
 
 </resources>

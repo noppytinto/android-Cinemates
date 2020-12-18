@@ -33,7 +33,6 @@
         android:layout_marginBottom="16dp"
         android:autofillHints=""
         android:background="@drawable/shape_search_box"
-        android:ems="10"
         android:fontFamily="@font/poppins_semibold"
         android:hint="@string/searc_with_ellipsis"
         android:inputType="textPersonName"
@@ -41,7 +40,7 @@
         android:paddingEnd="10dp"
         android:textColor="@color/dark_blue"
         android:textColorHint="@color/light_blue_2"
-        android:textSize="14sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_search_searchFragment"
         app:layout_constraintStart_toStartOf="parent" />
@@ -74,6 +73,17 @@
         app:layout_constraintVertical_bias="0.52" />
 
 
+    <View
+        android:id="@+id/dummyView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/editText_searchFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/button_selected_filter"
         android:layout_width="wrap_content"
@@ -82,10 +92,10 @@
         android:layout_marginBottom="6dp"
         android:background="@drawable/shape_search_filter"
         android:elevation="@dimen/default_elevation"
-        android:fontFamily="@font/poppins_semibold"
+        android:fontFamily="@font/poppins_bold"
         android:paddingTop="1dp"
         android:paddingRight="7dp"
-        android:text="filter"
+        android:text="regista"
         android:textAllCaps="false"
         android:textColor="@color/black"
         android:textSize="12sp"
@@ -144,18 +154,34 @@
         app:layout_constraintEnd_toEndOf="@+id/button_actor_filter" />
 
     <Button
-        android:id="@+id/button_person_filter"
+        android:id="@+id/button_user_filter"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/shape_search_filter"
+        android:focusableInTouchMode="true"
         android:fontFamily="@font/poppins_semibold"
-        android:text="@string/person"
+        android:text="@string/user"
         android:textAllCaps="false"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/button_director_filter"
-        app:layout_constraintEnd_toEndOf="@+id/button_director_filter" />
+        app:layout_constraintEnd_toEndOf="@+id/button_director_filter"
+
+
+        />
+
+    <TextView
+        android:id="@+id/textView_filterBy_searchFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="@string/filter_by"
+        android:textColor="@color/dark_blue"
+        android:visibility="gone"
+        app:layout_constraintBaseline_toBaselineOf="@+id/editText_searchFragment"
+        app:layout_constraintEnd_toStartOf="@+id/button_filter_searchFragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

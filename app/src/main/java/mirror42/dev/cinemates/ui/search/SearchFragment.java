@@ -10,6 +10,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -42,11 +43,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
     private RecycleAdapterSearchPage recycleAdapterSearchPage;
     private View view;
     private ToggleButton buttonFilter;
-    private Button buttonFilterPerson;
+    private Button buttonFilterUser;
     private Button buttonFilterDirector;
     private Button buttonFilterActor;
     private Button buttonFilterMovie;
     private Button buttonFilterSelected;
+    private View outsideDetector;
+    private TextView textViewFilterBy;
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
 
@@ -73,26 +76,32 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
         editText_search = view.findViewById(R.id.editText_searchFragment);
         buttonSearch = view.findViewById(R.id.button_search_searchFragment);
         buttonFilter = view.findViewById(R.id.button_filter_searchFragment);
-        buttonFilterPerson = view.findViewById(R.id.button_person_filter);
+        buttonFilterUser = view.findViewById(R.id.button_user_filter);
         buttonFilterDirector = view.findViewById(R.id.button_director_filter);
         buttonFilterActor = view.findViewById(R.id.button_actor_filter);
         buttonFilterMovie = view.findViewById(R.id.button_movie_filter);
         buttonFilterSelected = view.findViewById(R.id.button_selected_filter);
+        outsideDetector = view.findViewById(R.id.dummyView);
+        textViewFilterBy = view.findViewById(R.id.textView_filterBy_searchFragment);
+
+        // setting visibility
         buttonFilterMovie.setVisibility(View.GONE);
         buttonFilterActor.setVisibility(View.GONE);
         buttonFilterDirector.setVisibility(View.GONE);
-        buttonFilterPerson.setVisibility(View.GONE);
+        buttonFilterUser.setVisibility(View.GONE);
         buttonFilterSelected.setVisibility(View.GONE);
+        outsideDetector.setVisibility(View.GONE);
 
 
         // setting listeners
         buttonFilter.setOnCheckedChangeListener(this);
         buttonSearch.setOnClickListener(this);
-        buttonFilterPerson.setOnClickListener(this);
+        buttonFilterUser.setOnClickListener(this);
         buttonFilterDirector.setOnClickListener(this);
         buttonFilterActor.setOnClickListener(this);
         buttonFilterMovie.setOnClickListener(this);
         buttonFilterSelected.setOnClickListener(this);
+        outsideDetector.setOnClickListener(this);
 
 
         //
@@ -108,6 +117,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
                 recycleAdapterSearchPage.loadNewData(movies);
             }
         });
+
+
+        buttonFilterMovie.onWindowFocusChanged(false);
 
         // assigning adapter to recycle
 
@@ -208,21 +220,25 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
         else if(v.getId() == buttonFilterMovie.getId()) {
             buttonFilter.setVisibility(View.GONE);
             setupSelectedFiler(getResources().getString(R.string.movie));
+            outsideDetector.setVisibility(View.GONE);
             buttonFilter.setChecked(false);
         }
         else if(v.getId() == buttonFilterActor.getId()) {
             buttonFilter.setVisibility(View.GONE);
             setupSelectedFiler(getResources().getString(R.string.actor));
+            outsideDetector.setVisibility(View.GONE);
             buttonFilter.setChecked(false);
         }
         else if(v.getId() == buttonFilterDirector.getId()) {
             buttonFilter.setVisibility(View.GONE);
             setupSelectedFiler(getResources().getString(R.string.director));
+            outsideDetector.setVisibility(View.GONE);
             buttonFilter.setChecked(false);
         }
-        else if(v.getId() == buttonFilterPerson.getId()) {
+        else if(v.getId() == buttonFilterUser.getId()) {
             buttonFilter.setVisibility(View.GONE);
-            setupSelectedFiler(getResources().getString(R.string.person));
+            setupSelectedFiler(getResources().getString(R.string.user));
+            outsideDetector.setVisibility(View.GONE);
             buttonFilter.setChecked(false);
         }
         else if(v.getId() == buttonFilterSelected.getId()) {
@@ -230,7 +246,18 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
             buttonFilter.setVisibility(View.VISIBLE);
             buttonFilter.setChecked(false);
         }
+        else if(v.getId() == outsideDetector.getId()) {
+            hideFilters();
+        }
 
+
+
+
+    }
+
+    private void hideFilters() {
+        outsideDetector.setVisibility(View.GONE);
+        buttonFilter.setChecked(false);
     }
 
 
@@ -246,13 +273,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
             buttonFilterMovie.setVisibility(View.VISIBLE);
             buttonFilterActor.setVisibility(View.VISIBLE);
             buttonFilterDirector.setVisibility(View.VISIBLE);
-            buttonFilterPerson.setVisibility(View.VISIBLE);
+            buttonFilterUser.setVisibility(View.VISIBLE);
+            outsideDetector.setVisibility(View.VISIBLE);
+            textViewFilterBy.setVisibility(View.VISIBLE);
         } else {
             // The toggle is disabled
             buttonFilterMovie.setVisibility(View.GONE);
             buttonFilterActor.setVisibility(View.GONE);
             buttonFilterDirector.setVisibility(View.GONE);
-            buttonFilterPerson.setVisibility(View.GONE);
+            buttonFilterUser.setVisibility(View.GONE);
+            textViewFilterBy.setVisibility(View.GONE);
         }
     }
 
