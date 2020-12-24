@@ -64,7 +64,7 @@ public class DownloadUpcomings extends AsyncTask<Integer, Void, ArrayList<Movie>
                 String posterURL = null;
                 try {
                     posterURL = x.getString("poster_path");
-                    posterURL = tmdb.buildPosterURL(posterURL);
+                    posterURL = tmdb.buildPosterUrl(posterURL);
                 } catch (Exception e) {
                     e.getMessage();
                     e.printStackTrace();

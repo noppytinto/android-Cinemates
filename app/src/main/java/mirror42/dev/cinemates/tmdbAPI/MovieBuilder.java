@@ -30,9 +30,9 @@ public class MovieBuilder {
             String overview;
             String posterURL;
 
-            title = tmdb.getMovieTitle_byID(movieID);
-            overview = tmdb.getShortDescription_byID(movieID);
-            posterURL = tmdb.getPoster_byID(movieID);
+            title = tmdb.getMovieTitleById(movieID);
+            overview = tmdb.getShortDescriptionById(movieID);
+            posterURL = tmdb.getPosterById(movieID);
 
             mv = new Movie(movieID, title, posterURL, overview);
         }

@@ -53,7 +53,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
 
         try {
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonMovieDetails_byID(movieID);
+            JSONObject jsonObj = tmdb.getJsonMovieDetailsById(movieID);
 
 
             //---- fetching title
@@ -82,7 +82,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
             String posterURL = null;
             try {
                 posterURL = jsonObj.getString("poster_path");
-                posterURL = tmdb.buildPosterURL(posterURL);
+                posterURL = tmdb.buildPosterUrl(posterURL);
             } catch (Exception e) {
                 e.getMessage();
                 e.printStackTrace();
@@ -92,7 +92,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
             String backDropURL = null;
             try {
                 backDropURL = jsonObj.getString("backdrop_path");
-                backDropURL = tmdb.buildBackdropURL(backDropURL);
+                backDropURL = tmdb.buildBackdropUrl(backDropURL);
             } catch (Exception e) {
                 e.getMessage();
                 e.printStackTrace();
@@ -185,7 +185,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
             result = new ArrayList<>();
 
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonCredits_byID(movieID);
+            JSONObject jsonObj = tmdb.getJsonCreditsById(movieID);
 
             // fetching cast
             JSONArray resultsArray = jsonObj.getJSONArray("cast");
@@ -224,7 +224,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
                 String profileImageURL = null;
                 try {
                     profileImageURL = x.getString("profile_path");
-                    profileImageURL = tmdb.buildPersonImageURL(profileImageURL);
+                    profileImageURL = tmdb.buildPersonImageUrl(profileImageURL);
                 } catch (JSONException e) {
                     e.getMessage();
                     e.printStackTrace();
@@ -278,7 +278,7 @@ public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
                 String profileImageURL = null;
                 try {
                     profileImageURL = x.getString("profile_path");
-                    profileImageURL = tmdb.buildPersonImageURL(profileImageURL);
+                    profileImageURL = tmdb.buildPersonImageUrl(profileImageURL);
                 } catch (JSONException e) {
                     e.getMessage();
                     e.printStackTrace();

@@ -27,7 +27,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.MainFragmentDirections;
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapters.RecycleAdapterSearchPage;
 import mirror42.dev.cinemates.listeners.RecyclerSearchListener;
@@ -78,6 +78,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         Log.d(TAG, "onViewCreated() called");
+
+
+
+//        MainActivity mainActivity = (MainActivity) getParentFragment().getActivity();
+//        mainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         editText_search = view.findViewById(R.id.editText_searchFragment);
         buttonSearch = view.findViewById(R.id.button_search_searchFragment);
         buttonFilter = view.findViewById(R.id.button_filter_searchFragment);
@@ -326,7 +333,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
     @Override
     public void onItemClick(View view, int position) {
         try {
-
             Movie movieSelected = recycleAdapterSearchPage.getMoviesList(position);
 
             // firebase analytics
@@ -336,9 +342,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
             Bundle params = new Bundle();
             params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
 
-            //
-            MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
-                    action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
+//            NavHostFragment.findNavController(FirstFragment.this)
+//                    .navigate(R.id.action_FirstFragment_to_SecondFragment);
+
+            // passing movie to MovieDetailsFragment
+//            MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
+//                    action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
+//            NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+
+
+            NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
             NavHostFragment.findNavController(SearchFragment.this).navigate(action);
         } catch (Exception e) {
             e.printStackTrace();

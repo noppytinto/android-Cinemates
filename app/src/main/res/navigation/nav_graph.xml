@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
+    android:id="@+id/nav_graph"
     app:startDestination="@id/main_fragment">
 
     <fragment
@@ -15,11 +15,7 @@
         android:id="@+id/main_fragment"
         android:name="mirror42.dev.cinemates.MainFragment"
         android:label="Main Fragment"
-        tools:layout="@layout/fragment_main" >
-        <action
-            android:id="@+id/action_main_fragment_to_movieDetails_fragment"
-            app:destination="@id/movieDetails_fragment" />
-    </fragment>
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/search_fragment"
         android:name="mirror42.dev.cinemates.ui.search.SearchFragment"
@@ -37,30 +33,25 @@
     <fragment
         android:id="@+id/latestReleasesFragment"
         android:name="mirror42.dev.cinemates.ui.explore.LatestReleasesFragment"
-        android:label="LatestReleasesFragment" >
-        <action
-            android:id="@+id/action_latestReleasesFragment_to_movieDetails_fragment"
-            app:destination="@id/movieDetails_fragment" />
-    </fragment>
+        android:label="LatestReleasesFragment" />
     <fragment
         android:id="@+id/popularFragment"
         android:name="mirror42.dev.cinemates.ui.explore.PopularFragment"
-        android:label="PopularFragment" >
-        <action
-            android:id="@+id/action_popularFragment_to_movieDetails_fragment"
-            app:destination="@id/movieDetails_fragment" />
-    </fragment>
+        android:label="PopularFragment" />
     <fragment
         android:id="@+id/upcomginsFragment"
         android:name="mirror42.dev.cinemates.ui.explore.UpcomginsFragment"
-        android:label="UpcomginsFragment" >
-        <action
-            android:id="@+id/action_upcomginsFragment_to_movieDetails_fragment"
-            app:destination="@id/movieDetails_fragment" />
-    </fragment>
+        android:label="UpcomginsFragment" />
     <fragment
         android:id="@+id/exploreFragment"
         android:name="mirror42.dev.cinemates.ui.explore.ExploreFragment"
         android:label="fragment_explore"
         tools:layout="@layout/fragment_explore" />
+    <action
+        android:id="@+id/anywhere_to_movieDetails_fragment"
+        app:destination="@id/movieDetails_fragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 </navigation>

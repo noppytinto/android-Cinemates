@@ -56,7 +56,7 @@ public class DownloadMoviesList extends AsyncTask<String, Void, ArrayList<Movie>
 
         try {
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonMoviesList_byTitle(movieTitle);
+            JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, 1);
             JSONArray resultsArray = jsonObj.getJSONArray("results");
 
             // fetching results
@@ -86,7 +86,7 @@ public class DownloadMoviesList extends AsyncTask<String, Void, ArrayList<Movie>
                 String posterURL = null;
                 try {
                     posterURL = x.getString("poster_path");
-                    posterURL = tmdb.buildPosterURL(posterURL);
+                    posterURL = tmdb.buildPosterUrl(posterURL);
                 } catch (Exception e) {
                     e.getMessage();
                     e.printStackTrace();
