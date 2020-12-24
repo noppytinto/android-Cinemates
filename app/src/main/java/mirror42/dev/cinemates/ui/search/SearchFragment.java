@@ -23,6 +23,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MainFragmentDirections;
@@ -34,6 +36,8 @@ import mirror42.dev.cinemates.tmdbAPI.Movie;
 //import mirror42.dev.cinemates.NavGraphDirections;
 
 public class SearchFragment extends Fragment implements View.OnClickListener, RecyclerSearchListener.OnClick_RecycleSearchListener, CompoundButton.OnCheckedChangeListener {
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
     private ArrayList<Movie> moviesList;
@@ -64,6 +68,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
 //            }
 //        });
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
 
 
         return inflater.inflate(R.layout.fragment_search, container, false);
@@ -214,7 +219,21 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
             buttonSearch.startAnimation(buttonAnim);
             query = editText_search.getText().toString();
-            searchViewModel.init(query);
+            if( ! query.isEmpty()) {
+
+                // send to firebase analytics
+                //throw new RuntimeException("Test Crash"); // Force a crash for Crashlytics
+                Bundle params = new Bundle();
+                params.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+
+                //
+                searchViewModel.init(query);
+            }
+            else {
+                Toast.makeText(getContext(), "Campo Cerca vuoto", Toast.LENGTH_SHORT).show();
+
+            }
+
 
         }
         else if(v.getId() == buttonFilterMovie.getId()) {
@@ -307,6 +326,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
     @Override
     public void onItemClick(View view, int position) {
         try {
+
+            Movie movieSelected = recycleAdapterSearchPage.getMoviesList(position);
+
+            Bundle item1 = new Bundle();
+            item1.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
+            item1.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in search tab");
+            Bundle params = new Bundle();
+            params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
+
+
             MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
                     action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
             NavHostFragment.findNavController(SearchFragment.this).navigate(action);
