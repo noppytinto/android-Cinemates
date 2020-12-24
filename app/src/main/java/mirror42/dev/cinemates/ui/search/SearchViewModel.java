@@ -23,7 +23,6 @@ import mirror42.dev.cinemates.tmdbAPI.Movie;
  */
 public class SearchViewModel extends ViewModel implements DownloadMoviesList.DownloadListener {
     private MutableLiveData<ArrayList<Movie>> moviesList;
-    private SearchFragmentRepository repo;
 
     public SearchViewModel() {
         moviesList = new MutableLiveData<>();

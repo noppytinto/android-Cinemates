@@ -22,7 +22,7 @@ public class MovieBuilder {
     }
 
     public static Movie buildMovie_byID(int movieID) {
-        TheMovieDatabase_API tmdb = new TheMovieDatabase_API();
+        TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
         Movie mv = null;
 
         try {

@@ -1,6 +1,6 @@
 package mirror42.dev.cinemates.tmdbAPI;
 
-public class Image implements TheMovieDatabase{
+public class Image {
     String url;
 
     public Image(String url) {

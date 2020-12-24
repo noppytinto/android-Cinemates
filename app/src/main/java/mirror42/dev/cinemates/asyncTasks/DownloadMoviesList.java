@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
-import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabase_API;
+import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 
 
 public class DownloadMoviesList extends AsyncTask<String, Void, ArrayList<Movie>> {
     private DownloadStatus downloadStatus;
-    private TheMovieDatabase_API tmdb;
+    private TheMovieDatabaseApi tmdb;
     private final DownloadListener callbackCaller;
 
     // this ensures that the entity which uses this class
@@ -30,7 +30,7 @@ public class DownloadMoviesList extends AsyncTask<String, Void, ArrayList<Movie>
     public DownloadMoviesList(DownloadListener callback) {
         this.callbackCaller = callback;
         this.downloadStatus = DownloadStatus.IDLE;
-        tmdb = new TheMovieDatabase_API();
+        tmdb = new TheMovieDatabaseApi();
     }
 
 

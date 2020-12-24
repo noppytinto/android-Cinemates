@@ -329,13 +329,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Re
 
             Movie movieSelected = recycleAdapterSearchPage.getMoviesList(position);
 
+            // firebase analytics
             Bundle item1 = new Bundle();
             item1.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
             item1.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in search tab");
             Bundle params = new Bundle();
             params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
 
-
+            //
             MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
                     action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
             NavHostFragment.findNavController(SearchFragment.this).navigate(action);

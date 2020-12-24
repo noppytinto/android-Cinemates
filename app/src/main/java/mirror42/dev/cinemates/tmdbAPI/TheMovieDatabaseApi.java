@@ -68,7 +68,7 @@ import java.util.ArrayList;
  */
 
 
-public class TheMovieDatabase_API {
+public class TheMovieDatabaseApi {
     // api configuration data
     private final String BASE_URL = "https://api.themoviedb.org/";
     private final String MY_API_KEY = "632f90b0d342606c53a9ffd5fc5ed32e";
@@ -87,6 +87,15 @@ public class TheMovieDatabase_API {
     public final String SMALL_PROFILE_SIZE = "w45";
     public final String MEDIUM_PROFILE_SIZE = "w185";
     public final String BIG_PROFILE_SIZE = "h632";
+
+    // TMDb keywords
+    public final String RESULTS = "results";
+    public final String TOTAL_PAGES = "total_pages";
+    public final String PAGE = "page";
+    public final String TOTAL_RESULTS = "total_results";
+    // time windows
+    public final String DAY = "day";
+    public final String WEEK = "week";
     // ISO 639-1 language codes
     private static String defaultLanguage;
     public final String ITALIAN_LANGUAGE = "it";
@@ -96,14 +105,6 @@ public class TheMovieDatabase_API {
     public final String MOVIE = "movie";
     public final String TV = "tv";
     public final String PERSON = "person";
-    // time windows
-    public final String DAY = "day";
-    public final String WEEK = "week";
-    // TMDb keywords
-    public final String RESULTS = "results";
-    public final String TOTAL_PAGES = "total_pages";
-    public final String PAGE = "page";
-    public final String TOTAL_RESULTS = "total_results";
 
     //
     private String defaultPosterSize;
@@ -112,18 +113,17 @@ public class TheMovieDatabase_API {
 
 
     //--------------------------------------------------------------------------- CONSTRUCTORS
-    public TheMovieDatabase_API() {
+    public TheMovieDatabaseApi() {
         defaultLanguage = ITALIAN_LANGUAGE;
-
         posterSizes = new ArrayList<>();
         backgroundImageSizes = new ArrayList<>();
         profileImageSizes = new ArrayList<>();
         defaultPosterSize = SMALL_POSTER_SIZE;
         defaultBackdropSize = MEDIUM_BACKGROUND_SIZE;
         defaultPersonImageSize = MEDIUM_PROFILE_SIZE;
-
         apiConfigurationObject = null;
     }
+
 
 
     //--------------------------------------------------------------------------- GETTERS/SETTERS
@@ -176,6 +176,8 @@ public class TheMovieDatabase_API {
     public String getBaseImageUrl() {
         return baseImageUrl;
     }
+
+
 
     //--------------------------------------------------------------------------- PUBLIC METHODS
     public void trySearch(String movieTitle){
@@ -245,11 +247,7 @@ public class TheMovieDatabase_API {
 
     }
 
-
-
-
-
-    public ArrayList<Integer> getMovieIDList_byTitle(String movieTitle) {
+    public ArrayList<Integer> getMovieIdListByTitle(String movieTitle) {
         // a result can span across multiple pages
         // this method return only the first result page.
         // For a specific page use getMovieIDListByTitle(String, int)
@@ -286,7 +284,7 @@ public class TheMovieDatabase_API {
         return idList;
     }
 
-    public ArrayList<Integer> getMovieIDList_byTitle(String movieTitle, int page) {
+    public ArrayList<Integer> getMovieIdListByTitle(String movieTitle, int page) {
         ArrayList<Integer> idList = null;
         movieTitle = movieTitle.trim();
 
@@ -348,7 +346,7 @@ public class TheMovieDatabase_API {
      * @return   ID list of trending movies of the day,
      *           if some exception happens returns null
      */
-    public ArrayList<Integer> getTrendingMovies_OfTheDay(){
+    public ArrayList<Integer> getTrendingMoviesOfTheDay(){
         ArrayList<Integer> IDList = null;
 
         try {
@@ -375,7 +373,7 @@ public class TheMovieDatabase_API {
      * @return   ID list of trending movies of the week,
      *           if some exception happens returns null
      */
-    public ArrayList<Integer> getTrendingMovies_OfTheWeek(){
+    public ArrayList<Integer> getTrendingMoviesOfTheWeek(){
         ArrayList<Integer> IDList = null;
 
         try {
@@ -399,9 +397,9 @@ public class TheMovieDatabase_API {
     }
 
 
-    public String getMovieTitle_byID(int moviedID) {
+    public String getMovieTitleById(int movieId) {
         String result = null;
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -416,9 +414,9 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getOriginalTitle_byID(int moviedID) {
+    public String getOriginalTitleById(int movieId) {
         String result = null;
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -433,11 +431,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getPoster_byID(int moviedID) {
+    public String getPosterById(int movieId) {
         String result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -456,11 +454,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getBackgroundImage_byID(int moviedID) {
+    public String getBackgroundImageById(int movieId) {
         String result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -479,11 +477,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public ArrayList<String> getMovieImageList_byID(int moviedID) {
+    public ArrayList<String> getMovieImageListById(int movieId) {
         ArrayList<String> result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieImageList_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieImageListById(movieId);
 
         // parsing json object
         try {
@@ -507,11 +505,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getShortDescription_byID(int moviedID) {
+    public String getShortDescriptionById(int movieId) {
         String result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -519,7 +517,7 @@ public class TheMovieDatabase_API {
                 result = jsonObj.getString("overview");
 
                 if((result==null) || (result.isEmpty())) {
-                    JSONObject jsonObj2 = getJsonMovieDetails_byID_fallback(moviedID);
+                    JSONObject jsonObj2 = getJsonMovieDetailsByIdFallback(movieId);
                     try {
                         if(jsonObj != null) {
                             //TODO
@@ -541,11 +539,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public double getAverageVote(int moviedID) {
+    public double getAverageVote(int movieId) {
         double result = 0.0;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -561,11 +559,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getReleaseDate(int moviedID) {
+    public String getReleaseDate(int movieId) {
         String result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -581,11 +579,11 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getWebsite(int moviedID) {
+    public String getWebsite(int movieId) {
         String result = null;
 
         // getting json object
-        JSONObject jsonObj = getJsonMovieDetails_byID(moviedID);
+        JSONObject jsonObj = getJsonMovieDetailsById(movieId);
 
         // parsing json object
         try {
@@ -601,13 +599,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public ArrayList<String> getActorsNameList_byID(int moviedID) {
+    public ArrayList<String> getActorsNameListById(int movieId) {
         ArrayList<String> result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject parentObj = getJsonCredits_byID(moviedID);
+            JSONObject parentObj = getJsonCreditsById(movieId);
             JSONArray castObj = parentObj.getJSONArray("cast");
 
             if(castObj != null) {
@@ -630,13 +628,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public ArrayList<String> getDirectorsNameList_byID(int moviedID) {
+    public ArrayList<String> getDirectorsNameListById(int movieId) {
         ArrayList<String> result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject parentObj = getJsonCredits_byID(moviedID);
+            JSONObject parentObj = getJsonCreditsById(movieId);
             JSONArray castObj = parentObj.getJSONArray("cast");
 
             if(castObj != null) {
@@ -659,13 +657,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public ArrayList<Integer> getActorsIDList_byMovieID(int moviedID) {
+    public ArrayList<Integer> getActorsIDListByMovieId(int movieId) {
         ArrayList<Integer> result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject parentObj = getJsonCredits_byID(moviedID);
+            JSONObject parentObj = getJsonCreditsById(movieId);
             JSONArray castObj = parentObj.getJSONArray("cast");
 
             if(castObj != null) {
@@ -688,13 +686,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public ArrayList<Integer> getDirectorsIDList_byMovieID(int moviedID) {
+    public ArrayList<Integer> getDirectorsIDListByMovieId(int movieId) {
         ArrayList<Integer> result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject parentObj = getJsonCredits_byID(moviedID);
+            JSONObject parentObj = getJsonCreditsById(movieId);
             JSONArray castObj = parentObj.getJSONArray("cast");
 
             if(castObj != null) {
@@ -717,13 +715,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getPersonName_byID(int personID) {
+    public String getPersonNameById(int personID) {
         String result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject personObj = getJsonPerson_byID(personID);
+            JSONObject personObj = getJsonPersonById(personID);
 
             if(personObj != null) {
                 result = personObj.getString("name");
@@ -737,13 +735,13 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String getPersonProfileImage_byID(int personID) {
+    public String getPersonProfileImageById(int personID) {
         String result = null;
 
         // parsing json object
         try {
             // getting json objects
-            JSONObject personObj = getJsonPerson_byID(personID);
+            JSONObject personObj = getJsonPersonById(personID);
 
             if(personObj != null) {
                 String imagePath = personObj.getString("profile_path");
@@ -757,9 +755,6 @@ public class TheMovieDatabase_API {
 
         return result;
     }
-
-
-
 
     public int getTotalPages(JSONObject jsonObj) {
         int tot = 0;
@@ -798,28 +793,28 @@ public class TheMovieDatabase_API {
 
     //------ build methods
 
-    public String buildPosterURL(String imagePath) {
+    public String buildPosterUrl(String imagePath) {
         if(imagePath==null || imagePath.isEmpty())
             return null;
 
         return baseImageUrl + defaultPosterSize + imagePath;
     }
 
-    public String buildBackdropURL(String imagePath) {
+    public String buildBackdropUrl(String imagePath) {
         if(imagePath==null || imagePath.isEmpty())
             return null;
 
         return baseImageUrl + defaultBackdropSize + imagePath;
     }
 
-    public String buildPersonImageURL(String imagePath) {
+    public String buildPersonImageUrl(String imagePath) {
         if(imagePath==null || imagePath.isEmpty())
             return null;
 
         return baseImageUrl + defaultPersonImageSize + imagePath;
     }
 
-    public String buildURLfor_searchMovies_byTitle(String movieTitle) {
+    public String buildURLforSearchMoviesByTitle(String movieTitle) {
         String result = null;
         try{
             // creating TBDb url
@@ -837,10 +832,10 @@ public class TheMovieDatabase_API {
         return result;
     }
 
-    public String buildURfor_MovieDetails_byID(int movieID) {
+    public String buildURLforMovieDetailsById(int movieId) {
         String result = null;
         try{
-            result = BASE_URL + "3/movie/" + movieID + "?api_key=" + MY_API_KEY + "&language=" + defaultLanguage;
+            result = BASE_URL + "3/movie/" + movieId + "?api_key=" + MY_API_KEY + "&language=" + defaultLanguage;
             return result;
         } catch (Exception e) {
             e.getMessage();
@@ -865,17 +860,16 @@ public class TheMovieDatabase_API {
 
 
 
-
-
     //------
 
-    public JSONObject getJsonMoviesList_byTitle(String movieTitle) {
+    public JSONObject getJsonMoviesListByTitle(String movieTitle, int page) {
         JSONObject jsonObj = null;
         try{
             String myUrl  = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
-                            "&language=" + defaultLanguage +
-                            "&query=" + movieTitle +
-                            "&include_adult=" + defaultAdultContentFilter;
+                    "&language=" + defaultLanguage +
+                    "&query=" + movieTitle +
+                    "&page=" + page +
+                    "&include_adult=" + defaultAdultContentFilter;
 
             jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
@@ -886,11 +880,11 @@ public class TheMovieDatabase_API {
         return jsonObj;
     }
 
-    public JSONObject getJsonMovieDetails_byID(int movieID) {
+    public JSONObject getJsonMovieDetailsById(int movieId) {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/movie/" +
-                    movieID +
+                    movieId +
                     "?api_key=" + MY_API_KEY +
                     "&language=" + defaultLanguage;
             jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
@@ -902,10 +896,10 @@ public class TheMovieDatabase_API {
         return jsonObj;
     }
 
-    public JSONObject getJsonCredits_byID(int movieID) {
+    public JSONObject getJsonCreditsById(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieID + "/credits?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "/credits?api_key=" + MY_API_KEY;
             jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
@@ -1009,16 +1003,29 @@ public class TheMovieDatabase_API {
     }
 
 
+    // Retrieve all movie genres
+    public JSONObject getAllJsonMoviesGenres() {
+        JSONObject jsonObj = null;
+        try{
+            String myUrl  = BASE_URL +  "3/genre/movie/list?api_key=" + MY_API_KEY +
+                    "&language=" + defaultLanguage;
 
+            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
 
+        return jsonObj;
+    }
 
 
     //------
 
-    private JSONObject getJsonMovieDetails_byID_fallback(int movieID) {
+    private JSONObject getJsonMovieDetailsByIdFallback(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieID + "?api_key=" + MY_API_KEY + "&language=" + ENGISH_LANGUAGE;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "?api_key=" + MY_API_KEY + "&language=" + ENGISH_LANGUAGE;
             jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1027,10 +1034,10 @@ public class TheMovieDatabase_API {
         return jsonObj;
     }
 
-    private JSONObject getJsonMovieImageList_byID(int movieID) {
+    private JSONObject getJsonMovieImageListById(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieID + "/images?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "/images?api_key=" + MY_API_KEY;
             jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1039,7 +1046,7 @@ public class TheMovieDatabase_API {
         return jsonObj;
     }
 
-    private JSONObject getJsonPerson_byID(int personID) {
+    private JSONObject getJsonPersonById(int personID) {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/person/" + personID + "?api_key=" + MY_API_KEY;
@@ -1171,5 +1178,13 @@ public class TheMovieDatabase_API {
             e.printStackTrace();
         }
     }
+
+
+
+
+    //--------------------------------- retrofit versions
+
+
+
 
 }// end TheMovieDatabaseAPI class
