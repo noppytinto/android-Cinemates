@@ -28,8 +28,7 @@ import mirror42.dev.cinemates.tmdbAPI.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 
 
-public class PopularFragment extends Fragment  implements
-        RecyclerSearchListener.OnClick_RecycleSearchListener {
+public class PopularFragment extends Fragment implements RecyclerSearchListener.OnClick_RecycleSearchListener {
 
     private PopularViewModel popularViewModel;
     private FirebaseAnalytics mFirebaseAnalytics;
