@@ -32,15 +32,15 @@
     </fragment>
     <fragment
         android:id="@+id/latestReleasesFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.LatestReleasesFragment"
+        android:name="mirror42.dev.cinemates.ui.explore.latest.LatestReleasesFragment"
         android:label="LatestReleasesFragment" />
     <fragment
         android:id="@+id/popularFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.PopularFragment"
+        android:name="mirror42.dev.cinemates.ui.explore.popular.PopularFragment"
         android:label="PopularFragment" />
     <fragment
         android:id="@+id/upcomginsFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.UpcomginsFragment"
+        android:name="mirror42.dev.cinemates.ui.explore.upcomings.UpcomginsFragment"
         android:label="UpcomginsFragment" />
     <fragment
         android:id="@+id/exploreFragment"

@@ -51,7 +51,7 @@
 
                 <fragment
                     android:id="@+id/fragment_explore_fragment_latest"
-                    android:name="mirror42.dev.cinemates.ui.explore.LatestReleasesFragment"
+                    android:name="mirror42.dev.cinemates.ui.explore.latest.LatestReleasesFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -88,7 +88,7 @@
 
                 <fragment
                     android:id="@+id/fragment_upcomings"
-                    android:name="mirror42.dev.cinemates.ui.explore.UpcomginsFragment"
+                    android:name="mirror42.dev.cinemates.ui.explore.upcomings.UpcomginsFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -127,7 +127,7 @@
 
                 <fragment
                     android:id="@+id/fragment_popular"
-                    android:name="mirror42.dev.cinemates.ui.explore.PopularFragment"
+                    android:name="mirror42.dev.cinemates.ui.explore.popular.PopularFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"

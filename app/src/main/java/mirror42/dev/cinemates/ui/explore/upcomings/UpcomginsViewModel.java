@@ -1,5 +1,4 @@
-package mirror42.dev.cinemates.ui.search;
-
+package mirror42.dev.cinemates.ui.explore.upcomings;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,27 +7,14 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
-import mirror42.dev.cinemates.asyncTasks.DownloadMoviesList;
+import mirror42.dev.cinemates.asyncTasks.DownloadUpcomings;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
-
-/**
- * - MutableLiveData objects can be changed(directy and undirectly)
- * - LiveData objects cannot be changed directly!
- *   can only be observed! if changed undirectly!
- *   that's why we have
- *   searchViewModel.getText().observe(...)
- *
- *
- */
-public class SearchViewModel extends ViewModel implements DownloadMoviesList.DownloadListener {
+public class UpcomginsViewModel extends ViewModel implements DownloadUpcomings.DownloadListener {
     private MutableLiveData<ArrayList<Movie>> moviesList;
 
-
-
     //----------------------------------------------- CONSTRUCTORS
-
-    public SearchViewModel() {
+    public UpcomginsViewModel() {
         moviesList = new MutableLiveData<>();
     }
 
@@ -44,11 +30,9 @@ public class SearchViewModel extends ViewModel implements DownloadMoviesList.Dow
     }
 
 
-    //----------------------------------------------- METHODS
 
-    public void init(String query) {
-        downloadData(query);
-    }
+
+    //----------------------------------------------- METHODS
 
     @Override
     public void onDownloadComplete(ArrayList<Movie> moviesList, MyValues.DownloadStatus status) {
@@ -59,10 +43,13 @@ public class SearchViewModel extends ViewModel implements DownloadMoviesList.Dow
         }
     }
 
-
-    private void downloadData(String query) {
+    public void downloadData() {
         // starting async task here because of google suggestions
-        DownloadMoviesList downloadMoviesList = new DownloadMoviesList(this);
-        downloadMoviesList.execute(query);
+        DownloadUpcomings downloadUpcomings = new DownloadUpcomings(this);
+        downloadUpcomings.execute(1);
     }
-}// end SearchViewModel class
+
+
+
+
+}// end UpcomginsViewModel class

@@ -58,4 +58,4 @@ public class ExploreFragment extends Fragment{
 
 
 
-}// end NewsFragment class
+}// end ExploreFragment class

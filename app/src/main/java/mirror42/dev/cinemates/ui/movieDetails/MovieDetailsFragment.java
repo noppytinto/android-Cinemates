@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.movieDetails;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,37 +12,43 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.MyValues;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.RecycleAdapterActorsHorizontalList;
-import mirror42.dev.cinemates.asyncTasks.DownloadMovieDetails;
+import mirror42.dev.cinemates.adapters.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 import mirror42.dev.cinemates.tmdbAPI.Person;
 
 
-public class MovieDetailsFragment extends Fragment implements DownloadMovieDetails.DownloadListener, View.OnClickListener {
-    private RecycleAdapterActorsHorizontalList recycleAdapterActorsHorizontalList;
+public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
+
+    private MovieDetailsViewModel movieDetailsViewModel;
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
     private View view;
     private FloatingActionButton addToListButton;
 
-    public MovieDetailsFragment() {
-        // Required empty public constructor
-    }
+
+
+
+    //------------------------------------------------------------------------ LIFECYCLE METHODS
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
 
 //        // This callback will only be called when MyFragment is at least Started.
 //        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -71,21 +78,16 @@ public class MovieDetailsFragment extends Fragment implements DownloadMovieDetai
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-
-
-
         addToListButton = view.findViewById(R.id.button_movie_details_fragment_add_to_list);
         addToListButton.setOnClickListener(this);
 
-
-
-
-
+        //
         if(getArguments() != null) {
             MovieDetailsFragmentArgs args = MovieDetailsFragmentArgs.fromBundle(getArguments());
             Movie movie = args.getMovie();
 
             if(movie != null) {
+                int movieId = movie.getTmdbID();
 
                 // getting main activity
                 // and hiding action bar
@@ -95,75 +97,89 @@ public class MovieDetailsFragment extends Fragment implements DownloadMovieDetai
 
 //                }
 
+                //1
+                initRecyclerView();
 
-                int movieID = movie.getTmdbID();
-                // starting async task here because of google suggestions
-                DownloadMovieDetails downloadMovieDetails = new DownloadMovieDetails(this);
-                downloadMovieDetails.execute(movieID);
+                //2
+                movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
+                movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), new Observer<Movie>() {
+                    @Override
+                    public void onChanged(@Nullable Movie movie) {
+                        if(movie!=null) {
+                            composeUI(movie);
+                        }
+                        else {
+                            Toast toast = Toast.makeText(getContext(), "errore caricamento dettagli Film", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+                    }
+                });
 
-                // defining HORIZONTAL layout manager for recycler
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                // downloading data
+                movieDetailsViewModel.downloadData(movieId);
 
-                // defining Recycler view
-                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
-                recyclerView.setLayoutManager(linearLayoutManager);
 
-                // assigning adapter to recycle
-                recycleAdapterActorsHorizontalList = new RecycleAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
-                recyclerView.setAdapter(recycleAdapterActorsHorizontalList);
             }// inner if
         }// outer if
     }// end onViewCreated()
 
 
 
-        //------------------------------------------------------------- METHODS
+    //------------------------------------------------------------- METHODS
 
-    @Override
-    public void onDownloadComplete(Movie movie, MyValues.DownloadStatus status) {
-        if (status == MyValues.DownloadStatus.OK) {
-            Toast.makeText(getContext(), "Movie details retrieved! :D", Toast.LENGTH_LONG).show();
-            ImageView backdrop = view.findViewById(R.id.imageview_movie_details_fragment_backdrop);
-            TextView title = view.findViewById(R.id.textView_movie_details_fragment_movie_title);
-            TextView releaseDate = view.findViewById(R.id.textView_movie_details_fragment_release_date);
-            TextView overview = view.findViewById(R.id.textView_movie_details_fragment_overview);
-            ImageView poster = view.findViewById(R.id.imageView_movie_details_fragment_poster);
-            TextView duration = view.findViewById(R.id.textView_movie_details_fragment_duration);
-            TextView genres = view.findViewById(R.id.textView_movie_details_fragment_genres);
-            TextView releaseStatus = view.findViewById(R.id.textView_movie_details_fragment_release_status);
+    private void initRecyclerView() {
+        // defining HORIZONTAL layout manager for recycler
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
+        // defining Recycler view
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
-            title.setText(movie.getTitle());
-            releaseDate.setText(movie.getReleaseDate());
-            overview.setText(movie.getOverview());
-            duration.setText(String.valueOf(movie.getDuration()) + " min");
-            genres.setText(fixGenresPrint(movie));
-            releaseStatus.setText(movie.getReleaseStatus());
+        // assigning adapter to recycle
+        recyclerAdapterActorsHorizontalList = new RecyclerAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
+        recyclerView.setAdapter(recyclerAdapterActorsHorizontalList);
+    }
 
 
-            Glide.with(this)  //2
-                    .load(movie.getPosterURL()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .fitCenter() //4
-                    .into(poster); //8
+    private void composeUI(Movie movie) {
+        ImageView backdrop = view.findViewById(R.id.imageview_movie_details_fragment_backdrop);
+        TextView title = view.findViewById(R.id.textView_movie_details_fragment_movie_title);
+        TextView releaseDate = view.findViewById(R.id.textView_movie_details_fragment_release_date);
+        TextView overview = view.findViewById(R.id.textView_movie_details_fragment_overview);
+        ImageView poster = view.findViewById(R.id.imageView_movie_details_fragment_poster);
+        TextView duration = view.findViewById(R.id.textView_movie_details_fragment_duration);
+        TextView genres = view.findViewById(R.id.textView_movie_details_fragment_genres);
+        TextView releaseStatus = view.findViewById(R.id.textView_movie_details_fragment_release_status);
 
 
-            Glide.with(this)  //2
-                    .load(movie.getBackdropURL()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .fitCenter() //4
-                    .into(backdrop); //8
+        title.setText(movie.getTitle());
+        releaseDate.setText(movie.getReleaseDate());
+        overview.setText(movie.getOverview());
+        duration.setText(String.valueOf(movie.getDuration()) + " min");
+        genres.setText(fixGenresPrint(movie));
+        releaseStatus.setText(movie.getReleaseStatus());
 
 
-            // filling cast&crew list
-            recycleAdapterActorsHorizontalList.loadNewData(movie.getCastAndCrew());
+        Glide.with(this)  //2
+                .load(movie.getPosterURL()) //3
+                .fallback(R.drawable.broken_image)
+                .placeholder(R.drawable.placeholder_image)
+                .fitCenter() //4
+                .into(poster); //8
 
-        } else {
-            Toast.makeText(getContext(), "Movie details NOT retrieved! D:", Toast.LENGTH_SHORT).show();
-        }
+
+        Glide.with(this)  //2
+                .load(movie.getBackdropURL()) //3
+                .fallback(R.drawable.broken_image)
+                .placeholder(R.drawable.placeholder_image)
+                .fitCenter() //4
+                .into(backdrop); //8
+
+
+        // filling cast&crew list
+        recyclerAdapterActorsHorizontalList.loadNewData(movie.getCastAndCrew());
     }
 
     public String fixGenresPrint(Movie in) {
@@ -206,17 +222,4 @@ public class MovieDetailsFragment extends Fragment implements DownloadMovieDetai
         }
     }
 
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        // getting main activity
-        // and hding action bar
-//        MainActivity main = (MainActivity) getActivity();
-//        if(main!=null && main.getSupportActionBar()!=null) {
-//            main.getSupportActionBar().show();
-//
-//        }
-    }
-}// end MovieDetails_fragment class
+}// end MovieDetailsFragment class
