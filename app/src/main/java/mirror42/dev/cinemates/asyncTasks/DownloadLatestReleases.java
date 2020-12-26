@@ -57,6 +57,8 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
                 JSONObject x = resultsArray.getJSONObject(i);
                 int id = x.getInt("id");
 
+                String title = x.getString("title");
+
                 // if poster_path is null
                 // getString() will fail
                 // that's why the try-catch
@@ -70,7 +72,7 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
                 }
 
                 //
-                Movie mv = new Movie(id, posterURL);
+                Movie mv = new Movie(id, title, posterURL);
                 result.add(mv);
                 downloadStatus = DownloadStatus.OK;
             }// for

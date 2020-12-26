@@ -58,6 +58,8 @@ public class DownloadUpcomings extends AsyncTask<Integer, Void, ArrayList<Movie>
 
                 int id = x.getInt("id");
 
+                String title = x.getString("title");
+
                 // if poster_path is null
                 // getString() will fail
                 // that's why the try-catch
@@ -71,7 +73,7 @@ public class DownloadUpcomings extends AsyncTask<Integer, Void, ArrayList<Movie>
                 }
 
                 //
-                Movie mv = new Movie(id, posterURL);
+                Movie mv = new Movie(id, title, posterURL);
                 result.add(mv);
                 downloadStatus = DownloadStatus.OK;
             }// for

@@ -347,12 +347,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     private void logMovieSelected(Movie movieSelected) {
         // send to firebase analytics
-        Bundle item1 = new Bundle();
-        item1.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
-        item1.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in search tab");
-        Bundle params = new Bundle();
-        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Param.ITEMS, params);
+        Bundle item = new Bundle();
+        item.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in search tab");
+        item.putString(FirebaseAnalytics.Param.ITEM_ID, String.valueOf(movieSelected.getTmdbID()));
+        item.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
+        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+//        Bundle params = new Bundle();
+//        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, item);
     }
 
     private void logSearchTerm(String term) {
@@ -360,7 +362,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         //throw new RuntimeException("Test Crash"); // Force a crash for Crashlytics
         Bundle params = new Bundle();
         params.putString(FirebaseAnalytics.Param.SEARCH_TERM, term);
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Param.SEARCH_TERM, params);
+        params.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, params);
     }
 
 

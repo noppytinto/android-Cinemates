@@ -55,11 +55,17 @@ public class Movie implements Parcelable {
         this.castAndCrew = castAndCrew;
     }
 
-    public Movie(int id, String posterURL) {
+//    public Movie(int id, String posterURL) {
+//        this.tmdbID = id;
+//        this.posterURL = posterURL;
+//
+//
+//    }
+
+    public Movie(int id, String title, String posterURL) {
         this.tmdbID = id;
+        this.title = title;
         this.posterURL = posterURL;
-
-
     }
 
     //------------------------------------------------------- SETTERS/GETTERS
