@@ -1,0 +1,9 @@
+
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(·ˆÉ
+C
+java:S1604$"(Make this anonymous inner class a lambda(úƒĞ²ıÿÿÿÿ
+w
+java:S1450"\Remove the "homeViewModel" field and declare it as a local variable in the relevant methods.(¿­¶üÿÿÿÿ
+h	java:S116"NRename this field "TAG" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(›—íúÿÿÿÿ
+P
+java:S1161/":Add the "@Override" annotation above this method signature(¼²Á÷

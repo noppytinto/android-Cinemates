@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
-import mirror42.dev.cinemates.asyncTasks.DownloadLatestReleases;
+import mirror42.dev.cinemates.asynctasks.DownloadLatestReleases;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class LatestReleasesViewModel extends ViewModel implements DownloadLatestReleases.DownloadListener {

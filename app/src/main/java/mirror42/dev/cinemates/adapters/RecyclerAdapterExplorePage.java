@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.viewHolders.ExplorePageViewHolder;
+import mirror42.dev.cinemates.adapters.viewholders.ExplorePageViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 

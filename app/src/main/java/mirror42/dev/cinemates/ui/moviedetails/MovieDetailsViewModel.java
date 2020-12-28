@@ -1,11 +1,11 @@
-package mirror42.dev.cinemates.ui.movieDetails;
+package mirror42.dev.cinemates.ui.moviedetails;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import mirror42.dev.cinemates.MyValues;
-import mirror42.dev.cinemates.asyncTasks.DownloadMovieDetails;
+import mirror42.dev.cinemates.asynctasks.DownloadMovieDetails;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class MovieDetailsViewModel extends ViewModel implements DownloadMovieDetails.DownloadListener {

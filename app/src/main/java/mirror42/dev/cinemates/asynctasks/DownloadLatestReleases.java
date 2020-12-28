@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.asyncTasks;
+package mirror42.dev.cinemates.asynctasks;
 
 import android.os.AsyncTask;
 

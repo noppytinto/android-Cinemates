@@ -25,13 +25,24 @@ public class HomeFragment extends Fragment {
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate() called");
+
+        super.onCreate(savedInstanceState);
+
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView() called");
 
         // Inflate the layout for this fragment
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         final TextView textView = root.findViewById(R.id.textview_home_fragment);
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -39,6 +50,7 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
         return root;
     }
 
@@ -48,6 +60,7 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated() called");
 
+        homeViewModel.applyRemoteConfig();
 
 
     }

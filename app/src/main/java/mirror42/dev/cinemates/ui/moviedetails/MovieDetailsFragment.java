@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.movieDetails;
+package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.os.Bundle;
 import android.view.Gravity;

@@ -1,8 +1,11 @@
 package mirror42.dev.cinemates;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -12,17 +15,29 @@ import androidx.navigation.ui.NavigationUI;
 
 
 public class MainActivity extends AppCompatActivity {
+    private final String TAG = this.getClass().getSimpleName();
     NavController navController;
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate() called");
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController);
+
+        //
+        spinner = findViewById(R.id.progress_bar);
+        spinner.setVisibility(View.VISIBLE);
+
+        //
+        RemoteConfig remoteConfig = new RemoteConfig();
+        remoteConfig.loadConfig(this, spinner);
 
     }
 

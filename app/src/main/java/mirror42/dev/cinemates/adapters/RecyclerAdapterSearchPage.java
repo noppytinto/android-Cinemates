@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.viewHolders.SearchRecordViewHolder;
+import mirror42.dev.cinemates.adapters.viewholders.SearchRecordViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecordViewHolder> {
