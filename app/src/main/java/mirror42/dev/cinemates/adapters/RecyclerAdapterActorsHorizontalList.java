@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapter;
+package mirror42.dev.cinemates.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,12 +13,12 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.viewholder.ExplorePageViewHolder;
-import mirror42.dev.cinemates.api.tmdbAPI.Movie;
+import mirror42.dev.cinemates.adapters.viewholders.ActorCardsHolder;
+import mirror42.dev.cinemates.tmdbAPI.Person;
 
 
-public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePageViewHolder>  {
-    private ArrayList<Movie> moviesList;
+public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardsHolder>{
+    private ArrayList<Person> peopleList;
     private Context context;
 
 
@@ -26,8 +26,8 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
 
     //------------------------------------------------------------------------CONSTRUCTORS
 
-    public RecyclerAdapterExplorePage(ArrayList<Movie> moviesList, Context context) {
-        this.moviesList = moviesList;
+    public RecyclerAdapterActorsHorizontalList(ArrayList<Person> peopleList, Context context) {
+        this.peopleList = peopleList;
         this.context = context;
     }
 
@@ -48,12 +48,12 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
 
         // Your Adapter now knows how many items to display on the screen
 
-        return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.size() : 0);
+        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.size() : 0);
     }
 
     @NonNull
     @Override
-    public ExplorePageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ActorCardsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Next, you need to create the Layout needed for the ViewHolder
         // to display each item in the RecyclerView
         //
@@ -68,35 +68,42 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
         // A ViewHolder object is created, passing in the view created from the layout.
         // Finally, the ViewHolder is returned from the method
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card, parent, false);
-        return new ExplorePageViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actor_card, parent, false);
+        return new ActorCardsHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ExplorePageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ActorCardsHolder holder, int position) {
         // With the ViewHolder created,
         // you have to bind the list titles to it. To do this,
         // you need to know what Views to bind your data to.
         //
         // This is called repeatedly as you scroll through the RecyclerView
 
-
-        Movie movie = moviesList.get(position);
+        Person person = peopleList.get(position);
 
         Glide.with(context)  //2
-                .load(movie.getPosterURL()) //3
+                .load(person.getProfileImageURL()) //3
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.placeholder_image)
                 .fitCenter() //4
-                .into(holder.imageViewMovieCardPoster);
+                .into(holder.imageViewActorCard); //8
+
+        holder.textViewActorCard.setText(person.getFullName() +"\n"+ person.getCharacter() + "\n(" + person.getDepartment() + ")");
     }
 
-    public Movie getMoviesList(int position) {
-        return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.get(position) : null);
+
+
+    public Person getPerson(int position) {
+        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.get(position) : null);
     }
 
-    public void loadNewData(ArrayList<Movie> newList) {
-        moviesList = newList;
+    public void loadNewData(ArrayList<Person> newPeopleList) {
+        peopleList = newPeopleList;
         notifyDataSetChanged();
     }
-}// end RecycleAdapterExplorePage class
+
+
+
+
+}// end RecycleAdapterActorsHorizontalList class

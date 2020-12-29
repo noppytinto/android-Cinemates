@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.asynctask;
+package mirror42.dev.cinemates.asynctasks;
 
 import android.os.AsyncTask;
 
@@ -7,12 +7,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.api.tmdbAPI.Movie;
-import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 
 
-public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<Movie>> {
+public class DownloadMoviesList extends AsyncTask<String, Void, ArrayList<Movie>> {
     private DownloadStatus downloadStatus;
     private TheMovieDatabaseApi tmdb;
     private final DownloadListener callbackCaller;
@@ -27,8 +27,8 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
     //------------------------------------------------------------ CONSTRUCTORS
 
-    public DownloadLatestReleases(DownloadListener callerCallback) {
-        this.callbackCaller = callerCallback;
+    public DownloadMoviesList(DownloadListener callback) {
+        this.callbackCaller = callback;
         this.downloadStatus = DownloadStatus.IDLE;
         tmdb = new TheMovieDatabaseApi();
     }
@@ -41,23 +41,44 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
     //------------------------------------------------------------ GETTERS
 
     @Override
-    protected ArrayList<Movie> doInBackground(Integer... integers) {
-        int page = integers[0];
+    protected ArrayList<Movie> doInBackground(String... strings) {
+        String movieTitle = strings[0];
         ArrayList<Movie> result = null;
 
+        // checking string
+        if((movieTitle == null) || (movieTitle.isEmpty())) {
+            downloadStatus = DownloadStatus.NOT_INITILIZED;
+            return null;
+        }
+
+        movieTitle = movieTitle.trim();
         result = new ArrayList<>();
 
         try {
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonLatestReleases(page);
+            JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, 1);
             JSONArray resultsArray = jsonObj.getJSONArray("results");
 
             // fetching results
             for(int i=0; i<resultsArray.length(); i++) {
                 JSONObject x = resultsArray.getJSONObject(i);
                 int id = x.getInt("id");
-
                 String title = x.getString("title");
+
+                // if overview is null
+                // getString() will fail
+                // (due to the unvailable defaultLanguage version)
+                // that's why the try-catch
+                String overview = null;
+                try {
+                    overview = x.getString("overview");
+                    if((overview==null) || (overview.isEmpty()))
+                        overview = "(trama non disponibile in italiano)";
+                } catch (Exception e) {
+                    e.getMessage();
+                    e.printStackTrace();
+                    overview = "(trama in italiano non disp.)";
+                }
 
                 // if poster_path is null
                 // getString() will fail
@@ -72,7 +93,7 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
                 }
 
                 //
-                Movie mv = new Movie(id, title, posterURL);
+                Movie mv = new Movie(id, title, posterURL, overview);
                 result.add(mv);
                 downloadStatus = DownloadStatus.OK;
             }// for
@@ -87,7 +108,6 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
         return result;
     }// end doInBackground()
-
 
     @Override
     protected void onPostExecute(ArrayList<Movie> moviesList) {
@@ -105,4 +125,18 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
     //------------------------------------------------------------ METHODS
 
-}// end DownloadLatestReleases class
+}// end DownloadMoviesList class
+
+
+
+
+
+
+
+
+
+
+
+
+
+

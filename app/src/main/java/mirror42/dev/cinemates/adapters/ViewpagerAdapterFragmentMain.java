@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapter;
+package mirror42.dev.cinemates.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

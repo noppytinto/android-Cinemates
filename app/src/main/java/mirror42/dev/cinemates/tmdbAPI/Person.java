@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.api.tmdbAPI;
+package mirror42.dev.cinemates.tmdbAPI;
 
 public class Person {
     private int tmdbID; // 6193

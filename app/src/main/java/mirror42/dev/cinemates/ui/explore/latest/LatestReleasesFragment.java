@@ -23,9 +23,9 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
-import mirror42.dev.cinemates.listener.RecyclerSearchListener;
-import mirror42.dev.cinemates.api.tmdbAPI.Movie;
+import mirror42.dev.cinemates.adapters.RecyclerAdapterExplorePage;
+import mirror42.dev.cinemates.listeners.RecyclerSearchListener;
+import mirror42.dev.cinemates.tmdbAPI.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 
 public class LatestReleasesFragment extends Fragment implements

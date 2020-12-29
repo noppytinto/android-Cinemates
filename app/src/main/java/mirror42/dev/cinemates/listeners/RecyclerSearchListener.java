@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.listener;
+package mirror42.dev.cinemates.listeners;
 
 import android.content.Context;
 import android.view.GestureDetector;

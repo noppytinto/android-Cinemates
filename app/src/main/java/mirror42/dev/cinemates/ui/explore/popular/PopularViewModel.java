@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
-import mirror42.dev.cinemates.asynctask.DownloadPopular;
-import mirror42.dev.cinemates.api.tmdbAPI.Movie;
+import mirror42.dev.cinemates.asynctasks.DownloadPopular;
+import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class PopularViewModel extends ViewModel implements DownloadPopular.DownloadListener {
     private MutableLiveData<ArrayList<Movie>> moviesList;

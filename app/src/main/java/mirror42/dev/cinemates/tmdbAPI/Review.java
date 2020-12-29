@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.api.tmdbAPI;
+package mirror42.dev.cinemates.tmdbAPI;
 
 public class Review {
     private String title;

@@ -13,7 +13,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import mirror42.dev.cinemates.adapter.ViewpagerAdapterFragmentMain;
+import mirror42.dev.cinemates.adapters.ViewpagerAdapterFragmentMain;
 
 
 public class MainFragment extends Fragment {

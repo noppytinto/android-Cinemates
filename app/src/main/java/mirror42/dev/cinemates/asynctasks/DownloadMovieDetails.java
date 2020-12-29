@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.asynctask;
+package mirror42.dev.cinemates.asynctasks;
 
 import android.os.AsyncTask;
 
@@ -9,9 +9,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues.DownloadStatus;
-import mirror42.dev.cinemates.api.tmdbAPI.Movie;
-import mirror42.dev.cinemates.api.tmdbAPI.Person;
-import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.Person;
+import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 
 
 public class DownloadMovieDetails extends AsyncTask<Integer, Void, Movie> {
