@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.asynctasks;
+package mirror42.dev.cinemates.asynctask;
 
 import android.os.AsyncTask;
 
@@ -7,12 +7,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.tmdbAPI.Movie;
-import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.api.tmdbAPI.Movie;
+import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.MyValues.DownloadStatus;
 
 
-public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<Movie>> {
+public class DownloadUpcomings extends AsyncTask<Integer, Void, ArrayList<Movie>> {
     private DownloadStatus downloadStatus;
     private TheMovieDatabaseApi tmdb;
     private final DownloadListener callbackCaller;
@@ -27,8 +27,8 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
     //------------------------------------------------------------ CONSTRUCTORS
 
-    public DownloadLatestReleases(DownloadListener callerCallback) {
-        this.callbackCaller = callerCallback;
+    public DownloadUpcomings(DownloadListener callbackCaller) {
+        this.callbackCaller = callbackCaller;
         this.downloadStatus = DownloadStatus.IDLE;
         tmdb = new TheMovieDatabaseApi();
     }
@@ -49,12 +49,13 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
         try {
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonLatestReleases(page);
+            JSONObject jsonObj = tmdb.getJsonUpcoming(page);
             JSONArray resultsArray = jsonObj.getJSONArray("results");
 
             // fetching results
             for(int i=0; i<resultsArray.length(); i++) {
                 JSONObject x = resultsArray.getJSONObject(i);
+
                 int id = x.getInt("id");
 
                 String title = x.getString("title");
@@ -104,5 +105,4 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
 
     //------------------------------------------------------------ METHODS
-
-}// end DownloadLatestReleases class
+}// end DownloadUpcomings class

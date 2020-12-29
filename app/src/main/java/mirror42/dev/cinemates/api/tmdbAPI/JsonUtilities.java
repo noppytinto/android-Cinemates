@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.tmdbAPI;
+package mirror42.dev.cinemates.api.tmdbAPI;
 
 import org.json.JSONObject;
 

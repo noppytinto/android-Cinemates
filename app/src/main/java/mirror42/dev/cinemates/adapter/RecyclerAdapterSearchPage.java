@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapters;
+package mirror42.dev.cinemates.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,11 +13,10 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.viewholders.ExplorePageViewHolder;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.adapter.viewholder.SearchRecordViewHolder;
+import mirror42.dev.cinemates.api.tmdbAPI.Movie;
 
-
-public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePageViewHolder>  {
+public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecordViewHolder> {
     private ArrayList<Movie> moviesList;
     private Context context;
 
@@ -26,10 +25,13 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
 
     //------------------------------------------------------------------------CONSTRUCTORS
 
-    public RecyclerAdapterExplorePage(ArrayList<Movie> moviesList, Context context) {
+    public RecyclerAdapterSearchPage(ArrayList<Movie> moviesList, Context context) {
         this.moviesList = moviesList;
         this.context = context;
     }
+
+
+
 
 
 
@@ -51,9 +53,10 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
         return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.size() : 0);
     }
 
+
     @NonNull
     @Override
-    public ExplorePageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchRecordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Next, you need to create the Layout needed for the ViewHolder
         // to display each item in the RecyclerView
         //
@@ -68,35 +71,49 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
         // A ViewHolder object is created, passing in the view created from the layout.
         // Finally, the ViewHolder is returned from the method
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card, parent, false);
-        return new ExplorePageViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_record, parent, false);
+        return new SearchRecordViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ExplorePageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchRecordViewHolder holder, int position) {
         // With the ViewHolder created,
         // you have to bind the list titles to it. To do this,
         // you need to know what Views to bind your data to.
         //
         // This is called repeatedly as you scroll through the RecyclerView
 
-
-        Movie movie = moviesList.get(position);
+        Movie movieItem = moviesList.get(position);
 
         Glide.with(context)  //2
-                .load(movie.getPosterURL()) //3
+                .load(movieItem.getPosterURL()) //3
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.placeholder_image)
                 .fitCenter() //4
-                .into(holder.imageViewMovieCardPoster);
+                .into(holder.imageViewSearchRecordPoster); //8
+
+        holder.textViewSearchRecordMovieTitle.setText(movieItem.getTitle());
+        holder.textViewSearchRecordOverview.setText(movieItem.getOverview());
+
+
+//        if(position == moviesList.size()-1) {
+//
+//        }
+
+
+
     }
+
+
 
     public Movie getMoviesList(int position) {
         return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.get(position) : null);
     }
 
-    public void loadNewData(ArrayList<Movie> newList) {
-        moviesList = newList;
+    public void loadNewData(ArrayList<Movie> newMoviesList) {
+        moviesList = newMoviesList;
         notifyDataSetChanged();
     }
-}// end RecycleAdapterExplorePage class
+
+
+}// end RecycleAdapterSearch class

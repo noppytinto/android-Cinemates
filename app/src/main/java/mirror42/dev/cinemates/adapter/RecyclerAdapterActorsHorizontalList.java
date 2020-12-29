@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapters;
+package mirror42.dev.cinemates.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,11 +13,12 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.viewholders.SearchRecordViewHolder;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.adapter.viewholder.ActorCardsHolder;
+import mirror42.dev.cinemates.api.tmdbAPI.Person;
 
-public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecordViewHolder> {
-    private ArrayList<Movie> moviesList;
+
+public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardsHolder>{
+    private ArrayList<Person> peopleList;
     private Context context;
 
 
@@ -25,13 +26,10 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecord
 
     //------------------------------------------------------------------------CONSTRUCTORS
 
-    public RecyclerAdapterSearchPage(ArrayList<Movie> moviesList, Context context) {
-        this.moviesList = moviesList;
+    public RecyclerAdapterActorsHorizontalList(ArrayList<Person> peopleList, Context context) {
+        this.peopleList = peopleList;
         this.context = context;
     }
-
-
-
 
 
 
@@ -50,13 +48,12 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecord
 
         // Your Adapter now knows how many items to display on the screen
 
-        return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.size() : 0);
+        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.size() : 0);
     }
-
 
     @NonNull
     @Override
-    public SearchRecordViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ActorCardsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Next, you need to create the Layout needed for the ViewHolder
         // to display each item in the RecyclerView
         //
@@ -71,49 +68,42 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecord
         // A ViewHolder object is created, passing in the view created from the layout.
         // Finally, the ViewHolder is returned from the method
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_record, parent, false);
-        return new SearchRecordViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actor_card, parent, false);
+        return new ActorCardsHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SearchRecordViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ActorCardsHolder holder, int position) {
         // With the ViewHolder created,
         // you have to bind the list titles to it. To do this,
         // you need to know what Views to bind your data to.
         //
         // This is called repeatedly as you scroll through the RecyclerView
 
-        Movie movieItem = moviesList.get(position);
+        Person person = peopleList.get(position);
 
         Glide.with(context)  //2
-                .load(movieItem.getPosterURL()) //3
+                .load(person.getProfileImageURL()) //3
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.placeholder_image)
                 .fitCenter() //4
-                .into(holder.imageViewSearchRecordPoster); //8
+                .into(holder.imageViewActorCard); //8
 
-        holder.textViewSearchRecordMovieTitle.setText(movieItem.getTitle());
-        holder.textViewSearchRecordOverview.setText(movieItem.getOverview());
-
-
-//        if(position == moviesList.size()-1) {
-//
-//        }
-
-
-
+        holder.textViewActorCard.setText(person.getFullName() +"\n"+ person.getCharacter() + "\n(" + person.getDepartment() + ")");
     }
 
 
 
-    public Movie getMoviesList(int position) {
-        return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.get(position) : null);
+    public Person getPerson(int position) {
+        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.get(position) : null);
     }
 
-    public void loadNewData(ArrayList<Movie> newMoviesList) {
-        moviesList = newMoviesList;
+    public void loadNewData(ArrayList<Person> newPeopleList) {
+        peopleList = newPeopleList;
         notifyDataSetChanged();
     }
 
 
-}// end RecycleAdapterSearch class
+
+
+}// end RecycleAdapterActorsHorizontalList class

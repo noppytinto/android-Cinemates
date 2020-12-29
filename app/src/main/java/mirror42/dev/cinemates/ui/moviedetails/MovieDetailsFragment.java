@@ -28,9 +28,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.RecyclerAdapterActorsHorizontalList;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
-import mirror42.dev.cinemates.tmdbAPI.Person;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
+import mirror42.dev.cinemates.api.tmdbAPI.Movie;
+import mirror42.dev.cinemates.api.tmdbAPI.Person;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
