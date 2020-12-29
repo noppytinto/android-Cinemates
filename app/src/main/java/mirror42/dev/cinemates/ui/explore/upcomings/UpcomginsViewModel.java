@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
-import mirror42.dev.cinemates.asynctasks.DownloadUpcomings;
+import mirror42.dev.cinemates.asynctask.DownloadUpcomings;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class UpcomginsViewModel extends ViewModel implements DownloadUpcomings.DownloadListener {

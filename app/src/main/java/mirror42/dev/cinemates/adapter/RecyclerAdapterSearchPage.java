@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapters;
+package mirror42.dev.cinemates.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapters.viewholders.SearchRecordViewHolder;
+import mirror42.dev.cinemates.adapter.viewholder.SearchRecordViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.Movie;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecordViewHolder> {

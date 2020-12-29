@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.asynctasks;
+package mirror42.dev.cinemates.asynctask;
 
 import android.os.AsyncTask;
 
@@ -12,7 +12,7 @@ import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.MyValues.DownloadStatus;
 
 
-public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<Movie>> {
+public class DownloadPopular extends AsyncTask<Integer, Void, ArrayList<Movie>> {
     private DownloadStatus downloadStatus;
     private TheMovieDatabaseApi tmdb;
     private final DownloadListener callbackCaller;
@@ -27,8 +27,8 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
     //------------------------------------------------------------ CONSTRUCTORS
 
-    public DownloadLatestReleases(DownloadListener callerCallback) {
-        this.callbackCaller = callerCallback;
+    public DownloadPopular(DownloadListener callback) {
+        this.callbackCaller = callback;
         this.downloadStatus = DownloadStatus.IDLE;
         tmdb = new TheMovieDatabaseApi();
     }
@@ -49,7 +49,7 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
         try {
             // querying TBDb
-            JSONObject jsonObj = tmdb.getJsonLatestReleases(page);
+            JSONObject jsonObj = tmdb.getJsonPopular(page);
             JSONArray resultsArray = jsonObj.getJSONArray("results");
 
             // fetching results
@@ -104,5 +104,4 @@ public class DownloadLatestReleases extends AsyncTask<Integer, Void, ArrayList<M
 
 
     //------------------------------------------------------------ METHODS
-
-}// end DownloadLatestReleases class
+}// end

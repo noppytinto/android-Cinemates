@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.adapters.viewholders;
+package mirror42.dev.cinemates.adapter.viewholder;
 
 import android.view.View;
 import android.widget.ImageView;
