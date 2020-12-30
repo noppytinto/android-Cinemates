@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.RemoteConfig;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextEmail;
@@ -25,21 +24,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //
-        spinner = findViewById(R.id.progress_bar);
-        spinner.setVisibility(View.VISIBLE);
-
-        // get remote params
-        RemoteConfig remoteConfig = new RemoteConfig();
-        remoteConfig.loadConfig(this, spinner);
-
-        //
-        editTextEmail = (EditText) findViewById(R.id.loginActivity_editTextText_email);
-        editTextPassword = (EditText) findViewById(R.id.loginActivity_editTextText_password);
-        buttonLogin = findViewById(R.id.loginActivity_button_login);
-
-        //
-        buttonLogin.setOnClickListener(this);
+//        //
+//        spinner = findViewById(R.id.progress_bar);
+//        spinner.setVisibility(View.VISIBLE);
+//
+//        // get remote params
+//        RemoteConfig remoteConfig = new RemoteConfig();
+//        remoteConfig.loadConfig(this, spinner);
+//
+//        //
+//        editTextEmail = (EditText) findViewById(R.id.loginActivity_editTextText_email);
+//        editTextPassword = (EditText) findViewById(R.id.loginActivity_editTextText_password);
+//        buttonLogin = findViewById(R.id.loginActivity_button_login);
+//
+//        //
+//        buttonLogin.setOnClickListener(this);
 
     }
 

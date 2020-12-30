@@ -132,6 +132,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
         buttonFilterMovie.onWindowFocusChanged(false);
 
+        logFirebaseScreenEvent();
+
         // assigning adapter to recycle
 
 
@@ -364,6 +366,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         params.putString(FirebaseAnalytics.Param.SEARCH_TERM, term);
         params.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, params);
+    }
+
+    private void logFirebaseScreenEvent() {
+        // send to firebase analytics
+        Bundle item = new Bundle();
+        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Explore tab");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
     }
 
 

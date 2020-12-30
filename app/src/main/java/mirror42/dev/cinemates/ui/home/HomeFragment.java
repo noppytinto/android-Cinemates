@@ -13,10 +13,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import mirror42.dev.cinemates.R;
 
 public class HomeFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private HomeViewModel homeViewModel;
 
@@ -28,10 +31,10 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate() called");
 
-        super.onCreate(savedInstanceState);
-
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
 
     }
 
@@ -62,7 +65,18 @@ public class HomeFragment extends Fragment {
 
         homeViewModel.applyRemoteConfig();
 
+        logFirebaseScreenEvent();
+    }
 
+
+
+
+    private void logFirebaseScreenEvent() {
+        // send to firebase analytics
+        Bundle item = new Bundle();
+        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Home tab");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
     }
 
 }// end HomeFragment class

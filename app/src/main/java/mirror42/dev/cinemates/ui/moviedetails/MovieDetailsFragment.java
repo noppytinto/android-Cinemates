@@ -122,6 +122,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
             }// inner if
         }// outer if
+
+        logFirebaseScreenEvent();
     }// end onViewCreated()
 
 
@@ -221,5 +223,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             e.printStackTrace();
         }
     }
+
+    private void logFirebaseScreenEvent() {
+        // send to firebase analytics
+        Bundle item = new Bundle();
+        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Movie Details page");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
+    }
+
 
 }// end MovieDetailsFragment class
