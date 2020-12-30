@@ -1,23 +1,29 @@
 package mirror42.dev.cinemates;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import mirror42.dev.cinemates.ui.login.LoginActivity;
+
 
 public class MainActivity extends AppCompatActivity {
+    private static final String EXTRA_MESSAGE = " ";
     private final String TAG = this.getClass().getSimpleName();
     NavController navController;
-    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +37,13 @@ public class MainActivity extends AppCompatActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController);
 
-        //
-        spinner = findViewById(R.id.progress_bar);
-        spinner.setVisibility(View.VISIBLE);
-
-        //
-        RemoteConfig remoteConfig = new RemoteConfig();
-        remoteConfig.loadConfig(this, spinner);
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         return true;
     }
 
@@ -56,8 +55,29 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_notifications) {
+//            Toast.makeText(this, "notifications", Toast.LENGTH_LONG).show();
+
+            try {
+                //
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottom_sheet_dialog_theme);
+                bottomSheetDialog.setDismissWithAnimation(true);
+                bottomSheetDialog.setTitle("test");
+                View bottomSheetView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)findViewById(R.id.bottom_sheet_container));
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+            } catch (Exception e) {
+                e.getMessage();
+                e.printStackTrace();
+            }
+        }
+        else if (id == R.id.action_login) {
+            Intent intent = new Intent(this, LoginActivity.class);
+
+
+//            intent.putExtra(EXTRA_MESSAGE, message);
+
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

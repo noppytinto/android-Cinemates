@@ -203,11 +203,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
         try {
             //
-            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetDialogTheme);
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.bottom_sheet_dialog_theme);
             bottomSheetDialog.setCanceledOnTouchOutside(false);
             bottomSheetDialog.setDismissWithAnimation(true);
             bottomSheetDialog.setTitle("test");
-            View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)view.findViewById(R.id.bottomSheetContainer));
+            View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
             bottomSheetView.findViewById(R.id.button_addToList_dialog).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -8,7 +8,7 @@
 
     <!--BOTTOM SHEET STYLE-->
 
-    <style name="BottomSheetDialogTheme" parent="Theme.Design.BottomSheetDialog">
+    <style name="bottom_sheet_dialog_theme" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
     </style>
 
@@ -71,6 +71,154 @@
         <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle</item>
         <item name="android:textOn"></item>
         <item name="android:textOff"></item>
+    </style>
+
+
+
+
+
+
+
+
+
+    <!-- CINEMATES OUTLINED BUTTON ROUNDED -->
+    <style name="Cinemates.Button.Rounded" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.Rounded.TextAppearance</item>
+        <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
+        <item name="backgroundTint">@color/yellow</item>
+    </style>
+
+    <style name="Cinemates.Button.Rounded.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="android:textStyle">normal</item>
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+
+
+
+
+
+
+    <!-- CINEMATES OUTLINED BUTTON ROUNDED -->
+    <style name="Cinemates.Button.Rounded.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/yellow</item>
+        <item name="strokeWidth">1.2dp</item>
+        <item name="android:textColor">@color/yellow</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.Rounded.Outlined.TextAppearance</item>
+        <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
+    </style>
+
+    <style name="Cinemates.Button.Rounded.Outlined.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="android:textStyle">normal</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="cinemates_shape_rounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50dp</item>
+    </style>
+
+
+
+    <!-- CINEMATES OUTLINED BUTTON RECTANGULAR -->
+    <style name="Cinemates.Button.Outlined.Rectangular" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/yellow</item>
+        <item name="strokeWidth">1.2dp</item>
+        <item name="android:textColor">@color/yellow</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.Outlined.Rectangular.TextAppearance</item>
+    </style>
+
+    <style name="Cinemates.Button.Outlined.Rectangular.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="android:textStyle">normal</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+
+
+    <!-- CINEMATES OUTLINED BUTTON RECTANGULAR SEMIBOLD-->
+    <style name="Cinemates.Button.Outlined.Rectangular.Semibold" parent="Cinemates.Button.Outlined.Rectangular">
+        <item name="android:textAppearance">@style/Cinemates.Button.Outlined.Rectangular.TextAppearance</item>
+    </style>
+
+    <style name="Cinemates.Button.Outlined.Rectangular.TextAppearance.Semibold" parent="Cinemates.Button.Outlined.Rectangular.TextAppearance">
+        <item name="fontFamily">@font/poppins_semibold</item>
+    </style>
+
+
+
+
+
+
+    <!-- CINEMATES TYPE SYSTEM -->
+
+    <style name="TextAppearance.MdcTypographyStyles.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">93sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">58sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">47sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">33sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">23sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="TextAppearance.MdcTypographyStyles.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
 
