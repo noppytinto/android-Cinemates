@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private SearchViewModel searchViewModel;
     private FloatingActionButton buttonSearch;
     private TextInputEditText editText_search;
+    private TextInputLayout textInputLayout;
     private String currentSearchTerm;
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;
@@ -72,6 +74,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         Log.d(TAG, "onViewCreated() called");
         this.view = view;
         editText_search = view.findViewById(R.id.editText_searchFragment);
+        textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_search_searchFragment);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
 
@@ -196,11 +199,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 logSearchTerm(currentSearchTerm);
 
                 //
+                textInputLayout.setError(null);
 
                 //
                 searchViewModel.init(currentSearchTerm);
             }
             else {
+                textInputLayout.setError("Campo ricerca vuoto");
                 Toast.makeText(getContext(), "Campo Cerca vuoto", Toast.LENGTH_SHORT).show();
 
             }

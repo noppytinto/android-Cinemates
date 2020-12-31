@@ -19,7 +19,7 @@
 
 
 
-    
+
     <!-- CIRCULAR IMAGEVIEW STYLE-->
 
     <style name="circular_imageview_style" parent="Widget.MaterialComponents.ShapeableImageView">

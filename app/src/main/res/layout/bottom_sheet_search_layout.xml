@@ -89,6 +89,7 @@
         app:endIconMode="clear_text"
         app:endIconTint="@color/light_blue"
         app:hintTextColor="@color/yellow"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toStartOf="@+id/button_search_searchFragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
