@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
+
+import mirror42.dev.cinemates.ui.login.LoginActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -65,12 +68,12 @@ public class MainActivity extends AppCompatActivity {
 //            }
         }
         else if (id == R.id.action_login) {
-//            Intent intent = new Intent(this, LoginActivity.class);
-//
-//
-////            intent.putExtra(EXTRA_MESSAGE, message);
-//
-//            startActivity(intent);
+            Intent intent = new Intent(this, LoginActivity.class);
+
+
+//            intent.putExtra(EXTRA_MESSAGE, message);
+
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

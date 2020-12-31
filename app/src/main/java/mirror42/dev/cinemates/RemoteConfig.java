@@ -1,10 +1,6 @@
 package mirror42.dev.cinemates;
 
-import android.app.Activity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -20,17 +16,31 @@ public class RemoteConfig {
     private static String azureBaseUrl;
     private static String guestToken;
     private static String cinematesAppSignature;
+    private RemoteConfigListener listener;
 
-    public RemoteConfig() {
+
+
+
+    public interface RemoteConfigListener {
+        public void onRemoteConfigLoaded(boolean taskState);
+    }
+
+
+
+
+
+    public RemoteConfig(RemoteConfigListener remoteConfigListener) {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_params);
 
+        listener = remoteConfigListener;
+
     }
 
-    public void loadConfig(Activity activity, ProgressBar progressBar) {
+    public void loadConfig() {
         test = mFirebaseRemoteConfig.getString("test");
 
 
@@ -48,12 +58,11 @@ public class RemoteConfig {
                             guestToken = mFirebaseRemoteConfig.getString("guest_token");
                             cinematesAppSignature = mFirebaseRemoteConfig.getString("cinemates_app_signature");
 
-                            progressBar.setVisibility(View.GONE);
+                            listener.onRemoteConfigLoaded(true);
 
                         } else {
                             Log.d(TAG, "remote config task failed!");
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(activity, "Fetch config data failed", Toast.LENGTH_SHORT).show();
+                            listener.onRemoteConfigLoaded(false);
                         }
                     }
                 });

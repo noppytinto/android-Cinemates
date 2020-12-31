@@ -4,15 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primary_blue">
+    >
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         app:cardBackgroundColor="@color/dark_blue"
-        app:cardElevation="@dimen/cardview_default_elevation"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,8 +70,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                app:cardBackgroundColor="@color/primary_blue"
                 app:cardCornerRadius="@dimen/default_corner_radius"
+                app:cardElevation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintCircleRadius="@dimen/default_corner_radius"
                 app:layout_constraintStart_toStartOf="parent"

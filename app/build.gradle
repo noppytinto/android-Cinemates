@@ -64,6 +64,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-perf'
 
+    // apache
+    implementation 'com.squareup.okhttp:okhttp:2.5.0'
 
 
 }
