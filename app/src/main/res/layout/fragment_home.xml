@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_blue"
     tools:context=".ui.home.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <TextView
         android:id="@+id/textview_home_fragment"
         android:layout_width="match_parent"
@@ -20,52 +20,127 @@
         android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/button_rounded"
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="159dp"
         android:layout_height="55dp"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="532dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
         android:text="Login"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_rectangular"
-        style="@style/Cinemates.Button.Outlined.Rectangular"
+        style="@style/Cinemates.Button.Rectangular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Button"
-        app:layout_constraintEnd_toEndOf="@+id/button_rounded_outlined"
-        app:layout_constraintHorizontal_bias="0.618"
-        app:layout_constraintStart_toStartOf="@+id/button_rounded_outlined"
-        tools:layout_editor_absoluteY="408dp" />
+        app:layout_constraintStart_toStartOf="@+id/button_rounded"
+        app:layout_constraintTop_toBottomOf="@+id/button_rounded" />
 
     <Button
         android:id="@+id/button_rounded_outlined"
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="169dp"
         android:layout_height="62dp"
-        android:layout_marginStart="112dp"
-        android:layout_marginTop="264dp"
+        android:layout_marginTop="16dp"
         android:text="Button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/button_rectangular"
+        app:layout_constraintTop_toBottomOf="@+id/button_rectangular" />
 
     <Button
         android:id="@+id/button_rectangular_outlined"
         style="@style/Cinemates.Button.Outlined.Rectangular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="44dp"
+        android:layout_marginTop="16dp"
         android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/button_rounded_outlined"
-        app:layout_constraintEnd_toEndOf="@+id/button_rounded_outlined"
-        app:layout_constraintHorizontal_bias="0.447"
-        app:layout_constraintStart_toStartOf="@+id/button_rounded_outlined" />
+        app:layout_constraintStart_toStartOf="@+id/button_rounded_outlined"
+        app:layout_constraintTop_toBottomOf="@+id/button_rounded_outlined" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        style="@style/Cinemates.Button.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="140dp"
+        android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/add_icon_black" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="attore"
+        app:layout_constraintStart_toEndOf="@+id/radioButton"
+        app:layout_constraintTop_toTopOf="@+id/radioButton" />
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="CheckBox"
+        app:layout_constraintStart_toStartOf="@+id/radioButton"
+        app:layout_constraintTop_toBottomOf="@+id/radioButton" />
+
+    <RadioButton
+        android:id="@+id/radioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="RadioButton"
+        app:layout_constraintStart_toStartOf="@+id/button_rectangular_outlined"
+        app:layout_constraintTop_toBottomOf="@+id/button_rectangular_outlined" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Switch"
+        app:layout_constraintStart_toStartOf="@+id/toggleButton"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="ToggleButton"
+        app:layout_constraintStart_toStartOf="@+id/checkBox"
+        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/floatingActionButton"
+        app:layout_constraintTop_toBottomOf="@+id/floatingActionButton"
+        tools:src="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/button"
+        style="@style/Cinemates.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Text Button"
+        app:icon="@drawable/add_icon_black"
+        app:layout_constraintStart_toStartOf="@+id/imageButton2"
+        app:layout_constraintTop_toBottomOf="@+id/imageButton2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

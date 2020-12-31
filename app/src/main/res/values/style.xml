@@ -81,16 +81,51 @@
 
 
 
-    <!-- CINEMATES OUTLINED BUTTON ROUNDED -->
+
+    <!-- CINEMATES TEXT BUTTON -->
+    <style name="Cinemates.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/yellow</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.Rectangular.TextAppearance</item>
+        <item name="rippleColor">?colorSecondaryVariant</item>
+        <item name="elevation">@dimen/default_elevation</item>
+        <item name="iconTint">@color/yellow</item>
+    </style>
+
+
+    <!-- CINEMATES FLOATING BUTTON -->
+    <style name="Cinemates.Button.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="rippleColor">?colorSecondaryVariant</item>
+    </style>
+
+
+
+
+    <!-- CINEMATES BUTTON RECTANGULAR -->
+    <style name="Cinemates.Button.Rectangular" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.Rectangular.TextAppearance</item>
+        <item name="backgroundTint">?colorSecondary</item>
+        <item name="rippleColor">?colorSecondaryVariant</item>
+    </style>
+
+    <style name="Cinemates.Button.Rectangular.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+
+
+    <!-- CINEMATES BUTTON ROUNDED -->
     <style name="Cinemates.Button.Rounded" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@color/black</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Rounded.TextAppearance</item>
         <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
-        <item name="backgroundTint">@color/yellow</item>
+        <item name="backgroundTint">?colorSecondary</item>
+        <item name="rippleColor">?colorSecondaryVariant</item>
     </style>
 
     <style name="Cinemates.Button.Rounded.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
-        <item name="android:textStyle">normal</item>
         <item name="fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">16sp</item>
     </style>
@@ -102,13 +137,14 @@
 
 
 
-    <!-- CINEMATES OUTLINED BUTTON ROUNDED -->
+    <!-- CINEMATES BUTTON ROUNDED OUTLINED -->
     <style name="Cinemates.Button.Rounded.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="strokeColor">@color/yellow</item>
         <item name="strokeWidth">1.2dp</item>
         <item name="android:textColor">@color/yellow</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Rounded.Outlined.TextAppearance</item>
         <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
+        <item name="rippleColor">?colorSecondaryVariant</item>
     </style>
 
     <style name="Cinemates.Button.Rounded.Outlined.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
@@ -130,6 +166,7 @@
         <item name="strokeWidth">1.2dp</item>
         <item name="android:textColor">@color/yellow</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Outlined.Rectangular.TextAppearance</item>
+        <item name="rippleColor">?colorSecondaryVariant</item>
     </style>
 
     <style name="Cinemates.Button.Outlined.Rectangular.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">

@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.Cinemates" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimary">@color/primary_blue</item>
         <item name="colorPrimaryVariant">@color/dark_blue</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -10,7 +10,16 @@
         <item name="colorSecondaryVariant">@color/orange</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:colorBackground">@color/primary_blue</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorSurface">@color/dark_blue</item>
+        <item name="colorOnSurface">@color/dark_blue</item>
+        <item name="colorError">@color/red</item>
+        <item name="colorOnError">@color/white</item>
+        
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/primary_blue</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -22,4 +31,37 @@
     <style name="Theme.Cinemates.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Cinemates.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+
+
+
+
+
+    <!-- CINEMATES SWITCH BUTTON -->
+    <style name="Cinemates.Button.SwitchButton" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:textColor">@color/light_blue</item>
+        <item name="android:textAppearance">@style/Cinemates.Button.SwitchButton.TextAppearance</item>
+    </style>
+
+
+    <style name="Cinemates.Button.SwitchButton.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="fontFamily">@font/poppins_light</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </resources>
