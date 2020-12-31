@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private FirebaseAnalytics mFirebaseAnalytics;
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
-    private Button buttonSearch;
-    private EditText editText_search;
+    private FloatingActionButton buttonSearch;
+    private TextInputEditText editText_search;
     private String currentSearchTerm;
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;

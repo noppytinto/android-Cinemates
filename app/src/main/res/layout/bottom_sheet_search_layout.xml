@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_bottom_sheet_search"
+    >
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_search_searchFragment"
+        style="@style/Cinemates.Button.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/search_icon_black"
+        app:fabCustomSize="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextLayout_searchFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editTextLayout_searchFragment" />
+
+    <TextView
+        android:id="@+id/textView_chipGroup_label_searchFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="filtra per:"
+        android:textColor="@color/light_blue"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/editTextLayout_searchFragment"
+        app:layout_constraintTop_toBottomOf="@+id/editTextLayout_searchFragment" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup_searchFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/textView_chipGroup_label_searchFragment"
+        app:layout_constraintTop_toBottomOf="@+id/editTextLayout_searchFragment"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_movie_searchFragment"
+            style="@style/Cinemates.Button.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="film" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_actor_searchFragment"
+            style="@style/Cinemates.Button.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="attore" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_director_searchFragment"
+            style="@style/Cinemates.Button.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="regista" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_user_searchFragment"
+            style="@style/Cinemates.Button.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="utente" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/editTextLayout_searchFragment"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:hint="@string/search"
+        android:textColorHint="@color/light_blue"
+        app:boxStrokeColor="@color/search_outlined_box_states"
+        app:boxStrokeWidth="2dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/light_blue"
+        app:hintTextColor="@color/yellow"
+        app:layout_constraintEnd_toStartOf="@+id/button_search_searchFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/cinemates_shape_rounded_search_box">
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_searchFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/poppins_semibold"
+            android:inputType="text"
+            android:paddingBottom="10dp"
+            android:textColor="@color/light_blue"
+            android:textSize="16sp" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
