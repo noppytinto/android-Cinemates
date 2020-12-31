@@ -19,35 +19,7 @@
 
 
 
-
-    <!--VIEW ALL BUTTON STYLE-->
-
-    <!--theming of outlined button begins here-->
-    <!--parent name is to be give carefully-->
-    <style name="outline_button_style" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <!--these all styles are implemented outside, because to get all the overridden attributes easily-->
-        <item name="shapeAppearance">@style/customOutlinedButtonTheme</item>
-        <item name="android:textAppearance">@style/myCustomTextForMaterialButtons</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="strokeColor">@color/yellow</item>
-        <item name="strokeWidth">1dp</item>
-    </style>
-    <!--overriding cornerSize and cornerFamily of the outlined button-->
-    <style name="customOutlinedButtonTheme">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
-    </style>
-    <!--theming of outlined button ends here-->
-
-    <!--Font family and size of all the buttons in the entire application should be same-->
-    <!--so this child is common for all the material buttons in entire application-->
-    <style name="myCustomTextForMaterialButtons">
-        <item name="fontFamily">@font/poppins</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-
-
+    
     <!-- CIRCULAR IMAGEVIEW STYLE-->
 
     <style name="circular_imageview_style" parent="Widget.MaterialComponents.ShapeableImageView">
@@ -150,15 +122,16 @@
         <item name="android:textAppearance">@style/Cinemates.Button.Rounded.Outlined.TextAppearance</item>
         <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
         <item name="rippleColor">?colorSecondaryVariant</item>
+        <item name="android:textAllCaps">false</item>
     </style>
     <style name="Cinemates.Button.Rounded.Outlined.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
-        <item name="android:textStyle">normal</item>
         <item name="fontFamily">@font/poppins</item>
-        <item name="android:textSize">@dimen/rounded_outlined_button_text_size</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0</item>
     </style>
     <style name="cinemates_shape_rounded">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/rounded_button_corner_size</item>
+        <item name="cornerSize">20dp</item>
     </style>
 
 

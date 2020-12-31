@@ -34,19 +34,18 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/header_newsPage"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button_explore_fragment_view_all_latest"
+                    app:layout_constraintEnd_toStartOf="@+id/button_exploreFragment_seeAllLatest"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/button_explore_fragment_view_all_latest"
-                    style="@style/outline_button_style"
+                    android:id="@+id/button_exploreFragment_seeAllLatest"
+                    style="@style/Cinemates.Button.Rounded.Outlined"
                     android:layout_width="90dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    android:textColor="@color/yellow"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_releases"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -78,13 +77,12 @@
                     app:layout_constraintTop_toBottomOf="@+id/fragment_explore_fragment_latest" />
 
                 <Button
-                    android:id="@+id/button_explore_fragment_view_all_upcomings"
-                    style="@style/outline_button_style"
+                    android:id="@+id/button_exploreFragment_seeAllUpcomings"
+                    style="@style/Cinemates.Button.Rounded.Outlined"
                     android:layout_width="90dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    android:textColor="@color/yellow"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_upcomings"
                     app:layout_constraintEnd_toEndOf="parent" />
 
@@ -112,19 +110,18 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/header_newsPage"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/button_explore_fragment_view_all_popular"
+                    app:layout_constraintEnd_toStartOf="@+id/button_exploreFragment_seeAllPopular"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="@+id/fragment_upcomings"
                     app:layout_constraintTop_toBottomOf="@+id/fragment_upcomings" />
 
                 <Button
-                    android:id="@+id/button_explore_fragment_view_all_popular"
-                    style="@style/outline_button_style"
+                    android:id="@+id/button_exploreFragment_seeAllPopular"
+                    style="@style/Cinemates.Button.Rounded.Outlined"
                     android:layout_width="90dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    android:textColor="@color/yellow"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_popular"
                     app:layout_constraintEnd_toEndOf="parent" />
 
