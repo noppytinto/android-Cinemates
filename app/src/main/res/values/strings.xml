@@ -49,6 +49,7 @@
     <string name="search_director_ellipsis">Cerca regista...</string>
     <string name="search_person_ellipsis">Cerca persona...</string>
     <string name="filter_by">Filtra per</string>
+    <string name="titanic">titanic</string>
 
 
 </resources>

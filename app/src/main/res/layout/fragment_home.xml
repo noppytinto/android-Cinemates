@@ -25,6 +25,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip6"
+        style="@style/Cinemates.Button.Chip.Choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="attore"
+        app:layout_constraintStart_toStartOf="@+id/chip4"
+        app:layout_constraintTop_toBottomOf="@+id/chip4" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_entry"
+        style="@style/Cinemates.Button.Chip.Entry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
+        android:text="titanic"
+        app:layout_constraintStart_toStartOf="@+id/chip4"
+        app:layout_constraintTop_toBottomOf="@+id/chip4" />
+
     <Button
         android:id="@+id/button_rounded"
         style="@style/Cinemates.Button.Rounded"
@@ -84,6 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:text="attore"
+        style="@style/Cinemates.Button.Chip.Filter"
         app:layout_constraintStart_toEndOf="@+id/radioButton"
         app:layout_constraintTop_toTopOf="@+id/radioButton" />
 
