@@ -19,4 +19,20 @@
     <dimen name="movie_title_movie_details_page">22sp</dimen>
     <dimen name="cast_crew_movie_details_page">20sp</dimen>
     <dimen name="header_newsPage">18sp</dimen>
+    <dimen name="siwtch_label">10sp</dimen>
+
+
+
+
+
+    <!--  BUTTONS  -->
+
+    <dimen name="rounded_button_corner_size">50dp</dimen>
+
+    <dimen name="outlined_button_stroke_width">1.2dp</dimen>
+    <dimen name="rounded_outlined_button_text_size">16sp</dimen>
+
+    <dimen name="rectangular_button_text_size">16sp</dimen>
+    <dimen name="rounded_button_text_size">16sp</dimen>
+
 </resources>

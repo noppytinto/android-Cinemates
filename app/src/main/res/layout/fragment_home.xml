@@ -58,7 +58,7 @@
 
     <Button
         android:id="@+id/button_rectangular_outlined"
-        style="@style/Cinemates.Button.Outlined.Rectangular"
+        style="@style/Cinemates.Button.Rectangular.Outlined"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
