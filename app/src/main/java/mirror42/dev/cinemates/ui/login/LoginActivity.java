@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONObject;
 
@@ -99,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements
             try {
                 textInputLayoutEmail.setError(null);
                 textInputLayoutPassword.setError(null);
-                login(email, toHexString(getSHA(password)));
+                standardLogin(email, toHexString(getSHA(password)));
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
@@ -135,7 +136,14 @@ public class LoginActivity extends AppCompatActivity implements
 
 
 
-    private void login(String email, String password) {
+    private void standardLogin(String email, String password) {
+        //
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.METHOD, "email + password");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+
+        //
         final String dbFunction = "login";
         final OkHttpClient httpClient = new OkHttpClient();
         RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
