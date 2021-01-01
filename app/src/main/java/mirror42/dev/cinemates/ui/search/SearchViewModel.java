@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
 import mirror42.dev.cinemates.asynctask.DownloadMoviesList;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 
 /**

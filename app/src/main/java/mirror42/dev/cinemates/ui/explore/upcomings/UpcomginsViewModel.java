@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MyValues;
 import mirror42.dev.cinemates.asynctask.DownloadUpcomings;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 public class UpcomginsViewModel extends ViewModel implements DownloadUpcomings.DownloadListener {
     private MutableLiveData<ArrayList<Movie>> moviesList;

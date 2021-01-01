@@ -1,0 +1,92 @@
+package mirror42.dev.cinemates.tmdbAPI;
+
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import javax.net.ssl.HttpsURLConnection;
+
+public class HttpUtilities {
+
+    /**
+     * Opens a connection to this url
+     * and returns any raw data in String format.
+     *
+     * @return  raw data in String format.
+     *          If openStream()) yield to an invalid response (IOException)
+     *          returns null.
+     */
+    private static String getRawDataStringFromURL(String urlString) {
+        String result = null;
+
+        try {
+            URL url = new URL(urlString);
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.connect();
+            InputStream is = urlConnection.getInputStream();
+
+            result = buildStringFromInputStream(is);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+
+    }// end getRawDataStringFromURL()
+
+    public static String buildStringFromInputStream(InputStream in) {
+        String result = null;
+
+        try {
+            // creating reader
+            BufferedReader rd = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+            // converting inputstream into string
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char) cp);
+            }
+
+            //
+            result = sb.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+
+    }// end buildStringFromInputStream()
+
+
+    /**
+     * Opens a connection to this url
+     * and returns a json in {@code JSONObject} format.
+     *
+     * @return  json in JSONObject format.
+     *          If url is invalid, returns null.
+     *
+     * @see     #getRawDataStringFromURL(String)
+     */
+    public static JSONObject getJsonObjectFromUrl(String url) {
+        JSONObject json = null;
+
+        try {
+            String jsonString = getRawDataStringFromURL(url);
+
+            if(jsonString!=null)
+                json = new JSONObject(jsonString);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return json;
+    }// end getJsonObjectFromUrl()
+
+
+}// end HttpUtilities class

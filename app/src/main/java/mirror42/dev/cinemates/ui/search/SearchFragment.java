@@ -31,7 +31,7 @@ import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 //import mirror42.dev.cinemates.NavGraphDirections;
 

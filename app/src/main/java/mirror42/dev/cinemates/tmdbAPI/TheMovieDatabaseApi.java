@@ -197,7 +197,7 @@ public class TheMovieDatabaseApi {
 
             try {
                 // querying TBDb
-                JSONObject json = JsonUtilities.getJsonObjectFromUrl(url);
+                JSONObject json = HttpUtilities.getJsonObjectFromUrl(url);
                 JSONArray results = json.getJSONArray("results");
 
                 // fetching results
@@ -227,7 +227,7 @@ public class TheMovieDatabaseApi {
                     "&include_adult=" + defaultAdultContentFilter;
             try {
                 // querying TBDb
-                JSONObject json = JsonUtilities.getJsonObjectFromUrl(url);
+                JSONObject json = HttpUtilities.getJsonObjectFromUrl(url);
                 JSONArray results = json.getJSONArray("results");
 
                 // fetching results
@@ -266,7 +266,7 @@ public class TheMovieDatabaseApi {
                 idList = new ArrayList<>();
 
                 // querying TBDb
-                JSONObject json = JsonUtilities.getJsonObjectFromUrl(url);
+                JSONObject json = HttpUtilities.getJsonObjectFromUrl(url);
                 JSONArray results = json.getJSONArray("results");
 
                 // fetching results
@@ -299,7 +299,7 @@ public class TheMovieDatabaseApi {
                 idList = new ArrayList<>();
 
                 // querying TBDb
-                JSONObject json = JsonUtilities.getJsonObjectFromUrl(url);
+                JSONObject json = HttpUtilities.getJsonObjectFromUrl(url);
                 JSONArray results = json.getJSONArray("results");
 
                 // fetching results
@@ -331,7 +331,7 @@ public class TheMovieDatabaseApi {
 
             try {
                 // querying TBDb
-                JSONObject jsonObj = JsonUtilities.getJsonObjectFromUrl(url);
+                JSONObject jsonObj = HttpUtilities.getJsonObjectFromUrl(url);
                 result = jsonObj.getInt("total_pages");
 
             } catch (Exception e) {
@@ -848,7 +848,7 @@ public class TheMovieDatabaseApi {
     private JSONObject buildJsonObject(String url) {
         JSONObject jsonObj = null;
         try{
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(url);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(url);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -871,7 +871,7 @@ public class TheMovieDatabaseApi {
                     "&page=" + page +
                     "&include_adult=" + defaultAdultContentFilter;
 
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -887,7 +887,7 @@ public class TheMovieDatabaseApi {
                     movieId +
                     "?api_key=" + MY_API_KEY +
                     "&language=" + defaultLanguage;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -900,7 +900,7 @@ public class TheMovieDatabaseApi {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/movie/" + movieId + "/credits?api_key=" + MY_API_KEY;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -922,7 +922,7 @@ public class TheMovieDatabaseApi {
                     "&page=" + page +
                     "&region=" + defaultLanguage;
 
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -942,7 +942,7 @@ public class TheMovieDatabaseApi {
             String myUrl  = BASE_URL +  "3/movie/upcoming?api_key=" + MY_API_KEY +
                     "&language=" + defaultLanguage +
                     "&page=" + page;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -969,7 +969,7 @@ public class TheMovieDatabaseApi {
                     "&page=" + page +
                     "&region=" + defaultLanguage;
 
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -992,7 +992,7 @@ public class TheMovieDatabaseApi {
                     "&page=" + page +
                     "&region=" + defaultLanguage;
 
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -1010,7 +1010,7 @@ public class TheMovieDatabaseApi {
             String myUrl  = BASE_URL +  "3/genre/movie/list?api_key=" + MY_API_KEY +
                     "&language=" + defaultLanguage;
 
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
@@ -1026,7 +1026,7 @@ public class TheMovieDatabaseApi {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/movie/" + movieId + "?api_key=" + MY_API_KEY + "&language=" + ENGISH_LANGUAGE;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1038,7 +1038,7 @@ public class TheMovieDatabaseApi {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/movie/" + movieId + "/images?api_key=" + MY_API_KEY;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1050,7 +1050,7 @@ public class TheMovieDatabaseApi {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/person/" + personID + "?api_key=" + MY_API_KEY;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1069,7 +1069,7 @@ public class TheMovieDatabaseApi {
         JSONObject jsonObj = null;
         try{
             String myUrl = BASE_URL + "3/trending/" + mediaType + "/" + timeWindow + "?api_key=" + MY_API_KEY;
-            jsonObj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1089,7 +1089,7 @@ public class TheMovieDatabaseApi {
         try{
             // getting api configuration object
             String myUrl = BASE_URL + "3/configuration?api_key=" + MY_API_KEY;
-            JSONObject obj = JsonUtilities.getJsonObjectFromUrl(myUrl);
+            JSONObject obj = HttpUtilities.getJsonObjectFromUrl(myUrl);
             apiConfigurationObject = obj.getJSONObject("images");
 
             // loading configuration data

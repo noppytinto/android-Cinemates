@@ -15,7 +15,6 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.RemoteConfig;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

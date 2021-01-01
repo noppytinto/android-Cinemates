@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.tmdbAPI;
+package mirror42.dev.cinemates.tmdbAPI.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

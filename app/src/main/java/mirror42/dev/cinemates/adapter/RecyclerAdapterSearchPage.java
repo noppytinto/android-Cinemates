@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.viewholder.SearchRecordViewHolder;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecordViewHolder> {
     private ArrayList<Movie> moviesList;

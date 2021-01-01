@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_movie_details" >
         <argument
             android:name="Movie"
-            app:argType="mirror42.dev.cinemates.tmdbAPI.Movie" />
+            app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie" />
     </fragment>
     <fragment
         android:id="@+id/latestReleasesFragment"

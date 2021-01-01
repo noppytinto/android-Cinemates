@@ -2,6 +2,8 @@ package mirror42.dev.cinemates.tmdbAPI;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+
 public class MovieBuilder {
 
     public static ArrayList<Movie> buildMovieList_byID(ArrayList<Integer> IDlist) {

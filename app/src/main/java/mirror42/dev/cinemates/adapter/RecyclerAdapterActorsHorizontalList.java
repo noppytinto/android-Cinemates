@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.viewholder.ActorCardsHolder;
-import mirror42.dev.cinemates.tmdbAPI.Person;
+import mirror42.dev.cinemates.tmdbAPI.model.Person;
 
 
 public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardsHolder>{

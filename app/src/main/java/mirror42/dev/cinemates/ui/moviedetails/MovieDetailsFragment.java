@@ -29,8 +29,8 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
-import mirror42.dev.cinemates.tmdbAPI.Movie;
-import mirror42.dev.cinemates.tmdbAPI.Person;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Person;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
