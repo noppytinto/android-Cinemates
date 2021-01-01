@@ -109,28 +109,52 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onFailure(Call call, IOException e) {
-        final Toast toast = Toast.makeText(this, "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
-        toast.show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // print response
+                final Toast toast = Toast.makeText(getApplicationContext(), "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
     }
 
     @Override
     public void onResponse(Call call, Response response) {
         try (ResponseBody responseBody = response.body()) {
             if (!response.isSuccessful()) {
-                final Toast toast = Toast.makeText(this, "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
-                toast.show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // print response
+                        final Toast toast = Toast.makeText(getApplicationContext(), "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
                 return;
             }
 
-            // print response
-            final Toast toast = Toast.makeText(this, "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
-            toast.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // print response
+                    final Toast toast = Toast.makeText(getApplicationContext(), "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
+
         }
         catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
-            final Toast toast = Toast.makeText(this, "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
-            toast.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // print response
+                    final Toast toast = Toast.makeText(getApplicationContext(), "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
         }
     }
 }
