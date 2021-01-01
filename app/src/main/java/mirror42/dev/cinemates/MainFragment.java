@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import mirror42.dev.cinemates.adapter.ViewpagerAdapterFragmentMain;
+import mirror42.dev.cinemates.ui.explore.ExploreFragment;
+import mirror42.dev.cinemates.ui.home.HomeFragment;
+import mirror42.dev.cinemates.ui.search.SearchFragment;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 
 public class MainFragment extends Fragment {
@@ -67,6 +72,43 @@ public class MainFragment extends Fragment {
         });
         tabLayoutMediator.attach();
 
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
 
-    }
-}
+                switch (tab.getPosition()) {
+                    case 0:
+                        Log.d("tab analyzer", "clicked on home tab");
+                        firebaseEventsLogger.logScreenEvent(HomeFragment.class, "Home tab", getContext());
+                        tab.setIcon(R.drawable.home_icon_light_blue);
+                        break;
+                    case 1:
+                        Log.d("tab analyzer", "clicked on explore tab");
+                        firebaseEventsLogger.logScreenEvent(ExploreFragment.class, "Explore tab", getContext());
+                        tab.setIcon(R.drawable.movie_icon_light_blue);
+                        break;
+                    case 2:
+                        Log.d("tab analyzer", "clicked on search tab");
+                        firebaseEventsLogger.logScreenEvent(SearchFragment.class, "Search tab", getContext());
+                        tab.setIcon(R.drawable.search_icon_light_blue);
+                        break;
+                    default:
+                        tab.setText("");
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+
+    }// end onViewCreated()
+}// end MainFragment class

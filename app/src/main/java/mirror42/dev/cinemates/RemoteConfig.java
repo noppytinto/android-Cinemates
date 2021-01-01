@@ -9,20 +9,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
-import javax.inject.Singleton;
-
 
 public class RemoteConfig {
-
     private final String TAG = this.getClass().getSimpleName();
-
     private static RemoteConfig singletonInstance = null;
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private static String test;
-    private static String azureBaseUrl;
-    private static String guestToken;
-    private static String cinematesAppSignature;
-    private static RemoteConfigListener listener;
+    private String test;
+    private String azureBaseUrl;
+    private String guestToken;
+    private String cinematesAppSignature;
+    private RemoteConfigListener listener;
 
     public interface RemoteConfigListener {
         public void onRemoteConfigLoaded(boolean taskState);
@@ -32,28 +28,29 @@ public class RemoteConfig {
 
     //------------------------------------------------------- CONSTRUCTORS
 
-    private RemoteConfig(RemoteConfigListener remoteConfigListener) {
+    private RemoteConfig() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder().build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_params);
-
     }
 
 
 
     //------------------------------------------------------- GETTERS/SETTERS
 
-    public static RemoteConfig getInstance(RemoteConfigListener remoteConfigListener) {
+    public static RemoteConfig getInstance() {
         if (singletonInstance == null)
-            singletonInstance = new RemoteConfig(remoteConfigListener);
-
-        listener = remoteConfigListener;
+            singletonInstance = new RemoteConfig();
 
         return singletonInstance;
     }
 
-    public static String getTest() {
+    public void setListener(RemoteConfigListener remoteConfigListener) {
+        listener = remoteConfigListener;
+    }
+
+    public String getTest() {
         Log.d("RemoteConfig: ", "getTest() called");
         return test;
     }

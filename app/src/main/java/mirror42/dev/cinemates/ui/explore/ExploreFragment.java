@@ -9,14 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-
 import mirror42.dev.cinemates.R;
 
 
 public class ExploreFragment extends Fragment{
 //    private SwipeRefreshLayout swipeRefreshLayout;
-    private FirebaseAnalytics mFirebaseAnalytics;
 
     public ExploreFragment() {
         // Required empty public constructor
@@ -26,8 +23,6 @@ public class ExploreFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
-
         return inflater.inflate(R.layout.fragment_explore, container, false);
     }
 
@@ -59,17 +54,6 @@ public class ExploreFragment extends Fragment{
 //
 //        });
 
-
-    logFirebaseScreenEvent();
-
-    }
-
-    private void logFirebaseScreenEvent() {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Explore tab");
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
     }
 
 

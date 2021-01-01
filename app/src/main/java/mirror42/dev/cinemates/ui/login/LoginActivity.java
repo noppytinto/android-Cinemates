@@ -6,14 +6,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.IOException;
+
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.RemoteConfig;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -25,6 +28,7 @@ public class LoginActivity extends AppCompatActivity implements
     private EditText editTextPassword;
     private Button buttonLogin;
     private ProgressBar spinner;
+    private RemoteConfig remoteConfig;
 
 
 
@@ -36,11 +40,17 @@ public class LoginActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_login);
 
         //
+        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+        firebaseEventsLogger.logScreenEvent(this, "Login page", this);
+
+
+        //
         spinner = findViewById(R.id.progresBar_loginActivity);
         spinner.setVisibility(View.VISIBLE);
 
         // get remote params
-        RemoteConfig remoteConfig = new RemoteConfig(this);
+        RemoteConfig remoteConfig = RemoteConfig.getInstance();
+        remoteConfig.setListener(this);
         remoteConfig.loadConfig();
 
         //
@@ -76,16 +86,16 @@ public class LoginActivity extends AppCompatActivity implements
         final OkHttpClient httpClient = new OkHttpClient();
 
         try {
-            Request request = new Request.Builder()
-                    .url(RemoteConfig.getAzureBaseUrl()+ checkSignatureFunction + RemoteConfig.getCinematesAppSignature())
-                    .header("User-Agent", "OkHttp Headers.java")
-                    .addHeader("Accept", "application/json; q=0.5")
-                    .addHeader("Accept", "application/vnd.github.v3+json")
-                    .addHeader("Authorization", "Bearer " + RemoteConfig.getGuestToken())
-                    .build();
-
-            Call call = httpClient.newCall(request);
-            call.enqueue(this);
+//            Request request = new Request.Builder()
+//                    .url(RemoteConfig.getAzureBaseUrl()+ checkSignatureFunction + RemoteConfig.getCinematesAppSignature())
+//                    .header("User-Agent", "OkHttp Headers.java")
+//                    .addHeader("Accept", "application/json; q=0.5")
+//                    .addHeader("Accept", "application/vnd.github.v3+json")
+//                    .addHeader("Authorization", "Bearer " + RemoteConfig.getGuestToken())
+//                    .build();
+//
+//            Call call = httpClient.newCall(request);
+//            call.enqueue(this);
 
         }catch(Exception e) {
             e.printStackTrace();

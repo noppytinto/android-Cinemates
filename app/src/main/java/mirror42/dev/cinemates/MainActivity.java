@@ -13,18 +13,24 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import mirror42.dev.cinemates.ui.login.LoginActivity;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String EXTRA_MESSAGE = " ";
     private final String TAG = this.getClass().getSimpleName();
-    NavController navController;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate() called");
 
+        //
+        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+        firebaseEventsLogger.setUserConsensus(true);
+
+        //
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

@@ -16,8 +16,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
@@ -26,13 +24,13 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 
 public class UpcomginsFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
 
     private UpcomginsViewModel upcomginsViewModel;
-    private FirebaseAnalytics mFirebaseAnalytics;
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;
 //    private ArrayList<Movie> moviesList;
@@ -44,8 +42,6 @@ public class UpcomginsFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_upcomgins, container, false);
     }
@@ -122,7 +118,8 @@ public class UpcomginsFragment extends Fragment implements
             Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
 
             //
-            logMovieSelected(movieSelected);
+            FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+            firebaseEventsLogger.logSelectedMovie(movieSelected, "selected movie in explore tab", this, getContext());
 
             NavGraphDirections.AnywhereToMovieDetailsFragment
                     action = ExploreFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
@@ -138,18 +135,5 @@ public class UpcomginsFragment extends Fragment implements
 //        Toast.makeText(getContext(), "item "+position+" long clicked", Toast.LENGTH_SHORT).show();
 
     }
-
-    private void logMovieSelected(Movie movieSelected) {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in explore tab");
-        item.putString(FirebaseAnalytics.Param.ITEM_ID, String.valueOf(movieSelected.getTmdbID()));
-        item.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-//        Bundle params = new Bundle();
-//        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, item);
-    }
-
 
 }// end UpcomginsFragment class

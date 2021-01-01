@@ -17,8 +17,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
@@ -27,12 +25,12 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 public class LatestReleasesFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
 
     private LatestReleasesViewModel latestReleasesViewModel;
-    private FirebaseAnalytics mFirebaseAnalytics;
     private final String TAG = this.getClass().getSimpleName();
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;
@@ -47,8 +45,6 @@ public class LatestReleasesFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "//------------------------------------ onCreateView() called");
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
-
         return inflater.inflate(R.layout.fragment_latest_releases, container, false);
     }
 
@@ -146,7 +142,9 @@ public class LatestReleasesFragment extends Fragment implements
             Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
 
             //
-            logMovieSelected(movieSelected);
+            FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+            firebaseEventsLogger.logSelectedMovie(movieSelected, "selected movie in explore tab", this, getContext());
+
 
             //
             NavGraphDirections.AnywhereToMovieDetailsFragment
@@ -165,18 +163,6 @@ public class LatestReleasesFragment extends Fragment implements
 //        Toast.makeText(getContext(), "item "+position+" long clicked", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onItemLongClick() called");
         Log.d(TAG, "onItemLongClick() ended");
-    }
-
-    private void logMovieSelected(Movie movieSelected) {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in explore tab");
-        item.putString(FirebaseAnalytics.Param.ITEM_ID, String.valueOf(movieSelected.getTmdbID()));
-        item.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-//        Bundle params = new Bundle();
-//        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, item);
     }
 
 }// end LatestReleasesFragment class

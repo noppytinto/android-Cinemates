@@ -23,7 +23,6 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
@@ -32,13 +31,12 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
-//import mirror42.dev.cinemates.NavGraphDirections;
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
         RecyclerSearchListener.OnClick_RecycleSearchListener {
 
-    private FirebaseAnalytics mFirebaseAnalytics;
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
     private FloatingActionButton buttonSearch;
@@ -48,6 +46,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;
     private ChipGroup chipGroup;
+    private FirebaseEventsLogger firebaseEventsLogger;
 
 
 
@@ -64,9 +63,10 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //            }
 //        });
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        firebaseEventsLogger = FirebaseEventsLogger.getInstance();
 
-        return inflater.inflate(R.layout.fragment_search, container, false);
+        return view;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -100,8 +100,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
         });
 
-
-        logFirebaseScreenEvent();
 
         // assigning adapter to recycle
 
@@ -196,7 +194,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             currentSearchTerm = editText_search.getText().toString();
 
             if( ! currentSearchTerm.isEmpty()) {
-                logSearchTerm(currentSearchTerm);
+                firebaseEventsLogger.logSearchTerm(currentSearchTerm, this, getContext());
 
                 //
                 textInputLayout.setError(null);
@@ -235,7 +233,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         try {
             Movie movieSelected = recyclerAdapterSearchPage.getMoviesList(position);
 
-            logMovieSelected(movieSelected);
+            firebaseEventsLogger.logSelectedMovie(movieSelected, "selected movie in search tab", this, getContext());
 
 //            NavHostFragment.findNavController(FirstFragment.this)
 //                    .navigate(R.id.action_FirstFragment_to_SecondFragment);
@@ -259,34 +257,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     }
 
-    private void logMovieSelected(Movie movieSelected) {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "selected movie in search tab");
-        item.putString(FirebaseAnalytics.Param.ITEM_ID, String.valueOf(movieSelected.getTmdbID()));
-        item.putString(FirebaseAnalytics.Param.ITEM_NAME, movieSelected.getTitle());
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-//        Bundle params = new Bundle();
-//        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, item);
-    }
 
-    private void logSearchTerm(String term) {
-        // send to firebase analytics
-        //throw new RuntimeException("Test Crash"); // Force a crash for Crashlytics
-        Bundle params = new Bundle();
-        params.putString(FirebaseAnalytics.Param.SEARCH_TERM, term);
-        params.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, params);
-    }
-
-    private void logFirebaseScreenEvent() {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Explore tab");
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
-    }
 
 
 }// end SearchFragment class

@@ -10,7 +10,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,24 +18,20 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.util.ArrayList;
-
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
+import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
 
     private MovieDetailsViewModel movieDetailsViewModel;
-    private FirebaseAnalytics mFirebaseAnalytics;
     private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
     private View view;
     private FloatingActionButton addToListButton;
@@ -48,7 +43,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
 
 //        // This callback will only be called when MyFragment is at least Started.
 //        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -123,7 +117,9 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             }// inner if
         }// outer if
 
-        logFirebaseScreenEvent();
+        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+        firebaseEventsLogger.logScreenEvent(this, "Movie Details page", getContext());
+
     }// end onViewCreated()
 
 
@@ -224,13 +220,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    private void logFirebaseScreenEvent() {
-        // send to firebase analytics
-        Bundle item = new Bundle();
-        item.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
-        item.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Movie Details page");
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, item);
-    }
 
 
 }// end MovieDetailsFragment class
