@@ -129,6 +129,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         catch (Exception e) {
             e.getMessage();
             e.printStackTrace();
+            final Toast toast = Toast.makeText(this, "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 }
