@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+
 public class HomeViewModel extends ViewModel {
     private MutableLiveData<String> mText;
 
@@ -18,7 +20,10 @@ public class HomeViewModel extends ViewModel {
     public void applyRemoteConfig() {
 
         //
-        mText.setValue("Home");
+        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
+        String test = remoteConfigServer.getTest();
+
+        mText.setValue(test);
     }
 
 

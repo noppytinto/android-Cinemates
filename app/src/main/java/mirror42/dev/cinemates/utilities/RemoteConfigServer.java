@@ -12,14 +12,14 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import mirror42.dev.cinemates.R;
 
 
-public class RemoteConfig {
+public class RemoteConfigServer {
     private final String TAG = this.getClass().getSimpleName();
-    private static RemoteConfig singletonInstance = null;
+    private static RemoteConfigServer singletonInstance = null;
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private String test;
-    private String azureBaseUrl;
-    private String guestToken;
-    private String cinematesAppSignature;
+//    private String test;
+//    private String azureBaseUrl;
+//    private String guestToken;
+//    private String cinematesAppSignature;
     private RemoteConfigListener listener;
 
     public interface RemoteConfigListener {
@@ -30,7 +30,7 @@ public class RemoteConfig {
 
     //------------------------------------------------------- CONSTRUCTORS
 
-    private RemoteConfig() {
+    private RemoteConfigServer() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder().build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
@@ -41,9 +41,9 @@ public class RemoteConfig {
 
     //------------------------------------------------------- GETTERS/SETTERS
 
-    public static RemoteConfig getInstance() {
+    public static RemoteConfigServer getInstance() {
         if (singletonInstance == null)
-            singletonInstance = new RemoteConfig();
+            singletonInstance = new RemoteConfigServer();
 
         return singletonInstance;
     }
@@ -54,28 +54,26 @@ public class RemoteConfig {
 
     public String getTest() {
         Log.d("RemoteConfig: ", "getTest() called");
-        return test;
+        return mFirebaseRemoteConfig.getString("test");
     }
 
     public String getAzureBaseUrl() {
-        return azureBaseUrl;
+        return mFirebaseRemoteConfig.getString("azure_base_url");
     }
 
     public String getGuestToken() {
-        return guestToken;
+        return mFirebaseRemoteConfig.getString("guest_token");
     }
 
     public String getCinematesAppSignature() {
-        return cinematesAppSignature;
+        return mFirebaseRemoteConfig.getString("cinemates_app_signature");
     }
 
 
 
     //------------------------------------------------------- METHODS
 
-    public void loadConfig() {
-        test = mFirebaseRemoteConfig.getString("test");
-
+    public void loadConfigParams() {
 //        mFirebaseRemoteConfig.fetch(0);
 //        mFirebaseRemoteConfig.activate();
 
@@ -85,10 +83,10 @@ public class RemoteConfig {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "remote config task successful");
                     boolean updated = task.getResult();
-                    test = mFirebaseRemoteConfig.getString("test");
-                    azureBaseUrl = mFirebaseRemoteConfig.getString("azure_base_url");
-                    guestToken = mFirebaseRemoteConfig.getString("guest_token");
-                    cinematesAppSignature = mFirebaseRemoteConfig.getString("cinemates_app_signature");
+//                    test = mFirebaseRemoteConfig.getString("test");
+//                    azureBaseUrl = mFirebaseRemoteConfig.getString("azure_base_url");
+//                    guestToken = mFirebaseRemoteConfig.getString("guest_token");
+//                    cinematesAppSignature = mFirebaseRemoteConfig.getString("cinemates_app_signature");
 
                     // notify listener
                     listener.onRemoteConfigLoaded(true);
@@ -99,6 +97,6 @@ public class RemoteConfig {
                 }
             }
         });
-    }// end loadConfig()
+    }// end loadConfigParams()
 
 }// end RemoteConfig class
