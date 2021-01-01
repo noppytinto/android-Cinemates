@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import mirror42.dev.cinemates.MyValues;
+import mirror42.dev.cinemates.utilities.MyValues;
 import mirror42.dev.cinemates.asynctask.DownloadMovieDetails;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 

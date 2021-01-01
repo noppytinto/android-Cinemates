@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates;
+package mirror42.dev.cinemates.utilities;
 
 public class MyValues {
 

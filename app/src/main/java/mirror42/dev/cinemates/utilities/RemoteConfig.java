@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates;
+package mirror42.dev.cinemates.utilities;
 
 import android.util.Log;
 
@@ -8,6 +8,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+
+import mirror42.dev.cinemates.R;
 
 
 public class RemoteConfig {
@@ -21,7 +23,7 @@ public class RemoteConfig {
     private RemoteConfigListener listener;
 
     public interface RemoteConfigListener {
-        public void onRemoteConfigLoaded(boolean taskState);
+        public void onRemoteConfigLoaded(boolean taskIsSuccessful);
     }
 
 
@@ -88,6 +90,7 @@ public class RemoteConfig {
                     guestToken = mFirebaseRemoteConfig.getString("guest_token");
                     cinematesAppSignature = mFirebaseRemoteConfig.getString("cinemates_app_signature");
 
+                    // notify listener
                     listener.onRemoteConfigLoaded(true);
 
                 } else {

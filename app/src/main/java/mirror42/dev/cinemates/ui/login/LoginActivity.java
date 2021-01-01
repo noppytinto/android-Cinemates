@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.RemoteConfig;
+import mirror42.dev.cinemates.utilities.RemoteConfig;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity implements
         //
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
         firebaseEventsLogger.logScreenEvent(this, "Login page", this);
-
 
         //
         spinner = findViewById(R.id.progresBar_loginActivity);

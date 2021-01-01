@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 
 
 public class DownloadPopular extends AsyncTask<Integer, Void, ArrayList<Movie>> {

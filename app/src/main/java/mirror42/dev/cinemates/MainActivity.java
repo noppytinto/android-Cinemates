@@ -25,21 +25,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate() called");
-
-        //
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.setUserConsensus(true);
-
-        //
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // init firebase logger
+        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+        firebaseEventsLogger.setUserConsensus(true); //TODO: fetch user consensus from DB
+
+        //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController);
-
-
-    }
+    }// end onCreate()
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_login) {
             Intent intent = new Intent(this, LoginActivity.class);
-
-
 //            intent.putExtra(EXTRA_MESSAGE, message);
+
+
 
             startActivity(intent);
         }
