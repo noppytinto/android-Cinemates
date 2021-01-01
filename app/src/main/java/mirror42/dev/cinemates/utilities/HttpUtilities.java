@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.tmdbAPI;
+package mirror42.dev.cinemates.utilities;
 
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -62,7 +62,6 @@ public class HttpUtilities {
 
     }// end buildStringFromInputStream()
 
-
     /**
      * Opens a connection to this url
      * and returns a json in {@code JSONObject} format.
@@ -87,6 +86,5 @@ public class HttpUtilities {
 
         return json;
     }// end getJsonObjectFromUrl()
-
 
 }// end HttpUtilities class

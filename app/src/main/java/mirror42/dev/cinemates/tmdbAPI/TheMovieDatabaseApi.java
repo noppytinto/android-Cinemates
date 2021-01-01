@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.utilities.HttpUtilities;
+
 
 /**
  * REQUIREMENTS:
