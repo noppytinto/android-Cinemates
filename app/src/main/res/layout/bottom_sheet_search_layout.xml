@@ -102,7 +102,7 @@
             android:layout_height="match_parent"
             android:fontFamily="@font/poppins_semibold"
             android:inputType="text"
-            android:paddingBottom="10dp"
+            android:paddingBottom="9dp"
             android:textColor="@color/light_blue"
             android:textSize="16sp" />
 

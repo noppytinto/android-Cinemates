@@ -13,12 +13,20 @@
     <color name="light_blue">#B2CCDF</color>
     <color name="dark_blue">#004678</color>
     <color name="yellow">#FED23F</color>
-    <color name="orange">#F6A040</color>
+    <color name="orange">#ff6600</color>
     <color name="green">#86D602</color>
-    <color name="red">#FF364E</color>
+    <color name="red">#F8475C</color>
     <color name="divider">#FED23F</color>
     <color name="darkSemiTransparent">#C6000000</color>
     <color name="light_blue_2">#4786B3</color>
+
+
+
+    <!-- palette -->
+    <color name="orange_original">#F6A040</color>
+    <color name="orange_700">#ff9a00</color>
+    <color name="orange_800">#ff8800</color>
+    <color name="orange_900">#ff6600</color>
 
 
 </resources>

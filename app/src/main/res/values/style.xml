@@ -155,7 +155,7 @@
     <style name="Cinemates.Button.Chip.Filter" parent="Widget.MaterialComponents.Chip.Filter">
         <item name="android:textColor">@color/yellow</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Chip.Input.TextAppearance</item>
-        <item name="rippleColor">@color/orange</item>
+        <item name="rippleColor">@color/yellow</item>
         <item name="chipIconTint">@color/yellow</item>
         <item name="checkedIconTint">@color/yellow</item>
     </style>
@@ -171,7 +171,6 @@
         <item name="android:textColor">@color/chip_choice_text_states</item>
         <item name="chipBackgroundColor">@color/chip_choice_bg_states</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Chip.Choice.TextAppearance</item>
-        <item name="rippleColor">@color/orange</item>
     </style>
     <style name="Cinemates.Button.Chip.Choice.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
         <item name="fontFamily">@font/poppins_semibold</item>
