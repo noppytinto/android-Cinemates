@@ -64,20 +64,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String email = editTextEmail.getText().toString();
             String password = editTextPassword.getText().toString();
 
-            remoteConnectionIsEstablished();
+            establisAzureRemoteConnection();
 
         }
     }
 
 
-    private boolean remoteConnectionIsEstablished() {
-        boolean result = false;
-
+    private void establisAzureRemoteConnection() {
         final String checkSignatureFunction = "check_app_signature?signature=";
 
         try {
-
-
             Request request = new Request.Builder()
                     .url(RemoteConfig.getAzureBaseUrl()+ checkSignatureFunction + RemoteConfig.getCinematesAppSignature())
                     .header("User-Agent", "OkHttp Headers.java")
@@ -86,28 +82,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     .addHeader("Authorization", "Bearer " + RemoteConfig.getGuestToken())
                     .build();
 
-
             Call call = client.newCall(request);
             call.enqueue(this);
-
-
-//            HttpClient client = HttpClient.newHttpClient();
-//            HttpRequest request = HttpRequest.newBuilder()
-//                    .uri(URI.create(ConfigurationManager.getHttpsBaseUrl() + ConfigurationManager.getCheckSignature() + ConfigurationManager.getCinematesAppSignature()))
-//                    .header("Authorization", "Bearer " + ConfigurationManager.getGuestToken())
-//                    .header("Content-Type", "application/json")
-//                    .build();
-//
-//            // getting http response
-//            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//            result = Boolean.parseBoolean(response.body());
-
 
         }catch(Exception e) {
             e.printStackTrace();
         }
-
-        return result;
     }
 
 
@@ -129,27 +109,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onFailure(Call call, IOException e) {
-
+        final Toast toast = Toast.makeText(this, "Cannot establish remote connection! D:", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
     public void onResponse(Call call, Response response) {
         try (ResponseBody responseBody = response.body()) {
             if (!response.isSuccessful()) {
-                System.out.println("Unexpected code " + response);
-                Toast.makeText(this, "Remote connection failed! D:", Toast.LENGTH_SHORT).show();
+                final Toast toast = Toast.makeText(this, "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
+                toast.show();
                 return;
             }
 
             // print response
-            Headers responseHeaders = response.headers();
-            for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-                System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
-            }
-            System.out.println(responseBody.string());
-
-
-            //
+            final Toast toast = Toast.makeText(this, "code: " + response.code() + " | message:" +  response.message(), Toast.LENGTH_SHORT);
+            toast.show();
         }
         catch (Exception e) {
             e.getMessage();
