@@ -53,6 +53,9 @@ public class ExploreFragment extends Fragment{
 //
 //
 //        });
+        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+
+        firebaseEventsLogger.logScreenEvent(this, "Explore tab", getContext())
 
     }
 
