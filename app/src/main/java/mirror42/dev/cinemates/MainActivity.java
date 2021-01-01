@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
     @Override
     public void onFailure(Call call, IOException e) {
-        Log.d("appstartup", "Azure connection:\nCannot establish remote connection! D:");
+        showToastOnUiThread("Azure connection:\nCannot establish remote connection! D:");
     }
 
     @Override
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
             @Override
             public void run() {
                 // print response
-                final Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_LONG);
+                final Toast toast = Toast.makeText(getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
         });

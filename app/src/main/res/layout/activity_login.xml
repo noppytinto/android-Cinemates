@@ -6,28 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.LoginActivity">
 
-    <EditText
-        android:id="@+id/editTextText_loginActivity_email"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_loginActivity_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:visibility="gone"
+        android:hint="@string/email"
+        app:helperTextEnabled="true"
+        app:helperText="test@mail.com"
+        app:startIconDrawable="@drawable/email_icon_light_blue"
+        app:endIconMode="clear_text"
+        app:errorEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/progresBar_loginActivity"
+        app:layout_constraintVertical_bias="0.26999998">
 
-    <EditText
-        android:id="@+id/editTextText_loginActivity_password"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextText_loginActivity_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="15"
+            android:textColor="@color/white"
+            android:inputType="textEmailAddress" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_loginActivity_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@+id/editTextText_loginActivity_email"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText_loginActivity_email" />
+        android:hint="@string/password"
+        app:startIconDrawable="@drawable/password_icon_light_blue"
+        app:endIconMode="password_toggle"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginActivity_email">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextText_loginActivity_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="15"
+            android:textColor="@color/white"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/button_loginActivity_login"
@@ -36,19 +63,20 @@
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
         android:text="@string/login"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/editTextText_loginActivity_password"
-        app:layout_constraintStart_toStartOf="@+id/editTextText_loginActivity_password"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText_loginActivity_password" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginActivity_password" />
 
     <ProgressBar
         android:id="@+id/progresBar_loginActivity"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.156" />
 </androidx.constraintlayout.widget.ConstraintLayout>

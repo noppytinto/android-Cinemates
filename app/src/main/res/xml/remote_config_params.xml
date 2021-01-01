@@ -6,7 +6,7 @@
     </entry>
     <entry>
         <key>azure_base_url</key>
-        <value>https://cinemates.westeurope.cloudapp.azure.com/cinemates/rpc/</value>
+        <value>-</value>
     </entry>
     <entry>
         <key>guest_token</key>
@@ -14,6 +14,18 @@
     </entry>
     <entry>
         <key>cinemates_app_signature</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>cloudinary_url</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>postgrest_path_segment</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>azure_host_name</key>
         <value>-</value>
     </entry>
 </defaultsMap>
