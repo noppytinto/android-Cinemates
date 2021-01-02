@@ -78,6 +78,10 @@ public class RemoteConfigServer {
         return mFirebaseRemoteConfig.getString("cloudinary_url");
     }
 
+    public String getCinematesData() {
+        return mFirebaseRemoteConfig.getString("cinemates_data");
+    }
+
 
 
     //------------------------------------------------------- METHODS

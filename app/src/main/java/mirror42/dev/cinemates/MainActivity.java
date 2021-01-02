@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import mirror42.dev.cinemates.ui.login.LoginActivity;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -52,47 +53,11 @@ public class MainActivity extends AppCompatActivity implements Callback,
         remoteConfigServer.setListener(this);
         remoteConfigServer.loadConfigParams();
 
-
-
         //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController);
+
     }// end onCreate()
-
-
-
-
-    public void encryptFile() {
-//        try {
-//            // Although you can define your own key generation parameter specification, it's
-//            // recommended that you use the value specified here.
-//            Context context = getApplicationContext();
-//            MasterKey mainKey = new MasterKey.Builder(context)
-//                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-//                    .build();
-//
-//
-//            // Creates a file with this name, or replaces an existing file
-//            // that has the same name. Note that the file name cannot contain
-//            // path separators.
-//            String fileToWrite = "my_sensitive_data.txt";
-//            EncryptedFile encryptedFile = new EncryptedFile.Builder(context,
-//                    new File("test", fileToWrite),
-//                    mainKey,
-//                    EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-//            ).build();
-//
-//            byte[] fileContent = "MY SUPER-SECRET INFORMATION"
-//                    .getBytes(StandardCharsets.UTF_8);
-//            OutputStream outputStream = encryptedFile.openFileOutput();
-//            outputStream.write(fileContent);
-//            outputStream.flush();
-//            outputStream.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-    }
 
 
 
@@ -181,9 +146,11 @@ public class MainActivity extends AppCompatActivity implements Callback,
         if(taskIsSuccessful) {
             Toast.makeText(this, "Firebase remote config:\nfetching config data completed", Toast.LENGTH_SHORT).show();
             establishAzureConnection();
+
+
         }
         else {
-            Toast.makeText(this, "irebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Firebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();
         }
     }
 

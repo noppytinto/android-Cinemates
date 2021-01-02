@@ -64,5 +64,6 @@
     <string name="cinemates_app_signature_default_value">-</string>
     <string name="email">email</string>
     <string name="password">password</string>
+    <string name="rememberme">Ricordami</string>
 
 </resources>

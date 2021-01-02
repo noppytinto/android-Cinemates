@@ -28,4 +28,8 @@
         <key>azure_host_name</key>
         <value>-</value>
     </entry>
+    <entry>
+        <key>cinemates_data</key>
+        <value>-</value>
+    </entry>
 </defaultsMap>

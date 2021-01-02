@@ -3,6 +3,8 @@ package mirror42.dev.cinemates.ui.login;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -12,16 +14,14 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -33,7 +33,8 @@ import okhttp3.ResponseBody;
 
 public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener,
-        Callback {
+        Callback,
+        CompoundButton.OnCheckedChangeListener {
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
@@ -41,7 +42,8 @@ public class LoginActivity extends AppCompatActivity implements
     private Button buttonLogin;
     private ProgressBar spinner;
     private RemoteConfigServer remoteConfigServer;
-
+    private CheckBox checkBoxRememberMe;
+    private boolean rememberMeIsActive;
 
 
     //---------------------------------------------------- LIFECYCLE METHODS
@@ -50,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        remoteConfigServer = RemoteConfigServer.getInstance();
 
         //
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
@@ -65,13 +68,21 @@ public class LoginActivity extends AppCompatActivity implements
         textInputLayoutEmail = (TextInputLayout) findViewById(R.id.textInputLayout_loginActivity_email);
         textInputLayoutPassword = (TextInputLayout) findViewById(R.id.textInputLayout_loginActivity_password);
         buttonLogin = (Button) findViewById(R.id.button_loginActivity_login);
+        checkBoxRememberMe = findViewById(R.id.checkBox_loginActivity_rememberMe);
+        checkBoxRememberMe.setOnCheckedChangeListener(this);
 
         //
         buttonLogin.setOnClickListener(this);
 
+        //
+//        MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
+
+        //
+        rememberMeIsActive = checkRememberMe();
+
         // fast login
-        editTextEmail.setText("dev.mirror42@gmail.com");
-        editTextPassword.setText("a");
+//        editTextEmail.setText("dev.mirror42@gmail.com");
+//        editTextPassword.setText("a");
 
     }
 
@@ -97,46 +108,40 @@ public class LoginActivity extends AppCompatActivity implements
                 return;
             }
 
+            textInputLayoutEmail.setError(null);
+            textInputLayoutPassword.setError(null);
+            standardLogin(email, password);
+
+        }
+    }
+
+
+
+    public boolean checkRememberMe() {
+        boolean result = false;
+        if(MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this)) {
             try {
-                textInputLayoutEmail.setError(null);
-                textInputLayoutPassword.setError(null);
-                standardLogin(email, toHexString(getSHA(password)));
-            } catch (NoSuchAlgorithmException e) {
+                JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
+                editTextEmail.setText(jsonObject.getString("Email"));
+                editTextPassword.setText("********");
+//                showToastOnUiThread( "Authentication server:\nwelcome back: " + jsonObject.getString("Email"));
+                checkBoxRememberMe.setChecked(true);
+                result = true;
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
-        }
-    }
-
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
-        // Static getInstance method is called with hashing SHA
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-
-        // digest() method called
-        // to calculate message digest of an input
-        // and return array of byte
-        return md.digest(input.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static String toHexString(byte[] hash) {
-        // Convert byte array into signum representation
-        BigInteger number = new BigInteger(1, hash);
-
-        // Convert message digest into hex value
-        StringBuilder hexString = new StringBuilder(number.toString(16));
-
-        // Pad with leading zeros
-        while (hexString.length() < 32)
-        {
-            hexString.insert(0, '0');
         }
 
-        return hexString.toString();
+        return result;
     }
-
 
 
     private void standardLogin(String email, String password) {
+        if(password==null) {
+            // TODO handle password encrypt null result
+            return;
+        }
+
         //
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Bundle bundle = new Bundle();
@@ -146,20 +151,48 @@ public class LoginActivity extends AppCompatActivity implements
         //
         final String dbFunction = "login";
         final OkHttpClient httpClient = new OkHttpClient();
-        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
+        HttpUrl httpUrl = null;
 
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .addQueryParameter("mail", email)
-                .addQueryParameter("pass", password)
-                .build();
 
-        System.out.println(httpUrl);
+        if(rememberMeIsActive) {
+            // decryptFile
+            String data = MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this);
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(data);
+                httpUrl = new HttpUrl.Builder()
+                        .scheme("https")
+                        .host(remoteConfigServer.getAzureHostName())
+                        .addPathSegments(remoteConfigServer.getPostgrestPath())
+                        .addPathSegment(dbFunction)
+                        .addQueryParameter("mail", email)
+                        .addQueryParameter("pass", jsonObject.getString("Password"))
+                        .build();
 
-        spinner.setVisibility(View.VISIBLE);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            System.out.println(httpUrl);
+            spinner.setVisibility(View.VISIBLE);
+        }
+        else {
+            httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .addQueryParameter("mail", email)
+                    .addQueryParameter("pass", MyUtilities.SHAencrypt(password))
+                    .build();
+
+            System.out.println(httpUrl);
+            spinner.setVisibility(View.VISIBLE);
+        }
+
+
+
 
 
 //
@@ -204,6 +237,16 @@ public class LoginActivity extends AppCompatActivity implements
                 showToastOnUiThread( "Authentication server:\nlogin successful\nwelcome: " + jsonObject.getString("Email"));
                 resetTextLayout();
                 //TODO: handle login response
+                // encrypting
+
+                if(checkBoxRememberMe.isChecked()) {
+                    MyUtilities.encryptFile(remoteConfigServer.getCinematesData(), jsonObject.toString(), this);
+
+                    // decryptFile
+//                    String data = MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this);
+//                    showToastOnUiThread(data);
+                }
+
             }
             else {
                 notifyError();
@@ -254,4 +297,16 @@ public class LoginActivity extends AppCompatActivity implements
     }// end showToastOnUiThread()
 
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked) {
+//            Toast.makeText(this, "Credenziali salvate", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            rememberMeIsActive = false;
+            editTextPassword.setText("");
+            MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
+            Toast.makeText(this, "Credenziali eliminate", Toast.LENGTH_SHORT).show();
+        }
+    }
 }// end LoginActivity class

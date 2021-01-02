@@ -58,9 +58,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-perf'
     // security
-    implementation "androidx.security:security-crypto:1.0.0-rc03"
-    // For Identity Credential APIs
-    implementation "androidx.security:security-identity-credential:1.0.0-alpha01"
+    implementation "androidx.security:security-crypto:1.1.0-alpha03"
 
 
 
