@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.utilities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -43,6 +44,7 @@ public class FirebaseEventsLogger {
 
     public void logScreenEvent(Object screenClass, String screenName, Context context) {
         if(haveUserConsensus) {
+            @SuppressLint("MissingPermission")
             FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
             Bundle params = new Bundle();
             params.putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenClass.getClass().getSimpleName());
@@ -54,6 +56,7 @@ public class FirebaseEventsLogger {
     public void logSearchTerm(String term, Object screenClass, Context context) {
         if(haveUserConsensus) {
             // send to firebase analytics
+            @SuppressLint("MissingPermission")
             FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
             //throw new RuntimeException("Test Crash"); // Force a crash for Crashlytics
             Bundle params = new Bundle();
@@ -66,6 +69,7 @@ public class FirebaseEventsLogger {
     public void logSelectedMovie(Movie movie, String itemCategory, Object screenClass, Context context) {
         if(haveUserConsensus) {
             // send to firebase analytics
+            @SuppressLint("MissingPermission")
             FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
             Bundle params = new Bundle();
             params.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, itemCategory);
@@ -76,6 +80,14 @@ public class FirebaseEventsLogger {
 //        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, params);
         }
+    }
+
+    public void logLoginEvent(String method, Context context) {
+        @SuppressLint("MissingPermission")
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.METHOD, method);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
     }
 
 
