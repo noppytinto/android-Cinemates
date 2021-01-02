@@ -62,6 +62,41 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
 
 
+    public void encryptFile() {
+//        try {
+//            // Although you can define your own key generation parameter specification, it's
+//            // recommended that you use the value specified here.
+//            Context context = getApplicationContext();
+//            MasterKey mainKey = new MasterKey.Builder(context)
+//                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+//                    .build();
+//
+//
+//            // Creates a file with this name, or replaces an existing file
+//            // that has the same name. Note that the file name cannot contain
+//            // path separators.
+//            String fileToWrite = "my_sensitive_data.txt";
+//            EncryptedFile encryptedFile = new EncryptedFile.Builder(context,
+//                    new File("test", fileToWrite),
+//                    mainKey,
+//                    EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+//            ).build();
+//
+//            byte[] fileContent = "MY SUPER-SECRET INFORMATION"
+//                    .getBytes(StandardCharsets.UTF_8);
+//            OutputStream outputStream = encryptedFile.openFileOutput();
+//            outputStream.write(fileContent);
+//            outputStream.flush();
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+    }
+
+
+
+
     //-------------------------------------------------------- METHODS
 
     @Override
