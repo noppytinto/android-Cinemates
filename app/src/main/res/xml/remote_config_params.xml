@@ -17,10 +17,6 @@
         <value>-</value>
     </entry>
     <entry>
-        <key>cloudinary_url</key>
-        <value>-</value>
-    </entry>
-    <entry>
         <key>postgrest_path_segment</key>
         <value>-</value>
     </entry>
@@ -30,6 +26,14 @@
     </entry>
     <entry>
         <key>cinemates_data</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>cloudinary_download_base_url</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>cloudinary_upload_base_url</key>
         <value>-</value>
     </entry>
 </defaultsMap>

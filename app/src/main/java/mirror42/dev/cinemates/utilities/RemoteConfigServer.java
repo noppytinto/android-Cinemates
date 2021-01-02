@@ -74,8 +74,12 @@ public class RemoteConfigServer {
         return mFirebaseRemoteConfig.getString("postgrest_path_segment");
     }
 
-    public String getCloudinaryUrl() {
-        return mFirebaseRemoteConfig.getString("cloudinary_url");
+    public String getCloudinaryUploadBaseUrl() {
+        return mFirebaseRemoteConfig.getString("cloudinary_upload_base_url");
+    }
+
+    public String getCloudinaryDownloadBaseUrl() {
+        return mFirebaseRemoteConfig.getString("cloudinary_download_base_url");
     }
 
     public String getCinematesData() {
