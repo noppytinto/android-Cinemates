@@ -388,7 +388,7 @@ public class LoginActivity extends AppCompatActivity implements
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, context);
 
                     // load profile picture into main activity toolbar
-                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + loginMenuItem, profilePicture, context);
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, context);
                 }
             }
         });
