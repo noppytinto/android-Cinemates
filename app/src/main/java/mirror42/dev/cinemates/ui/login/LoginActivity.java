@@ -1,15 +1,25 @@
 package mirror42.dev.cinemates.ui.login;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -18,6 +28,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import mirror42.dev.cinemates.utilities.MyUtilities;
@@ -38,13 +49,16 @@ public class LoginActivity extends AppCompatActivity implements
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
     private Button buttonLogin;
+    private Button buttonLogout;
     private ProgressBar spinner;
     private RemoteConfigServer remoteConfigServer;
     private CheckBox checkBoxRememberMe;
     private static boolean rememberMeIsActive;
+    private ImageView profilePicture;
+    private MenuItem loginItemMenu;
 
 
-    
+
 
     //-------------------------------------------------------------------------------- LIFECYCLE METHODS
 
@@ -54,15 +68,19 @@ public class LoginActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_login);
         remoteConfigServer = RemoteConfigServer.getInstance();
         spinner = findViewById(R.id.progresBar_loginActivity);
-        editTextEmail = (TextInputEditText) findViewById(R.id.editTextText_loginActivity_email);
-        editTextPassword = (TextInputEditText) findViewById(R.id.editTextText_loginActivity_password);
+        editTextEmail = (TextInputEditText) findViewById(R.id.editText_loginActivity_email);
+        editTextPassword = (TextInputEditText) findViewById(R.id.editText_loginActivity_password);
         textInputLayoutEmail = (TextInputLayout) findViewById(R.id.textInputLayout_loginActivity_email);
         textInputLayoutPassword = (TextInputLayout) findViewById(R.id.textInputLayout_loginActivity_password);
         buttonLogin = (Button) findViewById(R.id.button_loginActivity_login);
         checkBoxRememberMe = findViewById(R.id.checkBox_loginActivity_rememberMe);
+        profilePicture = findViewById(R.id.imageView_loginActivity_profilePicture);
+        loginItemMenu = MainActivity.loginItemMenu;
+        buttonLogout = findViewById(R.id.button_loginActivity_logout);
 
         //
         buttonLogin.setOnClickListener(this);
+        buttonLogout.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
 
         //
@@ -73,9 +91,13 @@ public class LoginActivity extends AppCompatActivity implements
         boolean thereIsArememberMe = checkAnyPreviousRememberMe();
         if(thereIsArememberMe) {
             updateRememberMeState(true);
+            hideLogin();
+            showLogout();
         }
         else {
             updateRememberMeState(false);
+            showLogin();
+            hideLogout();
         }
 
         // fast login
@@ -104,6 +126,8 @@ public class LoginActivity extends AppCompatActivity implements
                 JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
                 editTextEmail.setText(jsonObject.getString("Email"));
                 editTextPassword.setText("********");
+                loadProfilePicture(jsonObject.getString("ProfileImage"), this);
+
 //                showToastOnUiThread( "Authentication server:\nwelcome back: " + jsonObject.getString("Email"));
                 checkBoxRememberMe.setChecked(true);
                 result = true;
@@ -209,6 +233,22 @@ public class LoginActivity extends AppCompatActivity implements
             textInputLayoutPassword.setError(null);
             standardLogin(email, password);
         }
+        else if(v.getId() == buttonLogout.getId()) {
+            showLogin();
+            hideLogout();
+            rememberMeIsActive = false;
+            editTextPassword.setText("");
+            try {
+                Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
+                profilePicture.setImageDrawable(drawable);
+                loginItemMenu.setIcon(drawable);
+
+            } catch (Resources.NotFoundException e) {
+                e.printStackTrace();
+            }
+            MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
+            checkBoxRememberMe.setChecked(false);
+        }
     }
 
     @Override
@@ -220,6 +260,14 @@ public class LoginActivity extends AppCompatActivity implements
             if(rememberMeIsActive) {
                 rememberMeIsActive = false;
                 editTextPassword.setText("");
+                try {
+                    Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
+                    profilePicture.setImageDrawable(drawable);
+                    loginItemMenu.setIcon(drawable);
+
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
                 MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
                 Toast.makeText(this, "Credenziali eliminate", Toast.LENGTH_SHORT).show();
             }
@@ -239,8 +287,12 @@ public class LoginActivity extends AppCompatActivity implements
 
                 if( ! responseData.equals("null")) {
                     JSONObject jsonObject = new JSONObject(responseData);
+
+                    String imagePath = jsonObject.getString("ProfileImage");
+                    loadProfilePicture(imagePath, this);
                     showToastOnUiThread( "Authentication server:\nlogin successful\nwelcome: " + jsonObject.getString("Email"));
-                    resetTextLayout();
+                    hideLogin();
+                    showLogout();
                     //TODO: handle login response
                     // encrypting
 
@@ -266,6 +318,42 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
+    public void loadProfilePicture(String imagePath, Context context) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(imagePath!=null || (! imagePath.isEmpty())) {
+                    Glide.with(context)  //2
+                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
+                            .fallback(R.drawable.broken_image)
+                            .placeholder(R.drawable.placeholder_image)
+                            .circleCrop() //4
+                            .into(profilePicture); //8
+
+
+                    Glide.with(context)  //2
+                            .asDrawable()
+                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
+                            .fallback(R.drawable.broken_image)
+                            .placeholder(R.drawable.placeholder_image)
+                            .circleCrop() //4
+                            .into(new CustomTarget<Drawable>() {
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                    loginItemMenu.setIcon(resource);
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                }
+                            }); //8
+
+                }
+            }
+        });
+
+    }
 
     private void resetTextLayout() {
         runOnUiThread(new Runnable() {
@@ -274,6 +362,7 @@ public class LoginActivity extends AppCompatActivity implements
                 // print response
                 textInputLayoutEmail.setError(null);
                 textInputLayoutPassword.setError(null);
+
             }
         });
     }
@@ -300,5 +389,33 @@ public class LoginActivity extends AppCompatActivity implements
             }
         });
     }// end showToastOnUiThread()
+
+    public void hideLogin() {
+        textInputLayoutEmail.setVisibility(View.GONE);
+        textInputLayoutPassword.setVisibility(View.GONE);
+        editTextEmail.setVisibility(View.GONE);
+        editTextPassword.setVisibility(View.GONE);
+        buttonLogin.setVisibility(View.GONE);
+        checkBoxRememberMe.setVisibility(View.GONE);
+
+    }
+
+    public void showLogin() {
+        textInputLayoutEmail.setVisibility(View.VISIBLE);
+        textInputLayoutPassword.setVisibility(View.VISIBLE);
+        editTextEmail.setVisibility(View.VISIBLE);
+        editTextPassword.setVisibility(View.VISIBLE);
+        buttonLogin.setVisibility(View.VISIBLE);
+        checkBoxRememberMe.setVisibility(View.VISIBLE);
+    }
+
+    public void hideLogout() {
+        buttonLogout.setVisibility(View.GONE);
+
+    }
+
+    public void showLogout() {
+        buttonLogout.setVisibility(View.VISIBLE);
+    }
 
 }// end LoginActivity class

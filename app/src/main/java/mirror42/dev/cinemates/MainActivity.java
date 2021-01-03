@@ -1,17 +1,27 @@
 package mirror42.dev.cinemates;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -33,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
     private final String TAG = this.getClass().getSimpleName();
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
+    public static MenuItem loginItemMenu;
 
 
     //-------------------------------------------------------- LIFECYCLE METHODS
@@ -64,10 +75,47 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
     //-------------------------------------------------------- METHODS
 
+    public boolean checkAnyPreviousRememberMe() {
+        boolean result = false;
+        if(MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this)) {
+            try {
+                JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
+                String imagePath = jsonObject.getString("ProfileImage");
+
+                if(imagePath!=null || (! imagePath.isEmpty())) {
+                    Glide.with(this)  //2
+                            .asDrawable()
+                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
+                            .fallback(R.drawable.broken_image)
+                            .placeholder(R.drawable.placeholder_image)
+                            .circleCrop() //4
+                            .into(new CustomTarget<Drawable>() {
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                    loginItemMenu.setIcon(resource);
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                }
+                            }); //8
+                }
+
+                result = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }// if
+
+        return result;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        loginItemMenu = menu.getItem(1);
         return true;
     }
 
@@ -146,8 +194,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         if(taskIsSuccessful) {
             Toast.makeText(this, "Firebase remote config:\nfetching config data completed", Toast.LENGTH_SHORT).show();
             establishAzureConnection();
-
-
+            checkAnyPreviousRememberMe();
         }
         else {
             Toast.makeText(this, "Firebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();
@@ -164,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         try (ResponseBody responseBody = response.body()) {
             if (!response.isSuccessful()) {
                 showToastOnUiThread("Azure connection:\ncode: " + response.code() + " | message:" + response.message());
+                
                 return;
             }
 
@@ -186,5 +234,15 @@ public class MainActivity extends AppCompatActivity implements Callback,
             }
         });
     }// end showToastOnUiThread()
+
+    public void loadProfilePicture(String imagePath, Context context) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+
+    }
 
 }

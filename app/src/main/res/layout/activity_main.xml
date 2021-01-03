@@ -31,11 +31,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/primary_blue"
-                app:popupTheme="@style/Theme.Cinemates.PopupOverlay" />
+                app:popupTheme="@style/Theme.Cinemates.PopupOverlay"
+                android:paddingEnd="7dp"
+                />
 
             <ImageView
                 android:id="@+id/imageView3"
-                android:layout_width="match_parent"
+                android:layout_width="143dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
                 app:srcCompat="@drawable/cinemates_logo_extended_nolights" />
