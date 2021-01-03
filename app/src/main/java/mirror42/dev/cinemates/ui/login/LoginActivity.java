@@ -318,6 +318,19 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     public void loadProfilePicture(String imagePath, Context context) {
         runOnUiThread(new Runnable() {
             @Override
@@ -329,7 +342,6 @@ public class LoginActivity extends AppCompatActivity implements
                             .placeholder(R.drawable.placeholder_image)
                             .circleCrop() //4
                             .into(profilePicture); //8
-
 
                     Glide.with(context)  //2
                             .asDrawable()
@@ -391,31 +403,51 @@ public class LoginActivity extends AppCompatActivity implements
     }// end showToastOnUiThread()
 
     public void hideLogin() {
-        textInputLayoutEmail.setVisibility(View.GONE);
-        textInputLayoutPassword.setVisibility(View.GONE);
-        editTextEmail.setVisibility(View.GONE);
-        editTextPassword.setVisibility(View.GONE);
-        buttonLogin.setVisibility(View.GONE);
-        checkBoxRememberMe.setVisibility(View.GONE);
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInputLayoutEmail.setVisibility(View.GONE);
+                textInputLayoutPassword.setVisibility(View.GONE);
+                editTextEmail.setVisibility(View.GONE);
+                editTextPassword.setVisibility(View.GONE);
+                buttonLogin.setVisibility(View.GONE);
+                checkBoxRememberMe.setVisibility(View.GONE);
+            }
+        });
     }
 
     public void showLogin() {
-        textInputLayoutEmail.setVisibility(View.VISIBLE);
-        textInputLayoutPassword.setVisibility(View.VISIBLE);
-        editTextEmail.setVisibility(View.VISIBLE);
-        editTextPassword.setVisibility(View.VISIBLE);
-        buttonLogin.setVisibility(View.VISIBLE);
-        checkBoxRememberMe.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInputLayoutEmail.setVisibility(View.VISIBLE);
+                textInputLayoutPassword.setVisibility(View.VISIBLE);
+                editTextEmail.setVisibility(View.VISIBLE);
+                editTextPassword.setVisibility(View.VISIBLE);
+                buttonLogin.setVisibility(View.VISIBLE);
+                checkBoxRememberMe.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void hideLogout() {
-        buttonLogout.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonLogout.setVisibility(View.GONE);
+
+            }
+        });
 
     }
 
     public void showLogout() {
-        buttonLogout.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonLogout.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
 }// end LoginActivity class
