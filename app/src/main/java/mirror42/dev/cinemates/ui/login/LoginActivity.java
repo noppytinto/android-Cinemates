@@ -13,13 +13,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -31,6 +26,7 @@ import java.io.IOException;
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -55,7 +51,7 @@ public class LoginActivity extends AppCompatActivity implements
     private CheckBox checkBoxRememberMe;
     private static boolean rememberMeIsActive;
     private ImageView profilePicture;
-    private MenuItem loginItemMenu;
+    private MenuItem loginMenuItem;
 
 
 
@@ -75,7 +71,7 @@ public class LoginActivity extends AppCompatActivity implements
         buttonLogin = (Button) findViewById(R.id.button_loginActivity_login);
         checkBoxRememberMe = findViewById(R.id.checkBox_loginActivity_rememberMe);
         profilePicture = findViewById(R.id.imageView_loginActivity_profilePicture);
-        loginItemMenu = MainActivity.loginItemMenu;
+        loginMenuItem = MainActivity.loginItemMenu;
         buttonLogout = findViewById(R.id.button_loginActivity_logout);
         // setting listeners
         buttonLogin.setOnClickListener(this);
@@ -108,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     //-------------------- REMEMBER ME methods
 
-    public void init() {
+    private void init() {
         boolean thereIsArememberMe = checkAnyPreviousRememberMe();
 
         if(thereIsArememberMe) {
@@ -127,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements
      * read a previous remember me state (if any)
      * on local store
      */
-    public boolean checkAnyPreviousRememberMe() {
+    private boolean checkAnyPreviousRememberMe() {
         boolean result = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
         return result;
     }
@@ -147,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    public void hideLoginComponents() {
+    private void hideLoginComponents() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -161,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements
         });
     }
 
-    public void showLoginComponents() {
+    private void showLoginComponents() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -175,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements
         });
     }
 
-    public void hideLogoutComponents() {
+    private void hideLogoutComponents() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -186,7 +182,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     }
 
-    public void showLogoutComponents() {
+    private void showLogoutComponents() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -204,20 +200,26 @@ public class LoginActivity extends AppCompatActivity implements
             if(rememberMeIsActive) {
                 rememberMeIsActive = false;
                 editTextPassword.setText("");
-                try {
-                    Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
-                    profilePicture.setImageDrawable(drawable);
-                    loginItemMenu.setIcon(drawable);
+                setDefaultProfilePicture();
 
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                }
+                // delete remember me data
                 MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
+
+                //
                 Toast.makeText(this, "Credenziali eliminate", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    private void setDefaultProfilePicture() {
+        try {
+            Drawable defaultProfilePicture = getResources().getDrawable(R.drawable.user_icon_light_blue);
+            profilePicture.setImageDrawable(defaultProfilePicture);
+            loginMenuItem.setIcon(defaultProfilePicture);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     //-------------------- LOGIN methods
@@ -242,11 +244,11 @@ public class LoginActivity extends AppCompatActivity implements
         // generating url request
         if(rememberMeIsActive) {
             // decrypt rememberme file
-            String data = MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this);
+            String rememberMeData = MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this);
             JSONObject jsonObject = null;
 
             try {
-                jsonObject = new JSONObject(data);
+                jsonObject = new JSONObject(rememberMeData);
                 httpUrl = new HttpUrl.Builder()
                         .scheme("https")
                         .host(remoteConfigServer.getAzureHostName())
@@ -272,7 +274,7 @@ public class LoginActivity extends AppCompatActivity implements
                     .build();
         }
 
-        // performing  request
+        // performing http request
         try {
             Request request = new Request.Builder()
                     .url(httpUrl)
@@ -319,7 +321,7 @@ public class LoginActivity extends AppCompatActivity implements
             try {
                 Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
                 profilePicture.setImageDrawable(drawable);
-                loginItemMenu.setIcon(drawable);
+                loginMenuItem.setIcon(drawable);
 
             } catch (Resources.NotFoundException e) {
                 e.printStackTrace();
@@ -376,39 +378,17 @@ public class LoginActivity extends AppCompatActivity implements
 
 
 
-    public void loadProfilePicture(String imagePath, Context context) {
+    private void loadProfilePicture(String imagePath, Context context) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if(imagePath!=null || ( ! imagePath.isEmpty())) {
 
                     // load profile picture in login activity
-                    Glide.with(context)  //2
-                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
-                            .fallback(R.drawable.broken_image)
-                            .placeholder(R.drawable.placeholder_image)
-                            .circleCrop() //4
-                            .into(profilePicture); //8
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, context);
 
-                    // load profile picture in main activity (toolbar)
-                    Glide.with(context)  //2
-                            .asDrawable()
-                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
-                            .fallback(R.drawable.broken_image)
-                            .placeholder(R.drawable.placeholder_image)
-                            .circleCrop() //4
-                            .into(new CustomTarget<Drawable>() {
-                                @Override
-                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    loginItemMenu.setIcon(resource);
-                                }
-
-                                @Override
-                                public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                                }
-                            }); //8
-
+                    // load profile picture into main activity toolbar
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + loginMenuItem, profilePicture, context);
                 }
             }
         });
