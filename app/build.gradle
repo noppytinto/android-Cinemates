@@ -63,6 +63,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-perf'
     // security
     implementation "androidx.security:security-crypto:1.1.0-alpha03"
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
 
 
