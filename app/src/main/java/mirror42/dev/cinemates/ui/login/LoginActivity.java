@@ -77,28 +77,17 @@ public class LoginActivity extends AppCompatActivity implements
         profilePicture = findViewById(R.id.imageView_loginActivity_profilePicture);
         loginItemMenu = MainActivity.loginItemMenu;
         buttonLogout = findViewById(R.id.button_loginActivity_logout);
-
-        //
+        // setting listeners
         buttonLogin.setOnClickListener(this);
         buttonLogout.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
 
-        //
+        // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
         firebaseEventsLogger.logScreenEvent(this, "Login page", this);
 
         //
-        boolean thereIsArememberMe = checkAnyPreviousRememberMe();
-        if(thereIsArememberMe) {
-            updateRememberMeState(true);
-            hideLogin();
-            showLogout();
-        }
-        else {
-            updateRememberMeState(false);
-            showLogin();
-            hideLogout();
-        }
+        init();
 
         // fast login
 //        editTextEmail.setText("dev.mirror42@gmail.com");
@@ -111,8 +100,27 @@ public class LoginActivity extends AppCompatActivity implements
 
     //-------------------------------------------------------------------------------- GETTERS/SETTERS
 
-    private void updateRememberMeState(Boolean rememberMeState) {
-        this.rememberMeIsActive = rememberMeState;
+
+
+
+
+    //-------------------------------------------------------------------------------- METHODS
+
+    //-------------------- REMEMBER ME methods
+
+    public void init() {
+        boolean thereIsArememberMe = checkAnyPreviousRememberMe();
+
+        if(thereIsArememberMe) {
+            loadRememberMeData();
+            hideLoginComponents();
+            showLogoutComponents();
+        }
+        else {
+            this.rememberMeIsActive = false;
+            showLoginComponents();
+            hideLogoutComponents();
+        }
     }
 
     /**
@@ -120,28 +128,99 @@ public class LoginActivity extends AppCompatActivity implements
      * on local store
      */
     public boolean checkAnyPreviousRememberMe() {
-        boolean result = false;
-        if(MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this)) {
-            try {
-                JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
-                editTextEmail.setText(jsonObject.getString("Email"));
-                editTextPassword.setText("********");
-                loadProfilePicture(jsonObject.getString("ProfileImage"), this);
-
-//                showToastOnUiThread( "Authentication server:\nwelcome back: " + jsonObject.getString("Email"));
-                checkBoxRememberMe.setChecked(true);
-                result = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }// if
-
+        boolean result = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
         return result;
+    }
+
+    private void loadRememberMeData() {
+        try {
+            JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
+
+            editTextEmail.setText(jsonObject.getString("Email"));
+            editTextPassword.setText("********");
+            loadProfilePicture(jsonObject.getString("ProfileImage"), this);
+            checkBoxRememberMe.setChecked(true);
+            this.rememberMeIsActive = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hideLoginComponents() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInputLayoutEmail.setVisibility(View.GONE);
+                textInputLayoutPassword.setVisibility(View.GONE);
+                editTextEmail.setVisibility(View.GONE);
+                editTextPassword.setVisibility(View.GONE);
+                buttonLogin.setVisibility(View.GONE);
+                checkBoxRememberMe.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void showLoginComponents() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textInputLayoutEmail.setVisibility(View.VISIBLE);
+                textInputLayoutPassword.setVisibility(View.VISIBLE);
+                editTextEmail.setVisibility(View.VISIBLE);
+                editTextPassword.setVisibility(View.VISIBLE);
+                buttonLogin.setVisibility(View.VISIBLE);
+                checkBoxRememberMe.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void hideLogoutComponents() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonLogout.setVisibility(View.GONE);
+
+            }
+        });
+
+    }
+
+    public void showLogoutComponents() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonLogout.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked) {
+//            Toast.makeText(this, "Credenziali salvate", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            if(rememberMeIsActive) {
+                rememberMeIsActive = false;
+                editTextPassword.setText("");
+                try {
+                    Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
+                    profilePicture.setImageDrawable(drawable);
+                    loginItemMenu.setIcon(drawable);
+
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                }
+                MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
+                Toast.makeText(this, "Credenziali eliminate", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 
 
-    //-------------------------------------------------------------------------------- METHODS
+    //-------------------- LOGIN methods
 
     private void standardLogin(String email, String password) {
         if(password==null) {
@@ -189,7 +268,7 @@ public class LoginActivity extends AppCompatActivity implements
                     .addPathSegments(remoteConfigServer.getPostgrestPath())
                     .addPathSegment(dbFunction)
                     .addQueryParameter("mail", email)
-                    .addQueryParameter("pass", MyUtilities.SHAencrypt(password))
+                    .addQueryParameter("pass", MyUtilities.SHA256encrypt(password))
                     .build();
         }
 
@@ -212,7 +291,6 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }// end standardLogin()
 
-
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonLogin.getId()) {
@@ -234,8 +312,8 @@ public class LoginActivity extends AppCompatActivity implements
             standardLogin(email, password);
         }
         else if(v.getId() == buttonLogout.getId()) {
-            showLogin();
-            hideLogout();
+            showLoginComponents();
+            hideLogoutComponents();
             rememberMeIsActive = false;
             editTextPassword.setText("");
             try {
@@ -248,29 +326,6 @@ public class LoginActivity extends AppCompatActivity implements
             }
             MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
             checkBoxRememberMe.setChecked(false);
-        }
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked) {
-//            Toast.makeText(this, "Credenziali salvate", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            if(rememberMeIsActive) {
-                rememberMeIsActive = false;
-                editTextPassword.setText("");
-                try {
-                    Drawable drawable = getResources().getDrawable(R.drawable.user_icon_light_blue);
-                    profilePicture.setImageDrawable(drawable);
-                    loginItemMenu.setIcon(drawable);
-
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                }
-                MyUtilities.deletFile(remoteConfigServer.getCinematesData(), this);
-                Toast.makeText(this, "Credenziali eliminate", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -291,8 +346,8 @@ public class LoginActivity extends AppCompatActivity implements
                     String imagePath = jsonObject.getString("ProfileImage");
                     loadProfilePicture(imagePath, this);
                     showToastOnUiThread( "Authentication server:\nlogin successful\nwelcome: " + jsonObject.getString("Email"));
-                    hideLogin();
-                    showLogout();
+                    hideLoginComponents();
+                    showLogoutComponents();
                     //TODO: handle login response
                     // encrypting
 
@@ -321,21 +376,13 @@ public class LoginActivity extends AppCompatActivity implements
 
 
 
-
-
-
-
-
-
-
-
-
-
     public void loadProfilePicture(String imagePath, Context context) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(imagePath!=null || (! imagePath.isEmpty())) {
+                if(imagePath!=null || ( ! imagePath.isEmpty())) {
+
+                    // load profile picture in login activity
                     Glide.with(context)  //2
                             .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
                             .fallback(R.drawable.broken_image)
@@ -343,6 +390,7 @@ public class LoginActivity extends AppCompatActivity implements
                             .circleCrop() //4
                             .into(profilePicture); //8
 
+                    // load profile picture in main activity (toolbar)
                     Glide.with(context)  //2
                             .asDrawable()
                             .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
@@ -365,18 +413,6 @@ public class LoginActivity extends AppCompatActivity implements
             }
         });
 
-    }
-
-    private void resetTextLayout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // print response
-                textInputLayoutEmail.setError(null);
-                textInputLayoutPassword.setError(null);
-
-            }
-        });
     }
 
     private void notifyError() {
@@ -402,52 +438,6 @@ public class LoginActivity extends AppCompatActivity implements
         });
     }// end showToastOnUiThread()
 
-    public void hideLogin() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                textInputLayoutEmail.setVisibility(View.GONE);
-                textInputLayoutPassword.setVisibility(View.GONE);
-                editTextEmail.setVisibility(View.GONE);
-                editTextPassword.setVisibility(View.GONE);
-                buttonLogin.setVisibility(View.GONE);
-                checkBoxRememberMe.setVisibility(View.GONE);
-            }
-        });
-    }
 
-    public void showLogin() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                textInputLayoutEmail.setVisibility(View.VISIBLE);
-                textInputLayoutPassword.setVisibility(View.VISIBLE);
-                editTextEmail.setVisibility(View.VISIBLE);
-                editTextPassword.setVisibility(View.VISIBLE);
-                buttonLogin.setVisibility(View.VISIBLE);
-                checkBoxRememberMe.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    public void hideLogout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                buttonLogout.setVisibility(View.GONE);
-
-            }
-        });
-
-    }
-
-    public void showLogout() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                buttonLogout.setVisibility(View.VISIBLE);
-            }
-        });
-    }
 
 }// end LoginActivity class

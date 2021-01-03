@@ -127,7 +127,9 @@ public class MyUtilities {
     }
 
 
-    public static String SHAencrypt(String message) {
+    public static String SHA256encrypt(String message) {
+        if(message== null || message.isEmpty()) return null;
+
         String hex = null;
 
         try {
