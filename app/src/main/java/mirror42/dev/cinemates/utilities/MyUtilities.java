@@ -1,9 +1,14 @@
 package mirror42.dev.cinemates.utilities;
 
 import android.content.Context;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import androidx.security.crypto.EncryptedFile;
 import androidx.security.crypto.MasterKey;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,7 +21,18 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import mirror42.dev.cinemates.model.User;
+
+
 public class MyUtilities {
+
+    public enum LoginResult {
+        INVALID_REQUEST,
+        FAILED,
+        SUCCESS,
+        INVALID_PASSWORD,
+        USER_NOT_EXIST
+    }
 
     public static void encryptFile(String filename, String rawData, Context context) {
         try {
@@ -50,7 +66,6 @@ public class MyUtilities {
             e.printStackTrace();
         }
     }
-
 
     public static String decryptFile(String filename, Context context) {
         String result=null;
@@ -141,6 +156,43 @@ public class MyUtilities {
 
         return hex;
     }
+
+    public static void showToast(String message, Context context) {
+        // print response
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.show();
+    }// end showToastOnUiThread()
+
+    public static void showCenteredToast(String message, Context context) {
+        // print response
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }// end showToastOnUiThread()
+
+
+
+
+    public static String convertUserInJSonString(User user) {
+        String string = null;
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("Username", user.getUsername());
+            jsonObject.put("Email", user.getEmail());
+            jsonObject.put("ProfileImage", user.getProfilePicturePath());
+
+            string = jsonObject.toString();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return string;
+    }
+
+
+
+
 
 
 }

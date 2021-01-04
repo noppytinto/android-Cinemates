@@ -30,7 +30,6 @@ import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
-
     private MovieDetailsViewModel movieDetailsViewModel;
     private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
     private View view;

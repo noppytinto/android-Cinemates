@@ -1,25 +1,19 @@
 package mirror42.dev.cinemates;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import org.json.JSONObject;
 
@@ -27,6 +21,7 @@ import java.io.IOException;
 
 import mirror42.dev.cinemates.ui.login.LoginActivity;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -43,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
     private final String TAG = this.getClass().getSimpleName();
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
-    public static MenuItem loginItemMenu;
+    public MenuItem loginItemMenu;
 
 
     //-------------------------------------------------------- LIFECYCLE METHODS
@@ -68,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements Callback,
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController);
 
+
+
+
     }// end onCreate()
 
 
@@ -83,23 +81,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
                 String imagePath = jsonObject.getString("ProfileImage");
 
                 if(imagePath!=null || (! imagePath.isEmpty())) {
-                    Glide.with(this)  //2
-                            .asDrawable()
-                            .load(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath) //3
-                            .fallback(R.drawable.broken_image)
-                            .placeholder(R.drawable.placeholder_image)
-                            .circleCrop() //4
-                            .into(new CustomTarget<Drawable>() {
-                                @Override
-                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    loginItemMenu.setIcon(resource);
-                                }
-
-                                @Override
-                                public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                                }
-                            }); //8
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginItemMenu, this);
                 }
 
                 result = true;
@@ -145,16 +127,45 @@ public class MainActivity extends AppCompatActivity implements Callback,
 //            }
         }
         else if (id == R.id.action_login) {
-            Intent intent = new Intent(this, LoginActivity.class);
 //            intent.putExtra(EXTRA_MESSAGE, message);
 
-
-
-            startActivity(intent);
+            int LAUNCH_SECOND_ACTIVITY = 1;
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, LAUNCH_SECOND_ACTIVITY);
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        int LAUNCH_SECOND_ACTIVITY = 1;
+
+        if (requestCode ==  LAUNCH_SECOND_ACTIVITY) {
+            if (resultCode == Activity.RESULT_OK) {
+                //Get result
+                String profileImagePath = data.getStringExtra("impagePathFromLoginFragment");
+
+                if(profileImagePath.equals("LOGOUT")) {
+                    loginItemMenu.setIcon(ImageUtilities.getDefaultProfilePictureIcon(this));
+                }
+                else if(profileImagePath.equals("LOGGED_BUT_NO_PICTURE")) {
+                    // TODO: set fname/lname initilas
+                }
+                else if(profileImagePath.equals("-")) {
+                    // ignore
+                }
+                else {
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profileImagePath, loginItemMenu, this);
+                }
+
+
+            }
+        }
+    }
+
+
 
     @Override
     public boolean onSupportNavigateUp() {

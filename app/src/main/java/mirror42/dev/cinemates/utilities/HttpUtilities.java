@@ -8,7 +8,15 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
 
+import okhttp3.HttpUrl;
+import okhttp3.Request;
+
+
+
+
+
 public class HttpUtilities {
+
 
     /**
      * Opens a connection to this url
@@ -86,5 +94,29 @@ public class HttpUtilities {
 
         return json;
     }// end getJsonObjectFromUrl()
+
+    /**
+     * build Http request (okHttp3)
+     */
+    public static Request buildGETrequest(HttpUrl httpUrl, String token) {
+        Request request = null;
+        try {
+            request = new Request.Builder()
+                    .url(httpUrl)
+                    .header("User-Agent", "OkHttp Headers.java")
+                    .addHeader("Accept", "application/json; q=0.5")
+                    .addHeader("Accept", "application/vnd.github.v3+json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return request;
+    }
+
+
+
+
 
 }// end HttpUtilities class

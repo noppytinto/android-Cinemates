@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.utilities;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -47,6 +48,18 @@ public class ImageUtilities {
 
                     }
                 }); //8
+    }
+
+    public static Drawable getDefaultProfilePictureIcon(Context context) {
+        Drawable defaultProfilePicture = null;
+
+        try {
+            defaultProfilePicture = context.getResources().getDrawable(R.drawable.user_icon_light_blue);
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return defaultProfilePicture;
     }
 
 
