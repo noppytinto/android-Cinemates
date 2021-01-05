@@ -14,6 +14,6 @@ public class ExplorePageViewHolder extends RecyclerView.ViewHolder  {
 
     public ExplorePageViewHolder(@NonNull View itemView) {
         super(itemView);
-        this.imageViewMovieCardPoster = (ImageView) itemView.findViewById(R.id.imageview_movie_card_poster);
+        this.imageViewMovieCardPoster = (ImageView) itemView.findViewById(R.id.imageview_movieCard_poster);
     }
 }

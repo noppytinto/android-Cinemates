@@ -7,7 +7,7 @@
     tools:context=".fragments.explorePage.LatestReleasesFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_latestReleases_newsPage"
+        android:id="@+id/recyclerView_explorePage_latestReleases"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

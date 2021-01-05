@@ -18,7 +18,7 @@ public class ActorCardsHolder extends RecyclerView.ViewHolder {
     public ActorCardsHolder(@NonNull View itemView) {
         super(itemView);
 
-        this.imageViewActorCard = (ImageView) itemView.findViewById(R.id.imageview_actor_card);
-        this.textViewActorCard = (TextView) itemView.findViewById(R.id.textview_actor_card);
+        this.imageViewActorCard = (ImageView) itemView.findViewById(R.id.imageview_actorCard);
+        this.textViewActorCard = (TextView) itemView.findViewById(R.id.textview_actorCard);
     }
 }

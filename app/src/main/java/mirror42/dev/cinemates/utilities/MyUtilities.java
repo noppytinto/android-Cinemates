@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.utilities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -171,6 +172,18 @@ public class MyUtilities {
     }// end showToastOnUiThread()
 
 
+
+    public static void showCenteredToastOnUiThread(Activity activity, String toastMessage) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // print response
+                final Toast toast = Toast.makeText(activity.getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
+    }// end showToastOnUiThread()
 
 
     public static String convertUserInJSonString(User user) {

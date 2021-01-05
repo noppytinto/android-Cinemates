@@ -7,7 +7,7 @@
     android:background="@color/dark_blue">
 
     <View
-        android:id="@+id/divider2"
+        android:id="@+id/divider_actorCard"
         android:layout_width="15dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -30,7 +30,7 @@
         app:cardCornerRadius="7dp"
         app:cardElevation="7dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/divider2"
+        app:layout_constraintEnd_toStartOf="@+id/divider_actorCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -39,7 +39,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageview_actor_card"
+                android:id="@+id/imageview_actorCard"
                 android:layout_width="0dp"
                 android:layout_height="190dp"
                 android:scaleType="centerCrop"
@@ -51,7 +51,7 @@
                 tools:srcCompat="@drawable/robert" />
 
             <TextView
-                android:id="@+id/textview_actor_card"
+                android:id="@+id/textview_actorCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -62,7 +62,7 @@
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageview_actor_card"
+                app:layout_constraintTop_toBottomOf="@+id/imageview_actorCard"
                 app:lineHeight="@dimen/default_line_height"
                 tools:text="Robert Downey Jr.  Tony Stark / Iron Man" />
 

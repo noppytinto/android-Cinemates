@@ -94,7 +94,7 @@ public class UpcomginsFragment extends Fragment implements
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_upcoming_newsPage);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_explorePage_upcoming);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection

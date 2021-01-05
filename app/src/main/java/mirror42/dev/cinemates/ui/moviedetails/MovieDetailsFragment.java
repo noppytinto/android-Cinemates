@@ -71,7 +71,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        addToListButton = view.findViewById(R.id.button_movie_details_fragment_add_to_list);
+        addToListButton = view.findViewById(R.id.button_movieDetailsFragment_addToList);
         addToListButton.setOnClickListener(this);
 
         //
@@ -131,7 +131,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movie_details_fragment_cast);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movieDetailsFragment_cast);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // assigning adapter to recycle
@@ -141,14 +141,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
     private void composeUI(Movie movie) {
-        ImageView backdrop = view.findViewById(R.id.imageview_movie_details_fragment_backdrop);
-        TextView title = view.findViewById(R.id.textView_movie_details_fragment_movie_title);
-        TextView releaseDate = view.findViewById(R.id.textView_movie_details_fragment_release_date);
-        TextView overview = view.findViewById(R.id.textView_movie_details_fragment_overview);
-        ImageView poster = view.findViewById(R.id.imageView_movie_details_fragment_poster);
-        TextView duration = view.findViewById(R.id.textView_movie_details_fragment_duration);
-        TextView genres = view.findViewById(R.id.textView_movie_details_fragment_genres);
-        TextView releaseStatus = view.findViewById(R.id.textView_movie_details_fragment_release_status);
+        ImageView backdrop = view.findViewById(R.id.imageView_movieDetailsFragment_backdrop);
+        TextView title = view.findViewById(R.id.textView_movieDetailsFragment_movieTitle);
+        TextView releaseDate = view.findViewById(R.id.textView_movieDetailsFragment_releaseDate);
+        TextView overview = view.findViewById(R.id.textView_movieDetailsFragment_overview);
+        ImageView poster = view.findViewById(R.id.imageView_movieDetailsFragment_poster);
+        TextView duration = view.findViewById(R.id.textView_movieDetailsFragment_duration);
+        TextView genres = view.findViewById(R.id.textView_movieDetailsFragment_genres);
+        TextView releaseStatus = view.findViewById(R.id.textView_movieDetailsFragment_releaseStatus);
 
 
         title.setText(movie.getTitle());
@@ -204,8 +204,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             bottomSheetDialog.setCanceledOnTouchOutside(false);
             bottomSheetDialog.setDismissWithAnimation(true);
             bottomSheetDialog.setTitle("test");
-            View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
-            bottomSheetView.findViewById(R.id.button_addToList_dialog).setOnClickListener(new View.OnClickListener() {
+            View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_addtolist, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
+            bottomSheetView.findViewById(R.id.button_addToList).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     bottomSheetDialog.dismiss();

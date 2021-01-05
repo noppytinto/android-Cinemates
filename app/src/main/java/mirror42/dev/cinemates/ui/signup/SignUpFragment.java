@@ -59,8 +59,7 @@ public class SignUpFragment extends Fragment implements
     //--------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_sign_up, container, false);
     }
@@ -90,16 +89,33 @@ public class SignUpFragment extends Fragment implements
         signUpViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
-                if(user != null) {
+                if (user != null) {
 
 
-
-                }
-                else {
+                } else {
 
                 }
             }
         });
+
+
+        // ...
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+
+        FirebaseAuth.AuthStateListener mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    sendEmailVerificationTo(user);
+
+                }
+            }
+        };
+
+        mAuth.addAuthStateListener(mAuthListener);
 
 
 
@@ -115,10 +131,6 @@ public class SignUpFragment extends Fragment implements
 
             try {
 
-                // ...
-                // Initialize Firebase Auth
-                mAuth = FirebaseAuth.getInstance();
-
                 String email = editTextEmail.getText().toString();
                 String password = editTextPassword.getText().toString();
 
@@ -133,17 +145,13 @@ public class SignUpFragment extends Fragment implements
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
-                                    System.out.println(user.getEmail());
+                                    Log.d(TAG, "welcome: " + user.getEmail());
 
-                                    user.sendEmailVerification()
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Log.d(TAG, "Email sent.");
-                                                    }
-                                                }
-                                            });
+                                    //
+//                                    MyUtilities.showCenteredToastOnUiThread(getActivity(), "welcome: " + user.getEmail());
+
+
+
 
 
                                 } else {
@@ -151,7 +159,6 @@ public class SignUpFragment extends Fragment implements
                                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                 }
 
-                                // ...
                             }
                         });
 
@@ -195,8 +202,27 @@ public class SignUpFragment extends Fragment implements
 
     //--------------------------------------------------------------- METHODS
 
+    private void sendEmailVerificationTo(FirebaseUser user) {
+        user.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Verification email sent.");
+                            deleteAccount(user);
 
+                        }
+                        else {
+                            Log.d(TAG, "Verification email NOT sent.");
 
+                        }
+                    }
+                });
+    }
+
+    private void deleteAccount(FirebaseUser user) {
+        user.delete();
+    }
 
     private RequestBody buildRequestBody(String username,
                                    String email,
@@ -225,7 +251,6 @@ public class SignUpFragment extends Fragment implements
         return requestBody;
     }
 
-
     @Override
     public void onFailure(@NotNull Call call, @NotNull IOException e) {
         System.out.println("failed");
@@ -242,4 +267,5 @@ public class SignUpFragment extends Fragment implements
             System.out.println(responseData);
         }
     }
+
 }// end signUpFragment class

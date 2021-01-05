@@ -7,7 +7,7 @@
     android:background="@color/primary_blue">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_movie_card"
+        android:id="@+id/cardview_movieCard"
         android:layout_width="125dp"
         android:layout_height="200dp"
         android:layout_marginStart="16dp"
@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageview_movie_card_poster"
+            android:id="@+id/imageview_movieCard_poster"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"

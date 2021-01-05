@@ -118,7 +118,7 @@ public class LatestReleasesFragment extends Fragment implements
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_latestReleases_newsPage);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_explorePage_latestReleases);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
