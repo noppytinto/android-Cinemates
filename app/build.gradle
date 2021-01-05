@@ -61,6 +61,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-perf'
+    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+
     // security
     implementation "androidx.security:security-crypto:1.1.0-alpha03"
     // leaks manager

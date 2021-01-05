@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.signup;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,20 +29,19 @@ import java.io.IOException;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
-import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class SignUpFragment extends Fragment implements
         View.OnClickListener, Callback {
 
+    private final String TAG = this.getClass().getSimpleName();
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
@@ -46,6 +51,7 @@ public class SignUpFragment extends Fragment implements
     private SignUpViewModel signUpViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
+    private FirebaseAuth mAuth;
 
 
 
@@ -109,32 +115,72 @@ public class SignUpFragment extends Fragment implements
 
             try {
 
-                final String dbFunction = "fn_register_new_user";
+                // ...
+                // Initialize Firebase Auth
+                mAuth = FirebaseAuth.getInstance();
 
-                //
-                httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
+                String email = editTextEmail.getText().toString();
+                String password = editTextPassword.getText().toString();
 
-                RequestBody requestBody = buildRequestBody(
-                        "foo",
-                        "foo@mail.com",
-                        "aaaa",
-                        "mrfoo",
-                        "bar",
-                        "1970-1-1",
-                        "foo.jpg",
-                        String.valueOf(true),
-                        String.valueOf(true));
+//                mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
+//                        user.getEmail(), user.isEmailVerified()));
 
-                Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Log.d(TAG, "createUserWithEmail:success");
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    System.out.println(user.getEmail());
 
-                //
-                Call call = httpClient.newCall(request);
-                call.enqueue(this);
+                                    user.sendEmailVerification()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.d(TAG, "Email sent.");
+                                                    }
+                                                }
+                                            });
+
+
+                                } else {
+                                    // If sign in fails, display a message to the user.
+                                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                }
+
+                                // ...
+                            }
+                        });
+
+//                final String dbFunction = "fn_register_new_user";
+//
+//                //
+//                httpUrl = new HttpUrl.Builder()
+//                        .scheme("https")
+//                        .host(remoteConfigServer.getAzureHostName())
+//                        .addPathSegments(remoteConfigServer.getPostgrestPath())
+//                        .addPathSegment(dbFunction)
+//                        .build();
+//
+//                RequestBody requestBody = buildRequestBody(
+//                        "foo",
+//                        "foo@mail.com",
+//                        "aaaa",
+//                        "mrfoo",
+//                        "bar",
+//                        "1970-1-1",
+//                        "foo.jpg",
+//                        String.valueOf(true),
+//                        String.valueOf(true));
+//
+//                Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
+//
+//                //
+//                Call call = httpClient.newCall(request);
+//                call.enqueue(this);
 
             } catch (Exception e) {
                 System.out.println("failed");
