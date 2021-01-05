@@ -8,12 +8,12 @@
 
 
     <Button
-        android:id="@+id/button_loginFragment_signIn"
+        android:id="@+id/button_loginFragment_signUp"
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="140dp"
         android:layout_height="86dp"
         android:layout_marginTop="320dp"
-        android:text="@string/sign_in"
+        android:text="@string/sign_up"
         android:textSize="18sp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"

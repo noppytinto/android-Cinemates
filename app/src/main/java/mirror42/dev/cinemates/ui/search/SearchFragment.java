@@ -75,7 +75,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         this.view = view;
         editText_search = view.findViewById(R.id.editText_searchFragment);
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
-        buttonSearch = view.findViewById(R.id.button_search_searchFragment);
+        buttonSearch = view.findViewById(R.id.button_searchFragment_search);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
 
         // setting listeners

@@ -19,8 +19,8 @@ public class SearchRecordViewHolder extends RecyclerView.ViewHolder{
     public SearchRecordViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        this.imageViewSearchRecordPoster = (ImageView) itemView.findViewById(R.id.imageview_search_record_poster);
-        this.textViewSearchRecordMovieTitle = (TextView) itemView.findViewById(R.id.textview_search_record_movie_title);
-        this.textViewSearchRecordOverview = (TextView) itemView.findViewById(R.id.textview_search_record_overview);
+        this.imageViewSearchRecordPoster = (ImageView) itemView.findViewById(R.id.imageview_searchRecord_poster);
+        this.textViewSearchRecordMovieTitle = (TextView) itemView.findViewById(R.id.textview_searchRecord_movie_title);
+        this.textViewSearchRecordOverview = (TextView) itemView.findViewById(R.id.textview_searchRecord_overview);
     }
 }

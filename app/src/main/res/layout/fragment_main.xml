@@ -10,7 +10,7 @@
 
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView"
+        android:id="@+id/materialCardView_mainFragment_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tablayout_fragment_main"
+            android:id="@+id/tablayout_mainFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/dark_blue"
@@ -53,14 +53,14 @@
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewpager_fragment_main"
+        android:id="@+id/viewpager_mainFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView_mainFragment_toolbar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

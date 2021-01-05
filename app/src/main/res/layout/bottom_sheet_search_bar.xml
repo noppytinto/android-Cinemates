@@ -8,7 +8,7 @@
     >
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_search_searchFragment"
+        android:id="@+id/button_searchFragment_search"
         style="@style/Cinemates.Button.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="@+id/editTextLayout_searchFragment" />
 
     <TextView
-        android:id="@+id/textView_chipGroup_label_searchFragment"
+        android:id="@+id/textView_searchFragment_chipGroupLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -38,34 +38,34 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/textView_chipGroup_label_searchFragment"
+        app:layout_constraintStart_toEndOf="@+id/textView_searchFragment_chipGroupLabel"
         app:layout_constraintTop_toBottomOf="@+id/editTextLayout_searchFragment"
         app:singleLine="true"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_movie_searchFragment"
+            android:id="@+id/chip_searchFragment_movie"
             style="@style/Cinemates.Button.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="film" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_actor_searchFragment"
+            android:id="@+id/chip_searchFragment_actor"
             style="@style/Cinemates.Button.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="attore" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_director_searchFragment"
+            android:id="@+id/chip_searchFragment_director"
             style="@style/Cinemates.Button.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="regista" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_user_searchFragment"
+            android:id="@+id/chip_searchFragment_user"
             style="@style/Cinemates.Button.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
         app:endIconTint="@color/light_blue"
         app:hintTextColor="@color/yellow"
         app:errorEnabled="true"
-        app:layout_constraintEnd_toStartOf="@+id/button_search_searchFragment"
+        app:layout_constraintEnd_toStartOf="@+id/button_searchFragment_search"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/cinemates_shape_rounded_search_box">

@@ -93,7 +93,7 @@ public class PopularFragment extends Fragment implements RecyclerSearchListener.
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_popular_newsPage);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_explorePage_popular);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection

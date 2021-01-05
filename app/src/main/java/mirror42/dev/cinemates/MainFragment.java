@@ -46,8 +46,8 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        tabLayout = view.findViewById(R.id.tablayout_fragment_main);
-        viewPager = view.findViewById(R.id.viewpager_fragment_main);
+        tabLayout = view.findViewById(R.id.tablayout_mainFragment);
+        viewPager = view.findViewById(R.id.viewpager_mainFragment);
         viewpagerAdapterFragmentMain = new ViewpagerAdapterFragmentMain(this);
         viewPager.setUserInputEnabled(false); // disables horiz. swipe to scroll tabs gestures
         viewPager.setAdapter(viewpagerAdapterFragmentMain);

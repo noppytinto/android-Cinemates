@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,18 +20,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
-
-import java.util.Arrays;
-import java.util.List;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -40,8 +31,6 @@ import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-
-import static android.app.Activity.RESULT_OK;
 
 
 public class LoginFragment extends Fragment  implements
@@ -98,7 +87,7 @@ public class LoginFragment extends Fragment  implements
         buttonLogout = view.findViewById(R.id.button_loginFragment_logout);
         remoteConfigServer = RemoteConfigServer.getInstance();
         textViewEmail = (TextView) view.findViewById(R.id.textView_loginFragment_email);
-        buttonSignUp = (Button) view.findViewById(R.id.button_loginFragment_signIn);
+        buttonSignUp = (Button) view.findViewById(R.id.button_loginFragment_signUp);
 
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);

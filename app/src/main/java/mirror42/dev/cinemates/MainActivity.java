@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate() called");
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
 
         // init firebase logger
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         remoteConfigServer.loadConfigParams();
 
         //
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
         NavigationUI.setupActionBarWithNavController(this, navController);
 
 

@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/textview_explore_fragment_latest_releases"
+                    android:id="@+id/textview__exploreFragment_latestReleases"
                     android:layout_width="0dp"
                     android:layout_height="34dp"
                     android:layout_marginStart="16dp"
@@ -46,23 +46,23 @@
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_releases"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview__exploreFragment_latestReleases"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <fragment
-                    android:id="@+id/fragment_explore_fragment_latest"
+                    android:id="@+id/fragment_exploreFragment_latest"
                     android:name="mirror42.dev.cinemates.ui.explore.latest.LatestReleasesFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/textview_explore_fragment_latest_releases"
-                    app:layout_constraintTop_toBottomOf="@+id/textview_explore_fragment_latest_releases"
+                    app:layout_constraintStart_toStartOf="@+id/textview__exploreFragment_latestReleases"
+                    app:layout_constraintTop_toBottomOf="@+id/textview__exploreFragment_latestReleases"
                     app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                     tools:layout="@layout/fragment_latest_releases" />
 
                 <TextView
-                    android:id="@+id/textview_explore_fragment_latest_upcomings"
+                    android:id="@+id/textview_exploreFragment_upcomings"
                     android:layout_width="0dp"
                     android:layout_height="34dp"
                     android:layout_marginTop="32dp"
@@ -73,8 +73,8 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/header_newsPage"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="@+id/fragment_explore_fragment_latest"
-                    app:layout_constraintTop_toBottomOf="@+id/fragment_explore_fragment_latest" />
+                    app:layout_constraintStart_toStartOf="@+id/fragment_exploreFragment_latest"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_exploreFragment_latest" />
 
                 <Button
                     android:id="@+id/button_exploreFragment_seeAllUpcomings"
@@ -83,22 +83,22 @@
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_upcomings"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_exploreFragment_upcomings"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <fragment
-                    android:id="@+id/fragment_upcomings"
+                    android:id="@+id/fragment_exploreFragment_upcomings"
                     android:name="mirror42.dev.cinemates.ui.explore.upcomings.UpcomginsFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/textview_explore_fragment_latest_upcomings"
-                    app:layout_constraintTop_toBottomOf="@+id/textview_explore_fragment_latest_upcomings"
+                    app:layout_constraintStart_toStartOf="@+id/textview_exploreFragment_upcomings"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_exploreFragment_upcomings"
                     tools:layout="@layout/fragment_upcomgins" />
 
                 <TextView
-                    android:id="@+id/textview_explore_fragment_latest_popular"
+                    android:id="@+id/textview_exploreFragment_popular"
                     android:layout_width="0dp"
                     android:layout_height="34dp"
                     android:layout_marginTop="32dp"
@@ -112,8 +112,8 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/button_exploreFragment_seeAllPopular"
                     app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="@+id/fragment_upcomings"
-                    app:layout_constraintTop_toBottomOf="@+id/fragment_upcomings" />
+                    app:layout_constraintStart_toStartOf="@+id/fragment_exploreFragment_upcomings"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_exploreFragment_upcomings" />
 
                 <Button
                     android:id="@+id/button_exploreFragment_seeAllPopular"
@@ -122,11 +122,11 @@
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
                     android:text="@string/see_all"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_explore_fragment_latest_popular"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_exploreFragment_popular"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <fragment
-                    android:id="@+id/fragment_popular"
+                    android:id="@+id/fragment_exploreFragment_popular"
                     android:name="mirror42.dev.cinemates.ui.explore.popular.PopularFragment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -134,8 +134,8 @@
                     android:layout_marginBottom="32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/textview_explore_fragment_latest_popular"
-                    app:layout_constraintTop_toBottomOf="@+id/textview_explore_fragment_latest_popular"
+                    app:layout_constraintStart_toStartOf="@+id/textview_exploreFragment_popular"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_exploreFragment_popular"
                     tools:layout="@layout/fragment_popular" />
 
 

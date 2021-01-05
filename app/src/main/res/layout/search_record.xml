@@ -26,7 +26,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/textview_search_record_overview"
+                android:id="@+id/textview_searchRecord_overview"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="16dp"
@@ -39,14 +39,14 @@
                 android:text="@string/overview_not_avalaible_in_italian"
                 android:textColor="@color/white"
                 android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="@+id/cardview_search_record"
+                app:layout_constraintBottom_toBottomOf="@+id/cardview_searchRecord"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardview_search_record"
-                app:layout_constraintTop_toBottomOf="@+id/textview_search_record_movie_title"
+                app:layout_constraintStart_toEndOf="@+id/cardview_searchRecord"
+                app:layout_constraintTop_toBottomOf="@+id/textview_searchRecord_movie_title"
                 tools:text="As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain." />
 
             <TextView
-                android:id="@+id/textview_search_record_movie_title"
+                android:id="@+id/textview_searchRecord_movie_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -59,12 +59,12 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/cardview_search_record"
+                app:layout_constraintStart_toEndOf="@+id/cardview_searchRecord"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Avengers: Infinity War" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardview_search_record"
+                android:id="@+id/cardview_searchRecord"
                 android:layout_width="110dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
@@ -78,7 +78,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/imageview_search_record_poster"
+                    android:id="@+id/imageview_searchRecord_poster"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
