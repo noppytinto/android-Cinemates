@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -41,6 +42,7 @@ public class LoginFragment extends Fragment  implements
     private TextInputEditText editTextPassword;
     private Button buttonStandardLogin;
     private Button buttonLogout;
+    private Button buttonSignin;
     private ProgressBar spinner;
     private CheckBox checkBoxRememberMe;
     private ImageView profilePicture;
@@ -85,10 +87,12 @@ public class LoginFragment extends Fragment  implements
         buttonLogout = view.findViewById(R.id.button_loginFragment_logout);
         remoteConfigServer = RemoteConfigServer.getInstance();
         textViewEmail = (TextView) view.findViewById(R.id.textView_loginFragment_email);
+        buttonSignin = (Button) view.findViewById(R.id.button_loginFragment_signIn);
 
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonLogout.setOnClickListener(this);
+        buttonSignin.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
 
 
@@ -289,7 +293,7 @@ public class LoginFragment extends Fragment  implements
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == buttonStandardLogin.getId()) {
+        if (v.getId() == buttonStandardLogin.getId()) {
             spinner.setVisibility(View.VISIBLE);
 
             // firebase logging
@@ -299,13 +303,13 @@ public class LoginFragment extends Fragment  implements
 
             // checks
             String email = editTextEmail.getText().toString();
-            if(email.isEmpty()) {
+            if (email.isEmpty()) {
                 textInputLayoutEmail.setError("inserire mail!");
                 return;
             }
 
             String password = editTextPassword.getText().toString();
-            if(password.isEmpty()) {
+            if (password.isEmpty()) {
                 textInputLayoutPassword.setError("inserire password!");
                 return;
             }
@@ -316,8 +320,7 @@ public class LoginFragment extends Fragment  implements
             //
 
             loginViewModel.standardLogin(email, password, getContext());
-        }
-        else if(v.getId() == buttonLogout.getId()) {
+        } else if (v.getId() == buttonLogout.getId()) {
             isLogged = false;
             showLoginComponents();
             hideLogoutComponents();
@@ -331,6 +334,11 @@ public class LoginFragment extends Fragment  implements
             }
             MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
             checkBoxRememberMe.setChecked(false);
+        } else if (v.getId() == buttonSignin.getId()) {
+
+            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signInFragment);
+
+
         }
     }
 

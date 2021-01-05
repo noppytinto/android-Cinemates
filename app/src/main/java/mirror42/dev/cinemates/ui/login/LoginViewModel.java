@@ -60,9 +60,6 @@ public class LoginViewModel extends ViewModel implements Callback {
         this.loginResult.postValue(loginResult);
     }
 
-    public void init(boolean rememberMeIsActive) {
-        this.rememberMeIsActive = rememberMeIsActive;
-    }
 
     public void setRememberMe(boolean value) {
         this.rememberMeIsActive = value;
@@ -71,6 +68,10 @@ public class LoginViewModel extends ViewModel implements Callback {
 
 
     //--------------------------------------------------- METHODS
+
+    public void init(boolean rememberMeIsActive) {
+        this.rememberMeIsActive = rememberMeIsActive;
+    }
 
     public void standardLogin(String email, String password, Context context) {
         if(password==null) {

@@ -10,9 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import okhttp3.HttpUrl;
 import okhttp3.Request;
-
-
-
+import okhttp3.RequestBody;
 
 
 public class HttpUtilities {
@@ -107,6 +105,27 @@ public class HttpUtilities {
                     .addHeader("Accept", "application/json; q=0.5")
                     .addHeader("Accept", "application/vnd.github.v3+json")
                     .addHeader("Authorization", "Bearer " + token)
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return request;
+    }
+
+    /**
+     * build Http request (okHttp3)
+     */
+    public static Request buildPOSTrequest(HttpUrl httpUrl, RequestBody requestBody, String token) {
+        Request request = null;
+        try {
+            request = new Request.Builder()
+                    .url(httpUrl)
+                    .header("User-Agent", "OkHttp Headers.java")
+                    .addHeader("Accept", "application/json; q=0.5")
+                    .addHeader("Accept", "application/vnd.github.v3+json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .post(requestBody)
                     .build();
         } catch (Exception e) {
             e.printStackTrace();

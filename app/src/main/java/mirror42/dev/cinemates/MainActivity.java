@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -246,14 +245,5 @@ public class MainActivity extends AppCompatActivity implements Callback,
         });
     }// end showToastOnUiThread()
 
-    public void loadProfilePicture(String imagePath, Context context) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
 
-            }
-        });
-
-    }
-
-}
+}// end MainActivity class
