@@ -336,7 +336,7 @@ public class LoginFragment extends Fragment  implements
             checkBoxRememberMe.setChecked(false);
         } else if (v.getId() == buttonSignin.getId()) {
 
-            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signInFragment);
+            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
 
 
         }

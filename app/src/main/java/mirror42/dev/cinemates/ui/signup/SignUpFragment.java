@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.signin;
+package mirror42.dev.cinemates.ui.signup;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,16 +34,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class SignInFragment extends Fragment implements
+public class SignUpFragment extends Fragment implements
         View.OnClickListener, Callback {
 
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
-    private Button buttonSignIn;
+    private Button buttonsignUp;
     private ProgressBar spinner;
-    private SignInViewModel signInViewModel;
+    private SignUpViewModel signUpViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
 
@@ -56,7 +56,7 @@ public class SignInFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_in, container, false);
+        return inflater.inflate(R.layout.fragment_sign_up, container, false);
     }
 
     @Override
@@ -65,23 +65,23 @@ public class SignInFragment extends Fragment implements
         this.view = view;
         remoteConfigServer = RemoteConfigServer.getInstance();
 
-//        spinner = view.findViewById(R.id.progresBar_signInFragment);
-        editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_signInFragment_email);
-        editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_signInFragment_password);
-        textInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.textInputLayout_signInFragment_email);
-        textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signInFragment_password);
-        buttonSignIn = (Button) view.findViewById(R.id.button_signInFragment_signIn);
+//        spinner = view.findViewById(R.id.progresBar_signUpFragment);
+        editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_email);
+        editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_password);
+        textInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_email);
+        textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_password);
+        buttonsignUp = (Button) view.findViewById(R.id.button_signUpFragment_signUp);
 
         // setting listeners
-        buttonSignIn.setOnClickListener(this);
+        buttonsignUp.setOnClickListener(this);
 
         // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
         firebaseEventsLogger.logScreenEvent(this, "Sign-In page", getContext());
 
         //
-        signInViewModel = new ViewModelProvider(this).get(SignInViewModel.class);
-        signInViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
+        signUpViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
+        signUpViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
                 if(user != null) {
@@ -103,7 +103,7 @@ public class SignInFragment extends Fragment implements
     @Override
     public void onClick(View v) {
 
-        if(v.getId() == buttonSignIn.getId()) {
+        if(v.getId() == buttonsignUp.getId()) {
             HttpUrl httpUrl = null;
             final OkHttpClient httpClient = new OkHttpClient();
 
@@ -196,4 +196,4 @@ public class SignInFragment extends Fragment implements
             System.out.println(responseData);
         }
     }
-}// end SignInFragment class
+}// end signUpFragment class

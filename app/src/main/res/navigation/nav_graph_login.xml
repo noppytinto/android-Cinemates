@@ -11,12 +11,12 @@
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
-            android:id="@+id/action_loginFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
     </fragment>
     <fragment
-        android:id="@+id/signInFragment"
-        android:name="mirror42.dev.cinemates.ui.signin.SignInFragment"
+        android:id="@+id/signUpFragment"
+        android:name="mirror42.dev.cinemates.ui.signup.SignUpFragment"
         android:label="fragment_sign_in"
-        tools:layout="@layout/fragment_sign_in" />
+        tools:layout="@layout/fragment_sign_up" />
 </navigation>

@@ -66,5 +66,6 @@
     <string name="rememberme">Ricordami</string>
     <string name="logout">logout</string>
     <string name="sign_in">Registrati</string>
+    <string name="username">username</string>
 
 </resources>

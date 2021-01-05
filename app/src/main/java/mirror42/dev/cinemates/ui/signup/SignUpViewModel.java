@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.signin;
+package mirror42.dev.cinemates.ui.signup;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
-public class SignInViewModel extends ViewModel {
+public class SignUpViewModel extends ViewModel {
     private MutableLiveData<User> user;
     private RemoteConfigServer remoteConfigServer;
 
@@ -18,7 +18,7 @@ public class SignInViewModel extends ViewModel {
 
 
     //--------------------------------------------------------------- CONSTRUCTORS
-    public SignInViewModel() {
+    public SignUpViewModel() {
         this.user = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
