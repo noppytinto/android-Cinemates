@@ -6,90 +6,207 @@
     android:layout_height="match_parent"
     tools:context=".ui.signup.SignUpFragment">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_signUpFragment_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:hint="@string/username"
-        app:endIconMode="clear_text"
-        app:errorEnabled="true"
-        app:helperTextEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.421"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_password"
-        app:startIconDrawable="@drawable/password_icon_light_blue">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_signUpFragment_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="20"
-            android:textColor="@color/white" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/button_signUpFragment_signUp"
-        style="@style/Cinemates.Button.Rounded"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/sign_up"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_username" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/email"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperText="test@mail.com"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:startIconDrawable="@drawable/email_icon_light_blue">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_signUpFragment_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:hint="@string/email"
-        app:endIconMode="clear_text"
-        app:errorEnabled="true"
-        app:helperText="test@mail.com"
-        app:helperTextEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.421"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:startIconDrawable="@drawable/email_icon_light_blue">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/white" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_signUpFragment_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="20"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/white" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/password"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_signUpFragment_password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:hint="@string/password"
-        app:endIconMode="clear_text"
-        app:errorEnabled="true"
-        app:helperTextEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.421"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
-        app:startIconDrawable="@drawable/password_icon_light_blue">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:inputType="textPassword"
+                    android:textColor="@color/white" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_signUpFragment_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="20"
-            android:inputType="textPassword"
-            android:textColor="@color/white" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/username"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_password"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:textColor="@color/white" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_firstName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Nome"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_username"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_firstName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/white" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_lastName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/lastname"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.421"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_firstName"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_lastName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/white" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_signUpFragment_birthDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/birthdate"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.421"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_lastName"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_signUpFragment_birthDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="20"
+                    android:inputType="date"
+                    android:textColor="@color/white" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/button_signUpFragment_signUp"
+                style="@style/Cinemates.Button.Rounded"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="64dp"
+                android:layout_marginBottom="64dp"
+                android:text="@string/sign_up"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
+
+
+            <CheckBox
+                android:id="@+id/checkBox_loginFragment_promo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Consenti ricezione messaggi promozionali"
+                android:textColor="@color/light_blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.166"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate" />
+
+            <CheckBox
+                android:id="@+id/checkBox_loginFragment_analytics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consenti raccolta dati utilizzo app (analytics)"
+                android:textColor="@color/light_blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.191"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_promo" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

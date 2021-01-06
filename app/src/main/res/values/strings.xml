@@ -67,5 +67,8 @@
     <string name="logout">logout</string>
     <string name="sign_up">Registrati</string>
     <string name="username">username</string>
+    <string name="firstname">Nome</string>
+    <string name="lastname">Cognome</string>
+    <string name="birthdate">Data di nascita</string>
 
 </resources>
