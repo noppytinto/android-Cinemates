@@ -42,11 +42,11 @@
     <string name="user">utente</string>
     <string name="director">regista</string>
     <string name="actor">attore</string>
-    <string name="searc_with_ellipsis">Cerca...</string>
-    <string name="search_movie_ellipsis">Cerca film...</string>
-    <string name="search_actor_ellipsis">Cerca attore...</string>
-    <string name="search_director_ellipsis">Cerca regista...</string>
-    <string name="search_person_ellipsis">Cerca persona...</string>
+    <string name="searc_with_ellipsis">Cerca…</string>
+    <string name="search_movie_ellipsis">Cerca film…</string>
+    <string name="search_actor_ellipsis">Cerca attore…</string>
+    <string name="search_director_ellipsis">Cerca regista…</string>
+    <string name="search_person_ellipsis">Cerca persona…</string>
     <string name="filter_by">Filtra per</string>
     <string name="titanic">titanic</string>
     <string name="search">Cerca</string>
@@ -61,14 +61,16 @@
     <string name="azure_base_url_default_value">https://cinemates.westeurope.cloudapp.azure.com/cinemates/rpc/</string>
     <string name="guest_token_default_value">-</string>
     <string name="cinemates_app_signature_default_value">-</string>
-    <string name="email">email</string>
-    <string name="password">password</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
     <string name="rememberme">Ricordami</string>
     <string name="logout">logout</string>
     <string name="sign_up">Registrati</string>
-    <string name="username">username</string>
+    <string name="username">Username</string>
     <string name="firstname">Nome</string>
     <string name="lastname">Cognome</string>
     <string name="birthdate">Data di nascita</string>
+    <string name="repeat_password">Ripeti password</string>
+    <string name="passwords_dont_match">le password non combaciano</string>
 
 </resources>

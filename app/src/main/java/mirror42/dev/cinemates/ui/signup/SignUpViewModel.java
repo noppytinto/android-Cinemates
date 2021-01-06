@@ -13,15 +13,27 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class SignUpViewModel extends ViewModel {
     private MutableLiveData<User> user;
@@ -29,7 +41,7 @@ private final String TAG = this.getClass().getSimpleName();
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    private MutableLiveData<FirebaseAuthState> firebaseAuthState;
+    private MutableLiveData<FirebaseSignUpServerCodeState> firebaseAuthState;
 
 
     /**
@@ -40,18 +52,23 @@ private final String TAG = this.getClass().getSimpleName();
      *  usually server errors
      *
      */
-    public enum FirebaseAuthState {
+    public enum FirebaseSignUpServerCodeState {
         SIGN_IN_SUCCESS,
         SIGN_IN_FAILURE,
         SIGN_UP_SUCCESS,
         SIGN_UP_FAILURE,
         INVALID_CREDENTIALS,
-        EMAIL_COLLISION,
+        PENDING_USER_COLLISION,
         PASSWORD_MALFORMED,
         PASSWORD_INVALID,
         EMAIL_NOT_EXISTS,
         VERIFICATION_MAIL_SENT,
-        VERIFICATION_MAIL_NOT_SENT
+        VERIFICATION_MAIL_NOT_SENT,
+        FIREBASE_GENERIC_ERROR,
+        EMAIL_COLLISION,
+        USERNAME_COLLISION,
+        USERNAME_EMAIL_COLLISION,
+        GENERIC_POSTGREST_ERROR
 
     }
 
@@ -83,11 +100,11 @@ private final String TAG = this.getClass().getSimpleName();
         this.user.postValue(user);
     }
 
-    public LiveData<FirebaseAuthState> getFirebaseAuthState() {
+    public LiveData<FirebaseSignUpServerCodeState> getFirebaseAuthState() {
         return firebaseAuthState;
     }
 
-    public void setFirebaseAuthState(FirebaseAuthState state) {
+    public void setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState state) {
         this.firebaseAuthState.postValue(state);
     }
 
@@ -106,28 +123,189 @@ private final String TAG = this.getClass().getSimpleName();
                                     boolean promo,
                                     boolean analytics) {
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) { // sign in success
-                            Log.d(TAG, "createUserWithEmail:success");
 
-                            // add pending user data in firebase DB
-                            FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
-                            Map<String, Object> newDBuser = composeDBuserData(email, password, username, firstName, lastName, birthDate, promo, analytics);
-                            // Add a new document with a the user UID
-                            insertUserInDB(newDBuser, firebaseDB);
 
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            setFirebaseAuthState(FirebaseAuthState.SIGN_UP_FAILURE);
+        try {
+
+            // check username/email exists in postgrest
+            checkUserCollision(username, email, password, firstName, lastName, birthDate, promo, analytics);
+
+
+
+
+
+
+            // check email exists in postgrest
+
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void checkUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, boolean promo, boolean analytics) {
+        HttpUrl httpUrl = null;
+        final OkHttpClient httpClient = new OkHttpClient();
+
+        final String dbFunction = "fn_check_user_collision_ignore_active";
+        try {
+            httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .addQueryParameter("username", username)
+                    .addQueryParameter("email", email)
+                    .build();
+
+
+//            RequestBody requestBody = buildRequestBody(
+//                    "foo",
+//                    "foo@mail.com",
+//                    "aaaa",
+//                    "mrfoo",
+//                    "bar",
+//                    "1970-1-1",
+//                    "foo.jpg",
+//                    String.valueOf(true),
+//                    String.valueOf(true));
+
+
+//            RequestBody requestBody = buildRequestBody(username, email);
+            Request request = HttpUtilities.buildGETrequest(httpUrl, remoteConfigServer.getGuestToken());
+
+            // checking response
+            httpClient.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try (ResponseBody responseBody = response.body()) {
+                        if (!response.isSuccessful()) {
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                            throw new IOException("Unexpected code " + response);
+                        }
+
+                        try {
+                            int responseCode = Integer.parseInt(responseBody.string());
+                            if (responseCode == 1) {
+                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_EMAIL_COLLISION);
+                            } else if (responseCode == 2) {
+                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_COLLISION);
+                            } else if (responseCode == 3) {
+                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.EMAIL_COLLISION);
+                            } else if (responseCode == 4) {
+                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                            } else {
+                                checkPendingUSerCollision(username, email, password, firstName, lastName, birthDate, promo, analytics);
+                            }
+
+                        } catch (Exception e) {
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                         }
 
                     }
-                });
+                }
+            });
+        } catch (Exception e) {
+            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+        }
     }
+
+    private RequestBody buildRequestBody(String username, String email) throws Exception {
+        RequestBody requestBody = new FormBody.Builder()
+                .add("mail", email)
+                .add("username", username)
+                .build();
+        return requestBody;
+    }
+
+//    private RequestBody buildRequestBody(String username,
+//                                         String email,
+//                                         String password,
+//                                         String firstName,
+//                                         String lastName,
+//                                         String birthday,
+//                                         String profilePicturePath,
+//                                         String promo,
+//                                         String analytics) throws Exception {
+//        RequestBody requestBody = new FormBody.Builder()
+//                .add("mail", email)
+//                .add("username", username)
+//                .add("pass", password)
+//                .add("firstname", firstName)
+//                .add("lastname", lastName)
+//                .add("birthday", birthday)
+//                .add("profilepicturepath", profilePicturePath)
+//                .add("promo", promo)
+//                .add("analytics", analytics)
+//                .build();
+//
+//
+//
+//        return requestBody;
+//    }
+
+
+
+
+
+    private void checkPendingUSerCollision(String username,String email, String password, String firstName, String lastName, String birthDate, boolean promo, boolean analytics) {
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) { // sign in success
+                        Log.d(TAG, "createUserWithEmail:success");
+                        firebaseUser = mAuth.getCurrentUser();
+
+                        // add pending user data in firebase DB
+                        FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
+                        Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, promo, analytics);
+                        // Add a new document with a the user UID
+                        insertUserInDB(newDBuser, firebaseDB);
+
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        try {
+                            throw task.getException();
+                        } catch (FirebaseAuthUserCollisionException e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.PENDING_USER_COLLISION);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.FIREBASE_GENERIC_ERROR);
+                        }
+                    }
+
+                }
+            });
+    }
+
+
+
 
 
 
@@ -138,11 +316,11 @@ private final String TAG = this.getClass().getSimpleName();
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Verification email sent.");
-                            setFirebaseAuthState(FirebaseAuthState.VERIFICATION_MAIL_SENT);
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_SENT);
                         }
                         else {
                             Log.d(TAG, "Verification email NOT sent. " + task.getException());
-                            setFirebaseAuthState(FirebaseAuthState.VERIFICATION_MAIL_NOT_SENT);
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_NOT_SENT);
                         }
                     }
                 });
@@ -152,9 +330,9 @@ private final String TAG = this.getClass().getSimpleName();
         user.delete();
     }
 
-    private Map<String, Object> composeDBuserData(String email,
+    private Map<String, Object> composeDBuserData(String username,
+                                                    String email,
                                                     String password,
-                                                    String username,
                                                     String firstName,
                                                     String lastName,
                                                     String birthDate,
@@ -177,27 +355,33 @@ private final String TAG = this.getClass().getSimpleName();
 
 
     private void insertUserInDB(Map<String, Object> newDBuser, FirebaseFirestore firebaseDB) {
-        firebaseDB.collection("pending_users").document(firebaseUser.getUid())
-                .set(newDBuser)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + firebaseUser.getUid());
-                        Log.d(TAG, "welcome: " + firebaseUser.getEmail());
-                        setFirebaseAuthState(FirebaseAuthState.SIGN_UP_SUCCESS);
+        try {
+            firebaseDB.collection("pending_users").document(firebaseUser.getUid())
+                    .set(newDBuser)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + firebaseUser.getUid());
+                            Log.d(TAG, "welcome: " + firebaseUser.getEmail());
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_SUCCESS);
 
-                        //
-                        firebaseUser = mAuth.getCurrentUser();
-                        sendEmailVerificationTo(firebaseUser);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                        setFirebaseAuthState(FirebaseAuthState.SIGN_UP_FAILURE);
-                    }
-                });
+                            //
+                            firebaseUser = mAuth.getCurrentUser();
+                            sendEmailVerificationTo(firebaseUser);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error adding document", e);
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
+                        }
+                    });
+        } catch (Exception e) {
+            Log.w(TAG, "Error adding document", e);
+            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
+            e.printStackTrace();
+        }
 
     }
 

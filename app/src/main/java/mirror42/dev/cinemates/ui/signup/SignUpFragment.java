@@ -29,10 +29,6 @@ import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class SignUpFragment extends Fragment implements
@@ -44,6 +40,7 @@ public class SignUpFragment extends Fragment implements
     private TextInputLayout textInputLayoutUsername;
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
+    private TextInputLayout textInputLayoutRepeatPassword;
     private TextInputLayout textInputLayoutFirstName;
     private TextInputLayout textInputLayoutLastName;
     private TextInputLayout textInputLayoutBirthDate;
@@ -51,12 +48,15 @@ public class SignUpFragment extends Fragment implements
     private TextInputEditText editTextUsername;
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
+    private TextInputEditText editTextRepeatPassword;
     private TextInputEditText editTextFirstName;
     private TextInputEditText editTextLastName;
     private TextInputEditText editTextBirthDate;
     //
     private CheckBox checkBoxPromo;
     private CheckBox checkBoxAnalytics;
+    private CheckBox checkBoxTermsAndConditions;
+
     //
     private Button buttonsignUp;
     private ProgressBar spinner;
@@ -86,6 +86,7 @@ public class SignUpFragment extends Fragment implements
         textInputLayoutUsername = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_username);
         textInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_email);
         textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_password);
+        textInputLayoutRepeatPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_repeatPassword);
         textInputLayoutFirstName = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_firstName);
         textInputLayoutLastName = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_lastName);
         textInputLayoutBirthDate = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_birthDate);
@@ -93,6 +94,7 @@ public class SignUpFragment extends Fragment implements
         editTextUsername = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_username);
         editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_email);
         editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_password);
+        editTextRepeatPassword = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_repeatPassword);
         editTextFirstName = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_firstName);
         editTextLastName = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_lastName);
         editTextBirthDate = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_birthDate);
@@ -100,10 +102,13 @@ public class SignUpFragment extends Fragment implements
         buttonsignUp = (Button) view.findViewById(R.id.button_signUpFragment_signUp);
         checkBoxPromo = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_promo);
         checkBoxAnalytics = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_analytics);
+        checkBoxTermsAndConditions = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_termsAndConditions);
         // setting listeners
         buttonsignUp.setOnClickListener(this);
         checkBoxPromo.setOnCheckedChangeListener(this);
         checkBoxAnalytics.setOnCheckedChangeListener(this);
+        checkBoxTermsAndConditions.setOnCheckedChangeListener(this);
+//        editTextUsername.setOnEditorActionListener(this);
 
         // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
@@ -124,11 +129,11 @@ public class SignUpFragment extends Fragment implements
         });
 
 
-        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), new Observer<SignUpViewModel.FirebaseAuthState>() {
+        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), new Observer<SignUpViewModel.FirebaseSignUpServerCodeState>() {
             @Override
-            public void onChanged(@Nullable SignUpViewModel.FirebaseAuthState firebaseAuthState) {
+            public void onChanged(@Nullable SignUpViewModel.FirebaseSignUpServerCodeState firebaseSignUpServerCodeState) {
 
-                switch (firebaseAuthState) {
+                switch (firebaseSignUpServerCodeState) {
                     case SIGN_UP_SUCCESS:
                         MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
                         break;
@@ -140,6 +145,27 @@ public class SignUpFragment extends Fragment implements
                         break;
                     case VERIFICATION_MAIL_NOT_SENT:
                         MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
+                        break;
+                    case PENDING_USER_COLLISION:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nuser colllision\nemail already in use by another user", getContext());
+                        textInputLayoutEmail.setError("email gia' in uso");
+                        break;
+                    case USERNAME_EMAIL_COLLISION:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nusername+email gia' presente", getContext());
+                        textInputLayoutUsername.setError("username+email gia' presente");
+                        textInputLayoutEmail.setError("username+email gia' presente");
+                        break;
+                    case USERNAME_COLLISION:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nusername gia' presente", getContext());
+                        textInputLayoutUsername.setError("username gia' presente");
+                        break;
+                    case EMAIL_COLLISION:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nemail gia' presente", getContext());
+                        textInputLayoutEmail.setError("email gia' presente");
+                        break;
+                    case GENERIC_POSTGREST_ERROR:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
+                        textInputLayoutEmail.setError("email gia' presente");
                         break;
 
                 }
@@ -174,29 +200,40 @@ public class SignUpFragment extends Fragment implements
     public void onClick(View v) {
 
         if(v.getId() == buttonsignUp.getId()) {
-            HttpUrl httpUrl = null;
-            final OkHttpClient httpClient = new OkHttpClient();
+            // getting data
+            String username = editTextUsername.getText().toString();
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
+            String repeatPassword = editTextRepeatPassword.getText().toString();
+            String firstName = editTextFirstName.getText().toString();
+            String lastName = editTextLastName.getText().toString();
+            String birthDate = editTextBirthDate.getText().toString();
+            boolean promo = checkBoxPromo.isChecked();
+            boolean analytics = checkBoxAnalytics.isChecked();
+            boolean termsAndConditions = checkBoxTermsAndConditions.isChecked();
+
+
+
+            // check fields
+            boolean allFieldsAreFilled = checkAllFieldsAreFilled();
+            boolean repeatPasswordMatches = checkRepeatPasswordMatch();
+
+            if(allFieldsAreFilled && repeatPasswordMatches) {
+                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, promo, analytics);
+            }
+            else {
+                MyUtilities.showCenteredToast("Completare prima tutti i campi evidenziati in rosso.", getContext());
+            }
+
+
 
             try {
-                // getting data
-                String username = editTextUsername.getText().toString();
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
-                String firstName = editTextFirstName.getText().toString();
-                String lastName = editTextLastName.getText().toString();
-                String birthDate = editTextBirthDate.getText().toString();
-                boolean promo = checkBoxPromo.isChecked();
-                boolean analytics = checkBoxAnalytics.isChecked();
 
                 //
-                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, promo, analytics);
 
 //                mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
 //                        user.getEmail(), user.isEmailVerified()));
 
-
-
-//                final String dbFunction = "fn_register_new_user";
 //
 //                //
 //                httpUrl = new HttpUrl.Builder()
@@ -206,16 +243,7 @@ public class SignUpFragment extends Fragment implements
 //                        .addPathSegment(dbFunction)
 //                        .build();
 //
-//                RequestBody requestBody = buildRequestBody(
-//                        "foo",
-//                        "foo@mail.com",
-//                        "aaaa",
-//                        "mrfoo",
-//                        "bar",
-//                        "1970-1-1",
-//                        "foo.jpg",
-//                        String.valueOf(true),
-//                        String.valueOf(true));
+
 //
 //                Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
 //
@@ -244,42 +272,101 @@ public class SignUpFragment extends Fragment implements
 
     //--------------------------------------------------------------- METHODS
 
+    private boolean checkAllFieldsAreFilled() {
+        boolean res = true;
+        if(editTextUsername.getText().toString().isEmpty()) {
+            textInputLayoutUsername.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutUsername.setError(null);
+        }
+
+        if(editTextEmail.getText().toString().isEmpty()) {
+            textInputLayoutEmail.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutEmail.setError(null);
+        }
+
+        if(editTextPassword.getText().toString().isEmpty()) {
+            textInputLayoutPassword.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutPassword.setError(null);
+        }
+
+        if(editTextRepeatPassword.getText().toString().isEmpty()) {
+            textInputLayoutRepeatPassword.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutRepeatPassword.setError(null);
+        }
+
+        if(editTextFirstName.getText().toString().isEmpty()) {
+            textInputLayoutFirstName.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutFirstName.setError(null);
+        }
+
+        if(editTextLastName.getText().toString().isEmpty()) {
+            textInputLayoutLastName.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutLastName.setError(null);
+        }
+
+        if(editTextBirthDate.getText().toString().isEmpty()) {
+            textInputLayoutBirthDate.setError("*");
+            res = false;
+        }
+        else {
+            textInputLayoutBirthDate.setError(null);
+        }
+
+        if( ! checkBoxTermsAndConditions.isChecked()) {
+            checkBoxTermsAndConditions.setTextColor(getResources().getColor(R.color.red));
+            res = false;
+        }
+        else {
+            checkBoxTermsAndConditions.setTextColor(getResources().getColor(R.color.light_blue));
+        }
+
+        return res;
+    }
+
+    private boolean checkRepeatPasswordMatch() {
+        if( ! editTextRepeatPassword.getText().toString().equals(editTextPassword.getText().toString())) {
+            textInputLayoutRepeatPassword.setError(getString(R.string.passwords_dont_match));
+            return false;
+        }
+        else {
+            textInputLayoutRepeatPassword.setError(null);
+        }
+
+        return true;
+    }
+
+
+
     private void fastSignUp() {
         editTextUsername.setText("foo");
-        editTextEmail.setText("noto42@outlook.com");
+        editTextEmail.setText("dev.mirror42@gmail.com");
         editTextPassword.setText("aaaaaaa");
+        editTextRepeatPassword.setText("aaaaaaa");
         editTextFirstName.setText("mrfoo");
         editTextLastName.setText("bar");
         editTextBirthDate.setText("1/1/1970");
     }
 
 
-    private RequestBody buildRequestBody(String username,
-                                   String email,
-                                   String password,
-                                   String firstName,
-                                   String lastName,
-                                   String birthday,
-                                   String profilePicturePath,
-                                   String promo,
-                                   String analytics) throws Exception {
 
-
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("mail", email)
-                .add("username", username)
-                .add("pass", password)
-                .add("firstname", firstName)
-                .add("lastname", lastName)
-                .add("birthday", birthday)
-                .add("profilepicturepath", profilePicturePath)
-                .add("promo", promo)
-                .add("analytics", analytics)
-                .build();
-
-        return requestBody;
-    }
 
     @Override
     public void onFailure(@NotNull Call call, @NotNull IOException e) {
