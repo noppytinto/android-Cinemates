@@ -362,7 +362,7 @@ public class SignUpFragment extends Fragment implements
 
     private void fastSignUp() {
         editTextUsername.setText("foo");
-        editTextEmail.setText("dev.mirror42@gmail.com");
+        editTextEmail.setText("noto42@outlook.com");
         editTextPassword.setText("aaaaaaa");
         editTextRepeatPassword.setText("aaaaaaa");
         editTextFirstName.setText("mrfoo");
