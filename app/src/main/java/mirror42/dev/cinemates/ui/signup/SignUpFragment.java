@@ -141,14 +141,14 @@ public class SignUpFragment extends Fragment implements
                         MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
                         break;
                     case VERIFICATION_MAIL_SENT:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua casella postale", getContext());
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
                         break;
                     case VERIFICATION_MAIL_NOT_SENT:
                         MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
                         break;
                     case PENDING_USER_COLLISION:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nuser colllision\nemail already in use by another user", getContext());
-                        textInputLayoutEmail.setError("email gia' in uso");
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
+                        textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
                         break;
                     case USERNAME_EMAIL_COLLISION:
                         MyUtilities.showCenteredToast("Firebase sign-up server:\nusername+email gia' presente", getContext());
@@ -167,6 +167,11 @@ public class SignUpFragment extends Fragment implements
                         MyUtilities.showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
                         textInputLayoutEmail.setError("email gia' presente");
                         break;
+                    case WEAK_PASSWORD:
+                        MyUtilities.showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
+                        textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
+                        break;
+
 
                 }
             }

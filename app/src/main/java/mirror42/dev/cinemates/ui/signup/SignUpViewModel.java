@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -68,7 +69,8 @@ private final String TAG = this.getClass().getSimpleName();
         EMAIL_COLLISION,
         USERNAME_COLLISION,
         USERNAME_EMAIL_COLLISION,
-        GENERIC_POSTGREST_ERROR
+        GENERIC_POSTGREST_ERROR,
+        WEAK_PASSWORD
 
     }
 
@@ -293,13 +295,14 @@ private final String TAG = this.getClass().getSimpleName();
                         } catch (FirebaseAuthUserCollisionException e) {
                             e.printStackTrace();
                             setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.PENDING_USER_COLLISION);
-                        }
-                        catch (Exception e) {
+                        } catch (FirebaseAuthWeakPasswordException e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.WEAK_PASSWORD);
+                        } catch (Exception e) {
                             e.printStackTrace();
                             setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.FIREBASE_GENERIC_ERROR);
                         }
                     }
-
                 }
             });
     }
@@ -384,6 +387,7 @@ private final String TAG = this.getClass().getSimpleName();
         }
 
     }
+
 
 
 
