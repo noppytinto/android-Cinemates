@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
@@ -19,6 +20,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import mirror42.dev.cinemates.ui.login.LoginActivity;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.login.UserViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
@@ -38,6 +41,10 @@ public class MainActivity extends AppCompatActivity implements Callback,
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
     public MenuItem loginItemMenu;
+    private static boolean rememberMeExists;
+    private String rememberMeData;
+    private UserViewModel userViewModel;
+    private LoginViewModel loginViewModel;
 
 
     //-------------------------------------------------------- LIFECYCLE METHODS
@@ -48,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // init firebase logger
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
@@ -65,6 +73,29 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
 
 
+        // observe login activity changes
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        loginViewModel.getLoginResult().observe(this, loginResult -> {
+            if (loginResult == MyUtilities.LoginResult.SUCCESS) {
+                String profilePicturePath = loginViewModel.getUser().getValue().getProfilePicturePath();
+                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginItemMenu, this);
+
+            }
+            else if(loginResult == MyUtilities.LoginResult.FAILED) {
+
+            }
+            else if(loginResult == MyUtilities.LoginResult.INVALID_REQUEST) {
+            }
+        });
+
+
+        // observe logged user profile image changes
+        loginViewModel.getUser().observe(this, user -> {
+
+        });
+
+
+
     }// end onCreate()
 
 
@@ -72,24 +103,26 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
     //-------------------------------------------------------- METHODS
 
-    public boolean checkAnyPreviousRememberMe() {
-        boolean result = false;
+    public void checkAnyPreviousRememberMe() {
         if(MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this)) {
+            rememberMeExists = true;
             try {
                 JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
+                rememberMeData = jsonObject.toString();
+
                 String imagePath = jsonObject.getString("ProfileImage");
 
                 if(imagePath!=null || (! imagePath.isEmpty())) {
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginItemMenu, this);
                 }
-
-                result = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }// if
-
-        return result;
+        }
+        else {
+            rememberMeData = null;
+            rememberMeExists = false;
+        }
     }
 
     @Override
@@ -128,9 +161,18 @@ public class MainActivity extends AppCompatActivity implements Callback,
         else if (id == R.id.action_login) {
 //            intent.putExtra(EXTRA_MESSAGE, message);
 
-            int LAUNCH_SECOND_ACTIVITY = 1;
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivityForResult(intent, LAUNCH_SECOND_ACTIVITY);
+            if(rememberMeExists) {
+//                int LAUNCH_LOGIN_ACTIVITY = 1;
+//                Intent intent = new Intent(this, LoginActivity.class);
+//                intent.putExtra("mainActivityRememberMeData", rememberMeData);
+//                startActivityForResult(intent, LAUNCH_LOGIN_ACTIVITY);
+            }
+            else {
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+            }
+
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -163,8 +205,6 @@ public class MainActivity extends AppCompatActivity implements Callback,
             }
         }
     }
-
-
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -233,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements Callback,
         }
     }// end onResponse()
 
-
     private void showToastOnUiThread(String toastMessage) {
         runOnUiThread(new Runnable() {
             @Override
@@ -244,6 +283,10 @@ public class MainActivity extends AppCompatActivity implements Callback,
             }
         });
     }// end showToastOnUiThread()
+
+    public static boolean getRememberMeState() {
+        return rememberMeExists;
+    }
 
 
 }// end MainActivity class

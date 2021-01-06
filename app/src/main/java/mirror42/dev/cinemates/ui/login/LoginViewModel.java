@@ -138,6 +138,7 @@ public class LoginViewModel extends ViewModel implements Callback {
                 String responseData = response.body().string();
 
                 if( ! responseData.equals("null")) {
+                    setLoginResult(LoginResult.SUCCESS);
                     JSONObject jsonObject = new JSONObject(responseData);
 
                     //

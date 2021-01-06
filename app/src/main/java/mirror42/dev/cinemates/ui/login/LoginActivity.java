@@ -1,15 +1,14 @@
 package mirror42.dev.cinemates.ui.login;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import mirror42.dev.cinemates.R;
 
-public class LoginActivity extends AppCompatActivity implements LoginFragment.ProfileImageListener {
+public class LoginActivity extends AppCompatActivity{
     private String profileImagePath = "-";
+    private boolean rememberMeExists;
 
 
 
@@ -20,22 +19,25 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.Pr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+//        rememberMeExists = MainActivity.getRememberMeState();
+
+//        //
+//        if(rememberMeExists) {
+//            String rememberMeData = getIntent().getStringExtra("mainActivityRememberMeData");
+//
+//            // start profile fragment
+//            Intent intent = new Intent(this, UserProfileFragment.class);
+//            intent.putExtra("loginActivityRememberMeData", rememberMeData);
+//            startActivity(intent);
+//
+//        }
+//        else {
+//            // start login fragment
+//            Intent intent = new Intent(this, LoginFragment.class);
+//            startActivity(intent);
+//        }
 
     }
 
-
-    @Override
-    public void onBackPressed() {
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("impagePathFromLoginFragment", profileImagePath);
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
-    }
-
-
-    @Override
-    public void onProfileImageReady(String profileImagePath) {
-        this.profileImagePath = profileImagePath;
-    }
 
 }// end LoginActivity class

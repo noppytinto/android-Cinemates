@@ -8,8 +8,6 @@
     tools:context=".MainActivity">
 
 
-
-
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -21,29 +19,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_mainActivity"
             android:layout_width="match_parent"
-            android:layout_height="?actionBarSize">
-
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_mainActivity"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/primary_blue"
-                app:popupTheme="@style/Theme.Cinemates.PopupOverlay"
-                android:paddingEnd="7dp"
-                />
-
+            android:layout_height="match_parent"
+            android:background="@color/primary_blue"
+            app:popupTheme="@style/Theme.Cinemates.PopupOverlay"
+            android:paddingEnd="7dp"
+            app:contentInsetStart="0dp"
+            app:titleMarginStart="0dp"
+            android:paddingStart="0dp"
+            >
             <ImageView
-                android:id="@+id/imageView_mainActivity_logo"
-                android:layout_width="143dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="10dp"
-                app:srcCompat="@drawable/cinemates_logo_extended_nolights" />
-
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+            android:id="@+id/imageView_mainActivity_logo"
+            android:layout_width="143dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            app:srcCompat="@drawable/cinemates_logo_extended_nolights" />
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

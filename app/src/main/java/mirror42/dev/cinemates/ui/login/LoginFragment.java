@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +8,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
-import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
@@ -41,18 +38,15 @@ public class LoginFragment extends Fragment  implements
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
     private Button buttonStandardLogin;
-    private Button buttonLogout;
     private Button buttonSignUp;
     private ProgressBar spinner;
     private CheckBox checkBoxRememberMe;
-    private ImageView profilePicture;
     private LoginViewModel loginViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
     private boolean rememberMeIsActive;
     private static boolean isLogged;
     private static User loggedUser;
-    private TextView textViewEmail;
 
     public interface ProfileImageListener {
         public void onProfileImageReady(String profileImagePath);
@@ -64,8 +58,7 @@ public class LoginFragment extends Fragment  implements
     //----------------------------------------------------------------------
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
@@ -75,7 +68,6 @@ public class LoginFragment extends Fragment  implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-
         spinner = view.findViewById(R.id.progresBar_loginFragment);
         editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_loginFragment_email);
         editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_loginFragment_password);
@@ -83,15 +75,11 @@ public class LoginFragment extends Fragment  implements
         textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_loginFragment_password);
         buttonStandardLogin = (Button) view.findViewById(R.id.button_loginFragment_standardLogin);
         checkBoxRememberMe = view.findViewById(R.id.checkBox_loginFragment_rememberMe);
-        profilePicture = view.findViewById(R.id.imageView_loginFragment_profilePicture);
-        buttonLogout = view.findViewById(R.id.button_loginFragment_logout);
         remoteConfigServer = RemoteConfigServer.getInstance();
-        textViewEmail = (TextView) view.findViewById(R.id.textView_loginFragment_email);
         buttonSignUp = (Button) view.findViewById(R.id.button_loginFragment_signUp);
 
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
-        buttonLogout.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
 
@@ -101,7 +89,8 @@ public class LoginFragment extends Fragment  implements
         firebaseEventsLogger.logScreenEvent(this, "Login page", getContext());
 
         //
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        FragmentActivity fa = requireActivity();
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.init(rememberMeIsActive);
         loginViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
@@ -112,18 +101,17 @@ public class LoginFragment extends Fragment  implements
                     isLogged = true;
                     loggedUser = user;
                     MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
-                    hideLoginComponents();
-                    showLogoutComponents(user.getEmail());
 
                     // load profile picture
                     String profilePicturePath = user.getProfilePicturePath();
                     LoginActivity loginActivity = (LoginActivity) getActivity();
                     if(profilePicturePath == null || profilePicturePath.isEmpty()) {
-                        loginActivity.onProfileImageReady("LOGGED_BUT_NO_PICTURE");
+//                        loginActivity.onProfileImageReady("LOGGED_BUT_NO_PICTURE");
+
                     }
                     else {
-                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
-                        loginActivity.onProfileImageReady(profilePicturePath);
+//                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+//                        loginActivity.onProfileImageReady(profilePicturePath);
                     }
 
 
@@ -165,8 +153,8 @@ public class LoginFragment extends Fragment  implements
         init();
 
         // fast login
-//        editTextEmail.setText("dev.mirror42@gmail.com");
-//        editTextPassword.setText("a");
+        editTextEmail.setText("dev.mirror42@gmail.com");
+        editTextPassword.setText("a");
 
 
 
@@ -186,9 +174,8 @@ public class LoginFragment extends Fragment  implements
         boolean thereIsArememberMe = checkAnyPreviousRememberMe();
 
         if(isLogged) {
-            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + loggedUser.getProfilePicturePath(), profilePicture, getContext());
-            hideLoginComponents();
-            showLogoutComponents(loggedUser.getEmail());
+//            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + loggedUser.getProfilePicturePath(), profilePicture, getContext());
+//            hideLoginComponents();
         }
         else if(thereIsArememberMe) {
             loadRememberMeData();
@@ -197,7 +184,6 @@ public class LoginFragment extends Fragment  implements
         else {
             this.rememberMeIsActive = false;
             showLoginComponents();
-            hideLogoutComponents();
         }
     }
 
@@ -213,8 +199,6 @@ public class LoginFragment extends Fragment  implements
     private void loadRememberMeData() {
         try {
             JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), getContext()));
-
-            showLogoutComponents(jsonObject.getString("Email"));
 
             loadProfilePicture(jsonObject.getString("ProfileImage"), getContext());
             this.rememberMeIsActive = true;
@@ -242,17 +226,6 @@ public class LoginFragment extends Fragment  implements
         checkBoxRememberMe.setVisibility(View.VISIBLE);
     }
 
-    private void hideLogoutComponents() {
-        textViewEmail.setVisibility(View.GONE);
-        buttonLogout.setVisibility(View.GONE);
-    }
-
-    private void showLogoutComponents(String email) {
-        textViewEmail.setVisibility(View.VISIBLE);
-        textViewEmail.setText(email);
-        buttonLogout.setVisibility(View.VISIBLE);
-    }
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if(isChecked) {
@@ -263,7 +236,7 @@ public class LoginFragment extends Fragment  implements
             if(rememberMeIsActive) {
                 rememberMeIsActive = false;
                 editTextPassword.setText("");
-                setDefaultProfilePicture();
+//                setDefaultProfilePicture();
 
                 // delete remember me data
                 MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
@@ -274,18 +247,7 @@ public class LoginFragment extends Fragment  implements
         }
     }
 
-    private void setDefaultProfilePicture() {
-        try {
-            profilePicture.setImageDrawable(ImageUtilities.getDefaultProfilePictureIcon(getContext()));
 
-            // sending image back to login activity for main activity toolbar to be used
-            LoginActivity loginActivity = (LoginActivity) getActivity();
-            loginActivity.onProfileImageReady("LOGOUT");
-
-        } catch (Resources.NotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 
@@ -320,21 +282,8 @@ public class LoginFragment extends Fragment  implements
             //
 
             loginViewModel.standardLogin(email, password, getContext());
-        } else if (v.getId() == buttonLogout.getId()) {
-            isLogged = false;
-            showLoginComponents();
-            hideLogoutComponents();
-            rememberMeIsActive = false;
-            editTextPassword.setText("");
-            try {
-                setDefaultProfilePicture();
-
-            } catch (Resources.NotFoundException e) {
-                e.printStackTrace();
-            }
-            MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
-            checkBoxRememberMe.setChecked(false);
-        } else if (v.getId() == buttonSignUp.getId()) {
+        }
+        else if (v.getId() == buttonSignUp.getId()) {
 
             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
 
@@ -403,7 +352,7 @@ public class LoginFragment extends Fragment  implements
 
         if(imagePath!=null || ( ! imagePath.isEmpty())) {
             // load profile picture in login activity
-            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, context);
+//            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, context);
         }
     }
 

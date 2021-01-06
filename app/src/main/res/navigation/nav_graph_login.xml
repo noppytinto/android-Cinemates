@@ -19,4 +19,14 @@
         android:name="mirror42.dev.cinemates.ui.signup.SignUpFragment"
         android:label="fragment_sign_in"
         tools:layout="@layout/fragment_sign_up" />
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="mirror42.dev.cinemates.ui.userprofile.UserProfileFragment"
+        android:label="fragment_user_profile"
+        tools:layout="@layout/fragment_user_profile" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="mirror42.dev.cinemates.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
 </navigation>

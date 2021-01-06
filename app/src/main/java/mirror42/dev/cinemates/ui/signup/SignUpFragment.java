@@ -112,7 +112,7 @@ public class SignUpFragment extends Fragment implements
 
         // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, "Sign-In page", getContext());
+        firebaseEventsLogger.logScreenEvent(this, "Sign-Up page", getContext());
 
         //
         signUpViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
