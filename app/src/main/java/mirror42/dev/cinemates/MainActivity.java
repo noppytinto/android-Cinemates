@@ -77,13 +77,14 @@ public class MainActivity extends AppCompatActivity implements
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(this, (Observer<LoginViewModel.LoginResult>) loginResult -> {
             if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
+//                restoreToolbarElements();
                 String profilePicturePath = loginViewModel.getUser().getValue().getProfilePicturePath();
                 ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
                 notificationMenuItem.setVisible(true);
 
             }
             else if(loginResult == LoginViewModel.LoginResult.LOGOUT) {
-                restoreToolbarElements();
+                showToolbarElements();
                 Drawable drawable = ImageUtilities.getDefaultProfilePictureIcon(this);
                 loginMenuItem.setIcon(drawable);
                 notificationMenuItem.setVisible(false);
@@ -315,12 +316,12 @@ public class MainActivity extends AppCompatActivity implements
         });
     }// end showToastOnUiThread()
 
-    public void setToolbarElements(String title) {
+    public void hideToolbarElements(String title) {
         loginMenuItem.setVisible(false);
         toolbarLogo.setVisibility(View.INVISIBLE);
     }
 
-    public void restoreToolbarElements() {
+    public void showToolbarElements() {
         loginMenuItem.setVisible(true);
         toolbarLogo.setVisibility(View.VISIBLE);
     }

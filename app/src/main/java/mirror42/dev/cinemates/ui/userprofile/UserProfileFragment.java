@@ -79,7 +79,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
         //
         MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.setToolbarElements("Profilo utente");
+        mainActivity.hideToolbarElements("Profilo utente");
 
 
         // setting listeners
@@ -156,12 +156,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
     //----------------------------------------------------------------------- METHODS
 
-
     @Override
     public void onDetach() {
         super.onDetach();
         MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.restoreToolbarElements();
+        mainActivity.showToolbarElements();
 
     }
+
+
+
 }// end UserProfileFragment class
