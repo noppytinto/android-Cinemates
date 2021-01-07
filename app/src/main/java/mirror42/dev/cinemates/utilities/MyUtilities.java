@@ -193,7 +193,11 @@ public class MyUtilities {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("Username", user.getUsername());
             jsonObject.put("Email", user.getEmail());
+            jsonObject.put("Name", user.getFirstName());
+            jsonObject.put("LastName", user.getLastName());
+            jsonObject.put("BirthDate", user.getBirthDate());
             jsonObject.put("ProfileImage", user.getProfilePicturePath());
+            jsonObject.put("AccessToken", user.getAccessToken());
 
             string = jsonObject.toString();
 

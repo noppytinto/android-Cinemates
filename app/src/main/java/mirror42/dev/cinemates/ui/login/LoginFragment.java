@@ -17,7 +17,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -49,10 +48,6 @@ public class LoginFragment extends Fragment  implements
     private static boolean isLogged;
     private static User loggedUser;
     private NavController navController;
-
-    public interface ProfileImageListener {
-        public void onProfileImageReady(String profileImagePath);
-    }
 
 
 
@@ -290,7 +285,7 @@ public class LoginFragment extends Fragment  implements
         }
         else if (v.getId() == buttonSignUp.getId()) {
 
-            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
+//            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
 
 //            // Choose authentication providers
 //            List<AuthUI.IdpConfig> providers = Arrays.asList(

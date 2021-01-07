@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.login.UserViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
@@ -60,16 +61,9 @@ public class MainActivity extends AppCompatActivity implements Callback,
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
         firebaseEventsLogger.setUserConsensus(true); //TODO: fetch user consensus from DB
 
-        // get remote params
-        remoteConfigServer = RemoteConfigServer.getInstance();
-        remoteConfigServer.setListener(this);
-        remoteConfigServer.loadConfigParams();
-
         //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
         NavigationUI.setupActionBarWithNavController(this, navController);
-
-
 
 
         // observe login activity changes
@@ -87,12 +81,20 @@ public class MainActivity extends AppCompatActivity implements Callback,
             }
         });
 
-
         // observe logged user profile image changes
         loginViewModel.getUser().observe(this, user -> {
+            if(user==null) {
 
+            }
+            else {
+                invalidateOptionsMenu();
+            }
         });
 
+        // get remote params
+        remoteConfigServer = RemoteConfigServer.getInstance();
+        remoteConfigServer.setListener(this);
+        remoteConfigServer.loadConfigParams();
 
 
     }// end onCreate()
@@ -103,32 +105,38 @@ public class MainActivity extends AppCompatActivity implements Callback,
     //-------------------------------------------------------- METHODS
 
     public void checkAnyPreviousRememberMe() {
-        if(MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this)) {
-            rememberMeExists = true;
+        rememberMeExists = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
+
+        if(rememberMeExists) {
             try {
+                // decrypt remember me data
                 JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
                 rememberMeData = jsonObject.toString();
 
-                String imagePath = jsonObject.getString("ProfileImage");
+                // create remember me user
+                User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
 
+                // set profile picture
+                String imagePath = remeberMeUser.getProfilePicturePath();
                 if(imagePath!=null || (! imagePath.isEmpty())) {
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginItemMenu, this);
                 }
+
+                // store remember me user
+                loginViewModel.setUser(remeberMeUser);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         else {
-            rememberMeData = null;
-            rememberMeExists = false;
+            loginViewModel.setUser(null);
         }
-    }
+    } // end checkAnyPreviousRememberMe()
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
-        loginItemMenu = menu.getItem(1);
 
         return true;
     }
@@ -159,23 +167,52 @@ public class MainActivity extends AppCompatActivity implements Callback,
 //            }
         }
         else if (id == R.id.action_login) {
-//            intent.putExtra(EXTRA_MESSAGE, message);
+            navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
 
             if(rememberMeExists) {
+//                invalidateOptionsMenu();
+
 //                int LAUNCH_LOGIN_ACTIVITY = 1;
 //                Intent intent = new Intent(this, LoginActivity.class);
 //                intent.putExtra("mainActivityRememberMeData", rememberMeData);
 //                startActivityForResult(intent, LAUNCH_LOGIN_ACTIVITY);
             }
             else {
-                loginItemMenu.setVisible(false);
-                navController.navigate(R.id.action_main_fragment_to_loginFragment2);
+
+
+//                if(loginViewModel.getLoginStatus().getValue() == true) {
+//
+//                }
+//                else {
+//
+//                }
+//
+//                loginItemMenu.setVisible(false);
             }
 
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem notificationMenuItem = menu.getItem(0);
+        MenuItem profileMenuItem = menu.getItem(1);
+
+        // if is logged
+        if(rememberMeExists) {
+            notificationMenuItem.setVisible(true);
+        }
+        else {
+            notificationMenuItem.setVisible(false);
+        }
+
+
+
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

@@ -27,6 +27,8 @@ import okhttp3.Response;
 public class LoginViewModel extends ViewModel implements Callback {
     private MutableLiveData<User> user;
     private MutableLiveData<LoginResult> loginResult;
+    private MutableLiveData<Boolean> logged;
+
     private RemoteConfigServer remoteConfigServer;
     private static boolean rememberMeIsActive;
     private NavController navController;
@@ -50,8 +52,12 @@ public class LoginViewModel extends ViewModel implements Callback {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setPostUser(User user) {
         this.user.postValue(user);
+    }
+
+    public void setUser(User user) {
+        this.user.setValue(user);
     }
 
     public MutableLiveData<LoginResult> getLoginResult() {
@@ -62,10 +68,14 @@ public class LoginViewModel extends ViewModel implements Callback {
         this.loginResult.postValue(loginResult);
     }
 
-
     public void setRememberMe(boolean value) {
         this.rememberMeIsActive = value;
     }
+
+    public LiveData<Boolean> getLoginStatus() {
+        return logged;
+    }
+
 
 
 
@@ -149,14 +159,17 @@ public class LoginViewModel extends ViewModel implements Callback {
                     User user = new User(username, email, profileImagePath);
 
                     //
-                    setUser(user);
+                    setPostUser(user);
                     setLoginResult(LoginResult.SUCCESS);
+
+                    //
+                    logged.setValue(true);
 
 
 
                 }
                 else {
-                    setUser(null);
+                    setPostUser(null);
                 }
             }
             else {

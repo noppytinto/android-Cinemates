@@ -5,7 +5,9 @@
         android:id="@+id/action_notifications"
         android:title="@string/notifications"
         android:icon="@drawable/notification_icon_light_blue"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:visible="false"
+        />
     <item
         android:id="@+id/action_login"
         android:title="@string/login"

@@ -11,9 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.ui.login.LoginActivity;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -25,7 +29,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private TextView textViewEmail;
     private Button buttonLogout;
     private RemoteConfigServer remoteConfigServer;
-
+    private UserProfileViewModel userProfileViewModel;
+    private LoginViewModel loginViewModel;
 
 
     //----------------------------------------------------------------------- ANDROID METHODS
@@ -54,6 +59,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         firebaseEventsLogger.logScreenEvent(this, "User profile page", getContext());
 
         //
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        loginViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if(user==null) {
+                final NavController navController = Navigation.findNavController(view);
+                navController.navigate(R.id.loginFragment);
+            }
+            else {
+
+            }
+        });
+
 
 
 
