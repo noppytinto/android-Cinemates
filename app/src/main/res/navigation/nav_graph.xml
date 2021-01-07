@@ -93,7 +93,7 @@
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" >
         <action
-            android:id="@+id/action_signUpFragment_to_userProfileFragment"
-            app:destination="@id/userProfileFragment" />
+            android:id="@+id/action_signUpFragment_to_main_fragment"
+            app:destination="@id/main_fragment" />
     </fragment>
 </navigation>

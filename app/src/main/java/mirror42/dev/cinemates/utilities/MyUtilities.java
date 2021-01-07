@@ -165,6 +165,13 @@ public class MyUtilities {
         toast.show();
     }// end showToastOnUiThread()
 
+    public static void showCenteredToastLong(String message, Context context) {
+        // print response
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }// end showToastOnUiThread()
+
     public static void showCenteredToastOnUiThread(String message, Activity activity) {
         activity.runOnUiThread(new Runnable() {
             @Override

@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements
         });
     }// end showToastOnUiThread()
 
-    public void hideToolbarElements(String title) {
+    public void hideToolbarElements() {
         loginMenuItem.setVisible(false);
         toolbarLogo.setVisibility(View.INVISIBLE);
     }

@@ -159,7 +159,7 @@ public class LoginFragment extends Fragment  implements
         }
         else if (v.getId() == buttonSignUp.getId()) {
 
-//            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
+            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
 
 //            // Choose authentication providers
 //            List<AuthUI.IdpConfig> providers = Arrays.asList(

@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -129,51 +131,52 @@ public class SignUpFragment extends Fragment implements
         });
 
 
-        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), new Observer<SignUpViewModel.FirebaseSignUpServerCodeState>() {
-            @Override
-            public void onChanged(@Nullable SignUpViewModel.FirebaseSignUpServerCodeState firebaseSignUpServerCodeState) {
+        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), (Observer<SignUpViewModel.FirebaseSignUpServerCodeState>) firebaseSignUpServerCodeState -> {
+            NavController navController = Navigation.findNavController(view);
 
-                switch (firebaseSignUpServerCodeState) {
-                    case SIGN_UP_SUCCESS:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
-                        break;
-                    case SIGN_UP_FAILURE:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
-                        break;
-                    case VERIFICATION_MAIL_SENT:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
-                        break;
-                    case VERIFICATION_MAIL_NOT_SENT:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
-                        break;
-                    case PENDING_USER_COLLISION:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
-                        textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
-                        break;
-                    case USERNAME_EMAIL_COLLISION:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nusername+email gia' presente", getContext());
-                        textInputLayoutUsername.setError("username+email gia' presente");
-                        textInputLayoutEmail.setError("username+email gia' presente");
-                        break;
-                    case USERNAME_COLLISION:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nusername gia' presente", getContext());
-                        textInputLayoutUsername.setError("username gia' presente");
-                        break;
-                    case EMAIL_COLLISION:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nemail gia' presente", getContext());
-                        textInputLayoutEmail.setError("email gia' presente");
-                        break;
-                    case GENERIC_POSTGREST_ERROR:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
-                        textInputLayoutEmail.setError("email gia' presente");
-                        break;
-                    case WEAK_PASSWORD:
-                        MyUtilities.showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
-                        textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
-                        break;
+            switch (firebaseSignUpServerCodeState) {
+                case SIGN_UP_SUCCESS:
+                    MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
 
-
-                }
+                    break;
+                case SIGN_UP_FAILURE:
+                    MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
+                    break;
+                case VERIFICATION_MAIL_SENT:
+                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
+                    navController.popBackStack();
+                    navController.navigate(R.id.main_fragment);
+                    break;
+                case VERIFICATION_MAIL_NOT_SENT:
+                    MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
+                    break;
+                case PENDING_USER_COLLISION:
+                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
+                    textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
+                    navController.popBackStack();
+                    navController.navigate(R.id.main_fragment);
+                    break;
+                case USERNAME_EMAIL_COLLISION:
+                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nusername+email gia' presente", getContext());
+                    textInputLayoutUsername.setError("username+email gia' presente");
+                    textInputLayoutEmail.setError("username+email gia' presente");
+                    break;
+                case USERNAME_COLLISION:
+                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nusername gia' presente", getContext());
+                    textInputLayoutUsername.setError("username gia' presente");
+                    break;
+                case EMAIL_COLLISION:
+                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nemail gia' presente", getContext());
+                    textInputLayoutEmail.setError("email gia' presente");
+                    break;
+                case GENERIC_POSTGREST_ERROR:
+                    MyUtilities.showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
+                    textInputLayoutEmail.setError("email gia' presente");
+                    break;
+                case WEAK_PASSWORD:
+                    MyUtilities.showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
+                    textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
+                    break;
             }
         });
 
@@ -200,10 +203,8 @@ public class SignUpFragment extends Fragment implements
 
     }// end onViewCreated class
 
-
     @Override
     public void onClick(View v) {
-
         if(v.getId() == buttonsignUp.getId()) {
             // getting data
             String username = editTextUsername.getText().toString();
@@ -227,7 +228,7 @@ public class SignUpFragment extends Fragment implements
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, promo, analytics);
             }
             else {
-                MyUtilities.showCenteredToast("Completare prima tutti i campi evidenziati in rosso.", getContext());
+                MyUtilities.showCenteredToastLong("Completare prima tutti i campi evidenziati in rosso.", getContext());
             }
 
 
@@ -262,9 +263,6 @@ public class SignUpFragment extends Fragment implements
             }
         }
     }// end onClick()
-
-
-
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -358,8 +356,6 @@ public class SignUpFragment extends Fragment implements
         return true;
     }
 
-
-
     private void fastSignUp() {
         editTextUsername.setText("foo");
         editTextEmail.setText("noto42@outlook.com");
@@ -369,9 +365,6 @@ public class SignUpFragment extends Fragment implements
         editTextLastName.setText("bar");
         editTextBirthDate.setText("1/1/1970");
     }
-
-
-
 
     @Override
     public void onFailure(@NotNull Call call, @NotNull IOException e) {
