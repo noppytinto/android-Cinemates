@@ -2,26 +2,31 @@ package mirror42.dev.cinemates;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.login.UserViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
@@ -34,20 +39,21 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 
-public class MainActivity extends AppCompatActivity implements Callback,
+public class MainActivity extends AppCompatActivity implements
         RemoteConfigServer.RemoteConfigListener {
     private static final String EXTRA_MESSAGE = " ";
     private final String TAG = this.getClass().getSimpleName();
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
-    public MenuItem loginItemMenu;
+    public MenuItem loginMenuItem;
+    public MenuItem notificationMenuItem;
     private static boolean rememberMeExists;
     private String rememberMeData;
-    private UserViewModel userViewModel;
     private LoginViewModel loginViewModel;
+    private ImageView toolbarLogo;
 
 
-    //-------------------------------------------------------- LIFECYCLE METHODS
+    //-------------------------------------------------------- ANDROID METHODS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbarLogo = findViewById(R.id.imageView_mainActivity_logo);
 
         // init firebase logger
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
@@ -68,28 +75,44 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
         // observe login activity changes
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(this, loginResult -> {
-            if (loginResult == MyUtilities.LoginResult.SUCCESS) {
+        loginViewModel.getLoginResult().observe(this, (Observer<LoginViewModel.LoginResult>) loginResult -> {
+            if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
                 String profilePicturePath = loginViewModel.getUser().getValue().getProfilePicturePath();
-                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginItemMenu, this);
+                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
+                notificationMenuItem.setVisible(true);
 
             }
-            else if(loginResult == MyUtilities.LoginResult.FAILED) {
-
+            else if(loginResult == LoginViewModel.LoginResult.LOGOUT) {
+                restoreToolbarElements();
+                Drawable drawable = ImageUtilities.getDefaultProfilePictureIcon(this);
+                loginMenuItem.setIcon(drawable);
+                notificationMenuItem.setVisible(false);
+                rememberMeExists = false;
             }
-            else if(loginResult == MyUtilities.LoginResult.INVALID_REQUEST) {
+            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME) {
+                try {
+                    // decrypt remember me data
+                    JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
+                    rememberMeData = jsonObject.toString();
+
+                    // create remember me user
+                    User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
+
+                    // set profile picture
+                    String imagePath = remeberMeUser.getProfilePicturePath();
+                    if(imagePath!=null || (! imagePath.isEmpty())) {
+                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
+                    }
+
+                    // store remember me user
+                    loginViewModel.setUser(remeberMeUser);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
-        // observe logged user profile image changes
-        loginViewModel.getUser().observe(this, user -> {
-            if(user==null) {
 
-            }
-            else {
-                invalidateOptionsMenu();
-            }
-        });
 
         // get remote params
         remoteConfigServer = RemoteConfigServer.getInstance();
@@ -99,44 +122,14 @@ public class MainActivity extends AppCompatActivity implements Callback,
 
     }// end onCreate()
 
-
-
-
-    //-------------------------------------------------------- METHODS
-
-    public void checkAnyPreviousRememberMe() {
-        rememberMeExists = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
-
-        if(rememberMeExists) {
-            try {
-                // decrypt remember me data
-                JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
-                rememberMeData = jsonObject.toString();
-
-                // create remember me user
-                User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
-
-                // set profile picture
-                String imagePath = remeberMeUser.getProfilePicturePath();
-                if(imagePath!=null || (! imagePath.isEmpty())) {
-                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginItemMenu, this);
-                }
-
-                // store remember me user
-                loginViewModel.setUser(remeberMeUser);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            loginViewModel.setUser(null);
-        }
-    } // end checkAnyPreviousRememberMe()
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        loginMenuItem = menu.getItem(1);
+        notificationMenuItem = menu.getItem(0);
+
+        loginMenuItem.setVisible(true);
 
         return true;
     }
@@ -167,30 +160,16 @@ public class MainActivity extends AppCompatActivity implements Callback,
 //            }
         }
         else if (id == R.id.action_login) {
-            navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
-
-            if(rememberMeExists) {
-//                invalidateOptionsMenu();
-
-//                int LAUNCH_LOGIN_ACTIVITY = 1;
-//                Intent intent = new Intent(this, LoginActivity.class);
-//                intent.putExtra("mainActivityRememberMeData", rememberMeData);
-//                startActivityForResult(intent, LAUNCH_LOGIN_ACTIVITY);
+            if(rememberMeExists || (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+                navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
             }
             else {
-
-
-//                if(loginViewModel.getLoginStatus().getValue() == true) {
-//
-//                }
-//                else {
-//
-//                }
-//
-//                loginItemMenu.setVisible(false);
+                try {
+                    navController.navigate(R.id.action_main_fragment_to_loginFragment);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -199,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements Callback,
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem notificationMenuItem = menu.getItem(0);
-        MenuItem profileMenuItem = menu.getItem(1);
 
         // if is logged
         if(rememberMeExists) {
@@ -226,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
                 String profileImagePath = data.getStringExtra("impagePathFromLoginFragment");
 
                 if(profileImagePath.equals("LOGOUT")) {
-                    loginItemMenu.setIcon(ImageUtilities.getDefaultProfilePictureIcon(this));
+                    loginMenuItem.setIcon(ImageUtilities.getDefaultProfilePictureIcon(this));
                 }
                 else if(profileImagePath.equals("LOGGED_BUT_NO_PICTURE")) {
                     // TODO: set fname/lname initilas
@@ -235,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
                     // ignore
                 }
                 else {
-                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profileImagePath, loginItemMenu, this);
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profileImagePath, loginMenuItem, this);
                 }
 
 
@@ -246,10 +224,24 @@ public class MainActivity extends AppCompatActivity implements Callback,
     @Override
     public boolean onSupportNavigateUp() {
         navController.navigateUp();
-        loginItemMenu.setVisible(true);
-
         return super.onSupportNavigateUp();
     }
+
+
+
+
+    //-------------------------------------------------------- METHODS
+
+    public void checkAnyPreviousRememberMe() {
+        rememberMeExists = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
+
+        if(rememberMeExists) {
+            loginViewModel.setLoginResult(LoginViewModel.LoginResult.REMEMBER_ME);
+        }
+        else {
+
+        }
+    } // end checkAnyPreviousRememberMe()
 
     private void establishAzureConnection() {
         final String checkSignatureFunction = "check_app_signature?signature=";
@@ -271,7 +263,29 @@ public class MainActivity extends AppCompatActivity implements Callback,
                     .build();
 
             Call call = httpClient.newCall(request);
-            call.enqueue(this);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    showToastOnUiThread("Azure connection:\nCannot establish remote connection! D:");
+
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try (ResponseBody responseBody = response.body()) {
+                        if (response.isSuccessful()) {
+                            showToastOnUiThread( "Azure connection:\ncode: " + response.code() + " | message:" +  response.message());
+                        }
+                        else {
+                            showToastOnUiThread("Azure connection:\ncode: " + response.code() + " | message:" + response.message());
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        showToastOnUiThread("Azure connection:\nCannot establish connection! D:");
+                    }
+                }
+            });
 
         }catch(Exception e) {
             e.printStackTrace();
@@ -290,28 +304,6 @@ public class MainActivity extends AppCompatActivity implements Callback,
         }
     }
 
-    @Override
-    public void onFailure(Call call, IOException e) {
-        showToastOnUiThread("Azure connection:\nCannot establish remote connection! D:");
-    }
-
-    @Override
-    public void onResponse(Call call, Response response) {
-        try (ResponseBody responseBody = response.body()) {
-            if (!response.isSuccessful()) {
-                showToastOnUiThread("Azure connection:\ncode: " + response.code() + " | message:" + response.message());
-                
-                return;
-            }
-
-            showToastOnUiThread( "Azure connection:\ncode: " + response.code() + " | message:" +  response.message());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            showToastOnUiThread("Azure connection:\nCannot establish connection! D:");
-        }
-    }// end onResponse()
-
     private void showToastOnUiThread(String toastMessage) {
         runOnUiThread(new Runnable() {
             @Override
@@ -323,8 +315,14 @@ public class MainActivity extends AppCompatActivity implements Callback,
         });
     }// end showToastOnUiThread()
 
-    public static boolean getRememberMeState() {
-        return rememberMeExists;
+    public void setToolbarElements(String title) {
+        loginMenuItem.setVisible(false);
+        toolbarLogo.setVisibility(View.INVISIBLE);
+    }
+
+    public void restoreToolbarElements() {
+        loginMenuItem.setVisible(true);
+        toolbarLogo.setVisibility(View.VISIBLE);
     }
 
 

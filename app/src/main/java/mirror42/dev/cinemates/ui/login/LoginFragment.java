@@ -1,6 +1,5 @@
 package mirror42.dev.cinemates.ui.login;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +12,13 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import org.json.JSONObject;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -32,7 +29,7 @@ import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 public class LoginFragment extends Fragment  implements
         View.OnClickListener,
-        CompoundButton.OnCheckedChangeListener {
+        CompoundButton.OnCheckedChangeListener{
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
@@ -45,21 +42,17 @@ public class LoginFragment extends Fragment  implements
     private View view;
     private RemoteConfigServer remoteConfigServer;
     private boolean rememberMeIsActive;
-    private static boolean isLogged;
-    private static User loggedUser;
-    private NavController navController;
 
 
 
-
-    //----------------------------------------------------------------------
+    //---------------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -87,144 +80,40 @@ public class LoginFragment extends Fragment  implements
         firebaseEventsLogger.logScreenEvent(this, "Login page", getContext());
 
         //
-        FragmentActivity fa = requireActivity();
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.init(rememberMeIsActive);
-        loginViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                spinner.setVisibility(View.GONE);
-
-                if(user != null) {
-                    isLogged = true;
-                    loggedUser = user;
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), (Observer<LoginViewModel.LoginResult>) loginResult -> {
+            if(loginResult == LoginViewModel.LoginResult.SUCCESS) {
+                User user = loginViewModel.getUser().getValue();
+                try {
                     MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
-
-                    // load profile picture
-                    String profilePicturePath = user.getProfilePicturePath();
-//                    LoginActivity loginActivity = (LoginActivity) getActivity();
-                    if(profilePicturePath == null || profilePicturePath.isEmpty()) {
-//                        loginActivity.onProfileImageReady("LOGGED_BUT_NO_PICTURE");
-
-                    }
-                    else {
-//                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
-//                        loginActivity.onProfileImageReady(profilePicturePath);
-                    }
-
-
-                    // sending image back to login activity for main activity toolbar to be used
-
-                    // eventually save login data on local store
-                    if(rememberMeIsActive) {
-                        remoteConfigServer = RemoteConfigServer.getInstance();
-                        MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
-                                                MyUtilities.convertUserInJSonString(user),
-                                                getContext());
-                    }
-
-//                    NavHostFragment.findNavController(getParentFragment()).popBackStack();
-
-
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                else {
-                    notifyError();
-                    MyUtilities.showCenteredToast("Authentication server:\ninvalid credentials! D:", getContext());
-                }
+
+                //
+                saveRememberMeDataIfChecked(user);
+
+
+                NavController navController = Navigation.findNavController(view);
+                navController.popBackStack();
+                navController.navigate(R.id.userProfileFragment);
+            }
+            if(loginResult == LoginViewModel.LoginResult.FAILED) {
+                spinner.setVisibility(View.GONE);
+                MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
+
+            }
+            else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
+                spinner.setVisibility(View.GONE);
+                MyUtilities.showCenteredToast("Autorization server:\ncannot make request! D:", getContext());
             }
         });
-
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), new Observer<MyUtilities.LoginResult>() {
-            @Override
-            public void onChanged(@Nullable MyUtilities.LoginResult loginResult) {
-                if(loginResult == MyUtilities.LoginResult.FAILED) {
-                    spinner.setVisibility(View.GONE);
-                    MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
-
-                }
-                else if(loginResult == MyUtilities.LoginResult.INVALID_REQUEST) {
-                    spinner.setVisibility(View.GONE);
-                    MyUtilities.showCenteredToast("Autorization server:\ncannot make request! D:", getContext());
-                }
-            }
-        });
-
-        //
-        init();
 
         // fast login
         editTextEmail.setText("dev.mirror42@gmail.com");
         editTextPassword.setText("a");
 
-
-
-
-
     }// end onViewCreated()
-
-
-
-
-
-    //-------------------------------------------------------------------------------- METHODS
-
-    //-------------------- REMEMBER ME methods
-
-    private void init() {
-        boolean thereIsArememberMe = checkAnyPreviousRememberMe();
-
-        if(isLogged) {
-//            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + loggedUser.getProfilePicturePath(), profilePicture, getContext());
-//            hideLoginComponents();
-        }
-        else if(thereIsArememberMe) {
-            loadRememberMeData();
-            hideLoginComponents();
-        }
-        else {
-            this.rememberMeIsActive = false;
-            showLoginComponents();
-        }
-    }
-
-    /**
-     * read a previous remember me state (if any)
-     * on local store
-     */
-    private boolean checkAnyPreviousRememberMe() {
-        boolean result = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), getContext());
-        return result;
-    }
-
-    private void loadRememberMeData() {
-        try {
-            JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), getContext()));
-
-            loadProfilePicture(jsonObject.getString("ProfileImage"), getContext());
-            this.rememberMeIsActive = true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void hideLoginComponents() {
-        textInputLayoutEmail.setVisibility(View.GONE);
-        textInputLayoutPassword.setVisibility(View.GONE);
-        editTextEmail.setVisibility(View.GONE);
-        editTextPassword.setVisibility(View.GONE);
-        buttonStandardLogin.setVisibility(View.GONE);
-        checkBoxRememberMe.setVisibility(View.GONE);
-    }
-
-    private void showLoginComponents() {
-        textInputLayoutEmail.setVisibility(View.VISIBLE);
-        textInputLayoutPassword.setVisibility(View.VISIBLE);
-        editTextEmail.setVisibility(View.VISIBLE);
-        editTextPassword.setVisibility(View.VISIBLE);
-        buttonStandardLogin.setVisibility(View.VISIBLE);
-        checkBoxRememberMe.setVisibility(View.VISIBLE);
-    }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -247,12 +136,6 @@ public class LoginFragment extends Fragment  implements
         }
     }
 
-
-
-
-
-    //-------------------- LOGIN methods
-
     @Override
     public void onClick(View v) {
         if (v.getId() == buttonStandardLogin.getId()) {
@@ -262,26 +145,17 @@ public class LoginFragment extends Fragment  implements
             FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
             firebaseEventsLogger.logLoginEvent("email + password", getContext());
 
-
             // checks
-            String email = editTextEmail.getText().toString();
-            if (email.isEmpty()) {
-                textInputLayoutEmail.setError("inserire mail!");
-                return;
-            }
-
-            String password = editTextPassword.getText().toString();
-            if (password.isEmpty()) {
-                textInputLayoutPassword.setError("inserire password!");
-                return;
-            }
+            boolean allFieldsAreOk = checkFields();
 
             //
-            resetTextfieldAppearance();
+            if(allFieldsAreOk) {
+                String email = editTextEmail.getText().toString();
+                String password = editTextPassword.getText().toString();
+                //
+                loginViewModel.standardLogin(email, password);
+            }
 
-            //
-
-            loginViewModel.standardLogin(email, password, getContext());
         }
         else if (v.getId() == buttonSignUp.getId()) {
 
@@ -303,64 +177,45 @@ public class LoginFragment extends Fragment  implements
 
 
         }
+    }// end onClick()
+
+
+
+
+    //-------------------------------------------------------------------------------- METHODS
+
+    private boolean checkFields() {
+        String email = editTextEmail.getText().toString();
+
+        if (email.isEmpty()) {
+            textInputLayoutEmail.setError("inserire mail!");
+            return false;
+        }
+
+        String password = editTextPassword.getText().toString();
+        if (password.isEmpty()) {
+            textInputLayoutPassword.setError("inserire password!");
+            return false;
+        }
+
+        resetTextfieldAppearance();
+
+        return true;
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == 99) {
-//            IdpResponse response = IdpResponse.fromResultIntent(data);
-//
-//            if (resultCode == RESULT_OK) {
-//                // Successfully signed in
-//                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                user.sendEmailVerification()
-//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<Void> task) {
-//                                if (task.isSuccessful()) {
-//                                    Log.d(TAG, "Email sent.");
-//                                }
-//                            }
-//                        });
-//                MyUtilities.showCenteredToast(user.getEmail(), getContext());
-//                // ...
-//            } else {
-//                // Sign in failed. If response is null the user canceled the
-//                // sign-in flow using the back button. Otherwise check
-//                // response.getError().getErrorCode() and handle the error.
-//                // ...
-//            }
-//        }
-//    }
-
-
-
-
+    private void saveRememberMeDataIfChecked(User user) {
+        if(rememberMeIsActive) {
+            remoteConfigServer = RemoteConfigServer.getInstance();
+            MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
+                    MyUtilities.convertUserInJSonString(user),
+                    getContext());
+        }
+    }
 
     private void resetTextfieldAppearance() {
         textInputLayoutEmail.setError(null);
         textInputLayoutPassword.setError(null);
 
     }
-
-
-    private void loadProfilePicture(String imagePath, Context context) {
-        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
-
-        if(imagePath!=null || ( ! imagePath.isEmpty())) {
-            // load profile picture in login activity
-//            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, context);
-        }
-    }
-
-    private void notifyError() {
-        textInputLayoutEmail.setError("credenziali non valide!");
-        textInputLayoutPassword.setError("credenziali non valide!");
-    }
-
-
 
 }// end LoginFragment class

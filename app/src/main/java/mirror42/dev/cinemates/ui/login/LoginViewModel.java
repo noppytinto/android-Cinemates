@@ -1,12 +1,11 @@
 package mirror42.dev.cinemates.ui.login;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavController;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities.LoginResult;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -32,6 +30,16 @@ public class LoginViewModel extends ViewModel implements Callback {
     private RemoteConfigServer remoteConfigServer;
     private static boolean rememberMeIsActive;
     private NavController navController;
+
+    public enum LoginResult {
+        INVALID_REQUEST,
+        FAILED,
+        SUCCESS,
+        INVALID_PASSWORD,
+        USER_NOT_EXIST,
+        LOGOUT,
+        REMEMBER_ME
+    }
 
 
 
@@ -64,8 +72,12 @@ public class LoginViewModel extends ViewModel implements Callback {
         return loginResult;
     }
 
-    public void setLoginResult(LoginResult loginResult) {
+    public void setPostLoginResult(LoginResult loginResult) {
         this.loginResult.postValue(loginResult);
+    }
+
+    public void setLoginResult(LoginResult loginResult) {
+        this.loginResult.setValue(loginResult);
     }
 
     public void setRememberMe(boolean value) {
@@ -81,14 +93,9 @@ public class LoginViewModel extends ViewModel implements Callback {
 
     //--------------------------------------------------- METHODS
 
-    public void init(boolean rememberMeIsActive) {
-        this.rememberMeIsActive = rememberMeIsActive;
-    }
-
-    public void standardLogin(String email, String password, Context context) {
+    public void standardLogin(String email, String password) {
         if(password==null) {
             // TODO handle failed password encryption
-            return;
         }
 
         //
@@ -100,7 +107,7 @@ public class LoginViewModel extends ViewModel implements Callback {
 
         } catch (Exception e) {
             e.printStackTrace();
-            setLoginResult(LoginResult.INVALID_REQUEST);
+            setPostLoginResult(LoginResult.INVALID_REQUEST);
         }
 
         // performing http request
@@ -111,10 +118,53 @@ public class LoginViewModel extends ViewModel implements Callback {
 
             //
             Call call = httpClient.newCall(request);
-            call.enqueue(this);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setPostLoginResult(LoginResult.FAILED);
+
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if( ! responseData.equals("null")) {
+                                JSONObject jsonObject = new JSONObject(responseData);
+
+                                //
+                                User user = User.parseUserFromJsonObject(jsonObject);
+
+                                //
+                                setPostUser(user);
+                                setPostLoginResult(LoginResult.SUCCESS);
+                            }
+                            else {
+                                setPostUser(null);
+                                setPostLoginResult(LoginResult.FAILED);
+                            }
+                        }
+                        else {
+                            setPostUser(null);
+                            setPostLoginResult(LoginResult.FAILED);
+
+                            //TODO: should be logged
+//                showToastOnUiThread("Authentication server:\n" +
+//                        "message: " + response.header("message")
+//                        + "errore code: " + response.header("code"));
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setPostLoginResult(LoginResult.FAILED);
+                    }
+                }
+            });
         }catch(Exception e) {
             e.printStackTrace();
-            setLoginResult(LoginResult.INVALID_REQUEST);
+            setPostLoginResult(LoginResult.INVALID_REQUEST);
         }
     }// end standardLogin()
 
@@ -140,51 +190,12 @@ public class LoginViewModel extends ViewModel implements Callback {
 
     @Override
     public void onFailure(Call call, IOException e) {
-        setLoginResult(LoginResult.FAILED);
+        setPostLoginResult(LoginResult.FAILED);
     }
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
-        try {
-            if (response.isSuccessful()) {
-                String responseData = response.body().string();
 
-                if( ! responseData.equals("null")) {
-                    JSONObject jsonObject = new JSONObject(responseData);
-
-                    //
-                    String username = jsonObject.getString("Username");
-                    String email = jsonObject.getString("Email");
-                    String profileImagePath = jsonObject.getString("ProfileImage");
-                    User user = new User(username, email, profileImagePath);
-
-                    //
-                    setPostUser(user);
-                    setLoginResult(LoginResult.SUCCESS);
-
-                    //
-                    logged.setValue(true);
-
-
-
-                }
-                else {
-                    setPostUser(null);
-                }
-            }
-            else {
-                setLoginResult(LoginResult.FAILED);
-
-                //TODO: should be logged
-//                showToastOnUiThread("Authentication server:\n" +
-//                        "message: " + response.header("message")
-//                        + "errore code: " + response.header("code"));
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            setLoginResult(LoginResult.FAILED);
-        }
     }
 
 

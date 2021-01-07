@@ -11,14 +11,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.ui.login.LoginActivity;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
@@ -29,11 +35,31 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private TextView textViewEmail;
     private Button buttonLogout;
     private RemoteConfigServer remoteConfigServer;
-    private UserProfileViewModel userProfileViewModel;
     private LoginViewModel loginViewModel;
 
 
     //----------------------------------------------------------------------- ANDROID METHODS
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // this is for Login Fragment:
+        // if login is NOT successful, navigte back to main fragment
+//        NavController navController = NavHostFragment.findNavController(this);
+//        NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
+//        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
+//        savedStateHandle.getLiveData(LoginFragment.LOGIN_SUCCESSFUL).observe(navBackStackEntry, success -> {
+//                    if( ! (Boolean) success) {
+//                        int startDestination = navController.getGraph().getStartDestination();
+//                        NavOptions navOptions = new NavOptions.Builder()
+//                                .setPopUpTo(startDestination, true)
+//                                .build();
+//                        navController.navigate(startDestination, null, navOptions);
+//                    }
+//                });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,6 +77,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonLogout = view.findViewById(R.id.button_loginFragment_logout);
         remoteConfigServer = RemoteConfigServer.getInstance();
 
+        //
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setToolbarElements("Profilo utente");
+
+
         // setting listeners
         buttonLogout.setOnClickListener(this);
 
@@ -60,16 +91,44 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if(user==null) {
-                final NavController navController = Navigation.findNavController(view);
-                navController.navigate(R.id.loginFragment);
-            }
-            else {
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), (Observer<LoginViewModel.LoginResult>) loginResult -> {
+            if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
+                User user = loginViewModel.getUser().getValue();
+                String profilePicturePath = user.getProfilePicturePath();
 
+                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                textViewEmail.setText(user.getEmail());
+
+            }
+            else if(loginResult == LoginViewModel.LoginResult.FAILED) {
+
+            }
+            else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
+            }
+            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME) {
+                try {
+                    // decrypt remember me data
+                    JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), getContext()));
+
+                    // create remember me user
+                    User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
+
+                    //
+                    textViewEmail.setText(remeberMeUser.getEmail());
+
+                    // set profile picture
+                    String imagePath = remeberMeUser.getProfilePicturePath();
+                    if(imagePath!=null || (! imagePath.isEmpty())) {
+                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, getContext());
+                    }
+
+                    // store remember me user
+                    loginViewModel.setUser(remeberMeUser);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
-
 
 
 
@@ -81,10 +140,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         if (v.getId() == buttonLogout.getId()) {
-            LoginActivity loginActivity = (LoginActivity) getActivity();
+            loginViewModel.setUser(null);
+            loginViewModel.setLoginResult(LoginViewModel.LoginResult.LOGOUT);
 
             // delete remember me data
             MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
+
+            //
+            NavController navController = Navigation.findNavController(v);
+            navController.popBackStack();
+            navController.navigate(R.id.loginFragment);
         }
     }
 
@@ -92,9 +157,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     //----------------------------------------------------------------------- METHODS
 
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.restoreToolbarElements();
 
-
-
-
-
+    }
 }// end UserProfileFragment class

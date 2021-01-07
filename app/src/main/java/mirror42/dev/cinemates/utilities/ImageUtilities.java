@@ -40,7 +40,8 @@ public class ImageUtilities {
                 .into(new CustomTarget<Drawable>() {
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                        menuItem.setIcon(resource);
+                        Drawable drawable = resource;
+                        menuItem.setIcon(drawable);
                     }
 
                     @Override

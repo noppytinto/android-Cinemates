@@ -27,13 +27,7 @@ import mirror42.dev.cinemates.model.User;
 
 public class MyUtilities {
 
-    public enum LoginResult {
-        INVALID_REQUEST,
-        FAILED,
-        SUCCESS,
-        INVALID_PASSWORD,
-        USER_NOT_EXIST
-    }
+
 
     public static void encryptFile(String filename, String rawData, Context context) {
         try {
@@ -171,20 +165,17 @@ public class MyUtilities {
         toast.show();
     }// end showToastOnUiThread()
 
-
-
-    public static void showCenteredToastOnUiThread(Activity activity, String toastMessage) {
+    public static void showCenteredToastOnUiThread(String message, Activity activity) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 // print response
-                final Toast toast = Toast.makeText(activity.getApplicationContext(), toastMessage, Toast.LENGTH_SHORT);
+                final Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
         });
     }// end showToastOnUiThread()
-
 
     public static String convertUserInJSonString(User user) {
         String string = null;
@@ -208,8 +199,18 @@ public class MyUtilities {
     }
 
 
+    public static void showToastOnUiThread(String message, Activity activity) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // print response
+                final Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+    }// end showToastOnUiThread()
 
 
 
 
-}
+}// end MyUtilities class
