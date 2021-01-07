@@ -8,26 +8,36 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 
 public class LoginViewModel extends ViewModel {
@@ -38,6 +48,8 @@ public class LoginViewModel extends ViewModel {
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
 
+
+
     public enum LoginResult {
         INVALID_REQUEST,
         FAILED,
@@ -47,7 +59,9 @@ public class LoginViewModel extends ViewModel {
         LOGOUT,
         REMEMBER_ME,
         IS_PENDING_USER,
-        IS_NOT_PENDING_USER
+        IS_NOT_PENDING_USER,
+        INVALID_CREDENTIALS,
+        NONE
     }
 
 
@@ -90,7 +104,9 @@ public class LoginViewModel extends ViewModel {
         this.loginResult.setValue(loginResult);
     }
 
-
+    public FirebaseUser getFirebaseUser() {
+        return firebaseUser;
+    }
 
     //--------------------------------------------------- METHODS
 
@@ -104,7 +120,7 @@ public class LoginViewModel extends ViewModel {
 
         // generating url request
         try {
-            httpUrl = buildStandardLoginUrl(email, MyUtilities.SHA256encrypt(password));
+            httpUrl = buildStandardLoginUrl(email, password);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +160,7 @@ public class LoginViewModel extends ViewModel {
                             }
                             else {
                                 setPostUser(null);
-                                setPostLoginResult(LoginResult.FAILED);
+                                setPostLoginResult(LoginResult.INVALID_CREDENTIALS);
                             }
                         }
                         else {
@@ -206,10 +222,182 @@ public class LoginViewModel extends ViewModel {
     }// end checkIfIsPendingUser()
 
 
-    //----------- callbacks
+
+    public boolean checkEmailVerificationState() {
+        if(firebaseUser!=null) {
+            return firebaseUser.isEmailVerified();
+        }
+
+        return false;
+    }
+
+
+    /**
+     * PRECONDITIONS:
+     * - pending user must exist
+     * - therefore document in pending_users must exists
+     *   with UID as name
+     *
+     */
+    public void insertIntoPostgres() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("pending_users").document(firebaseUser.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
+
+                        // insert into postgres
+                        insert(document.getData());
 
 
 
+                    } else {
+                        // NOTE: should not enter this case
+                        //       because of preconditions
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+        private RequestBody buildRequestBody(String username,
+                                         String email,
+                                         String password,
+                                         String firstName,
+                                         String lastName,
+                                         String birthday,
+                                         String profilePicturePath,
+                                         String promo,
+                                         String analytics) throws Exception {
+        RequestBody requestBody = new FormBody.Builder()
+                .add("mail", email)
+                .add("username", username)
+                .add("pass", password)
+                .add("firstname", firstName)
+                .add("lastname", lastName)
+                .add("birthday", birthday)
+                .add("profilepicturepath", profilePicturePath)
+                .add("promo", promo)
+                .add("analytics", analytics)
+                .build();
+
+
+
+        return requestBody;
+    }
+
+
+    private void insert(Map<String, Object> document) {
+        try {
+            JSONObject jsonObject = new JSONObject(document);
+
+            String username = jsonObject.getString("username");
+            String email = jsonObject.getString("email");
+            String password = jsonObject.getString("password");
+            String firstName = jsonObject.getString("firstname");
+            String lastName = jsonObject.getString("lastname");
+
+            SimpleDateFormat format = null;
+            Date parsed = null;
+            try {
+                format = new SimpleDateFormat("dd-MM-yyyy");
+                parsed = format.parse(jsonObject.getString("birthdate"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                format = new SimpleDateFormat("dd/MM/yyyy");
+                parsed = format.parse(jsonObject.getString("birthdate"));
+            }
+            java.sql.Date sqlStartDate = new java.sql.Date(parsed.getTime());
+            String sqldate = String.valueOf(sqlStartDate);
+            //String profilePicturePath = jsonObject.getString("username"); //TODO: profile picture
+            String promo = jsonObject.getString("promo");
+            String analytics = jsonObject.getString("analytics");
+
+            //
+            RequestBody requestBody = buildRequestBody(username, email, password, firstName, lastName, sqldate, "-", promo, analytics);
+
+            //
+            HttpUrl httpUrl = null;
+            final OkHttpClient httpClient = new OkHttpClient();
+            final String dbFunction = "fn_register_new_user";
+            //
+            httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+
+            Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
+
+            httpClient.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.d(TAG, "error postgrest");
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if(response.isSuccessful()) {
+                        Log.d(TAG, "postgrest success");
+                        try(ResponseBody responseBody = response.body()) {
+                            boolean res = Boolean.parseBoolean(responseBody.string());
+
+                            if(res) {
+                                deleteFromPendings();
+                                standardLogin(email, password);
+                            }
+
+
+                        } catch (Exception e) {
+                            Log.d(TAG, "error postgrest");
+                            e.printStackTrace();
+                        }
+
+                    }
+                    else {
+                        ResponseBody responseBody = response.body();
+                        String res1 = responseBody.string();
+
+                        Log.d(TAG, "error postgrest");
+
+                    }
+
+                }
+            });
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteFromPendings() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("pending_users").document(firebaseUser.getUid())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                        firebaseUser.delete();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
+    }
 
 
 }// end LoginViewModel class

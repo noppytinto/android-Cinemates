@@ -96,6 +96,10 @@ public class LoginFragment extends Fragment  implements
                 navController.popBackStack();
                 navController.navigate(R.id.userProfileFragment);
             }
+            else if(loginResult == LoginViewModel.LoginResult.INVALID_CREDENTIALS) {
+                spinner.setVisibility(View.GONE);
+                MyUtilities.showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
+            }
             else if(loginResult == LoginViewModel.LoginResult.FAILED) {
                 spinner.setVisibility(View.GONE);
                 MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
@@ -107,19 +111,39 @@ public class LoginFragment extends Fragment  implements
             }
             else if(loginResult == LoginViewModel.LoginResult.IS_PENDING_USER) {
                 spinner.setVisibility(View.GONE);
-                MyUtilities.showCenteredToast("Autorization server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+
+                // checking if email verification has been clicked
+                boolean accountEnabled = loginViewModel.checkEmailVerificationState();
+                if(accountEnabled) {
+
+                    // insert into postgrest database
+                    // and show new user profile page
+
+                    loginViewModel.insertIntoPostgres();
+                }
+                else {
+                    // show restricted user profile page
+                    MyUtilities.showCenteredToast("Autorization server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+
+                }
+
+
+                // loading temp user data from Firebase pending users table
+
+
+
             }
             else if(loginResult == LoginViewModel.LoginResult.IS_NOT_PENDING_USER) {
                 //
                 String email = editTextEmail.getText().toString();
                 String password = editTextPassword.getText().toString();
-                loginViewModel.standardLogin(email, password);
+                loginViewModel.standardLogin(email, MyUtilities.SHA256encrypt(password));
             }
         });
 
         // fast login
-        editTextEmail.setText("dev.mirror42@gmail.com");
-        editTextPassword.setText("a");
+        editTextEmail.setText("noto42@outlook.com");
+        editTextPassword.setText("aaaaaaa");
 
     }// end onViewCreated()
 

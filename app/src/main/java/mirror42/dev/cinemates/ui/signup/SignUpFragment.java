@@ -363,7 +363,7 @@ public class SignUpFragment extends Fragment implements
         editTextRepeatPassword.setText("aaaaaaa");
         editTextFirstName.setText("mrfoo");
         editTextLastName.setText("bar");
-        editTextBirthDate.setText("1/1/1970");
+        editTextBirthDate.setText("1-1-1970");
     }
 
     @Override

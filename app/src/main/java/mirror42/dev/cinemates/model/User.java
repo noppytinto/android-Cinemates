@@ -14,6 +14,8 @@ public class User {
     private Date birthDate;
     private String profilePicturePath;
     private String accessToken;
+    private boolean promo;
+    private boolean analytics;
 
 
 
@@ -43,6 +45,29 @@ public class User {
         this.birthDate = birthDate;
         this.profilePicturePath = profilePicturePath;
         this.accessToken = accessToken;
+    }
+
+    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean analytics) {
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.profilePicturePath = profilePicturePath;
+        this.accessToken = accessToken;
+        this.analytics = analytics;
+    }
+
+    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean promo, boolean analytics) {
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.profilePicturePath = profilePicturePath;
+        this.accessToken = accessToken;
+        this.promo = promo;
+        this.analytics = analytics;
     }
 
 
@@ -104,6 +129,14 @@ public class User {
         this.accessToken = accessToken;
     }
 
+    public boolean getAnalytics() {
+        return analytics;
+    }
+
+    public void setAnalytics(boolean analytics) {
+        this.analytics = analytics;
+    }
+
     //----------------------------------------------- METHODS
 
     public static User parseUserFromJsonObject(JSONObject jsonObject) {
@@ -120,8 +153,9 @@ public class User {
             Date birthDate = Date.valueOf(jsonObject.getString("BirthDate"));
             String profilePicturePath = jsonObject.getString("ProfileImage");
             String accessToken = jsonObject.getString("AccessToken");
+            boolean analytics = jsonObject.getBoolean("Analytics");
 
-            user = new User(username, email, firstName, secondName, birthDate, profilePicturePath, accessToken);
+            user = new User(username, email, firstName, secondName, birthDate, profilePicturePath, accessToken, analytics);
         } catch (JSONException e) {
             e.printStackTrace();
         }

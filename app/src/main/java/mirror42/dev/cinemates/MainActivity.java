@@ -78,8 +78,14 @@ public class MainActivity extends AppCompatActivity implements
         loginViewModel.getLoginResult().observe(this, (Observer<LoginViewModel.LoginResult>) loginResult -> {
             if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
 //                restoreToolbarElements();
-                String profilePicturePath = loginViewModel.getUser().getValue().getProfilePicturePath();
-                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
+
+                User user = loginViewModel.getUser().getValue();
+                try {
+                    String profilePicturePath = user.getProfilePicturePath();
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 notificationMenuItem.setVisible(true);
 
             }
@@ -101,8 +107,10 @@ public class MainActivity extends AppCompatActivity implements
 
                     // set profile picture
                     String imagePath = remeberMeUser.getProfilePicturePath();
-                    if(imagePath!=null || (! imagePath.isEmpty())) {
+                    try {
                         ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                     // store remember me user

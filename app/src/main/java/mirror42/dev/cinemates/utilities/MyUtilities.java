@@ -196,6 +196,7 @@ public class MyUtilities {
             jsonObject.put("BirthDate", user.getBirthDate());
             jsonObject.put("ProfileImage", user.getProfilePicturePath());
             jsonObject.put("AccessToken", user.getAccessToken());
+            jsonObject.put("Analytics", user.getAnalytics());
 
             string = jsonObject.toString();
 

@@ -61,7 +61,8 @@ private final String TAG = this.getClass().getSimpleName();
         USERNAME_COLLISION,
         USERNAME_EMAIL_COLLISION,
         GENERIC_POSTGREST_ERROR,
-        WEAK_PASSWORD
+        WEAK_PASSWORD,
+        NONE
     }
 
 
@@ -134,19 +135,7 @@ private final String TAG = this.getClass().getSimpleName();
                     .build();
 
 
-//            RequestBody requestBody = buildRequestBody(
-//                    "foo",
-//                    "foo@mail.com",
-//                    "aaaa",
-//                    "mrfoo",
-//                    "bar",
-//                    "1970-1-1",
-//                    "foo.jpg",
-//                    String.valueOf(true),
-//                    String.valueOf(true));
 
-
-//            RequestBody requestBody = buildRequestBody(username, email);
             Request request = HttpUtilities.buildGETrequest(httpUrl, remoteConfigServer.getGuestToken());
 
             // performing call
@@ -176,6 +165,8 @@ private final String TAG = this.getClass().getSimpleName();
                             } else if (responseCode == 4) {
                                 setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                             } else {
+                                // if not exist in postgres db
+                                // add as pending user
                                 checkPendingUserCollision(username, email, password, firstName, lastName, birthDate, promo, analytics);
                             }
 
@@ -276,6 +267,7 @@ private final String TAG = this.getClass().getSimpleName();
         dbUser.put("firstname", firstName);
         dbUser.put("lastname", lastName);
         dbUser.put("birthdate", birthDate);
+        // dbUser.put("birthdate", birthDate); // TODO: profile picture
         dbUser.put("promo", promo);
         dbUser.put("analytics", analytics);
 
@@ -313,31 +305,7 @@ private final String TAG = this.getClass().getSimpleName();
         return requestBody;
     }
 
-//    private RequestBody buildRequestBody(String username,
-//                                         String email,
-//                                         String password,
-//                                         String firstName,
-//                                         String lastName,
-//                                         String birthday,
-//                                         String profilePicturePath,
-//                                         String promo,
-//                                         String analytics) throws Exception {
-//        RequestBody requestBody = new FormBody.Builder()
-//                .add("mail", email)
-//                .add("username", username)
-//                .add("pass", password)
-//                .add("firstname", firstName)
-//                .add("lastname", lastName)
-//                .add("birthday", birthday)
-//                .add("profilepicturepath", profilePicturePath)
-//                .add("promo", promo)
-//                .add("analytics", analytics)
-//                .build();
-//
-//
-//
-//        return requestBody;
-//    }
+
 
 
     private void deleteAccount(FirebaseUser user) {
