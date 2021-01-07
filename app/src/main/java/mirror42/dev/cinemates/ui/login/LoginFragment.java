@@ -48,8 +48,7 @@ public class LoginFragment extends Fragment  implements
     //---------------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
@@ -93,12 +92,11 @@ public class LoginFragment extends Fragment  implements
                 //
                 saveRememberMeDataIfChecked(user);
 
-
                 NavController navController = Navigation.findNavController(view);
                 navController.popBackStack();
                 navController.navigate(R.id.userProfileFragment);
             }
-            if(loginResult == LoginViewModel.LoginResult.FAILED) {
+            else if(loginResult == LoginViewModel.LoginResult.FAILED) {
                 spinner.setVisibility(View.GONE);
                 MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
 
@@ -106,6 +104,16 @@ public class LoginFragment extends Fragment  implements
             else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
                 spinner.setVisibility(View.GONE);
                 MyUtilities.showCenteredToast("Autorization server:\ncannot make request! D:", getContext());
+            }
+            else if(loginResult == LoginViewModel.LoginResult.IS_PENDING_USER) {
+                spinner.setVisibility(View.GONE);
+                MyUtilities.showCenteredToast("Autorization server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+            }
+            else if(loginResult == LoginViewModel.LoginResult.IS_NOT_PENDING_USER) {
+                //
+                String email = editTextEmail.getText().toString();
+                String password = editTextPassword.getText().toString();
+                loginViewModel.standardLogin(email, password);
             }
         });
 
@@ -119,7 +127,6 @@ public class LoginFragment extends Fragment  implements
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if(isChecked) {
             rememberMeIsActive = true;
-            loginViewModel.setRememberMe(true);
         }
         else {
             if(rememberMeIsActive) {
@@ -152,8 +159,13 @@ public class LoginFragment extends Fragment  implements
             if(allFieldsAreOk) {
                 String email = editTextEmail.getText().toString();
                 String password = editTextPassword.getText().toString();
+
+                // checking if this correspond to a pending user
+
                 //
-                loginViewModel.standardLogin(email, password);
+                loginViewModel.checkIfIsPendingUser(email, password);
+
+
             }
 
         }

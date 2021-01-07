@@ -1,9 +1,17 @@
 package mirror42.dev.cinemates.ui.login;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.navigation.NavController;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -22,14 +30,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
-public class LoginViewModel extends ViewModel implements Callback {
+public class LoginViewModel extends ViewModel {
+    private final String TAG = this.getClass().getSimpleName();
     private MutableLiveData<User> user;
     private MutableLiveData<LoginResult> loginResult;
-    private MutableLiveData<Boolean> logged;
-
     private RemoteConfigServer remoteConfigServer;
-    private static boolean rememberMeIsActive;
-    private NavController navController;
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
 
     public enum LoginResult {
         INVALID_REQUEST,
@@ -38,7 +45,9 @@ public class LoginViewModel extends ViewModel implements Callback {
         INVALID_PASSWORD,
         USER_NOT_EXIST,
         LOGOUT,
-        REMEMBER_ME
+        REMEMBER_ME,
+        IS_PENDING_USER,
+        IS_NOT_PENDING_USER
     }
 
 
@@ -49,6 +58,7 @@ public class LoginViewModel extends ViewModel implements Callback {
         this.user = new MutableLiveData<>();
         loginResult = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
+        mAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -79,15 +89,6 @@ public class LoginViewModel extends ViewModel implements Callback {
     public void setLoginResult(LoginResult loginResult) {
         this.loginResult.setValue(loginResult);
     }
-
-    public void setRememberMe(boolean value) {
-        this.rememberMeIsActive = value;
-    }
-
-    public LiveData<Boolean> getLoginStatus() {
-        return logged;
-    }
-
 
 
 
@@ -184,19 +185,28 @@ public class LoginViewModel extends ViewModel implements Callback {
         return httpUrl;
     }
 
+    public void checkIfIsPendingUser(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "Autorization server: email ancora non approvata, controlla la tua posta");
+                    firebaseUser = mAuth.getCurrentUser();
+                    setLoginResult(LoginResult.IS_PENDING_USER);
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "Autorization server: not a pending user", task.getException());
+                    setLoginResult(LoginResult.IS_NOT_PENDING_USER);
+
+                    // ...
+                }
+            }
+        });
+    }// end checkIfIsPendingUser()
 
 
     //----------- callbacks
-
-    @Override
-    public void onFailure(Call call, IOException e) {
-        setPostLoginResult(LoginResult.FAILED);
-    }
-
-    @Override
-    public void onResponse(Call call, Response response) throws IOException {
-
-    }
 
 
 
