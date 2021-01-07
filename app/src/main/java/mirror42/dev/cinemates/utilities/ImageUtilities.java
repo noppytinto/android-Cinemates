@@ -22,33 +22,45 @@ public class ImageUtilities {
 
 
     public static void loadCircularImageInto(String imageUrl, ImageView imageView, Context context) {
-        Glide.with(context)  //2
-                .load(imageUrl) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
-                .circleCrop() //4
-                .into(imageView); //8
+        try {
+            Glide.with(context)  //2
+                    .load(imageUrl) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .circleCrop() //4
+                    .into(imageView); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void loadCircularImageInto(String imageUrl, MenuItem menuItem, Context context) {
-        Glide.with(context)  //2
-                .asDrawable()
-                .load(imageUrl) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
-                .circleCrop() //4
-                .into(new CustomTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                        Drawable drawable = resource;
-                        menuItem.setIcon(drawable);
-                    }
+        try {
+            Glide.with(context)  //2
+                    .asDrawable()
+                    .load(imageUrl) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .circleCrop() //4
+                    .into(new CustomTarget<Drawable>() {
+                        @Override
+                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                            try {
+                                Drawable drawable = resource;
+                                menuItem.setIcon(drawable);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                    }
-                }); //8
+                        }
+                    }); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Drawable getDefaultProfilePictureIcon(Context context) {
