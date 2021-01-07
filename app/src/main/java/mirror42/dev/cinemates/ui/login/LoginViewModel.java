@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.navigation.NavController;
 
 import org.json.JSONObject;
 
@@ -28,6 +29,7 @@ public class LoginViewModel extends ViewModel implements Callback {
     private MutableLiveData<LoginResult> loginResult;
     private RemoteConfigServer remoteConfigServer;
     private static boolean rememberMeIsActive;
+    private NavController navController;
 
 
 
@@ -138,7 +140,6 @@ public class LoginViewModel extends ViewModel implements Callback {
                 String responseData = response.body().string();
 
                 if( ! responseData.equals("null")) {
-                    setLoginResult(LoginResult.SUCCESS);
                     JSONObject jsonObject = new JSONObject(responseData);
 
                     //
@@ -149,6 +150,10 @@ public class LoginViewModel extends ViewModel implements Callback {
 
                     //
                     setUser(user);
+                    setLoginResult(LoginResult.SUCCESS);
+
+
+
                 }
                 else {
                     setUser(null);

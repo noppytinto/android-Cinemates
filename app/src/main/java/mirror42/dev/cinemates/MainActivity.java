@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import mirror42.dev.cinemates.ui.login.LoginActivity;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.login.UserViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
@@ -130,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements Callback,
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         loginItemMenu = menu.getItem(1);
+
         return true;
     }
 
@@ -168,8 +168,8 @@ public class MainActivity extends AppCompatActivity implements Callback,
 //                startActivityForResult(intent, LAUNCH_LOGIN_ACTIVITY);
             }
             else {
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
+                loginItemMenu.setVisible(false);
+                navController.navigate(R.id.action_main_fragment_to_loginFragment2);
             }
 
 
@@ -209,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements Callback,
     @Override
     public boolean onSupportNavigateUp() {
         navController.navigateUp();
+        loginItemMenu.setVisible(true);
+
         return super.onSupportNavigateUp();
     }
 

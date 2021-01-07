@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -47,6 +48,7 @@ public class LoginFragment extends Fragment  implements
     private boolean rememberMeIsActive;
     private static boolean isLogged;
     private static User loggedUser;
+    private NavController navController;
 
     public interface ProfileImageListener {
         public void onProfileImageReady(String profileImagePath);
@@ -78,6 +80,7 @@ public class LoginFragment extends Fragment  implements
         remoteConfigServer = RemoteConfigServer.getInstance();
         buttonSignUp = (Button) view.findViewById(R.id.button_loginFragment_signUp);
 
+
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
@@ -104,7 +107,7 @@ public class LoginFragment extends Fragment  implements
 
                     // load profile picture
                     String profilePicturePath = user.getProfilePicturePath();
-                    LoginActivity loginActivity = (LoginActivity) getActivity();
+//                    LoginActivity loginActivity = (LoginActivity) getActivity();
                     if(profilePicturePath == null || profilePicturePath.isEmpty()) {
 //                        loginActivity.onProfileImageReady("LOGGED_BUT_NO_PICTURE");
 
@@ -124,6 +127,8 @@ public class LoginFragment extends Fragment  implements
                                                 MyUtilities.convertUserInJSonString(user),
                                                 getContext());
                     }
+
+//                    NavHostFragment.findNavController(getParentFragment()).popBackStack();
 
 
                 }

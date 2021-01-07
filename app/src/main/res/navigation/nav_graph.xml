@@ -15,7 +15,11 @@
         android:id="@+id/main_fragment"
         android:name="mirror42.dev.cinemates.MainFragment"
         android:label="Main Fragment"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_main_fragment_to_loginFragment2"
+            app:destination="@id/loginFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/search_fragment"
         android:name="mirror42.dev.cinemates.ui.search.SearchFragment"
