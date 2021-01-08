@@ -23,12 +23,34 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import mirror42.dev.cinemates.model.User;
 
 
 public class MyUtilities {
+
+
+    /**
+     * Return date in specified format.
+     * @param milliSeconds Date in milliseconds
+     * @param dateFormat Date format
+     * @return String representing date in specified format
+     */
+    public static String convertMillisInDate(long milliSeconds)
+    {
+        // date format examples
+        // System.out.println(getDate(82233213123L, "dd/MM/yyyy hh:mm:ss.SSS"));
+
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
 
     public static long convertStringDateInMillis(String myDate) {
         // NOTE: from epoch

@@ -285,6 +285,11 @@ public class SignUpFragment extends Fragment implements
             materialDatePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
             MaterialDatePicker<Long> picker = materialDatePickerBuilder.build();
             picker.show(getActivity().getSupportFragmentManager(), picker.toString());
+            picker.addOnPositiveButtonClickListener(confirmButton-> {
+                long selectedDateInMillis = picker.getSelection();
+                String selectedDate = MyUtilities.convertMillisInDate(selectedDateInMillis);
+                editTextBirthDate.setText(selectedDate);
+            });
         }
     }// end onClick()
 
