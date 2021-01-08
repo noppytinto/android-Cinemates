@@ -1,7 +1,5 @@
 package mirror42.dev.cinemates;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -72,10 +69,9 @@ public class MainActivity extends AppCompatActivity implements
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
         NavigationUI.setupActionBarWithNavController(this, navController);
 
-
         // observe login activity changes
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(this, (Observer<LoginViewModel.LoginResult>) loginResult -> {
+        loginViewModel.getLoginResult().observe(this, loginResult -> {
             if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
 //                restoreToolbarElements();
 
@@ -203,34 +199,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        int LAUNCH_SECOND_ACTIVITY = 1;
-
-        if (requestCode ==  LAUNCH_SECOND_ACTIVITY) {
-            if (resultCode == Activity.RESULT_OK) {
-                //Get result
-                String profileImagePath = data.getStringExtra("impagePathFromLoginFragment");
-
-                if(profileImagePath.equals("LOGOUT")) {
-                    loginMenuItem.setIcon(ImageUtilities.getDefaultProfilePictureIcon(this));
-                }
-                else if(profileImagePath.equals("LOGGED_BUT_NO_PICTURE")) {
-                    // TODO: set fname/lname initilas
-                }
-                else if(profileImagePath.equals("-")) {
-                    // ignore
-                }
-                else {
-                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profileImagePath, loginMenuItem, this);
-                }
-
-
-            }
-        }
-    }
-
-    @Override
     public boolean onSupportNavigateUp() {
         navController.navigateUp();
         return super.onSupportNavigateUp();
@@ -255,11 +223,6 @@ public class MainActivity extends AppCompatActivity implements
     private void establishAzureConnection() {
         final String checkSignatureFunction = "check_app_signature?signature=";
         final OkHttpClient httpClient = new OkHttpClient();
-
-//
-//        Context context = this;
-//        SharedPreferences sharedPref = context.getSharedPreferences("cinemates_app_signature", Context.MODE_PRIVATE);
-
 
         RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
         try {

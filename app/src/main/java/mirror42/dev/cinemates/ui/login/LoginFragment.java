@@ -76,7 +76,7 @@ public class LoginFragment extends Fragment  implements
 
         // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, "Login page", getContext());
+        firebaseEventsLogger.logScreenEvent(this, getString(R.string.login_page_firebase_login_page), getContext());
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -142,8 +142,8 @@ public class LoginFragment extends Fragment  implements
         });
 
         // fast login
-        editTextEmail.setText("noto42@outlook.com");
-        editTextPassword.setText("aaaaaaa");
+        editTextEmail.setText(R.string.login_page_email_demo);
+        editTextPassword.setText(R.string.login_page_password_demo);
 
     }// end onViewCreated()
 
@@ -162,7 +162,7 @@ public class LoginFragment extends Fragment  implements
                 MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
 
                 //
-                MyUtilities.showCenteredToast( "Credenziali eliminate", getContext());
+                MyUtilities.showCenteredToast( getString(R.string.login_page_deleted_credentials), getContext());
             }
         }
     }
@@ -174,7 +174,7 @@ public class LoginFragment extends Fragment  implements
 
             // firebase logging
             FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-            firebaseEventsLogger.logLoginEvent("email + password", getContext());
+            firebaseEventsLogger.logLoginEvent(getString(R.string.login_page_firebase_standard_login_method), getContext());
 
             // checks
             boolean allFieldsAreOk = checkFields();
@@ -224,13 +224,13 @@ public class LoginFragment extends Fragment  implements
         String email = editTextEmail.getText().toString();
 
         if (email.isEmpty()) {
-            textInputLayoutEmail.setError("inserire mail!");
+            textInputLayoutEmail.setError(getString(R.string.login_page_no_email_error));
             return false;
         }
 
         String password = editTextPassword.getText().toString();
         if (password.isEmpty()) {
-            textInputLayoutPassword.setError("inserire password!");
+            textInputLayoutPassword.setError(getString(R.string.login_page_no_password_error));
             return false;
         }
 

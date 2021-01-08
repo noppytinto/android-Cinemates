@@ -17,10 +17,6 @@ import mirror42.dev.cinemates.R;
 
 public class ImageUtilities {
 
-
-
-
-
     public static void loadCircularImageInto(String imageUrl, ImageView imageView, Context context) {
         try {
             Glide.with(context)  //2
@@ -77,4 +73,4 @@ public class ImageUtilities {
 
 
 
-}
+}// end ImageUtilities class

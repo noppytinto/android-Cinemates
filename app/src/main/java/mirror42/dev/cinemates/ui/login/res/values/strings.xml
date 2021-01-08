@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--            LOGIN PAGE            -->
+
+<resources>
+    <string name="login_page_sign_up">Registrati</string>
+    <string name="login_page_test_mail_address">test@mail.com</string>
+    <string name="login_page_email">Email</string>
+    <string name="login_page_login">login</string>
+    <string name="login_page_remember_me">Ricordami</string>
+
+    <string name="login_page_email_demo">noto42@outlook.com</string>
+    <string name="login_page_password_demo">aaaaaaa</string>
+
+    <!-- firebase -->
+    <string name="login_page_firebase_login_page">Login page</string>
+    <string name="login_page_firebase_standard_login_method">email + password</string>
+
+
+
+    <!--       TOAST MESSAGES        -->
+    <string name="login_page_deleted_credentials">Credenziali eliminate</string>
+
+    <!-- auth server messages -->
+
+
+    <!--      TEXT FIELDS        -->
+    <string name="login_page_no_email_error">inserire mail!</string>
+    <string name="login_page_no_password_error">inserire password!!</string>
+
+
+</resources>

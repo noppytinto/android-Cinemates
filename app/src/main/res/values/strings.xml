@@ -35,7 +35,6 @@
     <string name="done">Fatto</string>
     <string name="upcomings">Prossimamente</string>
     <string name="about">about</string>
-    <string name="login">login</string>
     <string name="notifications">Notifiche</string>
     <string name="home">Home</string>
     <string name="movie">film</string>
@@ -61,11 +60,8 @@
     <string name="azure_base_url_default_value">https://cinemates.westeurope.cloudapp.azure.com/cinemates/rpc/</string>
     <string name="guest_token_default_value">-</string>
     <string name="cinemates_app_signature_default_value">-</string>
-    <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="rememberme">Ricordami</string>
     <string name="logout">logout</string>
-    <string name="sign_up">Registrati</string>
     <string name="username">Username</string>
     <string name="firstname">Nome</string>
     <string name="lastname">Cognome</string>

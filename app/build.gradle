@@ -35,6 +35,20 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets {
+        main.res.srcDirs += [
+                'src/main/java/mirror42/dev/cinemates/ui/explore/res',
+                'src/main/java/mirror42/dev/cinemates/ui/home/res',
+                'src/main/java/mirror42/dev/cinemates/ui/login/res',
+                'src/main/java/mirror42/dev/cinemates/ui/moviedetails/res',
+                'src/main/java/mirror42/dev/cinemates/ui/search/res',
+                'src/main/java/mirror42/dev/cinemates/ui/signup/res',
+                'src/main/java/mirror42/dev/cinemates/ui/userprofile/res',
+                'src/main/java/mirror42/dev/cinemates/ui/login/res'
+
+        ]
+    }
 }
 
 dependencies {
