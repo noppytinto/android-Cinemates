@@ -21,12 +21,37 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import mirror42.dev.cinemates.model.User;
 
 
 public class MyUtilities {
 
+    public static long convertStringDateInMillis(String myDate) {
+        // NOTE: from epoch
+        // f.e. :
+        // String myDate = "1990/01/01 00:00:00";
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        // String myDate = "1990/01/01";
+        // SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+
+        Date date = null;
+        long result = (long) 0.0;
+        try {
+            date = sdf.parse(myDate);
+            result = date.getTime();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
 
     public static void encryptFile(String filename, String rawData, Context context) {

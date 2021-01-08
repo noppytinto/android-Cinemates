@@ -196,11 +196,52 @@
 
 
 
+    <!-- CINEMATES CHECKBOX -->
+    <style name="Cinemates.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/light_blue</item>
+        <item name="android:textAppearance">@style/Cinemates.Checkbox.TextAppearance</item>
+    </style>
+    <style name="Cinemates.Checkbox.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Button">
+        <item name="fontFamily">@font/poppins</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+
+    <!-- CINEMATES TEXT INPUT LAYOUT -->
+    <style name="Cinemates.TextField.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textAppearance">@style/Cinemates.TextField.TextInputLayout.TextAppearance</item>
+        <item name="hintTextAppearance">@style/Cinemates.TextField.TextInputLayout.TextAppearance.Hint</item>
+        <item name="errorEnabled">true</item>
+        <item name="helperTextEnabled">true</item>
+    </style>
+    <style name="Cinemates.TextField.TextInputLayout.TextAppearance" parent="TextAppearance.MdcTypographyStyles.Subtitle1">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="Cinemates.TextField.TextInputLayout.TextAppearance.Hint" parent="TextAppearance.MdcTypographyStyles.Caption">
+        <item name="android:textSize">12sp</item>
+    </style>
 
 
 
 
-
+    <!-- CINEMATES MATERIAL DATE PICKER -->
+    <style name="Cinemates.MaterialDatePicker" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="materialCalendarHeaderLayout">@style/Cinemates.MaterialDatePicker.HeaderLayout</item>
+        <item name="materialCalendarStyle">@style/Cinemates.MaterialDatePicker.CalendarStyle</item>
+    </style>
+    <style name="Cinemates.MaterialDatePicker.HeaderLayout" parent="@style/Widget.MaterialComponents.MaterialCalendar.HeaderLayout">
+    <item name="android:background">@color/primary_blue</item>
+  </style>
+    <style name="Cinemates.MaterialDatePicker.CalendarStyle" parent="@style/Widget.MaterialComponents.MaterialCalendar">
+        <item name="daySelectedStyle">@style/Cinemates.MaterialDatePicker.CalendarStyle.Dat.Selected</item>
+    </style>
+    <style name="Cinemates.MaterialDatePicker.CalendarStyle.Dat.Selected" parent="Widget.MaterialComponents.MaterialCalendar.Day.Selected">
+        <item name="itemFillColor">?attr/colorPrimary</item>
+        <item name="itemTextColor">@color/black</item>
+        <item name="itemStrokeWidth">0dp</item>
+    </style>
 
     <!-- CINEMATES TYPING SYSTEM -->
 

@@ -15,17 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <CheckBox
-                android:id="@+id/checkBox_loginFragment_termsAndConditions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Accetta Termini e Condizioni."
-                android:textColor="@color/light_blue"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.095"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_username"
@@ -34,12 +23,11 @@
                 android:layout_marginTop="32dp"
                 android:hint="@string/username"
                 app:endIconMode="clear_text"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:startIconDrawable="@drawable/password_icon_light_blue">
+                app:startIconDrawable="@drawable/user_icon_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_username"
@@ -57,9 +45,8 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/login_page_email"
                 app:endIconMode="clear_text"
-                app:errorEnabled="true"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 app:helperText="test@mail.com"
-                app:helperTextEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_username"
@@ -83,8 +70,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/password"
                 app:endIconMode="password_toggle"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
@@ -107,8 +93,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 app:helperText="la password deve contenere almeno 5 caratteri"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -133,12 +118,11 @@
                 android:layout_marginTop="16dp"
                 android:hint="Nome"
                 app:endIconMode="clear_text"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_repeatPassword"
-                app:startIconDrawable="@drawable/password_icon_light_blue">
+                app:startIconDrawable="@drawable/icon_user_filled_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_firstName"
@@ -156,14 +140,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:hint="@string/lastname"
                 app:endIconMode="clear_text"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_firstName"
-                app:startIconDrawable="@drawable/password_icon_light_blue">
+                app:startIconDrawable="@drawable/icon_user_filled_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_lastName"
@@ -175,30 +158,31 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_birthDate"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:hint="@string/birthdate"
                 app:endIconMode="clear_text"
-                app:errorEnabled="true"
-                app:helperTextEnabled="true"
+                app:helperText="(gg-mm-aaaa)"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.175"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_lastName"
-                app:startIconDrawable="@drawable/password_icon_light_blue">
+                app:startIconDrawable="@drawable/icon_calendar_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_birthDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ems="20"
+                    android:ems="16"
                     android:inputType="date"
                     android:textColor="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
 
             <Button
                 android:id="@+id/button_signUpFragment_signUp"
@@ -217,13 +201,13 @@
 
             <CheckBox
                 android:id="@+id/checkBox_loginFragment_promo"
+                style="@style/Cinemates.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Consenti ricezione messaggi promozionali.\n(opzionale)"
-                android:textColor="@color/light_blue"
+                android:layout_marginTop="32dp"
+                android:text="@string/sign_up_promo_consensus_message"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.166"
+                app:layout_constraintHorizontal_bias="0.186"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate" />
 
@@ -232,12 +216,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Consenti raccolta dati utilizzo app (analytics).\n(opzionale)"
-                android:textColor="@color/light_blue"
+                android:text="@string/sign_up_page_analytics_consensus_message"
+                style="@style/Cinemates.Checkbox"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.191"
+                app:layout_constraintHorizontal_bias="0.161"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_promo" />
+
+
+            <CheckBox
+                android:id="@+id/checkBox_loginFragment_termsAndConditions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/sign_up_page_terms_and_conditions"
+                style="@style/Cinemates.Checkbox"
+                android:fontFamily="@font/poppins_bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
+
+            <ImageButton
+                android:id="@+id/button_signUpPage_datePicker"
+                android:layout_width="58dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="7dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/icon_clock_light_blue"
+                app:layout_constraintBottom_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate"
+                app:layout_constraintStart_toEndOf="@+id/textInputLayout_signUpFragment_birthDate"
+                app:layout_constraintTop_toTopOf="@+id/textInputLayout_signUpFragment_birthDate"
+                app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

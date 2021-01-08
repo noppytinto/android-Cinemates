@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -17,12 +18,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -61,6 +66,8 @@ public class SignUpFragment extends Fragment implements
 
     //
     private Button buttonsignUp;
+    private ImageButton buttonDatePicker;
+    private MaterialDatePicker.Builder<Long> materialDatePickerBuilder;
     private ProgressBar spinner;
     private SignUpViewModel signUpViewModel;
     private View view;
@@ -85,32 +92,36 @@ public class SignUpFragment extends Fragment implements
         remoteConfigServer = RemoteConfigServer.getInstance();
 
 //        spinner = view.findViewById(R.id.progresBar_signUpFragment);
-        textInputLayoutUsername = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_username);
-        textInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_email);
-        textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_password);
-        textInputLayoutRepeatPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_repeatPassword);
-        textInputLayoutFirstName = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_firstName);
-        textInputLayoutLastName = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_lastName);
-        textInputLayoutBirthDate = (TextInputLayout) view.findViewById(R.id.textInputLayout_signUpFragment_birthDate);
+        textInputLayoutUsername = view.findViewById(R.id.textInputLayout_signUpFragment_username);
+        textInputLayoutEmail = view.findViewById(R.id.textInputLayout_signUpFragment_email);
+        textInputLayoutPassword = view.findViewById(R.id.textInputLayout_signUpFragment_password);
+        textInputLayoutRepeatPassword = view.findViewById(R.id.textInputLayout_signUpFragment_repeatPassword);
+        textInputLayoutFirstName = view.findViewById(R.id.textInputLayout_signUpFragment_firstName);
+        textInputLayoutLastName = view.findViewById(R.id.textInputLayout_signUpFragment_lastName);
+        textInputLayoutBirthDate = view.findViewById(R.id.textInputLayout_signUpFragment_birthDate);
         //
-        editTextUsername = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_username);
-        editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_email);
-        editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_password);
-        editTextRepeatPassword = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_repeatPassword);
-        editTextFirstName = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_firstName);
-        editTextLastName = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_lastName);
-        editTextBirthDate = (TextInputEditText) view.findViewById(R.id.editText_signUpFragment_birthDate);
+        editTextUsername = view.findViewById(R.id.editText_signUpFragment_username);
+        editTextEmail = view.findViewById(R.id.editText_signUpFragment_email);
+        editTextPassword = view.findViewById(R.id.editText_signUpFragment_password);
+        editTextRepeatPassword = view.findViewById(R.id.editText_signUpFragment_repeatPassword);
+        editTextFirstName = view.findViewById(R.id.editText_signUpFragment_firstName);
+        editTextLastName = view.findViewById(R.id.editText_signUpFragment_lastName);
+        editTextBirthDate = view.findViewById(R.id.editText_signUpFragment_birthDate);
         //
-        buttonsignUp = (Button) view.findViewById(R.id.button_signUpFragment_signUp);
-        checkBoxPromo = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_promo);
-        checkBoxAnalytics = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_analytics);
-        checkBoxTermsAndConditions = (CheckBox) view.findViewById(R.id.checkBox_loginFragment_termsAndConditions);
+        buttonsignUp = view.findViewById(R.id.button_signUpFragment_signUp);
+        buttonDatePicker = view.findViewById(R.id.button_signUpPage_datePicker);
+        checkBoxPromo = view.findViewById(R.id.checkBox_loginFragment_promo);
+        checkBoxAnalytics = view.findViewById(R.id.checkBox_loginFragment_analytics);
+        checkBoxTermsAndConditions = view.findViewById(R.id.checkBox_loginFragment_termsAndConditions);
         // setting listeners
         buttonsignUp.setOnClickListener(this);
+        buttonDatePicker.setOnClickListener(this);
+
         checkBoxPromo.setOnCheckedChangeListener(this);
         checkBoxAnalytics.setOnCheckedChangeListener(this);
         checkBoxTermsAndConditions.setOnCheckedChangeListener(this);
 //        editTextUsername.setOnEditorActionListener(this);
+        //
 
         // firebase logging
         FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
@@ -261,6 +272,19 @@ public class SignUpFragment extends Fragment implements
                 System.out.println("failed");
                 e.printStackTrace();
             }
+        }
+        else if(v.getId() == buttonDatePicker.getId()) {
+            Locale.setDefault(Locale.ITALY); //TODO: should be handled differently
+            materialDatePickerBuilder = MaterialDatePicker.Builder.datePicker();
+            materialDatePickerBuilder.setTheme(R.style.Cinemates_MaterialDatePicker);
+            materialDatePickerBuilder.setTitleText("Seleziona data nascita");
+            CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+            long today = MaterialDatePicker.todayInUtcMilliseconds();
+            constraintsBuilder.setEnd(today);
+            constraintsBuilder.setValidator(DateValidatorPointBackward.now());
+            materialDatePickerBuilder.setCalendarConstraints(constraintsBuilder.build());
+            MaterialDatePicker<Long> picker = materialDatePickerBuilder.build();
+            picker.show(getActivity().getSupportFragmentManager(), picker.toString());
         }
     }// end onClick()
 

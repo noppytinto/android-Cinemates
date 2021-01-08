@@ -68,5 +68,6 @@
     <string name="birthdate">Data di nascita</string>
     <string name="repeat_password">Ripeti password</string>
     <string name="passwords_dont_match">le password non combaciano</string>
+    <string name="sign_up_page_terms_and_conditions">Accetta Termini e Condizioni.</string>
 
 </resources>

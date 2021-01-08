@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--            SIGN-UP PAGE            -->
+
+
+<resources>
+    <string name="sign_up_page_analytics_consensus_message">Consenti raccolta dati utilizzo (analytics).\n(opzionale)</string>
+    <string name="sign_up_promo_consensus_message">Consenti ricezione messaggi promozionali.\n(opzionale)</string>
+</resources>
