@@ -345,16 +345,13 @@ public class SignUpFragment extends Fragment implements
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
 
 
-
+//        requestPermissionForReadExtertalStorage();
         if(checkPermissionForReadExtertalStorage()) {
             startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
         }
         else {
             requestPermissionForReadExtertalStorage();
-            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
         }
-
-
     }
 
     public void requestPermissionForReadExtertalStorage() {
