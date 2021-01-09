@@ -22,7 +22,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
@@ -75,8 +75,8 @@ public class LoginFragment extends Fragment  implements
 
 
         // firebase logging
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, getString(R.string.login_page_firebase_login_page), getContext());
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, getString(R.string.login_page_firebase_login_page), getContext());
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -173,8 +173,8 @@ public class LoginFragment extends Fragment  implements
             spinner.setVisibility(View.VISIBLE);
 
             // firebase logging
-            FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-            firebaseEventsLogger.logLoginEvent(getString(R.string.login_page_firebase_standard_login_method), getContext());
+            FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+            firebaseAnalytics.logLoginEvent(getString(R.string.login_page_firebase_standard_login_method), getContext());
 
             // checks
             boolean allFieldsAreOk = checkFields();

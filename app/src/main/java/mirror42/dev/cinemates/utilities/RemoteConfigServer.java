@@ -29,10 +29,11 @@ public class RemoteConfigServer {
     private RemoteConfigServer() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(0)
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_params);
+
+        //.setMinimumFetchIntervalInSeconds(0)
     }
 
 

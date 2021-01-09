@@ -59,6 +59,19 @@ public class ImageUtilities {
         }
     }
 
+    public static void loadDefaultProfilePictureInto(MenuItem menuItem, Context context) {
+        Drawable drawable = null;
+
+        try {
+            drawable = context.getResources().getDrawable(R.drawable.user_icon_light_blue);
+            menuItem.setIcon(drawable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public static Drawable getDefaultProfilePictureIcon(Context context) {
         Drawable defaultProfilePicture = null;
 

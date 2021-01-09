@@ -23,7 +23,7 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -86,8 +86,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonLogout.setOnClickListener(this);
 
         // firebase logging
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, "User profile page", getContext());
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, "User profile page", getContext());
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -105,7 +105,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             }
             else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
             }
-            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME) {
+            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS) {
                 try {
                     // decrypt remember me data
                     JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), getContext()));

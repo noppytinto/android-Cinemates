@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -47,6 +50,7 @@ public class LoginViewModel extends ViewModel {
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
+    private boolean rememberMeExists;
 
 
 
@@ -57,10 +61,11 @@ public class LoginViewModel extends ViewModel {
         INVALID_PASSWORD,
         USER_NOT_EXIST,
         LOGOUT,
-        REMEMBER_ME,
+        REMEMBER_ME_EXISTS,
         IS_PENDING_USER,
         IS_NOT_PENDING_USER,
         INVALID_CREDENTIALS,
+        REMEMBER_ME_NOT_EXISTS,
         NONE
     }
 
@@ -397,6 +402,26 @@ public class LoginViewModel extends ViewModel {
                         Log.w(TAG, "Error deleting document", e);
                     }
                 });
+    }
+
+    public void checkRememberMeData(Context context) {
+        rememberMeExists = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), context);
+
+        if(rememberMeExists) {
+            try {
+                // decrypt remember me data
+                JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), context));
+
+                // create remember me user
+                User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
+
+                //
+                setUser(remeberMeUser);
+                setLoginResult(LoginResult.REMEMBER_ME_EXISTS);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

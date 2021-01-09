@@ -26,7 +26,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
@@ -116,8 +116,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             }// inner if
         }// outer if
 
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, "Movie Details page", getContext());
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, "Movie Details page", getContext());
 
     }// end onViewCreated()
 

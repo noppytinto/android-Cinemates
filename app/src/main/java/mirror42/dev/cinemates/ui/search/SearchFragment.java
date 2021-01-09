@@ -31,7 +31,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
@@ -46,7 +46,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;
     private ChipGroup chipGroup;
-    private FirebaseEventsLogger firebaseEventsLogger;
+    private FirebaseAnalytics firebaseAnalytics;
 
 
 
@@ -64,7 +64,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //        });
 
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-        firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+        firebaseAnalytics = FirebaseAnalytics.getInstance();
 
         return view;
     }
@@ -194,7 +194,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             currentSearchTerm = editText_search.getText().toString();
 
             if( ! currentSearchTerm.isEmpty()) {
-                firebaseEventsLogger.logSearchTerm(currentSearchTerm, this, getContext());
+                firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
 
                 //
                 textInputLayout.setError(null);
@@ -233,7 +233,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         try {
             Movie movieSelected = recyclerAdapterSearchPage.getMoviesList(position);
 
-            firebaseEventsLogger.logSelectedMovie(movieSelected, "selected movie in search tab", this, getContext());
+            firebaseAnalytics.logSelectedMovie(movieSelected, "selected movie in search tab", this, getContext());
 
 //            NavHostFragment.findNavController(FirstFragment.this)
 //                    .navigate(R.id.action_FirstFragment_to_SecondFragment);

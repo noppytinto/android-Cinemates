@@ -18,7 +18,7 @@ import mirror42.dev.cinemates.adapter.ViewpagerAdapterFragmentMain;
 import mirror42.dev.cinemates.ui.explore.ExploreFragment;
 import mirror42.dev.cinemates.ui.home.HomeFragment;
 import mirror42.dev.cinemates.ui.search.SearchFragment;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class MainFragment extends Fragment {
@@ -75,22 +75,22 @@ public class MainFragment extends Fragment {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
+                FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
 
                 switch (tab.getPosition()) {
                     case 0:
                         Log.d("tab analyzer", "clicked on home tab");
-                        firebaseEventsLogger.logScreenEvent(HomeFragment.class, "Home tab", getContext());
+                        firebaseAnalytics.logScreenEvent(HomeFragment.class, "Home tab", getContext());
                         tab.setIcon(R.drawable.home_icon_light_blue);
                         break;
                     case 1:
                         Log.d("tab analyzer", "clicked on explore tab");
-                        firebaseEventsLogger.logScreenEvent(ExploreFragment.class, "Explore tab", getContext());
+                        firebaseAnalytics.logScreenEvent(ExploreFragment.class, "Explore tab", getContext());
                         tab.setIcon(R.drawable.movie_icon_light_blue);
                         break;
                     case 2:
                         Log.d("tab analyzer", "clicked on search tab");
-                        firebaseEventsLogger.logScreenEvent(SearchFragment.class, "Search tab", getContext());
+                        firebaseAnalytics.logScreenEvent(SearchFragment.class, "Search tab", getContext());
                         tab.setIcon(R.drawable.search_icon_light_blue);
                         break;
                     default:

@@ -1,8 +1,6 @@
 package mirror42.dev.cinemates;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,16 +15,13 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -36,16 +31,13 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 
-public class MainActivity extends AppCompatActivity implements
-        RemoteConfigServer.RemoteConfigListener {
-    private static final String EXTRA_MESSAGE = " ";
+public class MainActivity extends AppCompatActivity implements RemoteConfigServer.RemoteConfigListener {
     private final String TAG = this.getClass().getSimpleName();
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
     public MenuItem loginMenuItem;
     public MenuItem notificationMenuItem;
     private static boolean rememberMeExists;
-    private String rememberMeData;
     private LoginViewModel loginViewModel;
     private ImageView toolbarLogo;
 
@@ -54,76 +46,55 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate() called");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbarLogo = findViewById(R.id.imageView_mainActivity_logo);
-
-        // init firebase logger
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.setUserConsensus(true); //TODO: fetch user consensus from DB
-
         //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
         NavigationUI.setupActionBarWithNavController(this, navController);
 
-        // observe login activity changes
+        // init firebase analytics
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.setUserConsent(true); //TODO: fetch user consensus from DB
+
+        // observe activity about login
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(this, loginResult -> {
-            if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
-//                restoreToolbarElements();
-
-                User user = loginViewModel.getUser().getValue();
-                try {
+            switch (loginResult) {
+                case SUCCESS: {
+                    User user = loginViewModel.getUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                notificationMenuItem.setVisible(true);
-
-            }
-            else if(loginResult == LoginViewModel.LoginResult.LOGOUT) {
-                showToolbarElements();
-                Drawable drawable = ImageUtilities.getDefaultProfilePictureIcon(this);
-                loginMenuItem.setIcon(drawable);
-                notificationMenuItem.setVisible(false);
-                rememberMeExists = false;
-            }
-            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME) {
-                try {
-                    // decrypt remember me data
-                    JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), this));
-                    rememberMeData = jsonObject.toString();
-
-                    // create remember me user
-                    User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
-
-                    // set profile picture
-                    String imagePath = remeberMeUser.getProfilePicturePath();
+                    notificationMenuItem.setVisible(true);
+                    }
+                    break;
+                case LOGOUT:
+                    showToolbarElements();
+                    ImageUtilities.loadDefaultProfilePictureInto(loginMenuItem, this);
+                    notificationMenuItem.setVisible(false);
+                    rememberMeExists = false;
+                    break;
+                case REMEMBER_ME_EXISTS:
                     try {
+                        User remeberMeUser = loginViewModel.getUser().getValue();
+
+                        // set profile picture
+                        String imagePath = remeberMeUser.getProfilePicturePath();
                         ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-                    // store remember me user
-                    loginViewModel.setUser(remeberMeUser);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    break;
                 }
-            }
         });
 
 
 
         // get remote params
-        remoteConfigServer = RemoteConfigServer.getInstance();
-        remoteConfigServer.setListener(this);
-        remoteConfigServer.loadConfigParams();
-
+        init();
 
     }// end onCreate()
 
@@ -191,10 +162,6 @@ public class MainActivity extends AppCompatActivity implements
         else {
             notificationMenuItem.setVisible(false);
         }
-
-
-
-
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -209,16 +176,11 @@ public class MainActivity extends AppCompatActivity implements
 
     //-------------------------------------------------------- METHODS
 
-    public void checkAnyPreviousRememberMe() {
-        rememberMeExists = MyUtilities.checkFileExists(remoteConfigServer.getCinematesData(), this);
-
-        if(rememberMeExists) {
-            loginViewModel.setLoginResult(LoginViewModel.LoginResult.REMEMBER_ME);
-        }
-        else {
-
-        }
-    } // end checkAnyPreviousRememberMe()
+    private void init() {
+        remoteConfigServer = RemoteConfigServer.getInstance();
+        remoteConfigServer.setListener(this);
+        remoteConfigServer.loadConfigParams();
+    }
 
     private void establishAzureConnection() {
         final String checkSignatureFunction = "check_app_signature?signature=";
@@ -261,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements
 
         }catch(Exception e) {
             e.printStackTrace();
+            showToastOnUiThread("Azure connection:\nCannot establish connection! D:");
         }
     }
 
@@ -269,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements
         if(taskIsSuccessful) {
             Toast.makeText(this, "Firebase remote config:\nfetching config data completed", Toast.LENGTH_SHORT).show();
             establishAzureConnection();
-            checkAnyPreviousRememberMe();
+            loginViewModel.checkRememberMeData(this);
         }
         else {
             Toast.makeText(this, "Firebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();
@@ -296,6 +259,5 @@ public class MainActivity extends AppCompatActivity implements
         loginMenuItem.setVisible(true);
         toolbarLogo.setVisibility(View.VISIBLE);
     }
-
 
 }// end MainActivity class

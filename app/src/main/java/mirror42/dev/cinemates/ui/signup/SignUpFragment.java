@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -124,8 +124,8 @@ public class SignUpFragment extends Fragment implements
         //
 
         // firebase logging
-        FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-        firebaseEventsLogger.logScreenEvent(this, "Sign-Up page", getContext());
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, "Sign-Up page", getContext());
 
         //
         signUpViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);

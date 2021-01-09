@@ -25,7 +25,7 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerSearchListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
-import mirror42.dev.cinemates.utilities.FirebaseEventsLogger;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class LatestReleasesFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
@@ -142,8 +142,8 @@ public class LatestReleasesFragment extends Fragment implements
             Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
 
             //
-            FirebaseEventsLogger firebaseEventsLogger = FirebaseEventsLogger.getInstance();
-            firebaseEventsLogger.logSelectedMovie(movieSelected, "selected movie in explore tab", this, getContext());
+            FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+            firebaseAnalytics.logSelectedMovie(movieSelected, "selected movie in explore tab", this, getContext());
 
 
             //
