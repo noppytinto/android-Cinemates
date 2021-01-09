@@ -131,7 +131,7 @@
     </style>
     <style name="cinemates_shape_rounded">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
+        <item name="cornerSize">35dp</item>
     </style>
 
 

@@ -53,7 +53,6 @@ public class LoginViewModel extends ViewModel {
     private boolean rememberMeExists;
 
 
-
     public enum LoginResult {
         INVALID_REQUEST,
         FAILED,
@@ -430,6 +429,18 @@ public class LoginViewModel extends ViewModel {
             MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
                     MyUtilities.convertUserInJSonString(user.getValue()), context);
         }
+    }
+
+    public void deleteRememberMeData(Context context) {
+        setUser(null);
+        setLoginResult(LoginViewModel.LoginResult.LOGGED_OUT);
+        MyUtilities.deletFile(remoteConfigServer.getCinematesData(), context);
+    }
+
+
+
+    public void checkAccountActivation() {
+
     }
 
 

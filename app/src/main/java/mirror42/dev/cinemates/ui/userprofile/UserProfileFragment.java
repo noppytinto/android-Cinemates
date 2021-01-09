@@ -17,9 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -34,13 +31,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private View view;
     private ImageView profilePicture;
     private TextView textViewEmail;
+    private TextView textViewResendEmailMessage;
     private Button buttonLogout;
+    private Button buttonResendEmail;
+
     private RemoteConfigServer remoteConfigServer;
     private LoginViewModel loginViewModel;
 
 
-    //----------------------------------------------------------------------- ANDROID METHODS
 
+    //----------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,17 +59,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        profilePicture = view.findViewById(R.id.imageView_loginFragment_profilePicture);
-        textViewEmail = (TextView) view.findViewById(R.id.textView_loginFragment_email);
-        buttonLogout = view.findViewById(R.id.button_loginFragment_logout);
+        profilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
+        textViewEmail = view.findViewById(R.id.textView_userProfileFragment_email);
+        textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
+        buttonLogout = view.findViewById(R.id.button_userProfileFragment_logout);
+        buttonResendEmail = view.findViewById(R.id.button_userProfileFragment_resendEmail);
         remoteConfigServer = RemoteConfigServer.getInstance();
-
-        //
-
-
-
         // setting listeners
         buttonLogout.setOnClickListener(this);
+        buttonResendEmail.setOnClickListener(this);
+        //
+        hideResendEmail();
 
         // firebase logging
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -80,69 +80,38 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
 
             switch (loginResult) {
-                case SUCCESS:
+                case SUCCESS: {
+                    User user = loginViewModel.getUser().getValue();
+                    String profilePicturePath = user.getProfilePicturePath();
+
+                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                    textViewEmail.setText(user.getEmail());
+                }
                     break;
                 case LOGGED_OUT:
                     break;
                 case REMEMBER_ME_EXISTS:
-                    break;
+                    try {
+                        User user = loginViewModel.getUser().getValue();
+                        String profilePicturePath = user.getProfilePicturePath();
 
-            }
-
-
-            if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
-                User user = loginViewModel.getUser().getValue();
-                String profilePicturePath = user.getProfilePicturePath();
-
-                ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
-                textViewEmail.setText(user.getEmail());
-
-            }
-            else if(loginResult == LoginViewModel.LoginResult.FAILED) {
-
-            }
-            else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
-            }
-            else if(loginResult == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS) {
-                try {
-                    // decrypt remember me data
-                    JSONObject jsonObject = new JSONObject(MyUtilities.decryptFile(remoteConfigServer.getCinematesData(), getContext()));
-
-                    // create remember me user
-                    User remeberMeUser = User.parseUserFromJsonObject(jsonObject);
-
-                    //
-                    textViewEmail.setText(remeberMeUser.getEmail());
-
-                    // set profile picture
-                    String imagePath = remeberMeUser.getProfilePicturePath();
-                    if(imagePath!=null || (! imagePath.isEmpty())) {
-                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, profilePicture, getContext());
-                    }
-
-                    // store remember me user
-                    loginViewModel.setUser(remeberMeUser);
-                } catch (JSONException e) {
+                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                        textViewEmail.setText(user.getEmail());
+                    }  catch (Exception e) {
                     e.printStackTrace();
-                }
-            }
+                    }
+                    break;
+            }// switch
         });
 
-
-
-
-
-
+        //
+        loginViewModel.checkAccountActivation();
     }// end onViewCreated()
 
     @Override
     public void onClick(View v) {
         if (v.getId() == buttonLogout.getId()) {
-            loginViewModel.setUser(null);
-            loginViewModel.setLoginResult(LoginViewModel.LoginResult.LOGGED_OUT);
-
-            // delete remember me data
-            MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
+            loginViewModel.deleteRememberMeData(getContext());
 
             //
             MainActivity mainActivity = (MainActivity) getActivity();
@@ -179,4 +148,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             mainActivity.showLogo();
         }
     }
+
+
+    private void showResendEmail() {
+        textViewResendEmailMessage.setVisibility(View.VISIBLE);
+        buttonResendEmail.setVisibility(View.VISIBLE);
+    }
+
+    private void hideResendEmail() {
+        textViewResendEmailMessage.setVisibility(View.GONE);
+        buttonResendEmail.setVisibility(View.GONE);
+    }
+
 }// end UserProfileFragment class
