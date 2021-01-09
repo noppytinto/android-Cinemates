@@ -76,7 +76,6 @@ public class LoginFragment extends Fragment  implements
         checkBoxRememberMe = view.findViewById(R.id.checkBox_loginFragment_rememberMe);
         remoteConfigServer = RemoteConfigServer.getInstance();
         buttonSignUp = view.findViewById(R.id.button_loginFragment_signUp);
-
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
@@ -91,62 +90,63 @@ public class LoginFragment extends Fragment  implements
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), (Observer<LoginViewModel.LoginResult>) loginResult -> {
-            if(loginResult == LoginViewModel.LoginResult.SUCCESS) {
-                User user = loginViewModel.getUser().getValue();
-                try {
-                    MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
-                } catch (Exception e) {
-                    e.printStackTrace();
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+            switch (loginResult) {
+                case SUCCESS: {
+                    User user = loginViewModel.getUser().getValue();
+                    try {
+                        MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // save remember me data only if is not pending user anymore
+                    if(loginResult != LoginViewModel.LoginResult.IS_PENDING_USER)
+                        loginViewModel.saveRememberMeDataIfChecked(checkBoxRememberMe.isChecked(), getContext());
+
+                    NavController navController = Navigation.findNavController(view);
+                    navController.popBackStack();
+                    navController.navigate(R.id.userProfileFragment);
                 }
+                    break;
+                case INVALID_CREDENTIALS:
+                    spinner.setVisibility(View.GONE);
+                    MyUtilities.showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
+                    break;
+                case FAILED:
+                    spinner.setVisibility(View.GONE);
+                    MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
+                    break;
+                case INVALID_REQUEST:
+                    spinner.setVisibility(View.GONE);
+                    MyUtilities.showCenteredToast("Authentication server:\ncannot make request! D:", getContext());
+                    break;
+                case IS_PENDING_USER: {
+                    spinner.setVisibility(View.GONE);
 
-                //
-                loginViewModel.saveRememberMeDataIfChecked(checkBoxRememberMe.isChecked(), getContext());
-
-                NavController navController = Navigation.findNavController(view);
-                navController.popBackStack();
-                navController.navigate(R.id.userProfileFragment);
-            }
-            else if(loginResult == LoginViewModel.LoginResult.INVALID_CREDENTIALS) {
-                spinner.setVisibility(View.GONE);
-                MyUtilities.showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
-            }
-            else if(loginResult == LoginViewModel.LoginResult.FAILED) {
-                spinner.setVisibility(View.GONE);
-                MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
-
-            }
-            else if(loginResult == LoginViewModel.LoginResult.INVALID_REQUEST) {
-                spinner.setVisibility(View.GONE);
-                MyUtilities.showCenteredToast("Autorization server:\ncannot make request! D:", getContext());
-            }
-            else if(loginResult == LoginViewModel.LoginResult.IS_PENDING_USER) {
-                spinner.setVisibility(View.GONE);
-
-                // checking if email verification has been clicked
-                boolean accountEnabled = loginViewModel.checkEmailVerificationState();
-                if(accountEnabled) {
-
-                    // insert into postgrest database
-                    // and show new user profile page
-
-                    loginViewModel.insertIntoPostgres();
+                    // checking if email verification has been clicked
+                    boolean accountEnabled = loginViewModel.checkEmailVerificationState();
+                    if(accountEnabled) {
+                        // insert into postgrest database
+                        // and show new user profile page
+                        loginViewModel.insertIntoPostgres();
+                    }
+                    else {
+                        // show restricted user profile page
+                        MyUtilities.showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+                        NavController navController = Navigation.findNavController(view);
+                        navController.popBackStack();
+                        navController.navigate(R.id.userProfileFragment);
+                    }
                 }
-                else {
-                    // show restricted user profile page
-                    MyUtilities.showCenteredToast("Autorization server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
-
+                    break;
+                case IS_NOT_PENDING_USER: {
+                    String email = editTextEmail.getText().toString();
+                    String password = editTextPassword.getText().toString();
+                    loginViewModel.standardLogin(email, MyUtilities.SHA256encrypt(password));
                 }
-
-
-                // loading temp user data from Firebase pending users table
-            }
-            else if(loginResult == LoginViewModel.LoginResult.IS_NOT_PENDING_USER) {
-                //
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
-                loginViewModel.standardLogin(email, MyUtilities.SHA256encrypt(password));
-            }
+                    break;
+            }// switch
         });
 
         // fast login
@@ -193,14 +193,9 @@ public class LoginFragment extends Fragment  implements
                 String email = editTextEmail.getText().toString();
                 String password = editTextPassword.getText().toString();
 
-                // checking if this correspond to a pending user
-
                 //
                 loginViewModel.checkIfIsPendingUser(email, password);
-
-
             }
-
         }
         else if (v.getId() == buttonSignUp.getId()) {
 

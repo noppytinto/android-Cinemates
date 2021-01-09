@@ -78,7 +78,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
-
             switch (loginResult) {
                 case SUCCESS: {
                     User user = loginViewModel.getUser().getValue();
@@ -101,11 +100,28 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     e.printStackTrace();
                     }
                     break;
+                case IS_PENDING_USER: {
+                    showResendEmail();
+
+                    // get pending-user basic data
+                    User user = loginViewModel.getPendingUser();
+                    if(user!=null) {
+                        try {
+                            String profilePicturePath = user.getProfilePicturePath();
+
+                            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                            textViewEmail.setText(user.getEmail());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                    break;
+                case IS_NOT_PENDING_USER:
+                    hideResendEmail();
+                    break;
             }// switch
         });
-
-        //
-        loginViewModel.checkAccountActivation();
     }// end onViewCreated()
 
     @Override
@@ -121,6 +137,18 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             NavController navController = Navigation.findNavController(v);
             navController.popBackStack();
             navController.navigate(R.id.loginFragment);
+        }
+        else if(v.getId() == buttonResendEmail.getId()) {
+            // checking if email verification has been clicked
+            boolean accountEnabled = loginViewModel.checkEmailVerificationState();
+            if( ! accountEnabled) {
+                // insert into postgrest database
+                // and show new user profile page
+                loginViewModel.resendVerificationEmail();
+                MyUtilities.showCenteredToast("Email attivazione riniviata, era esegui il Logout e controlla la posta.", getContext());
+                buttonResendEmail.setText("Email attivazione reinviata!");
+                buttonResendEmail.setEnabled(false);
+            }
         }
     }
 

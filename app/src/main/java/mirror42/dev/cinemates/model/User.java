@@ -26,13 +26,15 @@ public class User {
         // empty
     }
 
-    public User(String username, String profilePicturePath) {
-        this.username = username;
+    public User(String email, String profilePicturePath) {
+        this.email = email;
         this.profilePicturePath = profilePicturePath;
     }
 
+
     public User(String username, String email, String profilePicturePath) {
-        this(username, profilePicturePath);
+        this.username = username;
+        this.profilePicturePath = profilePicturePath;
         this.email = email;
     }
 

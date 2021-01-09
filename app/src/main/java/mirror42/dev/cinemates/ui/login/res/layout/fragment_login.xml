@@ -10,24 +10,22 @@
     <ImageView
         android:id="@+id/imageView_loginFragment_logo"
         android:layout_width="211dp"
-        android:layout_height="139dp"
-        android:layout_marginTop="32dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/cinemates_logo_extended_nolights"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <Button
         android:id="@+id/button_loginFragment_signUp"
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="161dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="56dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="36dp"
         android:text="@string/login_page_sign_up"
         android:textSize="18sp"
-        app:cornerRadius="20dp"
+        app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
@@ -36,7 +34,7 @@
         android:id="@+id/textInputLayout_loginFragment_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="204dp"
+        android:layout_marginTop="148dp"
         android:hint="@string/login_page_email"
         app:endIconMode="clear_text"
         app:errorEnabled="true"

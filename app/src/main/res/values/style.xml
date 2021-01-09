@@ -116,9 +116,9 @@
 
     <!-- CINEMATES BUTTON ROUNDED OUTLINED -->
     <style name="Cinemates.Button.Rounded.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/yellow</item>
+        <item name="strokeColor">@color/outlined_button_states</item>
         <item name="strokeWidth">@dimen/outlined_button_stroke_width</item>
-        <item name="android:textColor">@color/yellow</item>
+        <item name="android:textColor">@color/outlined_button_states</item>
         <item name="android:textAppearance">@style/Cinemates.Button.Rounded.Outlined.TextAppearance</item>
         <item name="shapeAppearance">@style/cinemates_shape_rounded</item>
         <item name="rippleColor">?colorSecondaryVariant</item>

@@ -227,16 +227,21 @@ public class SignUpFragment extends Fragment implements
             String birthDate = editTextBirthDate.getText().toString();
             boolean promo = checkBoxPromo.isChecked();
             boolean analytics = checkBoxAnalytics.isChecked();
-            boolean termsAndConditions = checkBoxTermsAndConditions.isChecked();
-
-
 
             // check fields
             boolean allFieldsAreFilled = checkAllFieldsAreFilled();
             boolean repeatPasswordMatches = checkRepeatPasswordMatch();
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
-                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, promo, analytics);
+                String profilePicturePath = "-"; //TODO: upload profile picture
+
+                try {
+
+                } catch (Exception e) {
+
+                }
+
+                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
             else {
                 MyUtilities.showCenteredToastLong("Completare prima tutti i campi evidenziati in rosso.", getContext());

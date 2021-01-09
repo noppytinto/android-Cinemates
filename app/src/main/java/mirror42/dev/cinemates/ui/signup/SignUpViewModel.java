@@ -113,13 +113,14 @@ private final String TAG = this.getClass().getSimpleName();
                                     String firstName,
                                     String lastName,
                                     String birthDate,
+                                    String profilePicturePath,
                                     boolean promo,
                                     boolean analytics) {
-        checkUserCollision(username, email, password, firstName, lastName, birthDate, promo, analytics);
+        checkUserCollision(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
 
     }
 
-    private void checkUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, boolean promo, boolean analytics) {
+    private void checkUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, String profilePicturePath, boolean promo, boolean analytics) {
         HttpUrl httpUrl = null;
         final OkHttpClient httpClient = new OkHttpClient();
 
@@ -167,7 +168,7 @@ private final String TAG = this.getClass().getSimpleName();
                             } else {
                                 // if not exist in postgres db
                                 // add as pending user
-                                checkPendingUserCollision(username, email, password, firstName, lastName, birthDate, promo, analytics);
+                                checkPendingUserCollision(username, email, password, firstName, lastName, birthDate, profilePicturePath,  promo, analytics);
                             }
 
                         } catch (Exception e) {
@@ -185,7 +186,7 @@ private final String TAG = this.getClass().getSimpleName();
         }
     }// end checkUserCollision()
 
-    private void checkPendingUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, boolean promo, boolean analytics) {
+    private void checkPendingUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, String profilePicturePath, boolean promo, boolean analytics) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -196,7 +197,7 @@ private final String TAG = this.getClass().getSimpleName();
 
                             // add pending user data in firebase DB
                             FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
-                            Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, promo, analytics);
+                            Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
                             // Add a new document with a the user UID
                             insertUserInDB(newDBuser, firebaseDB);
 
@@ -257,6 +258,7 @@ private final String TAG = this.getClass().getSimpleName();
                                                   String firstName,
                                                   String lastName,
                                                   String birthDate,
+                                                  String profilePicturePath,
                                                   boolean promo,
                                                   boolean analytics) {
 
@@ -267,7 +269,7 @@ private final String TAG = this.getClass().getSimpleName();
         dbUser.put("firstname", firstName);
         dbUser.put("lastname", lastName);
         dbUser.put("birthdate", birthDate);
-        // dbUser.put("birthdate", birthDate); // TODO: profile picture
+        dbUser.put("profilePicturePath", profilePicturePath);
         dbUser.put("promo", promo);
         dbUser.put("analytics", analytics);
 

@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.content.Context;
+import android.icu.lang.UScript;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.signup.SignUpViewModel;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -51,6 +53,8 @@ public class LoginViewModel extends ViewModel {
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private boolean rememberMeExists;
+    private User basicPendingUser;
+
 
 
     public enum LoginResult {
@@ -111,6 +115,11 @@ public class LoginViewModel extends ViewModel {
     public FirebaseUser getFirebaseUser() {
         return firebaseUser;
     }
+
+    public User getPendingUser() {
+        return basicPendingUser;
+    }
+
 
     //--------------------------------------------------- METHODS
 
@@ -206,24 +215,53 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void checkIfIsPendingUser(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "Autorization server: email ancora non approvata, controlla la tua posta");
-                    firebaseUser = mAuth.getCurrentUser();
-                    setLoginResult(LoginResult.IS_PENDING_USER);
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "Autorization server: not a pending user", task.getException());
-                    setLoginResult(LoginResult.IS_NOT_PENDING_USER);
-
-                    // ...
-                }
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener( task-> {
+            if (task.isSuccessful()) {
+                // Sign in success, update UI with the signed-in user's information
+                Log.d(TAG, "Autorization server: email ancora non approvata, controlla la tua posta");
+                firebaseUser = mAuth.getCurrentUser();
+                loadPendingUserBasicData();
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.w(TAG, "Autorization server: not a pending user", task.getException());
+                setLoginResult(LoginResult.IS_NOT_PENDING_USER);
             }
         });
     }// end checkIfIsPendingUser()
+
+    public void loadPendingUserBasicData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("pending_users").document(firebaseUser.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        try {
+                            JSONObject jsonObject = new JSONObject(document.getData());
+                            String email = jsonObject.getString("email");
+                            String profilePicturePath = jsonObject.getString("profilePicturePath");
+
+                            basicPendingUser = new User(email, profilePicturePath);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        setLoginResult(LoginResult.IS_PENDING_USER);
+                    } else {
+                        // NOTE: should not enter this case
+                        //       because of preconditions
+                        Log.d(TAG, "No such document");
+                    }
+
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
 
 
 
@@ -254,11 +292,8 @@ public class LoginViewModel extends ViewModel {
                     if (document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
-
                         // insert into postgres
                         insert(document.getData());
-
-
 
                     } else {
                         // NOTE: should not enter this case
@@ -321,12 +356,12 @@ public class LoginViewModel extends ViewModel {
             }
             java.sql.Date sqlStartDate = new java.sql.Date(parsed.getTime());
             String sqldate = String.valueOf(sqlStartDate);
-            //String profilePicturePath = jsonObject.getString("username"); //TODO: profile picture
+            String profilePicturePath = jsonObject.getString("profilePicturePath");
             String promo = jsonObject.getString("promo");
             String analytics = jsonObject.getString("analytics");
 
             //
-            RequestBody requestBody = buildRequestBody(username, email, password, firstName, lastName, sqldate, "-", promo, analytics);
+            RequestBody requestBody = buildRequestBody(username, email, password, firstName, lastName, sqldate, profilePicturePath, promo, analytics);
 
             //
             HttpUrl httpUrl = null;
@@ -439,9 +474,22 @@ public class LoginViewModel extends ViewModel {
 
 
 
-    public void checkAccountActivation() {
-
+    public void resendVerificationEmail() {
+        firebaseUser.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Verification email sent.");
+                            //
+                        }
+                        else {
+                            Log.d(TAG, "Verification email NOT sent. " + task.getException());
+                        }
+                    }
+                });
     }
+
 
 
 
