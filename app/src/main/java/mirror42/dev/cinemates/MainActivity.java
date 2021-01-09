@@ -49,8 +49,9 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
         toolbarLogo = findViewById(R.id.imageView_mainActivity_logo);
+
         //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
         NavigationUI.setupActionBarWithNavController(this, navController);
@@ -67,16 +68,18 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     User user = loginViewModel.getUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
-                    notificationMenuItem.setVisible(true);
+                    invalidateOptionsMenu();
                     }
                     break;
-                case LOGOUT:
-                    showToolbarElements();
+                case LOGGED_OUT:
                     ImageUtilities.loadDefaultProfilePictureInto(loginMenuItem, this);
-                    notificationMenuItem.setVisible(false);
+                    invalidateOptionsMenu();
                     rememberMeExists = false;
                     break;
                 case REMEMBER_ME_EXISTS:
+                    rememberMeExists = true;
+                    invalidateOptionsMenu();
+
                     try {
                         User remeberMeUser = loginViewModel.getUser().getValue();
 
@@ -102,26 +105,26 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
-        loginMenuItem = menu.getItem(1);
-        notificationMenuItem = menu.getItem(0);
 
-        loginMenuItem.setVisible(true);
-
+        loginMenuItem = menu.findItem(R.id.menu_item_login);
+        notificationMenuItem = menu.findItem(R.id.menu_item_notifications);
         return true;
     }
+
+//    public void updateOptionsMenu() {
+//        isEditing = !isEditing;
+//        requireActivity().invalidateOptionsMenu();
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_notifications) {
-//            Toast.makeText(this, "notifications", Toast.LENGTH_LONG).show();
-
-//            try {
+        switch (item.getItemId()) {
+            case R.id.menu_item_notifications:
+                //            try {
 //                //
 //                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottom_sheet_dialog_theme);
 //                bottomSheetDialog.setDismissWithAnimation(true);
@@ -134,34 +137,37 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 //                e.getMessage();
 //                e.printStackTrace();
 //            }
-        }
-        else if (id == R.id.action_login) {
-            if(rememberMeExists || (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
-                navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
-            }
-            else {
-                try {
-                    navController.navigate(R.id.action_main_fragment_to_loginFragment);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                break;
+            case R.id.menu_item_login:
+                if(rememberMeExists || (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+                    navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
                 }
-            }
-        }
+                else {
+                    try {
 
+                        navController.navigate(R.id.action_main_fragment_to_loginFragment);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }// switch
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem notificationMenuItem = menu.getItem(0);
+//        toolbarLogo.setVisibility(View.VISIBLE);
 
         // if is logged
-        if(rememberMeExists) {
+        if(rememberMeExists || loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) {
             notificationMenuItem.setVisible(true);
         }
         else {
             notificationMenuItem.setVisible(false);
+            loginMenuItem.setVisible(true);
         }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -171,7 +177,12 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         return super.onSupportNavigateUp();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        toolbarLogo.setVisibility(View.VISIBLE);
 
+    }
 
 
     //-------------------------------------------------------- METHODS
@@ -250,14 +261,13 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         });
     }// end showToastOnUiThread()
 
-    public void hideToolbarElements() {
-        loginMenuItem.setVisible(false);
-        toolbarLogo.setVisibility(View.INVISIBLE);
+    public void hideLogo() {
+        toolbarLogo.setVisibility(View.GONE);
     }
 
-    public void showToolbarElements() {
-        loginMenuItem.setVisible(true);
+    public void showLogo() {
         toolbarLogo.setVisibility(View.VISIBLE);
+
     }
 
 }// end MainActivity class

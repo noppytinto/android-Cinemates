@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/main_fragment"
         android:name="mirror42.dev.cinemates.MainFragment"
-        android:label="Main Fragment"
+        android:label=""
         tools:layout="@layout/fragment_main" >
         <action
             android:id="@+id/action_main_fragment_to_userProfileFragment"
@@ -64,12 +64,12 @@
     <activity
         android:id="@+id/mainActivity"
         android:name="mirror42.dev.cinemates.MainActivity"
-        android:label="activity_main"
+        android:label=""
         tools:layout="@layout/activity_main" />
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.UserProfileFragment"
-        android:label="fragment_user_profile"
+        android:label="@string/user_profile"
         tools:layout="@layout/fragment_user_profile" >
         <action
             android:id="@+id/action_userProfileFragment_to_loginFragment"
@@ -78,7 +78,7 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="mirror42.dev.cinemates.ui.login.LoginFragment"
-        android:label="fragment_login"
+        android:label="Login"
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_userProfileFragment"
@@ -90,7 +90,7 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:name="mirror42.dev.cinemates.ui.signup.SignUpFragment"
-        android:label="fragment_sign_up"
+        android:label="@string/sign_up"
         tools:layout="@layout/fragment_sign_up" >
         <action
             android:id="@+id/action_signUpFragment_to_main_fragment"

@@ -2,6 +2,8 @@ package mirror42.dev.cinemates.ui.login;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +22,7 @@ import androidx.navigation.Navigation;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
@@ -46,6 +49,13 @@ public class LoginFragment extends Fragment  implements
 
 
     //---------------------------------------------------------------------- ANDROID METHODS
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,20 +68,21 @@ public class LoginFragment extends Fragment  implements
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         spinner = view.findViewById(R.id.progresBar_loginFragment);
-        editTextEmail = (TextInputEditText) view.findViewById(R.id.editText_loginFragment_email);
-        editTextPassword = (TextInputEditText) view.findViewById(R.id.editText_loginFragment_password);
-        textInputLayoutEmail = (TextInputLayout) view.findViewById(R.id.textInputLayout_loginFragment_email);
-        textInputLayoutPassword = (TextInputLayout) view.findViewById(R.id.textInputLayout_loginFragment_password);
-        buttonStandardLogin = (Button) view.findViewById(R.id.button_loginFragment_standardLogin);
+        editTextEmail =  view.findViewById(R.id.editText_loginFragment_email);
+        editTextPassword = view.findViewById(R.id.editText_loginFragment_password);
+        textInputLayoutEmail = view.findViewById(R.id.textInputLayout_loginFragment_email);
+        textInputLayoutPassword = view.findViewById(R.id.textInputLayout_loginFragment_password);
+        buttonStandardLogin = view.findViewById(R.id.button_loginFragment_standardLogin);
         checkBoxRememberMe = view.findViewById(R.id.checkBox_loginFragment_rememberMe);
         remoteConfigServer = RemoteConfigServer.getInstance();
-        buttonSignUp = (Button) view.findViewById(R.id.button_loginFragment_signUp);
-
+        buttonSignUp = view.findViewById(R.id.button_loginFragment_signUp);
 
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
+
+        //
 
 
         // firebase logging
@@ -90,7 +101,7 @@ public class LoginFragment extends Fragment  implements
                 }
 
                 //
-                saveRememberMeDataIfChecked(user);
+                loginViewModel.saveRememberMeDataIfChecked(checkBoxRememberMe.isChecked(), getContext());
 
                 NavController navController = Navigation.findNavController(view);
                 navController.popBackStack();
@@ -129,9 +140,6 @@ public class LoginFragment extends Fragment  implements
 
 
                 // loading temp user data from Firebase pending users table
-
-
-
             }
             else if(loginResult == LoginViewModel.LoginResult.IS_NOT_PENDING_USER) {
                 //
@@ -148,22 +156,23 @@ public class LoginFragment extends Fragment  implements
     }// end onViewCreated()
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.menu_item_login);
+        if(item!=null)
+            item.setVisible(false);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+    }
+
+    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if(isChecked) {
             rememberMeIsActive = true;
         }
         else {
-            if(rememberMeIsActive) {
-                rememberMeIsActive = false;
-                editTextPassword.setText("");
-//                setDefaultProfilePicture();
-
-                // delete remember me data
-                MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
-
-                //
-                MyUtilities.showCenteredToast( getString(R.string.login_page_deleted_credentials), getContext());
-            }
+            rememberMeIsActive = false;
         }
     }
 
@@ -215,7 +224,12 @@ public class LoginFragment extends Fragment  implements
         }
     }// end onClick()
 
-
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.showLogo();
+    }
 
 
     //-------------------------------------------------------------------------------- METHODS
@@ -240,12 +254,7 @@ public class LoginFragment extends Fragment  implements
     }
 
     private void saveRememberMeDataIfChecked(User user) {
-        if(rememberMeIsActive) {
-            remoteConfigServer = RemoteConfigServer.getInstance();
-            MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
-                    MyUtilities.convertUserInJSonString(user),
-                    getContext());
-        }
+
     }
 
     private void resetTextfieldAppearance() {

@@ -69,5 +69,7 @@
     <string name="repeat_password">Ripeti password</string>
     <string name="passwords_dont_match">le password non combaciano</string>
     <string name="sign_up_page_terms_and_conditions">Accetta Termini e Condizioni.</string>
+    <string name="user_profile">Profilo utente</string>
+    <string name="sign_up">Registrazione</string>
 
 </resources>

@@ -2,6 +2,8 @@ package mirror42.dev.cinemates.ui.userprofile;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,7 +13,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -44,21 +45,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // this is for Login Fragment:
-        // if login is NOT successful, navigte back to main fragment
-//        NavController navController = NavHostFragment.findNavController(this);
-//        NavBackStackEntry navBackStackEntry = navController.getCurrentBackStackEntry();
-//        SavedStateHandle savedStateHandle = navBackStackEntry.getSavedStateHandle();
-//        savedStateHandle.getLiveData(LoginFragment.LOGIN_SUCCESSFUL).observe(navBackStackEntry, success -> {
-//                    if( ! (Boolean) success) {
-//                        int startDestination = navController.getGraph().getStartDestination();
-//                        NavOptions navOptions = new NavOptions.Builder()
-//                                .setPopUpTo(startDestination, true)
-//                                .build();
-//                        navController.navigate(startDestination, null, navOptions);
-//                    }
-//                });
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -78,8 +65,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         remoteConfigServer = RemoteConfigServer.getInstance();
 
         //
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideToolbarElements();
+
 
 
         // setting listeners
@@ -91,7 +77,19 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), (Observer<LoginViewModel.LoginResult>) loginResult -> {
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+
+            switch (loginResult) {
+                case SUCCESS:
+                    break;
+                case LOGGED_OUT:
+                    break;
+                case REMEMBER_ME_EXISTS:
+                    break;
+
+            }
+
+
             if (loginResult == LoginViewModel.LoginResult.SUCCESS) {
                 User user = loginViewModel.getUser().getValue();
                 String profilePicturePath = user.getProfilePicturePath();
@@ -141,10 +139,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         if (v.getId() == buttonLogout.getId()) {
             loginViewModel.setUser(null);
-            loginViewModel.setLoginResult(LoginViewModel.LoginResult.LOGOUT);
+            loginViewModel.setLoginResult(LoginViewModel.LoginResult.LOGGED_OUT);
 
             // delete remember me data
             MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext());
+
+            //
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.hideLogo();
 
             //
             NavController navController = Navigation.findNavController(v);
@@ -153,17 +155,28 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.menu_item_login);
+        if(item!=null)
+            item.setVisible(false);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+    }
+
 
     //----------------------------------------------------------------------- METHODS
+
 
     @Override
     public void onDetach() {
         super.onDetach();
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.showToolbarElements();
 
+        if(loginViewModel.getLoginResult().getValue() != LoginViewModel.LoginResult.LOGGED_OUT) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.showLogo();
+        }
     }
-
-
-
 }// end UserProfileFragment class

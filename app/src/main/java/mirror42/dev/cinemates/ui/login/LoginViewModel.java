@@ -60,7 +60,7 @@ public class LoginViewModel extends ViewModel {
         SUCCESS,
         INVALID_PASSWORD,
         USER_NOT_EXIST,
-        LOGOUT,
+        LOGGED_OUT,
         REMEMBER_ME_EXISTS,
         IS_PENDING_USER,
         IS_NOT_PENDING_USER,
@@ -423,6 +423,15 @@ public class LoginViewModel extends ViewModel {
             }
         }
     }
+
+    public void saveRememberMeDataIfChecked(boolean checked, Context context) {
+        if(checked) {
+            remoteConfigServer = RemoteConfigServer.getInstance();
+            MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
+                    MyUtilities.convertUserInJSonString(user.getValue()), context);
+        }
+    }
+
 
 
 }// end LoginViewModel class
