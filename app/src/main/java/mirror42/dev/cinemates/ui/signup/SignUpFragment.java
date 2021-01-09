@@ -331,26 +331,27 @@ public class SignUpFragment extends Fragment implements
     //--------------------------------------------------------------- METHODS
 
     void fetchImageFromGallery(View view){
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
 
-        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        getIntent.setType("image/*");
-
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
-
-        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+//        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//        getIntent.setType("image/*");
+//
+//        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        pickIntent.setType("image/*");
+//
+//        Intent intent = Intent.createChooser(getIntent, "Select Image");
+//        intent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
 
 
 //        requestPermissionForReadExtertalStorage();
         if(checkPermissionForReadExtertalStorage()) {
-            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
         }
         else {
             requestPermissionForReadExtertalStorage();
+//            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
         }
     }
 
