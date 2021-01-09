@@ -94,8 +94,7 @@ public class SignUpFragment extends Fragment implements
     private static int SELECT_PICTURE = 30;
     private String imageUrl;
     private ImageView imageViewProfilePicture;
-    private static final int PERMISSION_CODE = 10;
-    private static final int PICK_IMAGE = 20;
+
 
 
 
@@ -138,6 +137,7 @@ public class SignUpFragment extends Fragment implements
         //
         buttonUpload = view.findViewById(R.id.button_signUpFragment_upload);
         imageViewProfilePicture = view.findViewById(R.id.imageView_signUpFragment_profilePicture);
+        spinner = view.findViewById(R.id.progressBar_signUpFragment);
         // setting listeners
         buttonUpload.setOnClickListener(this);
         buttonsignUp.setOnClickListener(this);
@@ -170,11 +170,14 @@ public class SignUpFragment extends Fragment implements
 
         signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), (Observer<SignUpViewModel.FirebaseSignUpServerCodeState>) firebaseSignUpServerCodeState -> {
             NavController navController = Navigation.findNavController(view);
+            spinner.setVisibility(View.GONE);
 
             switch (firebaseSignUpServerCodeState) {
-                case SIGN_UP_SUCCESS:
+                case SIGN_UP_SUCCESS: {
                     MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
-
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    mainActivity.showLogo();
+                }
                     break;
                 case SIGN_UP_FAILURE:
                     MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
@@ -261,6 +264,7 @@ public class SignUpFragment extends Fragment implements
             boolean repeatPasswordMatches = checkRepeatPasswordMatch();
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
+                spinner.setVisibility(View.VISIBLE);
                 String profilePicturePath = imageUrl;
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
