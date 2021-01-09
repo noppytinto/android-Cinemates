@@ -80,16 +80,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     rememberMeExists = true;
                     invalidateOptionsMenu();
 
-                    try {
-                        User remeberMeUser = loginViewModel.getUser().getValue();
-
-                        // set profile picture
-                        String imagePath = remeberMeUser.getProfilePicturePath();
-                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    //TODO: load profile picture into login item menu
                     break;
                 }
         });
@@ -162,6 +153,11 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         // if is logged
         if(rememberMeExists || loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) {
             notificationMenuItem.setVisible(true);
+
+            // set profile picture
+            User remeberMeUser = loginViewModel.getUser().getValue();
+            String imagePath = remeberMeUser.getProfilePicturePath();
+            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
         }
         else {
             notificationMenuItem.setVisible(false);

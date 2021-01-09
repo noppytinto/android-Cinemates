@@ -97,4 +97,7 @@ dependencies {
     // network libraries
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
+    // cloudinary
+    implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.30.0'
+
 }

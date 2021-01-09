@@ -1,23 +1,37 @@
 package mirror42.dev.cinemates.ui.signup;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -29,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Locale;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
@@ -37,6 +52,8 @@ import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static android.app.Activity.RESULT_OK;
 
 public class SignUpFragment extends Fragment implements
         View.OnClickListener,
@@ -66,14 +83,19 @@ public class SignUpFragment extends Fragment implements
 
     //
     private Button buttonsignUp;
+    private Button buttonUpload;
     private ImageButton buttonDatePicker;
     private MaterialDatePicker.Builder<Long> materialDatePickerBuilder;
     private ProgressBar spinner;
     private SignUpViewModel signUpViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
-
-
+    //
+    private static int SELECT_PICTURE = 30;
+    private String imageUrl;
+    private ImageView imageViewProfilePicture;
+    private static final int PERMISSION_CODE = 10;
+    private static final int PICK_IMAGE = 20;
 
 
 
@@ -113,7 +135,11 @@ public class SignUpFragment extends Fragment implements
         checkBoxPromo = view.findViewById(R.id.checkBox_loginFragment_promo);
         checkBoxAnalytics = view.findViewById(R.id.checkBox_loginFragment_analytics);
         checkBoxTermsAndConditions = view.findViewById(R.id.checkBox_loginFragment_termsAndConditions);
+        //
+        buttonUpload = view.findViewById(R.id.button_signUpFragment_upload);
+        imageViewProfilePicture = view.findViewById(R.id.imageView_signUpFragment_profilePicture);
         // setting listeners
+        buttonUpload.setOnClickListener(this);
         buttonsignUp.setOnClickListener(this);
         buttonDatePicker.setOnClickListener(this);
 
@@ -216,12 +242,14 @@ public class SignUpFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == buttonsignUp.getId()) {
+        if(v.getId() == buttonUpload.getId()) {
+            fetchImageFromGallery(v);
+        }
+        else if(v.getId() == buttonsignUp.getId()) {
             // getting data
             String username = editTextUsername.getText().toString();
             String email = editTextEmail.getText().toString();
             String password = editTextPassword.getText().toString();
-            String repeatPassword = editTextRepeatPassword.getText().toString();
             String firstName = editTextFirstName.getText().toString();
             String lastName = editTextLastName.getText().toString();
             String birthDate = editTextBirthDate.getText().toString();
@@ -233,14 +261,7 @@ public class SignUpFragment extends Fragment implements
             boolean repeatPasswordMatches = checkRepeatPasswordMatch();
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
-                String profilePicturePath = "-"; //TODO: upload profile picture
-
-                try {
-
-                } catch (Exception e) {
-
-                }
-
+                String profilePicturePath = imageUrl;
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
             else {
@@ -308,6 +329,88 @@ public class SignUpFragment extends Fragment implements
 
 
     //--------------------------------------------------------------- METHODS
+
+    void fetchImageFromGallery(View view){
+//        Intent intent = new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+
+
+        if(checkPermissionForReadExtertalStorage()) {
+            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
+        }
+        else {
+            requestPermissionForReadExtertalStorage();
+            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
+        }
+
+
+    }
+
+    public void requestPermissionForReadExtertalStorage() {
+        try {
+            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 11);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public boolean checkPermissionForReadExtertalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int result = getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri selectedImageURI = data.getData();
+                imageUrl = "-";
+                try {
+                    imageUrl = getRealPathFromURI(getContext(), selectedImageURI);
+                    Glide.with(this)  //2
+                            .load(imageUrl) //3
+                            .fallback(R.drawable.broken_image)
+                            .placeholder(R.drawable.placeholder_image)
+                            .circleCrop() //4
+                            .into(imageViewProfilePicture); //8
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
     private boolean checkAllFieldsAreFilled() {
         boolean res = true;

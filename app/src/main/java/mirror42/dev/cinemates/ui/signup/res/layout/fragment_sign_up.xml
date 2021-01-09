@@ -16,15 +16,41 @@
             android:layout_height="wrap_content">
 
 
+            <ImageView
+                android:id="@+id/imageView_signUpFragment_profilePicture"
+                android:layout_width="130dp"
+                android:layout_height="118dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/placeholder_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/button_signUpFragment_upload"
+                style="@style/Cinemates.Button.Rectangular.Outlined"
+                android:layout_width="240dp"
+                android:layout_height="63dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/upload_profile_pciture"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_signUpFragment_profilePicture" />
+
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_username"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="236dp"
                 android:hint="@string/username"
                 app:endIconMode="clear_text"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.526"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:startIconDrawable="@drawable/user_icon_light_blue">
@@ -40,12 +66,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_email"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/login_page_email"
                 app:endIconMode="clear_text"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 app:helperText="test@mail.com"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -65,12 +91,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_password"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/password"
                 app:endIconMode="password_toggle"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
@@ -88,12 +114,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_repeatPassword"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 app:helperText="la password deve contenere almeno 5 caratteri"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -113,12 +139,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_firstName"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Nome"
                 app:endIconMode="clear_text"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_repeatPassword"
@@ -137,10 +163,10 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_lastName"
+                style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                style="@style/Cinemates.TextField.TextInputLayout"
                 android:hint="@string/lastname"
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -213,11 +239,11 @@
 
             <CheckBox
                 android:id="@+id/checkBox_loginFragment_analytics"
+                style="@style/Cinemates.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/sign_up_page_analytics_consensus_message"
-                style="@style/Cinemates.Checkbox"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.161"
                 app:layout_constraintStart_toStartOf="parent"
@@ -226,12 +252,12 @@
 
             <CheckBox
                 android:id="@+id/checkBox_loginFragment_termsAndConditions"
+                style="@style/Cinemates.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/sign_up_page_terms_and_conditions"
-                style="@style/Cinemates.Checkbox"
                 android:fontFamily="@font/poppins_bold"
+                android:text="@string/sign_up_page_terms_and_conditions"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintStart_toStartOf="parent"
@@ -248,6 +274,7 @@
                 app:layout_constraintStart_toEndOf="@+id/textInputLayout_signUpFragment_birthDate"
                 app:layout_constraintTop_toTopOf="@+id/textInputLayout_signUpFragment_birthDate"
                 app:layout_constraintVertical_bias="0.0" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

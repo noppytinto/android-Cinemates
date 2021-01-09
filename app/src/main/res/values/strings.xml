@@ -73,5 +73,6 @@
     <string name="sign_up">Registrazione</string>
     <string name="profile_page_resend_email">Rinvia email attivazione</string>
     <string name="user_profile_fragment_resend_message">Account ancora non attivato.\nNon hai ancora ricevuto l\'email di attivazione\n oppure e\' scaduta?</string>
+    <string name="upload_profile_pciture">seleziona immagine profilo</string>
 
 </resources>

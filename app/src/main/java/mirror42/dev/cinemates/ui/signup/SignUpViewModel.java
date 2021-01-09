@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -116,9 +118,24 @@ private final String TAG = this.getClass().getSimpleName();
                                     String profilePicturePath,
                                     boolean promo,
                                     boolean analytics) {
+
         checkUserCollision(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
 
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //
+
+
+
+            }
+        }).start();
+
     }
+
+
+
 
     private void checkUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, String profilePicturePath, boolean promo, boolean analytics) {
         HttpUrl httpUrl = null;
@@ -195,11 +212,27 @@ private final String TAG = this.getClass().getSimpleName();
                             Log.d(TAG, "createUserWithEmail:success");
                             firebaseUser = mAuth.getCurrentUser();
 
-                            // add pending user data in firebase DB
-                            FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
-                            Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
-                            // Add a new document with a the user UID
-                            insertUserInDB(newDBuser, firebaseDB);
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String imageName = "-";
+                                    try {
+                                        // uploading promo image to the cloud
+                                        Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
+                                        Map<String, Object> uploadResult = cloudinary.uploader().upload(profilePicturePath, ObjectUtils.emptyMap());
+                                        imageName = (String) uploadResult.get("public_id");
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    // add pending user data in firebase DB
+                                    FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
+                                    Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, imageName+".png", promo, analytics);
+                                    // Add a new document with a the user UID
+                                    insertUserInFirebaseDB(newDBuser, firebaseDB);
+                                }
+                            }).start();
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -221,7 +254,7 @@ private final String TAG = this.getClass().getSimpleName();
                 });
     }// end checkPendingUSerCollision()
 
-    private void insertUserInDB(Map<String, Object> newDBuser, FirebaseFirestore firebaseDB) {
+    private void insertUserInFirebaseDB(Map<String, Object> newDBuser, FirebaseFirestore firebaseDB) {
         try {
             firebaseDB.collection("pending_users").document(firebaseUser.getUid())
                     .set(newDBuser)
