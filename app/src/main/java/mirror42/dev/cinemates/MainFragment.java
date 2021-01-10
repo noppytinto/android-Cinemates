@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
@@ -48,7 +51,9 @@ public class MainFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.tablayout_mainFragment);
         viewPager = view.findViewById(R.id.viewpager_mainFragment);
-        viewpagerAdapterFragmentMain = new ViewpagerAdapterFragmentMain(this);
+        FragmentManager fm = getChildFragmentManager();
+        Lifecycle lifecycle = getViewLifecycleOwner().getLifecycle();
+        viewpagerAdapterFragmentMain = new ViewpagerAdapterFragmentMain(fm, lifecycle);
         viewPager.setUserInputEnabled(false); // disables horiz. swipe to scroll tabs gestures
         viewPager.setAdapter(viewpagerAdapterFragmentMain);
 
