@@ -154,7 +154,7 @@ private final String TAG = this.getClass().getSimpleName();
 
 
 
-            Request request = HttpUtilities.buildGETrequest(httpUrl, remoteConfigServer.getGuestToken());
+            Request request = HttpUtilities.buildPostgresGETrequest(httpUrl, remoteConfigServer.getGuestToken());
 
             // performing call
             httpClient.newCall(request).enqueue(new Callback() {

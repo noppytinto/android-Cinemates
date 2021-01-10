@@ -12,7 +12,7 @@ plugins {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3" // if some problems, change here
 
     defaultConfig {
         applicationId "mirror42.dev.cinemates"
@@ -26,8 +26,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true   // defauult value: false
-            shrinkResources true // defauult value: false
+            minifyEnabled true   // defuult value: false
+            shrinkResources true // default value: false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,6 +36,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    // **** define your res folders ****
     sourceSets {
         main.res.srcDirs += [
                 'src/main/java/mirror42/dev/cinemates/ui/explore/res',
@@ -80,11 +81,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-storage'
 
-
     // security
     implementation "androidx.security:security-crypto:1.1.0-alpha03"
-    // leaks manager
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+
 
 
 
@@ -99,5 +98,12 @@ dependencies {
 
     // cloudinary
     implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.30.0'
+
+    // rxjava
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+
+    // leaks manager
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
 }

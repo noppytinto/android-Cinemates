@@ -30,6 +30,7 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 public class LatestReleasesFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
 
+    private static final int PAGE_1 = 1;
     private LatestReleasesViewModel latestReleasesViewModel;
     private final String TAG = this.getClass().getSimpleName();
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
@@ -74,7 +75,7 @@ public class LatestReleasesFragment extends Fragment implements
         });
 
         // downloading data
-        latestReleasesViewModel.downloadData();
+        latestReleasesViewModel.downloadData(PAGE_1);
 
 //        if(savedInstanceState != null) {
 //            moviesList = savedInstanceState.getParcelableArrayList(MOVIES_LIST_KEY);

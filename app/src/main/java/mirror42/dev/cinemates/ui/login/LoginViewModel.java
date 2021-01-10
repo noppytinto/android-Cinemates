@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.content.Context;
-import android.icu.lang.UScript;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,7 +12,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,7 +28,6 @@ import java.util.Date;
 import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.signup.SignUpViewModel;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -144,7 +141,7 @@ public class LoginViewModel extends ViewModel {
         final OkHttpClient httpClient = new OkHttpClient();
 
         try {
-            Request request = HttpUtilities.buildGETrequest(httpUrl, remoteConfigServer.getGuestToken());
+            Request request = HttpUtilities.buildPostgresGETrequest(httpUrl, remoteConfigServer.getGuestToken());
 
             //
             Call call = httpClient.newCall(request);
@@ -375,7 +372,7 @@ public class LoginViewModel extends ViewModel {
                     .addPathSegment(dbFunction)
                     .build();
 
-            Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
 
             httpClient.newCall(request).enqueue(new Callback() {
                 @Override

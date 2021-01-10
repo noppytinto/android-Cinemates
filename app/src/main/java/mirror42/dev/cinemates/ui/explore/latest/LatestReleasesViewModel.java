@@ -34,6 +34,16 @@ public class LatestReleasesViewModel extends ViewModel implements DownloadLatest
 
     //----------------------------------------------- METHODS
 
+
+
+
+
+
+
+
+
+
+
     @Override
     public void onDownloadComplete(ArrayList<Movie> moviesList, MyValues.DownloadStatus status) {
         if (status == MyValues.DownloadStatus.OK) {
@@ -43,9 +53,16 @@ public class LatestReleasesViewModel extends ViewModel implements DownloadLatest
         }
     }
 
-    public void downloadData() {
+    public void downloadData(int page) {
         // starting async task here because of google suggestions
-        DownloadLatestReleases downloadLatestReleases = new DownloadLatestReleases(this);
-        downloadLatestReleases.execute(1);
+//        DownloadLatestReleases downloadLatestReleases = new DownloadLatestReleases(this);
+//        downloadLatestReleases.execute(1);
+
+
+
+
+
+
+
     }
 }// end LatestReleasesViewModel class
