@@ -99,7 +99,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                     @Override
                     public void onChanged(@Nullable Movie movie) {
                         if(movie!=null) {
-                            composeUI(movie);
+                            updateUI(movie);
                         }
                         else {
                             Toast toast = Toast.makeText(getContext(), "errore caricamento dettagli Film", Toast.LENGTH_SHORT);
@@ -140,7 +140,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     }
 
 
-    private void composeUI(Movie movie) {
+    private void updateUI(Movie movie) {
         ImageView backdrop = view.findViewById(R.id.imageView_movieDetailsFragment_backdrop);
         TextView title = view.findViewById(R.id.textView_movieDetailsFragment_movieTitle);
         TextView releaseDate = view.findViewById(R.id.textView_movieDetailsFragment_releaseDate);
@@ -159,20 +159,28 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         releaseStatus.setText(movie.getReleaseStatus());
 
 
-        Glide.with(this)  //2
-                .load(movie.getPosterURL()) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
-                .fitCenter() //4
-                .into(poster); //8
+        try {
+            Glide.with(this)  //2
+                    .load(movie.getPosterURL()) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .fitCenter() //4
+                    .into(poster); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
-        Glide.with(this)  //2
-                .load(movie.getBackdropURL()) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
-                .fitCenter() //4
-                .into(backdrop); //8
+        try {
+            Glide.with(this)  //2
+                    .load(movie.getBackdropURL()) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .fitCenter() //4
+                    .into(backdrop); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         // filling cast&crew list

@@ -30,6 +30,7 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 public class UpcomginsFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
 
+    private static final int PAGE_1 = 1;
     private UpcomginsViewModel upcomginsViewModel;
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;
@@ -71,7 +72,7 @@ public class UpcomginsFragment extends Fragment implements
         });
 
         // downloading data
-        upcomginsViewModel.downloadData();
+        upcomginsViewModel.downloadData(PAGE_1);
     }// end onViewCreated()
 
 //    @Override

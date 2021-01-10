@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,7 +58,6 @@ public class LatestReleasesFragment extends Fragment implements
         //1
         initRecyclerView();
 
-
         //2
         latestReleasesViewModel = new ViewModelProvider(this).get(LatestReleasesViewModel.class);
         latestReleasesViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
@@ -74,38 +74,9 @@ public class LatestReleasesFragment extends Fragment implements
             }
         });
 
-        // downloading data
+        //3 downloading data
         latestReleasesViewModel.downloadData(PAGE_1);
-
-//        if(savedInstanceState != null) {
-//            moviesList = savedInstanceState.getParcelableArrayList(MOVIES_LIST_KEY);
-//            recycleAdapterExplorePage.loadNewData(moviesList);
-//        }
-//        else {
-//            downloadData();
-//        }
-
     }// end onViewCreated()
-
-
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Log.d(TAG, "//--------------- onResume() called");
-//        Log.d(TAG, "onResume() ended");
-//
-//    }
-//
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        Log.d(TAG, "onSaveInstanceState() called");
-//
-//        outState.putParcelableArrayList(MOVIES_LIST_KEY, (ArrayList<Movie>) moviesList);
-//
-//    }
-//
 
 
 
@@ -120,6 +91,7 @@ public class LatestReleasesFragment extends Fragment implements
 
         // defining Recycler view
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_explorePage_latestReleases);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator()); //TODO: should investigate
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
@@ -145,7 +117,6 @@ public class LatestReleasesFragment extends Fragment implements
             //
             FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
             firebaseAnalytics.logSelectedMovie(movieSelected, "selected movie in explore tab", this, getContext());
-
 
             //
             NavGraphDirections.AnywhereToMovieDetailsFragment

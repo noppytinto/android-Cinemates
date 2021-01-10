@@ -4,50 +4,110 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.utilities.MyValues;
-import mirror42.dev.cinemates.asynctask.DownloadPopular;
+import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
-public class PopularViewModel extends ViewModel implements DownloadPopular.DownloadListener {
+public class PopularViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Movie>> moviesList;
+    private MutableLiveData<DownloadStatus> downloadStatus;
+
+
 
     //----------------------------------------------- CONSTRUCTORS
     public PopularViewModel() {
         moviesList = new MutableLiveData<>();
+        downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
     }
 
 
     //----------------------------------------------- GETTERS/SETTERS
 
-    public void setMoviesList(ArrayList<Movie> moviesList) {
-        this.moviesList.setValue(moviesList);
+    public void postMoviesList(ArrayList<Movie> moviesList) {
+        this.moviesList.postValue(moviesList);
     }
 
     public LiveData<ArrayList<Movie>> getMoviesList() {
         return moviesList;
     }
 
+    public void postDownloadStatus(DownloadStatus downloadStatus) {
+        this.downloadStatus.postValue(downloadStatus);
+    }
+
+    public LiveData<DownloadStatus> getDownloadStatus() {
+        return downloadStatus;
+    }
 
 
 
     //----------------------------------------------- METHODS
 
-    @Override
-    public void onDownloadComplete(ArrayList<Movie> moviesList, MyValues.DownloadStatus status) {
-        if (status == MyValues.DownloadStatus.OK) {
-            setMoviesList(moviesList);
-        } else {
-            setMoviesList(null);
-        }
+    public void downloadData(int givenPage) {
+        // starting async task here because of google suggestions
+//        DownloadLatestReleases downloadLatestReleases = new DownloadLatestReleases(this);
+//        downloadLatestReleases.execute(1);
+
+        Runnable downloadTask = createDownloadTask(givenPage);
+        Thread t = new Thread(downloadTask, "THREAD: EXPLORE PAGE - DOWNLOAD POPULARS");
+        t.start();
     }
 
-    public void downloadData() {
-        // starting async task here because of google suggestions
-        DownloadPopular downloadPopular = new DownloadPopular(this);
-        downloadPopular.execute(1);
-    }
+    private Runnable createDownloadTask(int givenPage) {
+        return ()-> {
+            int page = givenPage;
+            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+            ArrayList<Movie> result = null;
+
+            result = new ArrayList<>();
+
+            try {
+                // querying TBDb
+                JSONObject jsonObj = tmdb.getJsonPopular(page);
+                JSONArray resultsArray = jsonObj.getJSONArray("results");
+
+                // fetching results
+                for(int i=0; i<resultsArray.length(); i++) {
+                    JSONObject x = resultsArray.getJSONObject(i);
+                    int id = x.getInt("id");
+
+                    String title = x.getString("title");
+
+                    // if poster_path is null
+                    // getString() will fail
+                    // that's why the try-catch
+                    String posterURL = null;
+                    try {
+                        posterURL = x.getString("poster_path");
+                        posterURL = tmdb.buildPosterUrl(posterURL);
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                    }
+
+                    //
+                    Movie mv = new Movie(id, title, posterURL);
+                    result.add(mv);
+                }// for
+
+
+                // once finished set results
+                postMoviesList(result);
+                postDownloadStatus(DownloadStatus.SUCCESS);
+            } catch (Exception e) {
+                // if the search returns nothing
+                // moviesList will be null
+                e.printStackTrace();
+                postMoviesList(null);
+                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+            }
+        };
+    }// end createDownloadTask()
 
 
 

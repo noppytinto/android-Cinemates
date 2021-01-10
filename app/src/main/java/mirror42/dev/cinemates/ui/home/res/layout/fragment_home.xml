@@ -91,8 +91,8 @@
         style="@style/Cinemates.Button.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="140dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="152dp"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -100,11 +100,11 @@
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chip4"
+        style="@style/Cinemates.Button.Chip.Filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:text="attore"
-        style="@style/Cinemates.Button.Chip.Filter"
         app:layout_constraintStart_toEndOf="@+id/radioButton"
         app:layout_constraintTop_toTopOf="@+id/radioButton" />
 
@@ -121,7 +121,7 @@
         android:id="@+id/radioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="80dp"
         android:text="RadioButton"
         app:layout_constraintStart_toStartOf="@+id/button_rectangular_outlined"
         app:layout_constraintTop_toBottomOf="@+id/button_rectangular_outlined" />
@@ -144,24 +144,45 @@
         app:layout_constraintStart_toStartOf="@+id/checkBox"
         app:layout_constraintTop_toBottomOf="@+id/checkBox" />
 
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        app:layout_constraintStart_toStartOf="@+id/floatingActionButton"
-        app:layout_constraintTop_toBottomOf="@+id/floatingActionButton"
-        tools:src="@tools:sample/avatars" />
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button_homeFragment_update"
         style="@style/Cinemates.Button.TextButton"
+        android:layout_width="135dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="16dp"
+        android:text="update"
+        app:icon="@drawable/add_icon_black"
+        app:layout_constraintStart_toStartOf="@+id/button_rectangular_outlined"
+        app:layout_constraintTop_toBottomOf="@+id/button_rectangular_outlined" />
+
+    <TextView
+        android:id="@+id/textView_homeFragment_test"
+        android:layout_width="168dp"
+        android:layout_height="198dp"
+        android:text="TextView"
+
+        android:textColor="@color/light_blue"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.934"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.392" />
+
+    <EditText
+        android:id="@+id/editText_homeFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Text Button"
-        app:icon="@drawable/add_icon_black"
-        app:layout_constraintStart_toStartOf="@+id/imageButton2"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton2" />
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:textColor="@color/light_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.155" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

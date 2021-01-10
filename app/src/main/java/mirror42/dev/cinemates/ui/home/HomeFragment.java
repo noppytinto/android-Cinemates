@@ -5,21 +5,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
 import mirror42.dev.cinemates.R;
 
 public class HomeFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
-
-
+    private TextView textView;
+    private Button updateButton;
+    private EditText editText;
+    private String greetings;
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
@@ -41,11 +43,8 @@ public class HomeFragment extends Fragment {
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         final TextView textView = root.findViewById(R.id.textview_home_fragment);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
+        homeViewModel.getText().observe(getViewLifecycleOwner(), s -> {
+//            textView.setText(s);
         });
 
         return root;
@@ -59,6 +58,11 @@ public class HomeFragment extends Fragment {
 
         homeViewModel.applyRemoteConfig();
 
+        // rx java tests
+        textView = view.findViewById(R.id.textView_homeFragment_test);
+        updateButton = view.findViewById(R.id.button_homeFragment_update);
+        editText = view.findViewById(R.id.editText_homeFragment);
     }
+
 
 }// end HomeFragment class

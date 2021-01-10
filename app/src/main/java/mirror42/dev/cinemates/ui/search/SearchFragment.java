@@ -200,7 +200,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 textInputLayout.setError(null);
 
                 //
-                searchViewModel.init(currentSearchTerm);
+                searchViewModel.downloadData(currentSearchTerm);
             }
             else {
                 textInputLayout.setError("Campo ricerca vuoto");

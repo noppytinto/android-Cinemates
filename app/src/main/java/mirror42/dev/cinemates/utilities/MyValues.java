@@ -7,7 +7,8 @@ public class MyValues {
         PROCESSING,
         NOT_INITILIZED,
         FAILED_OR_EMPTY,
-        OK
+        SUCCESS,
+        NONE
     }
 
     static final String SEARCH_QUERY = "SEARCH_QUERY";
