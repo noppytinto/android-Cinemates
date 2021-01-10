@@ -102,8 +102,8 @@ dependencies {
     implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.30.0'
 
     // rxjava
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+//    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+//    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
 
     // leaks manager
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
