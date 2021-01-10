@@ -3,6 +3,7 @@ package mirror42.dev.cinemates.ui.moviedetails;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -16,16 +17,21 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
+
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
@@ -34,11 +40,21 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
     private View view;
     private FloatingActionButton addToListButton;
+    private LoginViewModel loginViewModel;
 
 
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+        mainActivity = null;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,6 +105,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 //                    main.getSupportActionBar().hide();
 
 //                }
+
+                loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+                loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+
+                });
+
 
                 //1
                 initRecyclerView();
@@ -225,6 +247,53 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             e.getMessage();
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_item_notifications:
+                //            try {
+//                //
+//                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottom_sheet_dialog_theme);
+//                bottomSheetDialog.setDismissWithAnimation(true);
+//                bottomSheetDialog.setTitle("test");
+//                View bottomSheetView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)findViewById(R.id.bottom_sheet_container));
+//                bottomSheetDialog.setContentView(bottomSheetView);
+//
+//                bottomSheetDialog.show();
+//            } catch (Exception e) {
+//                e.getMessage();
+//                e.printStackTrace();
+//            }
+                break;
+            case R.id.menu_item_login:
+                if((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+                    Navigation.findNavController(view).navigate(R.id.action_movieDetails_fragment_to_userProfileFragment);
+                }
+                else {
+                    try {
+
+                        Navigation.findNavController(view).navigate(R.id.action_movieDetails_fragment_to_loginFragment);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }// switch
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.showLogo();
+        mainActivity = null;
     }
 
 

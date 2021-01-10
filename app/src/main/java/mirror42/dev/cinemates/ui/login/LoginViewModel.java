@@ -75,7 +75,7 @@ public class LoginViewModel extends ViewModel {
 
     public LoginViewModel() {
         this.user = new MutableLiveData<>();
-        loginResult = new MutableLiveData<>();
+        loginResult = new MutableLiveData<>(LoginResult.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
     }

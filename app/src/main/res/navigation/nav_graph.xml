@@ -31,11 +31,17 @@
     <fragment
         android:id="@+id/movieDetails_fragment"
         android:name="mirror42.dev.cinemates.ui.moviedetails.MovieDetailsFragment"
-        android:label="fragment_movie_details"
+        android:label="Dettagli film"
         tools:layout="@layout/fragment_movie_details" >
         <argument
             android:name="Movie"
             app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie" />
+        <action
+            android:id="@+id/action_movieDetails_fragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_movieDetails_fragment_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/latestReleasesFragment"

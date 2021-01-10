@@ -220,26 +220,10 @@ public class SignUpFragment extends Fragment implements
             }
         });
 
-        // Initialize Firebase Auth
-
-//        FirebaseAuth.AuthStateListener mAuthListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser user = firebaseAuth.getCurrentUser();
-//                if (user != null) {
-//                    sendEmailVerificationTo(user);
-//
-//                }
-//            }
-//        };
-//
-//        mAuth.addAuthStateListener(mAuthListener);
 
 
         // fast sign up
         fastSignUp();
-
-
 
     }// end onViewCreated class
 

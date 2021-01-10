@@ -55,6 +55,7 @@ public class LoginFragment extends Fragment  implements
         setHasOptionsMenu(true);
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.hideLogo();
+        mainActivity = null;
     }
 
     @Override
@@ -134,9 +135,8 @@ public class LoginFragment extends Fragment  implements
                     else {
                         // show restricted user profile page
                         MyUtilities.showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
-                        NavController navController = Navigation.findNavController(view);
-                        navController.popBackStack();
-                        navController.navigate(R.id.userProfileFragment);
+                        Navigation.findNavController(view).popBackStack();
+                        Navigation.findNavController(view).navigate(R.id.userProfileFragment);
                     }
                 }
                     break;
@@ -164,6 +164,7 @@ public class LoginFragment extends Fragment  implements
 
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.hideLogo();
+        mainActivity = null;
     }
 
     @Override
@@ -224,6 +225,7 @@ public class LoginFragment extends Fragment  implements
         super.onDetach();
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.showLogo();
+        mainActivity = null;
     }
 
 

@@ -75,7 +75,7 @@ private final String TAG = this.getClass().getSimpleName();
 
     public SignUpViewModel() {
         this.user = new MutableLiveData<>();
-        this.firebaseAuthState = new MutableLiveData<>();
+        this.firebaseAuthState = new MutableLiveData<>(FirebaseSignUpServerCodeState.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
     }
