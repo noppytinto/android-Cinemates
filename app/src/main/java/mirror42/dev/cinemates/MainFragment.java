@@ -45,9 +45,26 @@ public class MainFragment extends Fragment {
 
     //---------------------------------------------------------- ANDROID METHODS
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: ");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.showLogo();
+        mainActivity = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+        mainActivity = null;
     }
 
     @Override

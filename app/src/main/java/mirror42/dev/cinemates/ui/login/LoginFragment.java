@@ -170,10 +170,6 @@ public class LoginFragment extends Fragment  implements
         MenuItem item = menu.findItem(R.id.menu_item_login);
         if(item!=null)
             item.setVisible(false);
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
-        mainActivity = null;
     }
 
     @Override
@@ -229,13 +225,6 @@ public class LoginFragment extends Fragment  implements
         }
     }// end onClick()
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.showLogo();
-        mainActivity = null;
-    }
 
 
     //-------------------------------------------------------------------------------- METHODS

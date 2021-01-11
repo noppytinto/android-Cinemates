@@ -54,15 +54,15 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: ");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+        mainActivity = null;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
-        mainActivity = null;
     }
 
     @Override
@@ -256,17 +256,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             e.getMessage();
             e.printStackTrace();
         }
-    }
-
-
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.showLogo();
-        mainActivity = null;
     }
 
 

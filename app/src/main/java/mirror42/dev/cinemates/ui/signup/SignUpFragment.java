@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -175,8 +176,6 @@ public class SignUpFragment extends Fragment implements
             switch (firebaseSignUpServerCodeState) {
                 case SIGN_UP_SUCCESS: {
                     MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
-                    MainActivity mainActivity = (MainActivity) getActivity();
-                    mainActivity.showLogo();
                 }
                     break;
                 case SIGN_UP_FAILURE:
@@ -314,9 +313,7 @@ public class SignUpFragment extends Fragment implements
 
 
 
-
-
-    //--------------------------------------------------------------- METHODS
+//--------------------------------------------------------------- METHODS
 
     void fetchImageFromGallery(View view){
 //        Intent intent = new Intent();

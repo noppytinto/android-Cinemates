@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,7 @@ import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 
 public class UserProfileFragment extends Fragment implements View.OnClickListener {
+    private final String TAG = getClass().getSimpleName();
     private View view;
     private ImageView profilePicture;
     private TextView textViewEmail;
@@ -41,6 +43,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
 
     //----------------------------------------------------------------------- ANDROID METHODS
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,10 +139,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             loginViewModel.deleteRememberMeData(getContext());
 
             //
-            MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.hideLogo();
-
-            //
             NavController navController = Navigation.findNavController(v);
             navController.popBackStack();
             navController.navigate(R.id.loginFragment);
@@ -158,25 +163,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         MenuItem item = menu.findItem(R.id.menu_item_login);
         if(item!=null)
             item.setVisible(false);
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
     }
 
 
     //----------------------------------------------------------------------- METHODS
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        if(loginViewModel.getLoginResult().getValue() != LoginViewModel.LoginResult.LOGGED_OUT) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.showLogo();
-        }
-    }
-
 
     private void showResendEmail() {
         textViewResendEmailMessage.setVisibility(View.VISIBLE);

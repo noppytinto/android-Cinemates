@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         toolbarLogo = findViewById(R.id.imageView_mainActivity_logo);
+//        toolbarLogo.setVisibility(View.GONE);
 
         //
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
@@ -174,11 +176,16 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-//        toolbarLogo.setVisibility(View.VISIBLE);
-
+        Log.d(TAG, "onResume: ");
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
 
 
     //-------------------------------------------------------- METHODS
