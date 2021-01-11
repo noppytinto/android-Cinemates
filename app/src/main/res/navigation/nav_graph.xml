@@ -31,18 +31,6 @@
             app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie" />
     </fragment>
     <fragment
-        android:id="@+id/latestReleasesFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.latest.LatestReleasesFragment"
-        android:label="LatestReleasesFragment" />
-    <fragment
-        android:id="@+id/popularFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.popular.PopularFragment"
-        android:label="PopularFragment" />
-    <fragment
-        android:id="@+id/upcomginsFragment"
-        android:name="mirror42.dev.cinemates.ui.explore.upcomings.UpcomginsFragment"
-        android:label="UpcomginsFragment" />
-    <fragment
         android:id="@+id/exploreFragment"
         android:name="mirror42.dev.cinemates.ui.explore.ExploreFragment"
         android:label="fragment_explore"
@@ -54,11 +42,6 @@
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="mirror42.dev.cinemates.MainActivity"
-        android:label=""
-        tools:layout="@layout/activity_main" />
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.UserProfileFragment"
