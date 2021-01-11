@@ -315,8 +315,7 @@ public class SignUpFragment extends Fragment implements
     }
 
     private void requestPermission(){
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        ){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
             accessTheGallery();
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
@@ -324,10 +323,7 @@ public class SignUpFragment extends Fragment implements
     }
 
     public void accessTheGallery(){
-        Intent i = new Intent(
-                Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        );
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         i.setType("image/*");
      startActivityForResult(i, PICK_IMAGE);
     }
@@ -347,10 +343,12 @@ public class SignUpFragment extends Fragment implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+
+        Bitmap thumbnail = null;
         if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
             try {
                 //set picked image to the mProfile
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
 //                mProfile.setImageBitmap(bitmap);
 
             } catch (IOException e) {
@@ -360,6 +358,8 @@ public class SignUpFragment extends Fragment implements
             filePath = "-";
             try {
                 filePath = getRealPathFromUri(data.getData(), getActivity());
+
+                // load thumbnail
                 Glide.with(this)  //2
                         .load(filePath) //3
                         .fallback(R.drawable.broken_image)
