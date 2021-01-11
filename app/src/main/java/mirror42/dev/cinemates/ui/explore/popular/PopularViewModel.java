@@ -1,5 +1,7 @@
 package mirror42.dev.cinemates.ui.explore.popular;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -14,6 +16,7 @@ import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 public class PopularViewModel extends ViewModel {
+    private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
 
@@ -49,10 +52,6 @@ public class PopularViewModel extends ViewModel {
     //----------------------------------------------- METHODS
 
     public void downloadData(int givenPage) {
-        // starting async task here because of google suggestions
-//        DownloadLatestReleases downloadLatestReleases = new DownloadLatestReleases(this);
-//        downloadLatestReleases.execute(1);
-
         Runnable downloadTask = createDownloadTask(givenPage);
         Thread t = new Thread(downloadTask, "THREAD: EXPLORE PAGE - DOWNLOAD POPULARS");
         t.start();
@@ -60,6 +59,7 @@ public class PopularViewModel extends ViewModel {
 
     private Runnable createDownloadTask(int givenPage) {
         return ()-> {
+            Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD POPULARS");
             int page = givenPage;
             TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
             ArrayList<Movie> result = null;

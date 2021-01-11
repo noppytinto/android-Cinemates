@@ -30,10 +30,9 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class LatestReleasesFragment extends Fragment implements
         RecyclerSearchListener.OnClick_RecycleSearchListener {
-
-    private static final int PAGE_1 = 1;
-    private LatestReleasesViewModel latestReleasesViewModel;
     private final String TAG = this.getClass().getSimpleName();
+    private final int PAGE_1 = 1;
+    private LatestReleasesViewModel latestReleasesViewModel;
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;
 //    private ArrayList<Movie> moviesList;

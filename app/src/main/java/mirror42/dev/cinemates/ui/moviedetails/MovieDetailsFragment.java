@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
+    private final String TAG = getClass().getSimpleName();
     private MovieDetailsViewModel movieDetailsViewModel;
     private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
     private View view;
@@ -45,7 +47,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
 
-    //------------------------------------------------------------------------ LIFECYCLE METHODS
+    //------------------------------------------------------------------------ LIFECYCLE METHOD
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -249,43 +258,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.menu_item_notifications:
-                //            try {
-//                //
-//                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.bottom_sheet_dialog_theme);
-//                bottomSheetDialog.setDismissWithAnimation(true);
-//                bottomSheetDialog.setTitle("test");
-//                View bottomSheetView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bottom_sheet_layout, (ConstraintLayout)findViewById(R.id.bottom_sheet_container));
-//                bottomSheetDialog.setContentView(bottomSheetView);
-//
-//                bottomSheetDialog.show();
-//            } catch (Exception e) {
-//                e.getMessage();
-//                e.printStackTrace();
-//            }
-                break;
-            case R.id.menu_item_login:
-                if((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
-                    Navigation.findNavController(view).navigate(R.id.action_movieDetails_fragment_to_userProfileFragment);
-                }
-                else {
-                    try {
-
-                        Navigation.findNavController(view).navigate(R.id.action_movieDetails_fragment_to_loginFragment);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-        }// switch
-
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
     @Override

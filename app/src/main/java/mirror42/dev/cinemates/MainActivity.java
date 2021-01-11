@@ -131,12 +131,12 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                 break;
             case R.id.menu_item_login:
                 if(rememberMeExists || (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
-                    navController.navigate(R.id.action_main_fragment_to_userProfileFragment);
+                    navController.navigate(R.id.action_global_userProfileFragment);
                 }
                 else {
                     try {
 
-                        navController.navigate(R.id.action_main_fragment_to_loginFragment);
+                        navController.navigate(R.id.action_global_loginFragment);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

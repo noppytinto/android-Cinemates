@@ -15,14 +15,7 @@
         android:id="@+id/main_fragment"
         android:name="mirror42.dev.cinemates.MainFragment"
         android:label=""
-        tools:layout="@layout/fragment_main" >
-        <action
-            android:id="@+id/action_main_fragment_to_userProfileFragment"
-            app:destination="@id/userProfileFragment" />
-        <action
-            android:id="@+id/action_main_fragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/search_fragment"
         android:name="mirror42.dev.cinemates.ui.search.SearchFragment"
@@ -36,12 +29,6 @@
         <argument
             android:name="Movie"
             app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie" />
-        <action
-            android:id="@+id/action_movieDetails_fragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-        <action
-            android:id="@+id/action_movieDetails_fragment_to_userProfileFragment"
-            app:destination="@id/userProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/latestReleasesFragment"
@@ -76,19 +63,12 @@
         android:id="@+id/userProfileFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.UserProfileFragment"
         android:label="@string/user_profile"
-        tools:layout="@layout/fragment_user_profile" >
-        <action
-            android:id="@+id/action_userProfileFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_user_profile" />
     <fragment
         android:id="@+id/loginFragment"
         android:name="mirror42.dev.cinemates.ui.login.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/action_loginFragment_to_userProfileFragment"
-            app:destination="@id/userProfileFragment" />
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
@@ -102,4 +82,18 @@
             android:id="@+id/action_signUpFragment_to_main_fragment"
             app:destination="@id/main_fragment" />
     </fragment>
+    <action
+        android:id="@+id/action_global_loginFragment"
+        app:destination="@id/loginFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+    <action
+        android:id="@+id/action_global_userProfileFragment"
+        app:destination="@id/userProfileFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 </navigation>

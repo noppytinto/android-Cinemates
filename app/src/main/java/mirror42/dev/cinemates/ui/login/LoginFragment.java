@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 public class LoginFragment extends Fragment  implements
         View.OnClickListener,
         CompoundButton.OnCheckedChangeListener{
+    private final String TAG = getClass().getSimpleName();
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
@@ -49,6 +51,13 @@ public class LoginFragment extends Fragment  implements
 
 
     //---------------------------------------------------------------------- ANDROID METHODS
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

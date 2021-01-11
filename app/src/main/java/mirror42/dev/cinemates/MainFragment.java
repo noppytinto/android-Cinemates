@@ -25,16 +25,30 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class MainFragment extends Fragment {
+    private final String TAG = getClass().getSimpleName();
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private ViewpagerAdapterFragmentMain viewpagerAdapterFragmentMain;
 
 
 
+
+
+    //---------------------------------------------------------- CONSTRUCTORS
+
     public MainFragment() {
         // Required empty public constructor
     }
 
+
+
+
+    //---------------------------------------------------------- ANDROID METHODS
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

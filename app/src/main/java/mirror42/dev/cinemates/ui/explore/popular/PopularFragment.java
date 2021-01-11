@@ -29,7 +29,7 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class PopularFragment extends Fragment implements RecyclerSearchListener.OnClick_RecycleSearchListener {
 
-    private static final int PAGE_1 = 1;
+    private final int PAGE_1 = 1;
     private PopularViewModel popularViewModel;
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;

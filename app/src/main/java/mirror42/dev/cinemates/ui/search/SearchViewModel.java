@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.ui.search;
 
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -25,6 +27,7 @@ import mirror42.dev.cinemates.tmdbAPI.model.Movie;
  *
  */
 public class SearchViewModel extends ViewModel {
+    private final String TAG = getClass().getSimpleName();
     private final int PAGE_1 = 1;
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
@@ -68,6 +71,7 @@ public class SearchViewModel extends ViewModel {
 
     private Runnable createDownloadTask(String givenQuery) {
         return ()-> {
+            Log.d(TAG, "THREAD: SEARCH PAGE - DOWNLOAD SEARCH RESULTS");
             String movieTitle = givenQuery;
             TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
             ArrayList<Movie> result = null;
