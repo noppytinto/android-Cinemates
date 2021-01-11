@@ -185,6 +185,8 @@ public class SignUpFragment extends Fragment implements
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
                     break;
                 case NO_PENDING_USER_COLLISION:
+                    spinner.setVisibility(View.VISIBLE);
+
                     signUpViewModel.insertUserInFirebaseDB();
                     break;
                 case USERNAME_EMAIL_COLLISION:

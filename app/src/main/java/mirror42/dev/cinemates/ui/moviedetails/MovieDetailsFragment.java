@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
@@ -48,16 +50,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHOD
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume: ");
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
-        mainActivity = null;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,8 +82,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_movie_details, container, false);
     }
-
-
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -152,6 +142,99 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     }// end onViewCreated()
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.hideLogo();
+        mainActivity = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        int buttonId = v.getId();
+
+
+        final String[] choices = {"1", "2", "3"};
+        final boolean[] checkedItems = {false, false, false};
+        ArrayList<String> res = new ArrayList<>();
+
+        if(buttonId == R.id.button_movieDetailsFragment_addToList) {
+            Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
+            addToListButton.startAnimation(buttonAnim);
+
+            // create a dialog with AlertDialog builder
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext()); //TODO: pass style here, once defined
+            builder.setTitle("Scegli liste").setNeutralButton("Annulla", null);
+            builder.setPositiveButton("Fatto", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for(String x: res) {
+                        Log.d("MainActivity", "clicked item index is " + x);
+                        Toast.makeText(getContext(), "items selected are: " + x, Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+            builder.setMultiChoiceItems(choices, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    if(isChecked) {
+                        res.add(choices[which]);
+                    }
+                    else {
+                        res.remove(choices[which]);
+                    }
+                }
+            });
+            builder.show();
+
+
+//            MaterialAlertDialogBuilder(getContext())
+//                    .setTitle("Tue liste")
+//                    .setNeutralButton(" ")){ dialog, which ->
+//                // Respond to neutral button press
+//            }
+//        .setPositiveButton(resources.getString(R.string.ok)) { dialog, which ->
+//                // Respond to positive button press
+//            }
+//            // Single-choice items (initialized with checked item)
+//        .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
+//                // Respond to item chosen
+//            }
+//        .show()
+
+
+
+
+//            try {
+//                //
+//                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.bottom_sheet_dialog_theme);
+//                bottomSheetDialog.setCanceledOnTouchOutside(false);
+//                bottomSheetDialog.setDismissWithAnimation(true);
+//                bottomSheetDialog.setTitle("test");
+//                View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_addtolist, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
+//                bottomSheetView.findViewById(R.id.button_addToList).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        bottomSheetDialog.dismiss();
+//                    }
+//                });
+//                bottomSheetDialog.setContentView(bottomSheetView);
+//                bottomSheetDialog.show();
+//            } catch (Exception e) {
+//                e.getMessage();
+//                e.printStackTrace();
+//            }
+
+
+        }
+        else if(buttonId == R.id.button_movieDetailsFragment_seeAllCast) {
+
+        }
+
+    }
 
 
     //------------------------------------------------------------- METHODS
@@ -169,7 +252,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         recyclerAdapterActorsHorizontalList = new RecyclerAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
         recyclerView.setAdapter(recyclerAdapterActorsHorizontalList);
     }
-
 
     private void updateUI(Movie movie) {
         ImageView backdrop = view.findViewById(R.id.imageView_movieDetailsFragment_backdrop);
@@ -231,32 +313,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         return temp;
     }
 
-
-    @Override
-    public void onClick(View v) {
-        Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
-        addToListButton.startAnimation(buttonAnim);
-
-        try {
-            //
-            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.bottom_sheet_dialog_theme);
-            bottomSheetDialog.setCanceledOnTouchOutside(false);
-            bottomSheetDialog.setDismissWithAnimation(true);
-            bottomSheetDialog.setTitle("test");
-            View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_addtolist, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
-            bottomSheetView.findViewById(R.id.button_addToList).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    bottomSheetDialog.dismiss();
-                }
-            });
-            bottomSheetDialog.setContentView(bottomSheetView);
-            bottomSheetDialog.show();
-        } catch (Exception e) {
-            e.getMessage();
-            e.printStackTrace();
-        }
-    }
 
 
 
