@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -36,20 +35,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private TextView textViewResendEmailMessage;
     private Button buttonLogout;
     private Button buttonResendEmail;
-
     private RemoteConfigServer remoteConfigServer;
     private LoginViewModel loginViewModel;
 
 
 
     //----------------------------------------------------------------------- ANDROID METHODS
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume: ");
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,12 +117,18 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     }
                 }
                     break;
-                case IS_NOT_PENDING_USER:
+                case IS_NOT_PENDING_USER_ANYMORE:
                     hideResendEmail();
                     break;
             }// switch
         });
     }// end onViewCreated()
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
 
     @Override
     public void onClick(View v) {
@@ -164,7 +161,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         if(item!=null)
             item.setVisible(false);
     }
-
 
     //----------------------------------------------------------------------- METHODS
 

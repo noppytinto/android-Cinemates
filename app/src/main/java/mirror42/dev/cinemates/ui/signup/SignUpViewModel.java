@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,12 +40,13 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class SignUpViewModel extends ViewModel {
-    private MutableLiveData<User> user;
+    private MutableLiveData<User> observableUser;
 private final String TAG = this.getClass().getSimpleName();
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private MutableLiveData<FirebaseSignUpServerCodeState> firebaseAuthState;
+    private User newUser;
 
     public enum FirebaseSignUpServerCodeState {
         SIGN_IN_SUCCESS,
@@ -53,6 +55,9 @@ private final String TAG = this.getClass().getSimpleName();
         SIGN_UP_FAILURE,
         INVALID_CREDENTIALS,
         PENDING_USER_COLLISION,
+        NO_PENDING_USER_COLLISION,
+        PENDING_USER_FOUND,
+        PENDING_USER_NOT_FOUND,
         PASSWORD_MALFORMED,
         PASSWORD_INVALID,
         EMAIL_NOT_EXISTS,
@@ -64,8 +69,11 @@ private final String TAG = this.getClass().getSimpleName();
         USERNAME_EMAIL_COLLISION,
         GENERIC_POSTGREST_ERROR,
         WEAK_PASSWORD,
+        POSTGRES_USER_COLLISION,
+        NO_POSTGRES_USER_COLLISION,
         NONE
     }
+
 
 
 
@@ -74,7 +82,7 @@ private final String TAG = this.getClass().getSimpleName();
     //--------------------------------------------------------------- CONSTRUCTORS
 
     public SignUpViewModel() {
-        this.user = new MutableLiveData<>();
+        this.observableUser = new MutableLiveData<>();
         this.firebaseAuthState = new MutableLiveData<>(FirebaseSignUpServerCodeState.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -88,11 +96,11 @@ private final String TAG = this.getClass().getSimpleName();
     //--------------------------------------------------------------- GETTERS/SETTERS
 
     public LiveData<User> getUser() {
-        return user;
+        return observableUser;
     }
 
     public void setUser(User user) {
-        this.user.postValue(user);
+        this.observableUser.postValue(user);
     }
 
     public LiveData<FirebaseSignUpServerCodeState> getFirebaseAuthState() {
@@ -118,26 +126,21 @@ private final String TAG = this.getClass().getSimpleName();
                                     String profilePicturePath,
                                     boolean promo,
                                     boolean analytics) {
+        newUser = new User();
+        newUser.setUsername(username);
+        newUser.setEmail(email);
+        newUser.setPassword(password);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setBirthDate(birthDate);
+        newUser.setProfilePicturePath(profilePicturePath);
+        newUser.setPromo(promo);
+        newUser.setAnalytics(analytics);
 
-        checkUserCollision(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
-
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //
-
-
-
-            }
-        }).start();
-
+        checkUserCollision();
     }
 
-
-
-
-    private void checkUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, String profilePicturePath, boolean promo, boolean analytics) {
+    private void checkUserCollision() {
         HttpUrl httpUrl = null;
         final OkHttpClient httpClient = new OkHttpClient();
 
@@ -148,11 +151,9 @@ private final String TAG = this.getClass().getSimpleName();
                     .host(remoteConfigServer.getAzureHostName())
                     .addPathSegments(remoteConfigServer.getPostgrestPath())
                     .addPathSegment(dbFunction)
-                    .addQueryParameter("username", username)
-                    .addQueryParameter("email", email)
+                    .addQueryParameter("username", newUser.getUsername())
+                    .addQueryParameter("email", newUser.getEmail())
                     .build();
-
-
 
             Request request = HttpUtilities.buildPostgresGETrequest(httpUrl, remoteConfigServer.getGuestToken());
 
@@ -174,24 +175,27 @@ private final String TAG = this.getClass().getSimpleName();
 
                         try {
                             int responseCode = Integer.parseInt(responseBody.string());
-                            if (responseCode == 1) {
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_EMAIL_COLLISION);
-                            } else if (responseCode == 2) {
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_COLLISION);
-                            } else if (responseCode == 3) {
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.EMAIL_COLLISION);
-                            } else if (responseCode == 4) {
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
-                            } else {
-                                // if not exist in postgres db
-                                // add as pending user
-                                checkPendingUserCollision(username, email, password, firstName, lastName, birthDate, profilePicturePath,  promo, analytics);
+                            switch (responseCode) {
+                                case 1:
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_EMAIL_COLLISION);
+                                    break;
+                                case 2:
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_COLLISION);
+                                    break;
+                                case 3:
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.EMAIL_COLLISION);
+                                    break;
+                                case 4:
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                                    break;
+                                default:
+                                    // if not exist in postgres db
+                                    // add as pending user
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.NO_POSTGRES_USER_COLLISION);
                             }
-
                         } catch (Exception e) {
                             setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                         }
-
                     } catch (Exception e) {
                         setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                     }
@@ -203,8 +207,8 @@ private final String TAG = this.getClass().getSimpleName();
         }
     }// end checkUserCollision()
 
-    private void checkPendingUserCollision(String username, String email, String password, String firstName, String lastName, String birthDate, String profilePicturePath, boolean promo, boolean analytics) {
-        mAuth.createUserWithEmailAndPassword(email, password)
+    public void checkPendingUserCollision() {
+        mAuth.createUserWithEmailAndPassword(newUser.getEmail(), newUser.getPassword())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -212,6 +216,7 @@ private final String TAG = this.getClass().getSimpleName();
                             Log.d(TAG, "createUserWithEmail:success");
                             firebaseUser = mAuth.getCurrentUser();
 
+                            // fetch profile picture
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -219,18 +224,15 @@ private final String TAG = this.getClass().getSimpleName();
                                     try {
                                         // uploading promo image to the cloud
                                         Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
-                                        Map<String, Object> uploadResult = cloudinary.uploader().upload(profilePicturePath, ObjectUtils.emptyMap());
+                                        Map<String, Object> uploadResult = cloudinary.uploader().upload(newUser.getProfilePicturePath(), ObjectUtils.emptyMap());
                                         imageName = (String) uploadResult.get("public_id");
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
 
-                                    // add pending user data in firebase DB
-                                    FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
-                                    Map<String, Object> newDBuser = composeDBuserData(username, email, password, firstName, lastName, birthDate, imageName+".png", promo, analytics);
-                                    // Add a new document with a the user UID
-                                    insertUserInFirebaseDB(newDBuser, firebaseDB);
+                                    newUser.setProfilePicturePath(imageName+".png");
+                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.NO_PENDING_USER_COLLISION);
                                 }
                             }).start();
 
@@ -254,7 +256,11 @@ private final String TAG = this.getClass().getSimpleName();
                 });
     }// end checkPendingUSerCollision()
 
-    private void insertUserInFirebaseDB(Map<String, Object> newDBuser, FirebaseFirestore firebaseDB) {
+    public void insertUserInFirebaseDB() {
+        // add pending user data in firebase DB
+        FirebaseFirestore firebaseDB = FirebaseFirestore.getInstance();
+        Map<String, Object> newDBuser = composeDBuserData();
+
         try {
             firebaseDB.collection("pending_users").document(firebaseUser.getUid())
                     .set(newDBuser)
@@ -282,29 +288,20 @@ private final String TAG = this.getClass().getSimpleName();
             setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
             e.printStackTrace();
         }
-
     }
 
-    private Map<String, Object> composeDBuserData(String username,
-                                                  String email,
-                                                  String password,
-                                                  String firstName,
-                                                  String lastName,
-                                                  String birthDate,
-                                                  String profilePicturePath,
-                                                  boolean promo,
-                                                  boolean analytics) {
+    private Map<String, Object> composeDBuserData() {
 
         Map<String, Object> dbUser = new HashMap<>();
-        dbUser.put("username", username);
-        dbUser.put("email", email);
-        dbUser.put("password", MyUtilities.SHA256encrypt(password));
-        dbUser.put("firstname", firstName);
-        dbUser.put("lastname", lastName);
-        dbUser.put("birthdate", birthDate);
-        dbUser.put("profilePicturePath", profilePicturePath);
-        dbUser.put("promo", promo);
-        dbUser.put("analytics", analytics);
+        dbUser.put("username", newUser.getUsername());
+        dbUser.put("email", newUser.getEmail());
+        dbUser.put("password", MyUtilities.SHA256encrypt(newUser.getPassword()));
+        dbUser.put("firstname", newUser.getFirstName());
+        dbUser.put("lastname", newUser.getLastName());
+        dbUser.put("birthdate", newUser.getBirthDate());
+        dbUser.put("profilePicturePath", newUser.getProfilePicturePath());
+        dbUser.put("promo", newUser.getPromo());
+        dbUser.put("analytics", newUser.getAnalytics());
 
         return dbUser;
 
@@ -330,8 +327,6 @@ private final String TAG = this.getClass().getSimpleName();
                 });
     }
 
-
-
     private RequestBody buildRequestBody(String username, String email) throws Exception {
         RequestBody requestBody = new FormBody.Builder()
                 .add("mail", email)
@@ -339,9 +334,6 @@ private final String TAG = this.getClass().getSimpleName();
                 .build();
         return requestBody;
     }
-
-
-
 
     private void deleteAccount(FirebaseUser user) {
         user.delete();

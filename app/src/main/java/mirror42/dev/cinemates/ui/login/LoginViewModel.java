@@ -23,8 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
@@ -63,7 +62,7 @@ public class LoginViewModel extends ViewModel {
         LOGGED_OUT,
         REMEMBER_ME_EXISTS,
         IS_PENDING_USER,
-        IS_NOT_PENDING_USER,
+        IS_NOT_PENDING_USER_ANYMORE,
         INVALID_CREDENTIALS,
         REMEMBER_ME_NOT_EXISTS,
         NONE
@@ -211,7 +210,8 @@ public class LoginViewModel extends ViewModel {
         return httpUrl;
     }
 
-    public void checkIfIsPendingUser(String email, String password) {
+    public void login(String email, String password) {
+        //check if is pending user first
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener( task-> {
             if (task.isSuccessful()) {
                 // Sign in success, update UI with the signed-in user's information
@@ -221,7 +221,7 @@ public class LoginViewModel extends ViewModel {
             } else {
                 // If sign in fails, display a message to the user.
                 Log.w(TAG, "Autorization server: not a pending user", task.getException());
-                setLoginResult(LoginResult.IS_NOT_PENDING_USER);
+                setLoginResult(LoginResult.IS_NOT_PENDING_USER_ANYMORE);
             }
         });
     }// end checkIfIsPendingUser()
@@ -258,7 +258,7 @@ public class LoginViewModel extends ViewModel {
                 }
             }
         });
-    }
+    }// end loadPendingUserBasicData()
 
 
 
@@ -340,19 +340,8 @@ public class LoginViewModel extends ViewModel {
             String password = jsonObject.getString("password");
             String firstName = jsonObject.getString("firstname");
             String lastName = jsonObject.getString("lastname");
-
-            SimpleDateFormat format = null;
-            Date parsed = null;
-            try {
-                format = new SimpleDateFormat("dd-MM-yyyy");
-                parsed = format.parse(jsonObject.getString("birthdate"));
-            } catch (Exception e) {
-                e.printStackTrace();
-                format = new SimpleDateFormat("dd/MM/yyyy");
-                parsed = format.parse(jsonObject.getString("birthdate"));
-            }
-            java.sql.Date sqlStartDate = new java.sql.Date(parsed.getTime());
-            String sqldate = String.valueOf(sqlStartDate);
+            String date = jsonObject.getString("birthdate");
+            String sqldate = MyUtilities.convertStringDateToStringSqlDate(date);
             String profilePicturePath = jsonObject.getString("profilePicturePath");
             String promo = jsonObject.getString("promo");
             String analytics = jsonObject.getString("analytics");
@@ -413,6 +402,7 @@ public class LoginViewModel extends ViewModel {
 
         } catch (Exception e) {
             e.printStackTrace();
+            setLoginResult(LoginResult.FAILED);
         }
     }
 

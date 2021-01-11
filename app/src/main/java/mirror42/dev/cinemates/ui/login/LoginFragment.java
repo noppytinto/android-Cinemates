@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,7 +22,6 @@ import androidx.navigation.Navigation;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
@@ -50,21 +48,13 @@ public class LoginFragment extends Fragment  implements
 
 
 
-    //---------------------------------------------------------------------- ANDROID METHODS
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume: ");
-    }
 
+    //---------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
-        mainActivity = null;
     }
 
     @Override
@@ -145,11 +135,11 @@ public class LoginFragment extends Fragment  implements
                         // show restricted user profile page
                         MyUtilities.showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
                         Navigation.findNavController(view).popBackStack();
-                        Navigation.findNavController(view).navigate(R.id.userProfileFragment);
+                        Navigation.findNavController(view).navigate(R.id.action_global_userProfileFragment);
                     }
                 }
                     break;
-                case IS_NOT_PENDING_USER: {
+                case IS_NOT_PENDING_USER_ANYMORE: {
                     String email = editTextEmail.getText().toString();
                     String password = editTextPassword.getText().toString();
                     loginViewModel.standardLogin(email, MyUtilities.SHA256encrypt(password));
@@ -163,6 +153,12 @@ public class LoginFragment extends Fragment  implements
         editTextPassword.setText(R.string.login_page_password_demo);
 
     }// end onViewCreated()
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -200,7 +196,7 @@ public class LoginFragment extends Fragment  implements
                 String password = editTextPassword.getText().toString();
 
                 //
-                loginViewModel.checkIfIsPendingUser(email, password);
+                loginViewModel.login(email, password);
             }
         }
         else if (v.getId() == buttonSignUp.getId()) {

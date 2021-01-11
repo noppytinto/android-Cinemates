@@ -11,7 +11,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
-    private Date birthDate;
+    private String birthDate;
     private String profilePicturePath;
     private String accessToken;
     private boolean promo;
@@ -38,18 +38,7 @@ public class User {
         this.email = email;
     }
 
-
-    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken) {
-        this.username = username;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.profilePicturePath = profilePicturePath;
-        this.accessToken = accessToken;
-    }
-
-    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean analytics) {
+    public User(String username, String email, String firstName, String lastName, String birthDate, String profilePicturePath, String accessToken, boolean analytics) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
@@ -60,17 +49,17 @@ public class User {
         this.analytics = analytics;
     }
 
-    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean promo, boolean analytics) {
-        this.username = username;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.profilePicturePath = profilePicturePath;
-        this.accessToken = accessToken;
-        this.promo = promo;
-        this.analytics = analytics;
-    }
+//    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean promo, boolean analytics) {
+//        this.username = username;
+//        this.email = email;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.birthDate = birthDate;
+//        this.profilePicturePath = profilePicturePath;
+//        this.accessToken = accessToken;
+//        this.promo = promo;
+//        this.analytics = analytics;
+//    }
 
 
     //----------------------------------------------- GETTERS/SETTERS
@@ -87,7 +76,7 @@ public class User {
         return profilePicturePath;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
@@ -111,7 +100,8 @@ public class User {
         this.profilePicturePath = profilePicturePath;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
+
         this.birthDate = birthDate;
     }
 
@@ -139,6 +129,26 @@ public class User {
         this.analytics = analytics;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean getPromo() {
+        return promo;
+    }
+
+    public void setPromo(boolean promo) {
+        this.promo = promo;
+    }
+
+    public boolean isAnalytics() {
+        return analytics;
+    }
+
     //----------------------------------------------- METHODS
 
     public static User parseUserFromJsonObject(JSONObject jsonObject) {
@@ -152,7 +162,7 @@ public class User {
             String email = jsonObject.getString("Email");
             String firstName = jsonObject.getString("Name");
             String secondName = jsonObject.getString("LastName");
-            Date birthDate = Date.valueOf(jsonObject.getString("BirthDate"));
+            String birthDate = jsonObject.getString("BirthDate");
             String profilePicturePath = jsonObject.getString("ProfileImage");
             String accessToken = jsonObject.getString("AccessToken");
             boolean analytics = jsonObject.getBoolean("Analytics");

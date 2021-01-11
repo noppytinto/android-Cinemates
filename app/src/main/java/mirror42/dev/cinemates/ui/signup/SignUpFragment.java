@@ -2,25 +2,24 @@ package mirror42.dev.cinemates.ui.signup;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +28,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
@@ -39,27 +37,21 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.Locale;
 
-import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 import static android.app.Activity.RESULT_OK;
 
 public class SignUpFragment extends Fragment implements
         View.OnClickListener,
-        CompoundButton.OnCheckedChangeListener,
-        Callback {
+        CompoundButton.OnCheckedChangeListener{
+    private final int PERMISSION_CODE = 5;
     private final String TAG = this.getClass().getSimpleName();
     //
     private TextInputLayout textInputLayoutUsername;
@@ -92,8 +84,8 @@ public class SignUpFragment extends Fragment implements
     private View view;
     private RemoteConfigServer remoteConfigServer;
     //
-    private static int SELECT_PICTURE = 30;
-    private String imageUrl;
+    private static int PICK_IMAGE = 30;
+    private String filePath;
     private ImageView imageViewProfilePicture;
 
 
@@ -143,7 +135,6 @@ public class SignUpFragment extends Fragment implements
         buttonUpload.setOnClickListener(this);
         buttonsignUp.setOnClickListener(this);
         buttonDatePicker.setOnClickListener(this);
-
         checkBoxPromo.setOnCheckedChangeListener(this);
         checkBoxAnalytics.setOnCheckedChangeListener(this);
         checkBoxTermsAndConditions.setOnCheckedChangeListener(this);
@@ -169,22 +160,20 @@ public class SignUpFragment extends Fragment implements
         });
 
 
-        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), (Observer<SignUpViewModel.FirebaseSignUpServerCodeState>) firebaseSignUpServerCodeState -> {
-            NavController navController = Navigation.findNavController(view);
+        signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), firebaseSignUpServerCodeState -> {
             spinner.setVisibility(View.GONE);
 
             switch (firebaseSignUpServerCodeState) {
-                case SIGN_UP_SUCCESS: {
+                case SIGN_UP_SUCCESS:
                     MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
-                }
                     break;
                 case SIGN_UP_FAILURE:
                     MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
                     break;
                 case VERIFICATION_MAIL_SENT:
                     MyUtilities.showCenteredToastLong("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
-                    navController.popBackStack();
-                    navController.navigate(R.id.main_fragment);
+                    Navigation.findNavController(view).popBackStack();
+                    Navigation.findNavController(view).navigate(R.id.main_fragment);
                     break;
                 case VERIFICATION_MAIL_NOT_SENT:
                     MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
@@ -192,8 +181,11 @@ public class SignUpFragment extends Fragment implements
                 case PENDING_USER_COLLISION:
                     MyUtilities.showCenteredToastLong("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
                     textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
-                    navController.popBackStack();
-                    navController.navigate(R.id.main_fragment);
+                    Navigation.findNavController(view).popBackStack();
+                    Navigation.findNavController(view).navigate(R.id.main_fragment);
+                    break;
+                case NO_PENDING_USER_COLLISION:
+                    signUpViewModel.insertUserInFirebaseDB();
                     break;
                 case USERNAME_EMAIL_COLLISION:
                     MyUtilities.showCenteredToastLong("Firebase sign-up server:\nusername+email gia' presente", getContext());
@@ -215,6 +207,9 @@ public class SignUpFragment extends Fragment implements
                 case WEAK_PASSWORD:
                     MyUtilities.showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
                     textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
+                    break;
+                case NO_POSTGRES_USER_COLLISION:
+                    signUpViewModel.checkPendingUserCollision();
                     break;
             }
         });
@@ -248,7 +243,7 @@ public class SignUpFragment extends Fragment implements
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
                 spinner.setVisibility(View.VISIBLE);
-                String profilePicturePath = imageUrl;
+                String profilePicturePath = filePath;
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
             else {
@@ -313,88 +308,77 @@ public class SignUpFragment extends Fragment implements
 
 
 
-//--------------------------------------------------------------- METHODS
+    //--------------------------------------------------------------- METHODS
 
     void fetchImageFromGallery(View view){
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
+        requestPermission();
+    }
 
-//        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-//        getIntent.setType("image/*");
-
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickIntent.setType("image/*");
-
-//        Intent intent = Intent.createChooser(getIntent, "Select Image");
-//        intent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
-
-//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//        intent.setType("image/*");
-//        startActivityForResult(intent, SELECT_PICTURE);
-
-//        requestPermissionForReadExtertalStorage();
-        if(checkPermissionForReadExtertalStorage()) {
-            startActivityForResult(Intent.createChooser(pickIntent, "Select Picture"), SELECT_PICTURE);
-        }
-        else {
-            requestPermissionForReadExtertalStorage();
-//            startActivityForResult(Intent.createChooser(chooserIntent, "Select Picture"), SELECT_PICTURE);
+    private void requestPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        ){
+            accessTheGallery();
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
         }
     }
 
-    public void requestPermissionForReadExtertalStorage() {
-        try {
-            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 11);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void accessTheGallery(){
+        Intent i = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        );
+        i.setType("image/*");
+     startActivityForResult(i, PICK_IMAGE);
     }
 
 
-
-    public boolean checkPermissionForReadExtertalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int result = getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-            return result == PackageManager.PERMISSION_GRANTED;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode== PERMISSION_CODE){
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                accessTheGallery();
+            }else {
+                Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
-        return false;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == SELECT_PICTURE) {
-                Uri selectedImageURI = data.getData();
-                imageUrl = "-";
-                try {
-                    imageUrl = getRealPathFromURI(getContext(), selectedImageURI);
-                    Glide.with(this)  //2
-                            .load(imageUrl) //3
-                            .fallback(R.drawable.broken_image)
-                            .placeholder(R.drawable.placeholder_image)
-                            .circleCrop() //4
-                            .into(imageViewProfilePicture); //8
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
+            try {
+                //set picked image to the mProfile
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+//                mProfile.setImageBitmap(bitmap);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            filePath = "-";
+            try {
+                filePath = getRealPathFromUri(data.getData(), getActivity());
+                Glide.with(this)  //2
+                        .load(filePath) //3
+                        .fallback(R.drawable.broken_image)
+                        .placeholder(R.drawable.placeholder_image)
+                        .circleCrop() //4
+                        .into(imageViewProfilePicture); //8
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+    private String getRealPathFromUri(Uri imageUri, Activity activity){
+        Cursor cursor = activity.getContentResolver().query(imageUri, null,  null, null, null); if(cursor==null) {
+            return imageUri.getPath();
+        }else{
             cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            int idx =  cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
         }
     }
 
@@ -487,23 +471,6 @@ public class SignUpFragment extends Fragment implements
         editTextFirstName.setText("mrfoo");
         editTextLastName.setText("bar");
         editTextBirthDate.setText("1-1-1970");
-    }
-
-    @Override
-    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-        System.out.println("failed");
-
-    }
-
-    @Override
-    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-        String responseData = response.body().string();
-        if (response.isSuccessful()) {
-            System.out.println(responseData);
-        }
-        else {
-            System.out.println(responseData);
-        }
     }
 
 

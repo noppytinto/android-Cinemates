@@ -35,7 +35,6 @@ public class MyUtilities {
     /**
      * Return date in specified format.
      * @param milliSeconds Date in milliseconds
-     * @param dateFormat Date format
      * @return String representing date in specified format
      */
     public static String convertMillisInDate(long milliSeconds)
@@ -264,6 +263,55 @@ public class MyUtilities {
             }
         });
     }// end showToastOnUiThread()
+
+    public static String convertStringDateToStringSqlDate(String date) {
+        if(date==null || date.isEmpty()) return null;
+
+        Date parsed = null;
+        SimpleDateFormat format = null;
+        String sqldate = null;
+        try {
+            format = new SimpleDateFormat("dd-MM-yyyy");
+            parsed = format.parse(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            format = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                parsed = format.parse(date);
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+
+            }
+        }
+        java.sql.Date sqlStartDate = new java.sql.Date(parsed.getTime());
+        sqldate = String.valueOf(sqlStartDate);
+
+        return sqldate;
+    }
+
+    public static java.sql.Date convertStringDateToSqlDate(String date) {
+        if(date==null || date.isEmpty()) return null;
+
+        Date parsed = null;
+        SimpleDateFormat format = null;
+        java.sql.Date sqldate = null;
+        try {
+            format = new SimpleDateFormat("dd-MM-yyyy");
+            parsed = format.parse(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            format = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                parsed = format.parse(date);
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+            }
+        }
+        sqldate = new java.sql.Date(parsed.getTime());
+
+        return sqldate;
+    }
+
 
 
 
