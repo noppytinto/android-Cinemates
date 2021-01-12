@@ -8,12 +8,16 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.selection.SelectionTracker;
+import androidx.recyclerview.selection.StorageStrategy;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -50,6 +54,7 @@ public class WatchlistFragment extends Fragment implements View.OnClickListener 
     private View view;
     private ArrayList<Movie> movies;
     private CardView cardView;
+    private ProgressBar spinner;
 
 
 
@@ -68,6 +73,7 @@ public class WatchlistFragment extends Fragment implements View.OnClickListener 
         this.view = view;
         cardView = view.findViewById(R.id.cardView_listStub_watchlist);
         cardView.setOnClickListener(this);
+        spinner = view.findViewById(R.id.progressBar_listStub);
 
         //2
         watchlistViewModel = new ViewModelProvider(this).get(WatchlistViewModel.class);
@@ -103,12 +109,6 @@ public class WatchlistFragment extends Fragment implements View.OnClickListener 
             }
         });
 
-
-
-
-
-
-
     }// end onViewCreated()
 
 
@@ -142,6 +142,7 @@ public class WatchlistFragment extends Fragment implements View.OnClickListener 
             String posterUrl = moviesList.get(i).getPosterURL();
             ImageUtilities.loadRectangularImageInto(posterUrl, t, getContext());
         }
+        spinner.setVisibility(View.GONE);
     }// end setThumbnails()
 
 
