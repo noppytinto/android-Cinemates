@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context=".fragments.explorePage.LatestReleasesFragment">
+    tools:context=".ui.explore.latest.LatestReleasesFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_explorePage_latestReleases"

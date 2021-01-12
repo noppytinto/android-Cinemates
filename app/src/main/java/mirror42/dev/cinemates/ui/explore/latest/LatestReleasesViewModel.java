@@ -23,8 +23,8 @@ public class LatestReleasesViewModel extends ViewModel {
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
     }
 
-
     //----------------------------------------------- GETTERS/SETTERS
+
 
     public void postMoviesList(ArrayList<Movie> moviesList) {
         this.moviesList.postValue(moviesList);

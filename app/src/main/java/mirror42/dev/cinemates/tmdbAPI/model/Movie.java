@@ -26,7 +26,9 @@ public class Movie implements Parcelable {
 
     }
 
-
+    public Movie(int tmdbID) {
+        this.tmdbID = tmdbID;
+    }
 
 
     public Movie(int tmdbID, String title, String posterURL, String overview) {

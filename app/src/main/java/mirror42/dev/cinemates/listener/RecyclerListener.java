@@ -9,21 +9,21 @@ import androidx.annotation.NonNull;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RecyclerSearchListener extends RecyclerView.SimpleOnItemTouchListener {
-    public interface OnClick_RecycleSearchListener {
+public class RecyclerListener extends RecyclerView.SimpleOnItemTouchListener {
+    public interface OnClick_RecyclerListener {
         void onItemClick(View view, int position);
         void onItemLongClick(View view, int position);
 
     }
 
-    private final OnClick_RecycleSearchListener listener;
+    private final OnClick_RecyclerListener listener;
     private final GestureDetectorCompat gestureDetector;
 
 
 
     //---------------------------------------------------------------- CONSTRUCTORS
 
-    public RecyclerSearchListener(Context context, final RecyclerView recyclerView, OnClick_RecycleSearchListener listener) {
+    public RecyclerListener(Context context, final RecyclerView recyclerView, OnClick_RecyclerListener listener) {
         this.listener = listener;
 
         // customize gestures

@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,21 +22,18 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
-import mirror42.dev.cinemates.listener.RecyclerSearchListener;
+import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class LatestReleasesFragment extends Fragment implements
-        RecyclerSearchListener.OnClick_RecycleSearchListener {
+        RecyclerListener.OnClick_RecyclerListener {
     private final String TAG = this.getClass().getSimpleName();
     private final int PAGE_1 = 1;
     private LatestReleasesViewModel latestReleasesViewModel;
     private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
     private View view;
-//    private ArrayList<Movie> moviesList;
-//    private final String MOVIES_LIST_KEY = "MOVIE_LIST_KEY";
-
 
 
 
@@ -59,17 +55,14 @@ public class LatestReleasesFragment extends Fragment implements
 
         //2
         latestReleasesViewModel = new ViewModelProvider(this).get(LatestReleasesViewModel.class);
-        latestReleasesViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<Movie> movies) {
-                if(movies!=null) {
-                    recyclerAdapterExplorePage.loadNewData(movies);
-                }
-                else {
-                    Toast toast = Toast.makeText(getContext(), "errore caricamento Ultime Uscite", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
+        latestReleasesViewModel.getMoviesList().observe(getViewLifecycleOwner(), moviesList -> {
+            if(moviesList!=null) {
+                recyclerAdapterExplorePage.loadNewData(moviesList);
+            }
+            else {
+                Toast toast = Toast.makeText(getContext(), "errore caricamento Ultime Uscite", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
 
@@ -94,7 +87,7 @@ public class LatestReleasesFragment extends Fragment implements
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
-        recyclerView.addOnItemTouchListener(new RecyclerSearchListener(getContext(), recyclerView, this));
+        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
         recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<Movie>(), getContext());
@@ -133,7 +126,6 @@ public class LatestReleasesFragment extends Fragment implements
     public void onItemLongClick(View view, int position) {
 //        Toast.makeText(getContext(), "item "+position+" long clicked", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onItemLongClick() called");
-        Log.d(TAG, "onItemLongClick() ended");
     }
 
 }// end LatestReleasesFragment class

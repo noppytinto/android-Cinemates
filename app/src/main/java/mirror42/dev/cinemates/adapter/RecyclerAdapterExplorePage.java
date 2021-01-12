@@ -13,11 +13,11 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.viewholder.ExplorePageViewHolder;
+import mirror42.dev.cinemates.adapter.viewholder.MovieCardViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 
-public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePageViewHolder>  {
+public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<MovieCardViewHolder>  {
     private ArrayList<Movie> moviesList;
     private Context context;
 
@@ -53,7 +53,7 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
 
     @NonNull
     @Override
-    public ExplorePageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MovieCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Next, you need to create the Layout needed for the ViewHolder
         // to display each item in the RecyclerView
         //
@@ -69,11 +69,11 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
         // Finally, the ViewHolder is returned from the method
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card, parent, false);
-        return new ExplorePageViewHolder(view);
+        return new MovieCardViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ExplorePageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MovieCardViewHolder holder, int position) {
         // With the ViewHolder created,
         // you have to bind the list titles to it. To do this,
         // you need to know what Views to bind your data to.
@@ -88,7 +88,7 @@ public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<ExplorePage
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.placeholder_image)
                 .fitCenter() //4
-                .into(holder.imageViewMovieCardPoster);
+                .into(holder.imageViewPoster);
     }
 
     public Movie getMoviesList(int position) {

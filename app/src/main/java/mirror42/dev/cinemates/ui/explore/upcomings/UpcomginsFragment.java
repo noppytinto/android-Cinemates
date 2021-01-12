@@ -21,14 +21,14 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
-import mirror42.dev.cinemates.listener.RecyclerSearchListener;
+import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class UpcomginsFragment extends Fragment implements
-        RecyclerSearchListener.OnClick_RecycleSearchListener {
+        RecyclerListener.OnClick_RecyclerListener {
 
     private final int PAGE_1 = 1;
     private UpcomginsViewModel upcomginsViewModel;
@@ -99,7 +99,7 @@ public class UpcomginsFragment extends Fragment implements
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
-        recyclerView.addOnItemTouchListener(new RecyclerSearchListener(getContext(), recyclerView, this));
+        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
         recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<Movie>(), getContext());

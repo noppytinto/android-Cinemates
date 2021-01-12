@@ -29,13 +29,13 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
-import mirror42.dev.cinemates.listener.RecyclerSearchListener;
+import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
-        RecyclerSearchListener.OnClick_RecycleSearchListener {
+        RecyclerListener.OnClick_RecyclerListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
@@ -223,7 +223,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        recyclerView.addOnItemTouchListener(new RecyclerSearchListener(getContext(), recyclerView, this));
+        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
         recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<Movie>(), getContext());
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }

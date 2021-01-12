@@ -10,15 +10,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import mirror42.dev.cinemates.R;
 
 
-public class ActorCardsHolder extends RecyclerView.ViewHolder {
+public class ActorCardHolder extends RecyclerView.ViewHolder {
     public ImageView imageViewActorCard;
     public TextView textViewActorCard;
 
 
-    public ActorCardsHolder(@NonNull View itemView) {
+    public ActorCardHolder(@NonNull View itemView) {
         super(itemView);
 
-        this.imageViewActorCard = (ImageView) itemView.findViewById(R.id.imageview_actorCard);
-        this.textViewActorCard = (TextView) itemView.findViewById(R.id.textview_actorCard);
+        this.imageViewActorCard = itemView.findViewById(R.id.imageview_actorCard);
+        this.textViewActorCard = itemView.findViewById(R.id.textview_actorCard);
     }
 }

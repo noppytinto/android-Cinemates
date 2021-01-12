@@ -13,11 +13,11 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.viewholder.ActorCardsHolder;
+import mirror42.dev.cinemates.adapter.viewholder.ActorCardHolder;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
 
 
-public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardsHolder>{
+public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardHolder>{
     private ArrayList<Person> peopleList;
     private Context context;
 
@@ -53,7 +53,7 @@ public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<Ac
 
     @NonNull
     @Override
-    public ActorCardsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ActorCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Next, you need to create the Layout needed for the ViewHolder
         // to display each item in the RecyclerView
         //
@@ -69,11 +69,11 @@ public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<Ac
         // Finally, the ViewHolder is returned from the method
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.actor_card, parent, false);
-        return new ActorCardsHolder(view);
+        return new ActorCardHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ActorCardsHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ActorCardHolder holder, int position) {
         // With the ViewHolder created,
         // you have to bind the list titles to it. To do this,
         // you need to know what Views to bind your data to.
