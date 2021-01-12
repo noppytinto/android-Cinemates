@@ -37,6 +37,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private Button buttonResendEmail;
     private RemoteConfigServer remoteConfigServer;
     private LoginViewModel loginViewModel;
+    private View includeAccountActivationView;
+    private View includeUserProfileContent;
 
 
 
@@ -63,12 +65,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         textViewEmail = view.findViewById(R.id.textView_userProfileFragment_email);
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_userProfileFragment_logout);
-        buttonResendEmail = view.findViewById(R.id.button_userProfileFragment_resendEmail);
         remoteConfigServer = RemoteConfigServer.getInstance();
         // setting listeners
         buttonLogout.setOnClickListener(this);
-        buttonResendEmail.setOnClickListener(this);
         //
+        buttonResendEmail = view.findViewById(R.id.button_userProfileFragment_resendEmail);
+        buttonResendEmail.setOnClickListener(this);
+        includeAccountActivationView = view.findViewById(R.id.include_userProfileFragment_accountVerification);
+        includeUserProfileContent = view.findViewById(R.id.include_userProfileFragment_content);
         hideResendEmail();
 
         // firebase logging
@@ -147,7 +151,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 // insert into postgrest database
                 // and show new user profile page
                 loginViewModel.resendVerificationEmail();
-                MyUtilities.showCenteredToast("Email attivazione riniviata, era esegui il Logout e controlla la posta.", getContext());
+                MyUtilities.showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.", getContext());
                 buttonResendEmail.setText("Email attivazione reinviata!");
                 buttonResendEmail.setEnabled(false);
             }
@@ -165,13 +169,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     //----------------------------------------------------------------------- METHODS
 
     private void showResendEmail() {
-        textViewResendEmailMessage.setVisibility(View.VISIBLE);
-        buttonResendEmail.setVisibility(View.VISIBLE);
+        includeAccountActivationView.setVisibility(View.VISIBLE);
+        includeUserProfileContent.setVisibility(View.GONE);
     }
 
     private void hideResendEmail() {
-        textViewResendEmailMessage.setVisibility(View.GONE);
-        buttonResendEmail.setVisibility(View.GONE);
+        includeAccountActivationView.setVisibility(View.GONE);
+        includeUserProfileContent.setVisibility(View.VISIBLE);
     }
 
 }// end UserProfileFragment class

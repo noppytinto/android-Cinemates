@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -234,6 +235,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
         }
 
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem menuItem = menu.getItem(1);
+        menuItem.setVisible(false);
     }
 
 

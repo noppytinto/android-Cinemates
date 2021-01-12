@@ -90,10 +90,22 @@
     <fragment
         android:id="@+id/listFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.list.ListFragment"
-        android:label="fragment_list"
+        android:label=" "
         tools:layout="@layout/fragment_list" >
         <argument
             android:name="movies_list"
             app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie[]" />
+        <argument
+            android:name="list_title"
+            app:argType="string"
+            android:defaultValue="-" />
+        <argument
+            android:name="list_description"
+            app:argType="string"
+            android:defaultValue="-" />
+        <action
+            android:id="@+id/action_listFragment_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment"
+            app:popUpTo="@id/userProfileFragment" />
     </fragment>
 </navigation>

@@ -90,7 +90,7 @@ public class LatestReleasesFragment extends Fragment implements
         recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
-        recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<Movie>(), getContext());
+        recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<>(), getContext());
         recyclerView.setAdapter(recyclerAdapterExplorePage);
     }
 

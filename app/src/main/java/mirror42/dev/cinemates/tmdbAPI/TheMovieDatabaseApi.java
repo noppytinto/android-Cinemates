@@ -898,6 +898,21 @@ public class TheMovieDatabaseApi {
         return jsonObj;
     }
 
+    public String getJsonMovieDetailsById_urlString(int movieId) {
+        String myUrl = null;
+        try{
+            myUrl = BASE_URL + "3/movie/" +
+                    movieId +
+                    "?api_key=" + MY_API_KEY +
+                    "&language=" + defaultLanguage;
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
+
+        return myUrl;
+    }
+
     public JSONObject getJsonCreditsById(int movieId) {
         JSONObject jsonObj = null;
         try{

@@ -33,6 +33,7 @@ public class WatchlistViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
     private RemoteConfigServer remoteConfigServer;
+    private TheMovieDatabaseApi tmdb;
 
 
     //----------------------------------------------- CONSTRUCTORS
@@ -40,6 +41,7 @@ public class WatchlistViewModel extends ViewModel {
         moviesList = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        tmdb = new TheMovieDatabaseApi();
     }
 
 
@@ -108,7 +110,6 @@ public class WatchlistViewModel extends ViewModel {
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
                                 ArrayList<Movie> result = null;
-                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
                                 if (!responseData.equals("null")) {
                                     result = new ArrayList<>();
