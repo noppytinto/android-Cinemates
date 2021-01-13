@@ -291,8 +291,7 @@
                 app:fabCustomSize="50dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:maxImageSize="30dp"
-                />
+                app:maxImageSize="30dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -108,6 +108,13 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                 loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
                 loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+                    switch (loginResult) {
+                        case SUCCESS:
+                            addToListButton.setVisibility(View.VISIBLE);
+                            break;
+                        default:
+                            addToListButton.setVisibility(View.GONE);
+                    }
 
                 });
 

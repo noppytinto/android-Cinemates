@@ -137,7 +137,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         if (v.getId() == buttonLogout.getId()) {
-            loginViewModel.deleteRememberMeData(getContext());
+            loginViewModel.deleteLoggedUserLocalData(getContext());
 
             //
             NavController navController = Navigation.findNavController(v);

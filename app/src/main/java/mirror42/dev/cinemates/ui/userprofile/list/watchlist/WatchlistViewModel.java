@@ -79,7 +79,7 @@ public class WatchlistViewModel extends ViewModel {
             HttpUrl httpUrl = null;
             // generating url request
             try {
-                httpUrl = buildHttpUrl(email);
+                httpUrl = buildHttpUrl();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -169,7 +169,7 @@ public class WatchlistViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
-    private HttpUrl buildHttpUrl(String email) throws Exception {
+    private HttpUrl buildHttpUrl() throws Exception {
         final String dbFunction = "fn_get_movies_watchlist";
 
         //

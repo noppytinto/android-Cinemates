@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
@@ -88,7 +87,7 @@ public class LoginViewModel extends ViewModel {
         return user;
     }
 
-    public void setPostUser(User user) {
+    public void postUser(User user) {
         this.user.postValue(user);
     }
 
@@ -168,16 +167,16 @@ public class LoginViewModel extends ViewModel {
                                 User user = User.parseUserFromJsonObject(jsonObject);
 
                                 //
-                                setPostUser(user);
+                                postUser(user);
                                 setPostLoginResult(LoginResult.SUCCESS);
                             }
                             else {
-                                setPostUser(null);
+                                postUser(null);
                                 setPostLoginResult(LoginResult.INVALID_CREDENTIALS);
                             }
                         }
                         else {
-                            setPostUser(null);
+                            postUser(null);
                             setPostLoginResult(LoginResult.FAILED);
 
                             //TODO: should be logged
@@ -455,11 +454,55 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    public void deleteRememberMeData(Context context) {
-        setUser(null);
+    public void deleteLoggedUserLocalData(Context context) {
+        invalidateCurrentAccessToken();
         setLoginResult(LoginViewModel.LoginResult.LOGGED_OUT);
         MyUtilities.deletFile(remoteConfigServer.getCinematesData(), context);
     }
+
+    private void invalidateCurrentAccessToken() {
+        HttpUrl httpUrl = null;
+        final String dbFunction = "fn_invalidate_access_token";
+        final OkHttpClient httpClient = new OkHttpClient();
+
+        //
+        httpUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host(remoteConfigServer.getAzureHostName())
+                .addPathSegments(remoteConfigServer.getPostgrestPath())
+                .addPathSegment(dbFunction)
+                .build();
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("email", user.getValue().getEmail())
+                .add("access_token", user.getValue().getAccessToken())
+                .build();
+
+        Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, user.getValue().getAccessToken());
+
+        Call call = httpClient.newCall(request);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                //TODO
+                postUser(null);
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                if (response.isSuccessful()) { }
+                else {
+                    //TODO
+                }
+
+                postUser(null);
+
+            }
+        });
+
+    }// end invalidateCurrentAccessToken();
 
 
 
