@@ -455,7 +455,11 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void deleteLoggedUserLocalData(Context context) {
-        invalidateCurrentAccessToken();
+        try {
+            invalidateCurrentAccessToken();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         setLoginResult(LoginViewModel.LoginResult.LOGGED_OUT);
         MyUtilities.deletFile(remoteConfigServer.getCinematesData(), context);
     }
