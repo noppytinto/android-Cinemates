@@ -143,8 +143,6 @@ public class HttpUtilities {
         return request;
     }
 
-
-
     /**
      * build Http POST request (okHttp3)
      * for postgres
@@ -166,8 +164,5 @@ public class HttpUtilities {
 
         return request;
     }
-
-
-
 
 }// end HttpUtilities class

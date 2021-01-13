@@ -4,30 +4,59 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
+import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MovieDetailsViewModel extends ViewModel {
     private MutableLiveData<Movie> movie;
     private MutableLiveData<DownloadStatus> downloadStatus;
     private TheMovieDatabaseApi tmdb;
     private final int MAX_NUM_CREDITS = 10;
+    private MutableLiveData<AddToListStatus> addToListStatus;
+    private RemoteConfigServer remoteConfigServer;
+
+    public enum AddToListStatus {
+        SUCCESS,
+        FAILED,
+        IDLE
+    }
+
 
 
     //----------------------------------------------- CONSTRUCTORS
     public MovieDetailsViewModel() {
         movie = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
+        addToListStatus = new MutableLiveData<>(AddToListStatus.IDLE);
         tmdb = new TheMovieDatabaseApi();
+        remoteConfigServer = RemoteConfigServer.getInstance();
     }
+
+
 
 
     //----------------------------------------------- GETTERS/SETTERS
@@ -46,6 +75,14 @@ public class MovieDetailsViewModel extends ViewModel {
 
     public LiveData<DownloadStatus> getDownloadStatus() {
         return downloadStatus;
+    }
+
+    public void postAddToListStatus(AddToListStatus addToListStatus) {
+        this.addToListStatus.postValue(addToListStatus);
+    }
+
+    public LiveData<AddToListStatus> getAddToListStatus() {
+        return addToListStatus;
     }
 
 
@@ -327,6 +364,81 @@ public class MovieDetailsViewModel extends ViewModel {
         }
 
         return result;
+    }
+
+    public void addMovieToWatchList(int movieId, String email, String accessToken) {
+        Runnable task = createAddToWatchListTask(movieId, email, accessToken);
+        Thread t = new Thread(task, "THREAD: MOVIE DETAILS PAGE - ADD MOVIE TO WATCHLIST");
+        t.start();
+    }
+
+    private Runnable createAddToWatchListTask(int movieId, String email, String accessToken) {
+        return ()-> {
+            // checking input
+            if(movieId<0) {
+                postAddToListStatus(AddToListStatus.IDLE);
+                return;
+            }
+
+            //
+            HttpUrl httpUrl = null;
+            final OkHttpClient httpClient = new OkHttpClient();
+            // generating url request
+            try {
+                final String dbFunction = "fn_add_to_list_watchlist";
+
+                //
+                httpUrl = new HttpUrl.Builder()
+                        .scheme("https")
+                        .host(remoteConfigServer.getAzureHostName())
+                        .addPathSegments(remoteConfigServer.getPostgrestPath())
+                        .addPathSegment(dbFunction)
+                        .build();
+
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("movieid", String.valueOf(movieId))
+                        .add("email", email)
+                        .add("access_token", accessToken)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
+
+                //
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        postAddToListStatus(AddToListStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                if(responseData.equals("true")) {
+                                    postAddToListStatus(AddToListStatus.SUCCESS);
+                                }
+                                else {
+                                    postAddToListStatus(AddToListStatus.FAILED);
+                                }
+                            }
+                            else {
+                                postAddToListStatus(AddToListStatus.FAILED);
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                            postAddToListStatus(AddToListStatus.FAILED);
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                postAddToListStatus(AddToListStatus.FAILED);
+            }
+        };
     }
 
 

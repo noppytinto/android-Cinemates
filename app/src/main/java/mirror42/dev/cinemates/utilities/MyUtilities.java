@@ -31,7 +31,6 @@ import mirror42.dev.cinemates.model.User;
 
 public class MyUtilities {
 
-
     /**
      * Return date in specified format.
      * @param milliSeconds Date in milliseconds
@@ -73,7 +72,6 @@ public class MyUtilities {
 
         return result;
     }
-
 
     public static void encryptFile(String filename, String rawData, Context context) {
         try {
@@ -182,7 +180,6 @@ public class MyUtilities {
         return hexString.toString();
     }
 
-
     public static String SHA256encrypt(String message) {
         if(message== null || message.isEmpty()) return null;
 
@@ -252,7 +249,6 @@ public class MyUtilities {
         return string;
     }
 
-
     public static void showToastOnUiThread(String message, Activity activity) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -311,9 +307,5 @@ public class MyUtilities {
 
         return sqldate;
     }
-
-
-
-
 
 }// end MyUtilities class

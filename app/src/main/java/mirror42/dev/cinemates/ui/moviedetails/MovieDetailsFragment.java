@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.content.DialogInterface;
+import android.icu.lang.UScript;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -46,11 +48,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private View view;
     private FloatingActionButton addToListButton;
     private LoginViewModel loginViewModel;
+    private int currentMovieId;
 
 
 
 
-    //------------------------------------------------------------------------ LIFECYCLE METHOD
+    //------------------------------------------------------------------------ ANDROID METHODS
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,12 +94,17 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         addToListButton.setOnClickListener(this);
 
         //
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, "Movie Details page", getContext());
+
+        //
         if(getArguments() != null) {
             MovieDetailsFragmentArgs args = MovieDetailsFragmentArgs.fromBundle(getArguments());
             Movie movie = args.getMovie();
 
             if(movie != null) {
                 int movieId = movie.getTmdbID();
+                currentMovieId = movieId;
 
                 // getting main activity
                 // and hiding action bar
@@ -109,7 +117,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
                 loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
                     switch (loginResult) {
-                        case SUCCESS:
+                        case SUCCESS: case REMEMBER_ME_EXISTS:
                             addToListButton.setVisibility(View.VISIBLE);
                             break;
                         default:
@@ -141,12 +149,21 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 // downloading data
                 movieDetailsViewModel.downloadData(movieId);
 
-
+                // observe add to list action status
+                movieDetailsViewModel.getAddToListStatus().observe(getViewLifecycleOwner(), addToListStatus ->  {
+                    switch (addToListStatus) {
+                        case SUCCESS:
+                            Toast.makeText(getContext(), "film aggiunto a Watchlist", Toast.LENGTH_LONG).show();
+                            break;
+                        case FAILED:
+                            Toast.makeText(getContext(), "film NON aggiunto a watchlist", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                });
             }// inner if
         }// outer if
 
-        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
-        firebaseAnalytics.logScreenEvent(this, "Movie Details page", getContext());
+
 
     }// end onViewCreated()
 
@@ -161,13 +178,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-
         int buttonId = v.getId();
 
-
-        final String[] choices = {"1", "2", "3"};
+        final String[] choices = {"Watchlist", "2", "3"};
         final boolean[] checkedItems = {false, false, false};
-        ArrayList<String> res = new ArrayList<>();
+        ArrayList<Integer> res = new ArrayList<>();
 
         if(buttonId == R.id.button_movieDetailsFragment_addToList) {
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
@@ -179,9 +194,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             builder.setPositiveButton("Fatto", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    for(String x: res) {
-                        Log.d("MainActivity", "clicked item index is " + x);
-                        Toast.makeText(getContext(), "items selected are: " + x, Toast.LENGTH_LONG).show();
+                    for(Integer x: res) {
+                        Log.d(TAG, "clicked item index is " + x);
+
+                        if(x==0) {
+                            // add movie to watchlist
+                            User user = loginViewModel.getUser().getValue();
+                            movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
+                        }
+
+                        Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -189,14 +211,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                     if(isChecked) {
-                        res.add(choices[which]);
+                        res.add(which);
                     }
                     else {
-                        res.remove(choices[which]);
+                        res.remove(which);
                     }
                 }
             });
             builder.show();
+
+
 
 
 //            MaterialAlertDialogBuilder(getContext())
@@ -236,7 +260,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 //                e.printStackTrace();
 //            }
 
-
         }
         else if(buttonId == R.id.button_movieDetailsFragment_seeAllCast) {
 
@@ -251,6 +274,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         MenuItem menuItem = menu.getItem(1);
         menuItem.setVisible(false);
     }
+
+
 
 
     //------------------------------------------------------------- METHODS
