@@ -140,7 +140,11 @@ public class LoginViewModel extends ViewModel {
         final OkHttpClient httpClient = new OkHttpClient();
 
         try {
-            Request request = HttpUtilities.buildPostgresGETrequest(httpUrl, remoteConfigServer.getGuestToken());
+            RequestBody requestBody = new FormBody.Builder()
+                .add("mail", email)
+                .add("pass", password)
+                .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
 
             //
             Call call = httpClient.newCall(request);
@@ -203,8 +207,6 @@ public class LoginViewModel extends ViewModel {
                 .host(remoteConfigServer.getAzureHostName())
                 .addPathSegments(remoteConfigServer.getPostgrestPath())
                 .addPathSegment(dbFunction)
-                .addQueryParameter("mail", email)
-                .addQueryParameter("pass", password)
                 .build();
 
         return httpUrl;
