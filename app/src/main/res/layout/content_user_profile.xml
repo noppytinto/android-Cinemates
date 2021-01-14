@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_userProfileFragment"
-        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistFragment"
+        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistThumbnailsFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"

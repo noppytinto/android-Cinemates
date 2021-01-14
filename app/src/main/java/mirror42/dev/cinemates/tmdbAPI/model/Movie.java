@@ -18,6 +18,7 @@ public class Movie implements Parcelable {
     private ArrayList<String> genres;
     private ArrayList<Person> castAndCrew;
     private ArrayList<Review> reviews;
+    private boolean isSelected;
 
 
     //------------------------------------------------------------------- CONSTRUCTORS
@@ -161,7 +162,15 @@ public class Movie implements Parcelable {
         this.duration = duration;
     }
 
-//------------------------------------------------------------------- METHODS
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    //------------------------------------------------------------------- METHODS
 
     @Override
     public String toString() {

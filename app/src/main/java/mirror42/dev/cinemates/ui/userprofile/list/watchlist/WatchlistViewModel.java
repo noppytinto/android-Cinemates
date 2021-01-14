@@ -13,13 +13,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.MyValues.*;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -31,29 +30,28 @@ import okhttp3.Response;
 
 public class WatchlistViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
-    private MutableLiveData<ArrayList<Movie>> moviesList;
+    private MutableLiveData<ArrayList<Movie>> selectedMovies;
     private MutableLiveData<DownloadStatus> downloadStatus;
     private RemoteConfigServer remoteConfigServer;
-    private TheMovieDatabaseApi tmdb;
 
 
-    //----------------------------------------------- CONSTRUCTORS
+
+    //----------------------------------------------------------------------------------------- CONSTRUCTORS
     public WatchlistViewModel() {
-        moviesList = new MutableLiveData<>();
+        selectedMovies = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
-        tmdb = new TheMovieDatabaseApi();
     }
 
 
-    //----------------------------------------------- GETTERS/SETTERS
+    //----------------------------------------------------------------------------------------- GETTERS/SETTERS
 
-    public void postMoviesList(ArrayList<Movie> moviesList) {
-        this.moviesList.postValue(moviesList);
+    public void postSelectedMovies(ArrayList<Movie> moviesList) {
+        this.selectedMovies.postValue(moviesList);
     }
 
-    public LiveData<ArrayList<Movie>> getMoviesList() {
-        return moviesList;
+    public LiveData<ArrayList<Movie>> getSelectedMovies() {
+        return selectedMovies;
     }
 
     public void postDownloadStatus(DownloadStatus downloadStatus) {
@@ -66,21 +64,21 @@ public class WatchlistViewModel extends ViewModel {
 
 
 
-    //----------------------------------------------- METHODS
+    //----------------------------------------------------------------------------------------- METHODS
 
     public void fetchData(String email, String token) {
         Runnable downloadTask = createDownloadTask(email, token);
-        Thread t = new Thread(downloadTask, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
+        Thread t = new Thread(downloadTask, "THREAD: LIST PAGE - FETCH ELEMENTS");
         t.start();
     }
 
     private Runnable createDownloadTask(String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
+            Log.d(TAG, "THREAD: LIST PAGE - FETCH ELEMENTS");
             HttpUrl httpUrl = null;
             // generating url request
             try {
-                httpUrl = buildHttpUrl();
+                httpUrl = buildHttpUrl(email);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,6 +109,7 @@ public class WatchlistViewModel extends ViewModel {
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
                                 ArrayList<Movie> result = null;
+                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
                                 if (!responseData.equals("null")) {
                                     result = new ArrayList<>();
@@ -144,33 +143,33 @@ public class WatchlistViewModel extends ViewModel {
                                     }
 
                                     // once finished set results
-                                    postMoviesList(result);
+                                    postSelectedMovies(result);
                                     postDownloadStatus(DownloadStatus.SUCCESS);
 
                                 }
                                 else {
-                                    postMoviesList(null);
+                                    postSelectedMovies(null);
                                     postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                                 }
                             } // if response is unsuccessful
                             else {
-                                postMoviesList(null);
+                                postSelectedMovies(null);
                                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                             }
                         } catch (Exception e) {
-                            postMoviesList(null);
+                            postSelectedMovies(null);
                             postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                         }
                     }
                 });
             } catch (Exception e) {
-                postMoviesList(null);
+                postSelectedMovies(null);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
     }// end createDownloadTask()
 
-    private HttpUrl buildHttpUrl() throws Exception {
+    private HttpUrl buildHttpUrl(String email) throws Exception {
         final String dbFunction = "fn_get_movies_watchlist";
 
         //
@@ -183,6 +182,5 @@ public class WatchlistViewModel extends ViewModel {
 
         return httpUrl;
     }
-
 
 }// end WatchlistViewModel class

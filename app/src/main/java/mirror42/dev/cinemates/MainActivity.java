@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     private static boolean rememberMeExists;
     private LoginViewModel loginViewModel;
     private ImageView toolbarLogo;
+    private Toolbar toolbar;
 
 
     //-------------------------------------------------------- ANDROID METHODS
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar_mainActivity);
+        toolbar = findViewById(R.id.toolbar_mainActivity);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         toolbarLogo = findViewById(R.id.imageView_mainActivity_logo);
@@ -277,5 +278,14 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         toolbarLogo.setVisibility(View.VISIBLE);
 
     }
+
+    public void hideToolbar() {
+        toolbar.setVisibility(View.GONE);
+    }
+
+    public void showToolbar() {
+        toolbar.setVisibility(View.VISIBLE);
+    }
+
 
 }// end MainActivity class

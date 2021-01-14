@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.userprofile.list;
+package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
 
 import android.util.Log;
 
@@ -13,12 +13,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -28,21 +29,24 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ListViewModel extends ViewModel {
+public class WatchlistThumbnailsViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
     private RemoteConfigServer remoteConfigServer;
+    private TheMovieDatabaseApi tmdb;
 
-    //----------------------------------------------------------------------------------------- CONSTRUCTORS
-    public ListViewModel() {
+
+    //----------------------------------------------- CONSTRUCTORS
+    public WatchlistThumbnailsViewModel() {
         moviesList = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        tmdb = new TheMovieDatabaseApi();
     }
 
 
-    //----------------------------------------------------------------------------------------- GETTERS/SETTERS
+    //----------------------------------------------- GETTERS/SETTERS
 
     public void postMoviesList(ArrayList<Movie> moviesList) {
         this.moviesList.postValue(moviesList);
@@ -62,21 +66,21 @@ public class ListViewModel extends ViewModel {
 
 
 
-    //----------------------------------------------------------------------------------------- METHODS
+    //----------------------------------------------- METHODS
 
     public void fetchData(String email, String token) {
         Runnable downloadTask = createDownloadTask(email, token);
-        Thread t = new Thread(downloadTask, "THREAD: LIST PAGE - FETCH ELEMENTS");
+        Thread t = new Thread(downloadTask, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
         t.start();
     }
 
     private Runnable createDownloadTask(String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: LIST PAGE - FETCH ELEMENTS");
+            Log.d(TAG, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
             HttpUrl httpUrl = null;
             // generating url request
             try {
-                httpUrl = buildHttpUrl(email);
+                httpUrl = buildHttpUrl();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -107,7 +111,6 @@ public class ListViewModel extends ViewModel {
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
                                 ArrayList<Movie> result = null;
-                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
                                 if (!responseData.equals("null")) {
                                     result = new ArrayList<>();
@@ -167,7 +170,7 @@ public class ListViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
-    private HttpUrl buildHttpUrl(String email) throws Exception {
+    private HttpUrl buildHttpUrl() throws Exception {
         final String dbFunction = "fn_get_movies_watchlist";
 
         //
@@ -181,4 +184,5 @@ public class ListViewModel extends ViewModel {
         return httpUrl;
     }
 
-}// end ListViewModel class
+
+}// end WatchlistViewModel class

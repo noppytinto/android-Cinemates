@@ -89,7 +89,7 @@
         app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/listFragment"
-        android:name="mirror42.dev.cinemates.ui.userprofile.list.ListFragment"
+        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistFragment"
         android:label=" "
         tools:layout="@layout/fragment_list" >
         <argument

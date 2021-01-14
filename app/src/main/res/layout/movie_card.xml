@@ -31,5 +31,26 @@
             app:srcCompat="@drawable/placeholder_image"
             tools:ignore="ContentDescription"
             tools:srcCompat="@drawable/poster_avengers" />
+
+
+        <View
+            android:id="@+id/gradient_movieCard_selected"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_selecte_item_list"
+            android:visibility="gone" />
+
     </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/imageView_movieCard_selected"
+        android:layout_width="34dp"
+        android:layout_height="38dp"
+        android:elevation="15dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_selected_red"
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
