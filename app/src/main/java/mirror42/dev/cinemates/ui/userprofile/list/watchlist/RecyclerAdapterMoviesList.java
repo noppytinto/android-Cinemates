@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.fragment.NavHostFragment;
@@ -94,6 +93,9 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
                                         //if list is empty
                                         // show message
                                     }
+
+                                    watchlistFragment.removeMoviesFromList(selectedMovies);
+
                                     mode.finish();
                                     break;
                                 case R.id.menuItem_listMenu_selectAll:
@@ -247,8 +249,14 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
         notifyDataSetChanged();
     }
 
+    public void releaseFragment() {
+        watchlistFragment = null;
+    }
 
 
-
-
+//    @Override
+//    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+//        super.onDetachedFromRecyclerView(recyclerView);
+//        watchlistFragment = null;
+//    }
 }// end RecyclerAdapterWatchlist class

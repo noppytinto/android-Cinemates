@@ -31,8 +31,10 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.listener.RecyclerListener;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class WatchlistFragment extends Fragment implements
@@ -45,6 +47,8 @@ public class WatchlistFragment extends Fragment implements
     private boolean isSelectAll;
     private ArrayList<Movie> moviesList;
     private WatchlistViewModel watchlistViewModel;
+    private LoginViewModel loginViewModel;
+    private boolean listIsEmpty;
 
 
 
@@ -87,6 +91,7 @@ public class WatchlistFragment extends Fragment implements
             if(moviesList != null && moviesList.size()!=0) {
                 // loading data into recycler
                 recyclerAdapterMoviesList.loadNewData(moviesList);
+                listIsEmpty = false;
 
                 // observing selected movies list
                 watchlistViewModel = new ViewModelProvider(requireActivity()).get(WatchlistViewModel.class);
@@ -120,6 +125,20 @@ public class WatchlistFragment extends Fragment implements
                 TextView textView = view.findViewById(R.id.textView_listFragment_description);
                 textView.setText(null);
             }
+
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+            loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+//                switch (loginResult) {
+//                    case SUCCESS: case REMEMBER_ME_EXISTS:
+//                        addToListButton.setVisibility(View.VISIBLE);
+//                        break;
+//                    default:
+//                        addToListButton.setVisibility(View.GONE);
+//                }
+
+            });
+
+
         }//if
     }// end onViewCreated()
 
@@ -154,6 +173,17 @@ public class WatchlistFragment extends Fragment implements
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        recyclerAdapterMoviesList.releaseFragment();
+    }
+
+    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
+        User user = loginViewModel.getUser().getValue();
+        watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
+        listIsEmpty = true;
+    }
 
     //--------------------------------------------------------------------------------------- METHODS
 

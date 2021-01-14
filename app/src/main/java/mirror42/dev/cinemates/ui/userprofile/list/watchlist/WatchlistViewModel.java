@@ -66,15 +66,15 @@ public class WatchlistViewModel extends ViewModel {
 
     //----------------------------------------------------------------------------------------- METHODS
 
-    public void fetchData(String email, String token) {
-        Runnable downloadTask = createDownloadTask(email, token);
-        Thread t = new Thread(downloadTask, "THREAD: LIST PAGE - FETCH ELEMENTS");
+    public void removeMovie(int movieId, String email, String token) {
+        Runnable downloadTask = createTask(movieId, email, token);
+        Thread t = new Thread(downloadTask, "THREAD: WATCHLIST PAGE - REMOVE MOVIE");
         t.start();
     }
 
-    private Runnable createDownloadTask(String email, String token) {
+    private Runnable createTask(int movieId, String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: LIST PAGE - FETCH ELEMENTS");
+            Log.d(TAG, "THREAD: WATCHLIST PAGE - REMOVE MOVIE");
             HttpUrl httpUrl = null;
             // generating url request
             try {
@@ -90,7 +90,9 @@ public class WatchlistViewModel extends ViewModel {
             try {
 
                 RequestBody requestBody = new FormBody.Builder()
+                        .add("movieid", String.valueOf(movieId))
                         .add("email", email)
+                        .add("access_token", token)
                         .build();
 
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
@@ -100,7 +102,8 @@ public class WatchlistViewModel extends ViewModel {
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+//                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                        Log.d(TAG, "onFailure: ");
                     }
 
                     @Override
@@ -108,69 +111,42 @@ public class WatchlistViewModel extends ViewModel {
                         try {
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
-                                ArrayList<Movie> result = null;
-                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+//                                ArrayList<Movie> result = null;
+//                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
                                 if (!responseData.equals("null")) {
-                                    result = new ArrayList<>();
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    String posterURL = null;
-
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject x = jsonArray.getJSONObject(i);
-                                        int movieId = x.getInt("fk_movie");
-
-                                        try{
-                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-
-                                            try {
-                                                posterURL = jsonMovieDetails.getString("poster_path");
-                                                posterURL = tmdb.buildPosterUrl(posterURL);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-
-
-                                        Movie movie = new Movie();
-                                        movie.setTmdbID(movieId);
-                                        movie.setPosterURL(posterURL);
-
-                                        result.add(movie);
-                                    }
 
                                     // once finished set results
-                                    postSelectedMovies(result);
-                                    postDownloadStatus(DownloadStatus.SUCCESS);
+//                                    postSelectedMovies(result);
+//                                    postDownloadStatus(DownloadStatus.SUCCESS);
 
                                 }
                                 else {
-                                    postSelectedMovies(null);
-                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+//                                    postSelectedMovies(null);
+//                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                                 }
                             } // if response is unsuccessful
                             else {
-                                postSelectedMovies(null);
-                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+//                                postSelectedMovies(null);
+//                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                             }
                         } catch (Exception e) {
-                            postSelectedMovies(null);
-                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                            e.printStackTrace();
+//                            postSelectedMovies(null);
+//                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                         }
                     }
                 });
             } catch (Exception e) {
-                postSelectedMovies(null);
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                e.printStackTrace();
+//                postSelectedMovies(null);
+//                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
     }// end createDownloadTask()
 
     private HttpUrl buildHttpUrl(String email) throws Exception {
-        final String dbFunction = "fn_get_movies_watchlist";
+        final String dbFunction = "fn_remove_from_list_watchlist";
 
         //
         HttpUrl httpUrl = new HttpUrl.Builder()
@@ -183,4 +159,15 @@ public class WatchlistViewModel extends ViewModel {
         return httpUrl;
     }
 
+    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, String email, String token) {
+        if(moviesToRemove!=null) {
+            for(Movie m: moviesToRemove) {
+                try {
+                    removeMovie(m.getTmdbID(), email, token);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }// end WatchlistViewModel class
