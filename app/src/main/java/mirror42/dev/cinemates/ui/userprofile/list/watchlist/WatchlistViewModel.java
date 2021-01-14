@@ -18,6 +18,7 @@ import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.*;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -87,7 +88,7 @@ public class WatchlistViewModel extends ViewModel {
             }
 
             // performing http request
-            final OkHttpClient httpClient = new OkHttpClient();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
             try {
 
                 RequestBody requestBody = new FormBody.Builder()

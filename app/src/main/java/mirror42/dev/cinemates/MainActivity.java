@@ -23,6 +23,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         // init firebase analytics
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.setUserConsent(true); //TODO: fetch user consensus from DB
+
+
+        OkHttpSingleton okHttpSingleton = OkHttpSingleton.getInstance(getApplicationContext());
+
 
         // observe activity about login
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -198,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
     private void establishAzureConnection() {
         final String checkSignatureFunction = "check_app_signature?signature=";
-        final OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
         RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
         try {

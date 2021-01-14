@@ -77,7 +77,7 @@ public class HttpUtilities {
      */
     private static String getRawDataStringFromURL(String urlString) {
         String result = null;
-        final OkHttpClient client = new OkHttpClient();
+        final OkHttpClient client = OkHttpSingleton.getClient();
         Request request = new Request.Builder()
                 .url(urlString)
                 .build();

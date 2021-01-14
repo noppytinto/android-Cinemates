@@ -21,6 +21,7 @@ import mirror42.dev.cinemates.tmdbAPI.model.Person;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -382,7 +383,7 @@ public class MovieDetailsViewModel extends ViewModel {
 
             //
             HttpUrl httpUrl = null;
-            final OkHttpClient httpClient = new OkHttpClient();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
             // generating url request
             try {
                 final String dbFunction = "fn_add_to_list_watchlist";

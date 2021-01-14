@@ -28,6 +28,7 @@ import java.util.Map;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -142,7 +143,7 @@ private final String TAG = this.getClass().getSimpleName();
 
     private void checkUserCollision() {
         HttpUrl httpUrl = null;
-        final OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
         final String dbFunction = "fn_check_user_collision_ignore_active";
         try {

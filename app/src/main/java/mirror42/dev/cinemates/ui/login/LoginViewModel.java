@@ -28,6 +28,7 @@ import java.util.Map;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -136,7 +137,7 @@ public class LoginViewModel extends ViewModel {
         }
 
         // performing http request
-        final OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
         try {
             RequestBody requestBody = new FormBody.Builder()
@@ -352,7 +353,7 @@ public class LoginViewModel extends ViewModel {
 
             //
             HttpUrl httpUrl = null;
-            final OkHttpClient httpClient = new OkHttpClient();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
             final String dbFunction = "fn_register_new_user";
             //
             httpUrl = new HttpUrl.Builder()
@@ -467,7 +468,7 @@ public class LoginViewModel extends ViewModel {
     private void invalidateCurrentAccessToken() {
         HttpUrl httpUrl = null;
         final String dbFunction = "fn_invalidate_access_token";
-        final OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
         //
         httpUrl = new HttpUrl.Builder()
