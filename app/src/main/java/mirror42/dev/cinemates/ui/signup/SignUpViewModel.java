@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,7 +107,7 @@ private final String TAG = this.getClass().getSimpleName();
         return firebaseAuthState;
     }
 
-    public void setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState state) {
+    public void setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState state) {
         this.firebaseAuthState.postValue(state);
     }
 
@@ -163,14 +162,14 @@ private final String TAG = this.getClass().getSimpleName();
                 @Override
                 public void onFailure(Call call, IOException e) {
                     e.printStackTrace();
-                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     try (ResponseBody responseBody = response.body()) {
                         if (!response.isSuccessful()) {
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                             throw new IOException("Unexpected code " + response);
                         }
 
@@ -178,33 +177,33 @@ private final String TAG = this.getClass().getSimpleName();
                             int responseCode = Integer.parseInt(responseBody.string());
                             switch (responseCode) {
                                 case 1:
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_EMAIL_COLLISION);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.USERNAME_EMAIL_COLLISION);
                                     break;
                                 case 2:
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.USERNAME_COLLISION);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.USERNAME_COLLISION);
                                     break;
                                 case 3:
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.EMAIL_COLLISION);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.EMAIL_COLLISION);
                                     break;
                                 case 4:
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                                     break;
                                 default:
                                     // if not exist in postgres db
                                     // add as pending user
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.NO_POSTGRES_USER_COLLISION);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.NO_POSTGRES_USER_COLLISION);
                             }
                         } catch (Exception e) {
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                         }
                     } catch (Exception e) {
-                        setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+                        setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
                     }
                 }// end onResponse()
             });// end enquee()
 
         } catch (Exception e) {
-            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
+            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.GENERIC_POSTGREST_ERROR);
         }
     }// end checkUserCollision()
 
@@ -233,7 +232,7 @@ private final String TAG = this.getClass().getSimpleName();
                                     }
 
                                     newUser.setProfilePicturePath(imageName+".png");
-                                    setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.NO_PENDING_USER_COLLISION);
+                                    setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.NO_PENDING_USER_COLLISION);
                                 }
                             }).start();
 
@@ -244,13 +243,13 @@ private final String TAG = this.getClass().getSimpleName();
                                 throw task.getException();
                             } catch (FirebaseAuthUserCollisionException e) {
                                 e.printStackTrace();
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.PENDING_USER_COLLISION);
+                                setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.PENDING_USER_COLLISION);
                             } catch (FirebaseAuthWeakPasswordException e) {
                                 e.printStackTrace();
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.WEAK_PASSWORD);
+                                setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.WEAK_PASSWORD);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.FIREBASE_GENERIC_ERROR);
+                                setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.FIREBASE_GENERIC_ERROR);
                             }
                         }
                     }
@@ -270,7 +269,7 @@ private final String TAG = this.getClass().getSimpleName();
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "DocumentSnapshot added with ID: " + firebaseUser.getUid());
                             Log.d(TAG, "welcome: " + firebaseUser.getEmail());
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_SUCCESS);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.SIGN_UP_SUCCESS);
 
                             //
                             firebaseUser = mAuth.getCurrentUser();
@@ -281,12 +280,12 @@ private final String TAG = this.getClass().getSimpleName();
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error adding document", e);
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
                         }
                     });
         } catch (Exception e) {
             Log.w(TAG, "Error adding document", e);
-            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
+            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.SIGN_UP_FAILURE);
             e.printStackTrace();
         }
     }
@@ -315,14 +314,14 @@ private final String TAG = this.getClass().getSimpleName();
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Verification email sent.");
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_SENT);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_SENT);
 
                             //
                             mAuth.signOut();
                         }
                         else {
                             Log.d(TAG, "Verification email NOT sent. " + task.getException());
-                            setFirebaseSignUpServerCodeState(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_NOT_SENT);
+                            setFirebaseSignUpServerCodeStatus(FirebaseSignUpServerCodeState.VERIFICATION_MAIL_NOT_SENT);
                         }
                     }
                 });

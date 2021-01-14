@@ -129,6 +129,14 @@ public class HttpUtilities {
     public static Request buildPostgresGETrequest(HttpUrl httpUrl, String token) {
         Request request = null;
         try {
+
+//            HttpUrl httpUrl = new HttpUrl.Builder()
+//                    .scheme("https")
+//                    .host(remoteConfigServer.getAzureHostName())
+//                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+//                    .addPathSegment(dbFunction)
+//                    .build();
+
             request = new Request.Builder()
                     .url(httpUrl)
                     .header("User-Agent", "OkHttp Headers.java")
@@ -164,5 +172,24 @@ public class HttpUtilities {
 
         return request;
     }
+
+//    public static Request buildRemoteDBrequest(String dbFunctionName, String token) {
+//        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
+//        Request request = null;
+//
+//        try {
+//            request = new Request.Builder()
+//                    .url(remoteConfigServer.getAzureBaseUrl()+ dbFunctionName)
+//                    .header("User-Agent", "OkHttp Headers.java")
+//                    .addHeader("Accept", "application/json; q=0.5")
+//                    .addHeader("Accept", "application/vnd.github.v3+json")
+//                    .addHeader("Authorization", "Bearer " + token)
+//                    .build();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return request;
+//    }
 
 }// end HttpUtilities class
