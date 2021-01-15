@@ -170,4 +170,5 @@ public class WatchlistViewModel extends ViewModel {
             }
         }
     }
+
 }// end WatchlistViewModel class

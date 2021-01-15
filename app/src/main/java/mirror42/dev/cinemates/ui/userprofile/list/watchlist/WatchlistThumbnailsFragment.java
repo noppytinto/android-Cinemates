@@ -44,16 +44,16 @@ public class WatchlistThumbnailsFragment extends Fragment implements View.OnClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_watchlist, container, false);
+        return inflater.inflate(R.layout.fragment_watchlist_thumbnails, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        cardView = view.findViewById(R.id.cardView_listStub_watchlist);
+        cardView = view.findViewById(R.id.cardView_watchlistThumbnailsFragment);
         cardView.setOnClickListener(this);
-        spinner = view.findViewById(R.id.progressBar_listStub);
+        spinner = view.findViewById(R.id.progressBar_watchlist);
 
         //2
         watchlistThumbnailsViewModel = new ViewModelProvider(this).get(WatchlistThumbnailsViewModel.class);
@@ -98,26 +98,26 @@ public class WatchlistThumbnailsFragment extends Fragment implements View.OnClic
     //--------------------------------------------------------------------------------------- METHODS
 
     private void setThumbnails(ArrayList<Movie> moviesList) {
-        ImageView thumbnail_1 = view.findViewById(R.id.imageView_listStub_1);
-        ImageView thumbnail_2 = view.findViewById(R.id.imageView_listStub_2);
-        ImageView thumbnail_3 = view.findViewById(R.id.imageView_listStub_3);
-        ImageView thumbnail_4 = view.findViewById(R.id.imageView_listStub_4);
-        ImageView thumbnail_5 = view.findViewById(R.id.imageView_listStub_5);
-        ImageView thumbnail_6 = view.findViewById(R.id.imageView_listStub_6);
-        ImageView thumbnail_7 = view.findViewById(R.id.imageView_listStub_7);
-        ImageView thumbnail_8 = view.findViewById(R.id.imageView_listStub_8);
+        ImageView thumbnail_1 = view.findViewById(R.id.imageView_watchlist_1);
+        ImageView thumbnail_2 = view.findViewById(R.id.imageView_watchlist_2);
+        ImageView thumbnail_3 = view.findViewById(R.id.imageView_watchlist_3);
+        ImageView thumbnail_4 = view.findViewById(R.id.imageView_watchlist_4);
+//        ImageView thumbnail_5 = view.findViewById(R.id.imageView_listStub_5);
+//        ImageView thumbnail_6 = view.findViewById(R.id.imageView_listStub_6);
+//        ImageView thumbnail_7 = view.findViewById(R.id.imageView_listStub_7);
+//        ImageView thumbnail_8 = view.findViewById(R.id.imageView_listStub_8);
 
         ArrayList<ImageView> thumbnailsList = new ArrayList<>();
         thumbnailsList.add(thumbnail_1);
         thumbnailsList.add(thumbnail_2);
         thumbnailsList.add(thumbnail_3);
         thumbnailsList.add(thumbnail_4);
-        thumbnailsList.add(thumbnail_5);
-        thumbnailsList.add(thumbnail_6);
-        thumbnailsList.add(thumbnail_7);
-        thumbnailsList.add(thumbnail_8);
+//        thumbnailsList.add(thumbnail_5);
+//        thumbnailsList.add(thumbnail_6);
+//        thumbnailsList.add(thumbnail_7);
+//        thumbnailsList.add(thumbnail_8);
 
-        for(int i=0; i<8 && i<moviesList.size(); i++) {
+        for(int i=0; i<4 && i<moviesList.size(); i++) {
             ImageView t = thumbnailsList.get(i);
             String posterUrl = moviesList.get(i).getPosterURL();
             ImageUtilities.loadRectangularImageInto(posterUrl, t, getContext());
@@ -131,7 +131,7 @@ public class WatchlistThumbnailsFragment extends Fragment implements View.OnClic
     public void onClick(View v) {
         int id = v.getId();
 
-        if(id == R.id.cardView_listStub_watchlist) {
+        if(id == R.id.cardView_watchlistThumbnailsFragment) {
             if(movies!=null) {
                 Movie[] m = movies.toArray(new Movie[0]);
 
