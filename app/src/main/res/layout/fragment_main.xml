@@ -28,9 +28,22 @@
             android:layout_height="wrap_content"
             android:background="@color/dark_blue"
             android:elevation="@dimen/default_elevation"
-            app:tabRippleColor="@color/orange">
+            app:tabRippleColor="@color/orange"/>
+    </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.tabs.TabItem
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewpager_mainFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView_mainFragment_toolbar" />
+
+
+    <!--
+                <com.google.android.material.tabs.TabItem
                 android:id="@+id/home_tab"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,20 +60,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:icon="@drawable/search_icon_light_blue" />
-        </com.google.android.material.tabs.TabLayout>
 
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewpager_mainFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialCardView_mainFragment_toolbar" />
+    -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

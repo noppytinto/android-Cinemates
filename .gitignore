@@ -115,3 +115,5 @@ lint/tmp/
     Blog
     About
 
+.idea/misc.xml
+.idea/compiler.xml

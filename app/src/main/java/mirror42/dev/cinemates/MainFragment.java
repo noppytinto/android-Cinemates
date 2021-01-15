@@ -93,16 +93,14 @@ public class MainFragment extends Fragment {
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 switch (position) {
                     case 0:
-                        tab.setIcon(R.drawable.home_icon_light_blue);
+                        tab.setIcon(R.drawable.movie_icon_light_blue);
                         break;
                     case 1:
-                        tab.setIcon(R.drawable.movie_icon_light_blue);
+                        tab.setIcon(R.drawable.home_icon_light_blue);
                         break;
                     case 2:
                         tab.setIcon(R.drawable.search_icon_light_blue);
                         break;
-                    default:
-                        tab.setText("");
                 }
             }
         });
@@ -115,22 +113,17 @@ public class MainFragment extends Fragment {
 
                 switch (tab.getPosition()) {
                     case 0:
-                        Log.d("tab analyzer", "clicked on home tab");
-                        firebaseAnalytics.logScreenEvent(HomeFragment.class, "Home tab", getContext());
-                        tab.setIcon(R.drawable.home_icon_light_blue);
-                        break;
-                    case 1:
                         Log.d("tab analyzer", "clicked on explore tab");
                         firebaseAnalytics.logScreenEvent(ExploreFragment.class, "Explore tab", getContext());
-                        tab.setIcon(R.drawable.movie_icon_light_blue);
+                        break;
+                    case 1:
+                        Log.d("tab analyzer", "clicked on home tab");
+                        firebaseAnalytics.logScreenEvent(HomeFragment.class, "Home tab", getContext());
                         break;
                     case 2:
                         Log.d("tab analyzer", "clicked on search tab");
                         firebaseAnalytics.logScreenEvent(SearchFragment.class, "Search tab", getContext());
-                        tab.setIcon(R.drawable.search_icon_light_blue);
                         break;
-                    default:
-                        tab.setText("");
                 }
             }
 

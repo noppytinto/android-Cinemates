@@ -22,9 +22,9 @@ public class ViewpagerAdapterFragmentMain extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                return new HomeFragment();
-            case 1:
                 return new ExploreFragment();
+            case 1:
+                return new HomeFragment();
             default :
                 return new SearchFragment();
         }
@@ -32,7 +32,6 @@ public class ViewpagerAdapterFragmentMain extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-
         return 3;
     }
 
