@@ -41,6 +41,7 @@ android {
         main.res.srcDirs += [
                 'src/main/java/mirror42/dev/cinemates/ui/explore/res',
                 'src/main/java/mirror42/dev/cinemates/ui/home/res',
+                'src/main/java/mirror42/dev/cinemates/ui/home/post/res',
                 'src/main/java/mirror42/dev/cinemates/ui/login/res',
                 'src/main/java/mirror42/dev/cinemates/ui/moviedetails/res',
                 'src/main/java/mirror42/dev/cinemates/ui/search/res',

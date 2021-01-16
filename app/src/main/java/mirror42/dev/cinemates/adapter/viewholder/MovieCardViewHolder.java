@@ -36,16 +36,6 @@ public class MovieCardViewHolder extends RecyclerView.ViewHolder  {
     }// end bindView()
 
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
-
-
-
 
 
 

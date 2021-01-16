@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_blue">
+
+    <Button
+        android:id="@+id/button_reactionsFragment_comment"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@color/dark_blue"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="12"
+        app:icon="@drawable/icon_comment_light_blue"
+        app:iconGravity="textStart"
+        android:stateListAnimator="@null"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_reactionsFragment_like"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@color/dark_blue"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="7"
+        app:icon="@drawable/icon_like_light_blue"
+        app:iconGravity="textStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:stateListAnimator="@null"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.50121653" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

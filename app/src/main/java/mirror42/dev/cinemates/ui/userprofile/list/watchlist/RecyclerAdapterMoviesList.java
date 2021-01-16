@@ -158,7 +158,7 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
                     // enable movie details navigation
                     try {
                         //
-                        Movie movieSelected = getMoviesList(position);
+                        Movie movieSelected = getMovie(position);
 
                         //
                         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -240,7 +240,7 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
         return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.size() : 0);
     }
 
-    public Movie getMoviesList(int position) {
+    public Movie getMovie(int position) {
         return ( (moviesList != null) && (moviesList.size() != 0) ? moviesList.get(position) : null);
     }
 

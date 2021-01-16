@@ -224,7 +224,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
         // adding recycle listener for touch detection
         recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
-        recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<Movie>(), getContext());
+        recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext());
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
 
