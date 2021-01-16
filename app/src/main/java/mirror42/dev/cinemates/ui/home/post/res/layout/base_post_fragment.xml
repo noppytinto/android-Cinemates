@@ -27,18 +27,8 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include3"
-                layout="@layout/reactions_fragment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include4" />
-
-            <include
-                android:id="@+id/include2"
-                layout="@layout/post_owner_fragment"
+                android:id="@+id/include_postOwnerLayout"
+                layout="@layout/post_owner_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -46,13 +36,26 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include4"
-                layout="@layout/content_post"
-                android:layout_width="wrap_content"
+                android:id="@+id/include_postContentLayout"
+                layout="@layout/content_watchlist_post_layout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include2" />
+                app:layout_constraintTop_toBottomOf="@+id/include_postOwnerLayout" />
+
+            <include
+                android:id="@+id/include_postReactionsLayout"
+                layout="@layout/post_reactions_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/include_postContentLayout" />
+
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

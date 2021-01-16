@@ -1,14 +1,15 @@
 package mirror42.dev.cinemates.model;
 
 
+import java.util.ArrayList;
 
 public class Post {
     private User owner;
     private long publishDateMillis;
-    private int likes;
-    private int comments;
+    private ArrayList<Like> likes;
+    private ArrayList<Comment> comments;
     private String description;
-    private String postType;
+    private PostType postType;
 
     public enum PostType {
         ADD_TO_LIST_WATCHLIST,
@@ -37,10 +38,43 @@ public class Post {
         this.description = description;
     }
 
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 
+    public long getPublishDateMillis() {
+        return publishDateMillis;
+    }
 
+    public void setPublishDateMillis(long publishDateMillis) {
+        this.publishDateMillis = publishDateMillis;
+    }
 
-    //---------------------------------------------------------------------- GETTERS/SETTERS
+    public ArrayList<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(ArrayList<Like> likes) {
+        this.likes = likes;
+    }
+
+    public ArrayList<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(ArrayList<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public PostType getPostType() {
+        return postType;
+    }
+
+    public void setPostType(PostType postType) {
+        this.postType = postType;
+    }
+
+//---------------------------------------------------------------------- GETTERS/SETTERS
 
 
 

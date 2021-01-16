@@ -7,7 +7,7 @@
     android:background="@color/dark_blue">
 
     <ImageView
-        android:id="@+id/imageView_postOwnerFragment_profilePicture"
+        android:id="@+id/imageView_postOwnerLayout_profilePicture"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
@@ -15,50 +15,50 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/shape_circle_light_blue"
         android:elevation="@dimen/default_elevation"
-        android:padding="3dp"
+        android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/user_icon_dark_blue" />
 
     <TextView
-        android:id="@+id/textView_postOwnerFragment_username"
+        android:id="@+id/textView_postOwnerLayout_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="@font/poppins_semibold"
         android:textColor="@android:color/white"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView_postOwnerFragment_profilePicture"
-        app:layout_constraintEnd_toStartOf="@+id/button_postOwnerFragment_more"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView_postOwnerLayout_profilePicture"
+        app:layout_constraintEnd_toStartOf="@+id/button_postOwnerLayout_more"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView_postOwnerFragment_profilePicture"
-        app:layout_constraintTop_toTopOf="@+id/imageView_postOwnerFragment_profilePicture"
+        app:layout_constraintStart_toEndOf="@+id/imageView_postOwnerLayout_profilePicture"
+        app:layout_constraintTop_toTopOf="@+id/imageView_postOwnerLayout_profilePicture"
         app:layout_constraintVertical_bias="0.25"
         tools:text="Mario Rossi" />
 
     <TextView
-        android:id="@+id/textView_postOwnerFragment_publishDate"
+        android:id="@+id/textView_postOwnerLayout_publishDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins_medium"
         android:textColor="@color/light_blue"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/textView_postOwnerFragment_username"
-        app:layout_constraintTop_toBottomOf="@+id/textView_postOwnerFragment_username"
+        app:layout_constraintStart_toStartOf="@+id/textView_postOwnerLayout_username"
+        app:layout_constraintTop_toBottomOf="@+id/textView_postOwnerLayout_username"
         tools:text="10 min fa" />
 
     <ImageButton
-        android:id="@+id/button_postOwnerFragment_more"
-        android:layout_width="32dp"
-        android:layout_height="21dp"
+        android:id="@+id/button_postOwnerLayout_more"
+        style="@style/Cinemates.Button.TextButton"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/dark_blue"
         android:src="@drawable/icon_more_vertical_light_blue"
-        android:stateListAnimator="@null"
-        app:layout_constraintBottom_toBottomOf="@+id/textView_postOwnerFragment_username"
+        app:layout_constraintBottom_toBottomOf="@+id/textView_postOwnerLayout_username"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView_postOwnerFragment_username"
+        app:layout_constraintTop_toTopOf="@+id/textView_postOwnerLayout_username"
         app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

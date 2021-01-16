@@ -7,37 +7,39 @@
     android:background="@color/dark_blue">
 
     <Button
-        android:id="@+id/button_reactionsFragment_comment"
+        android:id="@+id/button_reactionsLayout_comment"
+        style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/dark_blue"
-        android:fontFamily="@font/poppins_semibold"
         android:text="12"
+        android:textColor="@color/light_blue"
         app:icon="@drawable/icon_comment_light_blue"
         app:iconGravity="textStart"
-        android:stateListAnimator="@null"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:iconTint="@color/light_blue"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_reaction"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button_reactionsFragment_like"
+        android:id="@+id/button_reactionsLayout_like"
+        style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/dark_blue"
-        android:fontFamily="@font/poppins_semibold"
         android:text="7"
+        android:textColor="@color/light_blue"
         app:icon="@drawable/icon_like_light_blue"
         app:iconGravity="textStart"
+        app:iconTint="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        android:stateListAnimator="@null"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/guideline_reaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"

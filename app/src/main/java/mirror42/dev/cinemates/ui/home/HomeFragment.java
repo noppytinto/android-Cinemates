@@ -12,14 +12,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.Post;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchlistPost;
-import mirror42.dev.cinemates.ui.home.post.WatchlistPostAdapter;
+import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class HomeFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
@@ -28,10 +32,17 @@ public class HomeFragment extends Fragment {
     private Button updateButton;
     private EditText editText;
     private String greetings;
-    private WatchlistPostAdapter watchlistPostAdapter;
+    private RecyclerAdapterPost recyclerAdapterPost;
     private View view;
+    private LoginViewModel loginViewModel;
 
-    //------------------------------------------------------------------------ LIFECYCLE METHODS
+
+
+
+
+
+
+    //------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,29 +83,59 @@ public class HomeFragment extends Fragment {
 //        editText = view.findViewById(R.id.editText_homeFragment);
 
 
-        initRecycleView();
-
-        WatchlistPost watchlistPost = new WatchlistPost();
-        watchlistPost.setThumbnail_1_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/mMWLGu9pFymqipN8yvISHsAaj72.jpg");
-        watchlistPost.setThumbnail_2_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/k68nPLbIST6NP96JmTxmZijEvCA.jpg");
-        watchlistPost.setThumbnail_3_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg");
-        ArrayList<WatchlistPost> arrayList = new ArrayList<>();
-        arrayList.add(watchlistPost);
-
-        watchlistPostAdapter.loadNewData(arrayList);
+        initRecyclerView();
 
 
 
+    }// end onViewCreated()
 
-    }
-    private void initRecycleView() {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+            switch (loginResult) {
+                case SUCCESS: {
+                    User user = new User();
+                    user.setUsername("Mario Rossi");
+                    user.setProfilePicturePath("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vSe6sIsdtcoqBhuWRXynahFg8Vf.jpg");
+
+                    WatchlistPost watchlistPost = new WatchlistPost();
+                    watchlistPost.setPostType(Post.PostType.ADD_TO_LIST_WATCHLIST);
+                    watchlistPost.setOwner(user);
+                    watchlistPost.setPublishDateMillis(1610703153494L);
+                    watchlistPost.setDescription("ha aggiunt 5 film alla Watchlist.");
+                    watchlistPost.setThumbnail_1_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/mMWLGu9pFymqipN8yvISHsAaj72.jpg");
+                    watchlistPost.setThumbnail_2_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/k68nPLbIST6NP96JmTxmZijEvCA.jpg");
+                    watchlistPost.setThumbnail_3_url("https://www.themoviedb.org/t/p/w600_and_h900_bestv2/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg");
+
+                    ArrayList<Post> arrayList = new ArrayList<>();
+                    arrayList.add(watchlistPost);
+
+                    recyclerAdapterPost.loadNewData(arrayList);
+                }
+
+                    break;
+                case FAILED:
+                    break;
+            }
+        });
+    }// end onActivityCreated()
+
+
+
+
+    //------------------------------------------------------------------------------- METHODS
+
+    private void initRecyclerView() {
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_loggedUserHomeFragment);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_homeFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        watchlistPostAdapter = new WatchlistPostAdapter(new ArrayList<>(), getContext());
-        recyclerView.setAdapter(watchlistPostAdapter);
+        recyclerAdapterPost = new RecyclerAdapterPost(new ArrayList<>(), getContext());
+        recyclerView.setAdapter(recyclerAdapterPost);
     }
 
 

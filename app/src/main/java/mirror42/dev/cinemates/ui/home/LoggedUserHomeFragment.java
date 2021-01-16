@@ -15,11 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.ui.home.post.WatchlistPostAdapter;
+import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 
 public class LoggedUserHomeFragment extends Fragment {
     private LoggedUserHomeViewModel loggedUserHomeViewModel;
-    private WatchlistPostAdapter watchlistPostAdapter;
+    private RecyclerAdapterPost recyclerAdapterPost;
     private View view;
 
 
@@ -57,12 +57,12 @@ public class LoggedUserHomeFragment extends Fragment {
 
     private void initRecycleView() {
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_loggedUserHomeFragment);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_homeFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        watchlistPostAdapter = new WatchlistPostAdapter(new ArrayList<>(), getContext());
-        recyclerView.setAdapter(watchlistPostAdapter);
+        recyclerAdapterPost = new RecyclerAdapterPost(new ArrayList<>(), getContext());
+        recyclerView.setAdapter(recyclerAdapterPost);
     }
 
 

@@ -52,9 +52,6 @@
 
 
 
-
-
-
     <!-- CINEMATES TEXT BUTTON -->
     <style name="Cinemates.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/yellow</item>

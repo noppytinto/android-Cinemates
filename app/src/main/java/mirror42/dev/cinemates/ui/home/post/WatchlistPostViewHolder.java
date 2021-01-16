@@ -29,19 +29,23 @@ public class WatchlistPostViewHolder extends RecyclerView.ViewHolder {
 
     public WatchlistPostViewHolder(@NonNull View itemView) {
         super(itemView);
-        imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerFragment_profilePicture);
-        textViewUsername = itemView.findViewById(R.id.textView_postOwnerFragment_username);
-        textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerFragment_publishDate);
-        buttonMore = itemView.findViewById(R.id.button_postOwnerFragment_more);
+        imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+        textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
+        textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+        buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
-        textViewPostDescription = itemView.findViewById(R.id.textView_contentPost_description);
-        imageViewThumbnail_1 = (itemView.findViewById(R.id.include1_watchlistPost)).findViewById(R.id.imageview_movieCard_poster_s);
-        imageViewThumbnail_2 = (itemView.findViewById(R.id.include2_watchlistPost)).findViewById(R.id.imageview_movieCard_poster_s);
-        imageViewThumbnail_3 = (itemView.findViewById(R.id.include3_watchlistPost)).findViewById(R.id.imageview_movieCard_poster_s);
+        textViewPostDescription = itemView.findViewById(R.id.textView_contentWatchlistPost_description);
+        imageViewThumbnail_1 = (itemView.findViewById(R.id.include_conentWatchlistPost_thumbnail_1)).findViewById(R.id.imageview_movieThumbnail);
+        imageViewThumbnail_2 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_2)).findViewById(R.id.imageview_movieThumbnail);
+        imageViewThumbnail_3 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_3)).findViewById(R.id.imageview_movieThumbnail);
 
-        buttonComment = itemView.findViewById(R.id.button_reactionsFragment_comment);
-        buttonLike = itemView.findViewById(R.id.button_reactionsFragment_like);
+        buttonComment = itemView.findViewById(R.id.button_reactionsLayout_comment);
+        buttonLike = itemView.findViewById(R.id.button_reactionsLayout_like);
     }
+
+
+
+
 
 
 
