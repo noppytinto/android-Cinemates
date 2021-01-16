@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.ui.home.post.WatchlistPost;
+import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.ui.home.post.WatchlistPostAdapter;
 
 public class HomeFragment extends Fragment {

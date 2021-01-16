@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.WatchlistPost;
 
 public class WatchlistPostAdapter extends RecyclerView.Adapter<WatchlistPostViewHolder>  {
     private ArrayList<WatchlistPost> postList;

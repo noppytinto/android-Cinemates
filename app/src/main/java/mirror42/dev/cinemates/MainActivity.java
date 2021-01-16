@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     private Toolbar toolbar;
 
 
-    //-------------------------------------------------------- ANDROID METHODS
+
+    //---------------------------------------------------------------------------------------------- ANDROID METHODS
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
 
 
-    //-------------------------------------------------------- METHODS
+    //---------------------------------------------------------------------------------------------- METHODS
 
     private void init() {
         remoteConfigServer = RemoteConfigServer.getInstance();
@@ -286,6 +288,5 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     public void showToolbar() {
         toolbar.setVisibility(View.VISIBLE);
     }
-
 
 }// end MainActivity class

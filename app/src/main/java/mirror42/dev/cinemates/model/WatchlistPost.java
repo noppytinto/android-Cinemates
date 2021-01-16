@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.home.post;
+package mirror42.dev.cinemates.model;
 
 public class WatchlistPost extends Post {
     private String listOwnerEmail;
