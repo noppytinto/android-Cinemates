@@ -84,7 +84,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getUser().getValue();
+                    User user = loginViewModel.getLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
 
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
@@ -95,7 +95,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     break;
                 case REMEMBER_ME_EXISTS:
                     try {
-                        User user = loginViewModel.getUser().getValue();
+                        User user = loginViewModel.getLoggedUser().getValue();
                         String profilePicturePath = user.getProfilePicturePath();
 
                         ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());

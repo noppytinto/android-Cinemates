@@ -1,39 +1,30 @@
 package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
 
-import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import mirror42.dev.cinemates.MainActivity;
-import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
@@ -180,7 +171,7 @@ public class WatchlistFragment extends Fragment implements
     }
 
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
-        User user = loginViewModel.getUser().getValue();
+        User user = loginViewModel.getLoggedUser().getValue();
         watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
         listIsEmpty = true;
     }

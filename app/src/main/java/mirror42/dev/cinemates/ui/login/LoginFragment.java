@@ -93,7 +93,7 @@ public class LoginFragment extends Fragment  implements
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getUser().getValue();
+                    User user = loginViewModel.getLoggedUser().getValue();
                     try {
                         MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
                     } catch (Exception e) {

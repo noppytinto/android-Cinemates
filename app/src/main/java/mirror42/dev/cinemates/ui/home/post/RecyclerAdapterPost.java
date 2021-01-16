@@ -54,7 +54,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         View view;
 
         if(viewType == ADD_TO_LIST_WATCHLIST) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.base_post_fragment, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.watchlist_post_layout, parent, false);
             return new WatchlistPostViewHolder(view);
 
         }
@@ -68,41 +68,8 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == ADD_TO_LIST_WATCHLIST) {
             WatchlistPost watchlistPost = (WatchlistPost) postList.get(position);
-
-            ((WatchlistPostViewHolder) holder).textViewUsername.setText(watchlistPost.getOwner().getUsername());
-            ((WatchlistPostViewHolder) holder).textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
-            ((WatchlistPostViewHolder) holder).textViewPostDescription.setText(watchlistPost.getDescription());
-
-            Glide.with(context)  //2
-                    .load(watchlistPost.getThumbnail_1_url()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .fitCenter() //4
-                    .into(((WatchlistPostViewHolder) holder).imageViewThumbnail_1); //8
-            Glide.with(context)  //2
-                    .load(watchlistPost.getThumbnail_2_url()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .fitCenter() //4
-                    .into(((WatchlistPostViewHolder) holder).imageViewThumbnail_2); //8
-            Glide.with(context)  //2
-                    .load(watchlistPost.getThumbnail_3_url()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .fitCenter() //4
-                    .into(((WatchlistPostViewHolder) holder).imageViewThumbnail_3); //8
-
-
-            try {
-                Glide.with(context)  //2
-                        .load(watchlistPost.getOwner().getProfilePicturePath()) //3
-                        .fallback(R.drawable.broken_image)
-                        .placeholder(R.drawable.placeholder_image)
-                        .circleCrop() //4
-                        .into(((WatchlistPostViewHolder) holder).imageViewProfilePicture); //8
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            //
+            buildWatchlistPost((WatchlistPostViewHolder) holder, watchlistPost);
         }
     }
 
@@ -115,7 +82,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         return ( (postList != null) && (postList.size() != 0) ? postList.size() : 0);
     }
 
-    public Post getWatchlistPost(int position) {
+    public Post getPost(int position) {
         return ( (postList != null) && (postList.size() != 0) ? postList.get(position) : null);
     }
 
@@ -126,4 +93,64 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-}
+    //--------------------------------------------------------------------------------
+
+    private void buildWatchlistPost(WatchlistPostViewHolder holder, WatchlistPost watchlistPost) {
+        holder.textViewUsername.setText(watchlistPost.getOwner().getUsername());
+        holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
+        holder.textViewPostDescription.setText(watchlistPost.getDescription());
+
+
+
+        try {
+            String posterUrl_1 = watchlistPost.getMovie().getPosterURL();
+            Glide.with(context)  //2
+                    .load(posterUrl_1) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .fitCenter() //4
+                    .into(holder.imageViewThumbnail_1); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        try {
+//            String posterUrl_2 = watchlistPost.getAddedMovies().get(1).getPosterURL();
+//            Glide.with(context)  //2
+//                    .load(posterUrl_2) //3
+//                    .fallback(R.drawable.broken_image)
+//                    .placeholder(R.drawable.placeholder_image)
+//                    .fitCenter() //4
+//                    .into(holder.imageViewThumbnail_2); //8
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            String posterUrl_3 = watchlistPost.getAddedMovies().get(2).getPosterURL();
+//            Glide.with(context)  //2
+//                    .load(posterUrl_3) //3
+//                    .fallback(R.drawable.broken_image)
+//                    .placeholder(R.drawable.placeholder_image)
+//                    .fitCenter() //4
+//                    .into(holder.imageViewThumbnail_3); //8
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+        try {
+            Glide.with(context)  //2
+                    .load(watchlistPost.getOwner().getProfilePicturePath()) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .circleCrop() //4
+                    .into(holder.imageViewProfilePicture); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+}// end RecyclerAdapterPost class

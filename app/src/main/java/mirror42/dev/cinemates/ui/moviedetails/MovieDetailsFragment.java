@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.content.DialogInterface;
-import android.icu.lang.UScript;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,16 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
@@ -199,7 +194,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                         if(x==0) {
                             // add movie to watchlist
-                            User user = loginViewModel.getUser().getValue();
+                            User user = loginViewModel.getLoggedUser().getValue();
                             movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
                         }
 

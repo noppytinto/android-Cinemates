@@ -7,18 +7,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -78,7 +75,7 @@ public class WatchlistViewModel extends ViewModel {
             HttpUrl httpUrl = null;
             // generating url request
             try {
-                httpUrl = buildHttpUrl(email);
+                httpUrl = buildHttpUrl();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -145,7 +142,7 @@ public class WatchlistViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
-    private HttpUrl buildHttpUrl(String email) throws Exception {
+    private HttpUrl buildHttpUrl() throws Exception {
         final String dbFunction = "fn_remove_from_list_watchlist";
 
         //

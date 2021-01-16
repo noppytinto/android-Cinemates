@@ -84,7 +84,7 @@ public class LoginViewModel extends ViewModel {
 
     //--------------------------------------------------- GETTERS/SETTERS
 
-    public LiveData<User> getUser() {
+    public LiveData<User> getLoggedUser() {
         return user;
     }
 

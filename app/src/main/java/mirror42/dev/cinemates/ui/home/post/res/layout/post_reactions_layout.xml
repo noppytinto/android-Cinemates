@@ -20,7 +20,8 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_reaction"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="@color/yellow" />
 
     <Button
         android:id="@+id/button_reactionsLayout_like"
@@ -36,7 +37,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="@color/netflix_red" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_reaction"

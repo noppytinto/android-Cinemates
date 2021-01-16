@@ -79,7 +79,7 @@ public class WatchlistThumbnailsFragment extends Fragment implements View.OnClic
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: case REMEMBER_ME_EXISTS: {
-                    User user = loginViewModel.getUser().getValue();
+                    User user = loginViewModel.getLoggedUser().getValue();
                     if(user!=null) {
                         String email = user.getEmail();
                         watchlistThumbnailsViewModel.fetchData(email, user.getAccessToken());

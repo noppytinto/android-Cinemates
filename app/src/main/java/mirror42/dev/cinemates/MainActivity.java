@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         loginViewModel.getLoginResult().observe(this, loginResult -> {
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getUser().getValue();
+                    User user = loginViewModel.getLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, loginMenuItem, this);
                     invalidateOptionsMenu();
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             notificationMenuItem.setVisible(true);
 
             // set profile picture
-            User remeberMeUser = loginViewModel.getUser().getValue();
+            User remeberMeUser = loginViewModel.getLoggedUser().getValue();
             String imagePath = remeberMeUser.getProfilePicturePath();
             ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
         }
