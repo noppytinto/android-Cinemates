@@ -7,7 +7,7 @@
     android:background="@color/dark_blue">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_movieCard_s"
+        android:id="@+id/cardview_movieThumbnail"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -18,6 +18,8 @@
         app:cardCornerRadius="@dimen/default_corner_radius"
         app:cardElevation="3dp"
         app:cardMaxElevation="7dp"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

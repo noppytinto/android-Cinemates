@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mirror42.dev.cinemates.R;
 
-public class WatchlistPostViewHolder extends RecyclerView.ViewHolder {
+public class WatchlistPostViewHolder extends RecyclerView.ViewHolder  {
     public ImageView imageViewProfilePicture;
     public TextView textViewUsername;
     public TextView textViewPublishDate;

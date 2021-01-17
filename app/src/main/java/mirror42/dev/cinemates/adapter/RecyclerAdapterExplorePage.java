@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,13 +14,28 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.viewholder.MovieCardViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 
 
-public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<MovieCardViewHolder>  {
+public class RecyclerAdapterExplorePage extends RecyclerView.Adapter<RecyclerAdapterExplorePage.MovieCardViewHolder>  {
     private ArrayList<Movie> moviesList;
     private Context context;
+
+    class MovieCardViewHolder extends RecyclerView.ViewHolder  {
+        public ImageView imageViewPoster;
+        public View viewGradientSelected;
+        public ImageView imageViewIconSelected;
+        public boolean isSelected;
+
+
+        public MovieCardViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.imageViewPoster = itemView.findViewById(R.id.imageview_movieCard_poster);
+            this.imageViewIconSelected = itemView.findViewById(R.id.imageView_movieCard_selected);
+            this.viewGradientSelected = itemView.findViewById(R.id.gradient_movieCard_selected);
+        }
+
+    }// end MovieCardViewHolder class
 
 
 

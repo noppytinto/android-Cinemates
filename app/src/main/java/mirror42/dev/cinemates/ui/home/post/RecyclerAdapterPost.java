@@ -26,10 +26,17 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
+
+    //------------------------------------------------------------------------------- CONSTRUCTORS
+
     public RecyclerAdapterPost(ArrayList<Post> postList, Context context) {
         this.postList = postList;
         this.context = context;
     }
+
+
+
+    //------------------------------------------------------------------------------- CONSTRUCTORS
 
     @Override
     public int getItemViewType(int position) {

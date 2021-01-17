@@ -1,28 +1,34 @@
 package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
+import java.util.List;
+
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.viewholder.MovieCardViewHolder;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
-public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardViewHolder> {
+public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdapterMoviesList.MovieCardViewHolder> {
     private ArrayList<Movie> moviesList;
     private Context context;
     private boolean actionModeisEnabled;
@@ -30,20 +36,82 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
     private boolean allItemsAreSelected;
     private WatchlistFragment watchlistFragment;
 
+    private ClickAdapterListener listener;
+    private SparseBooleanArray selectedItems;
+    private static int currentSelectedIndex = -1;
 
-    public RecyclerAdapterMoviesList(ArrayList<Movie> moviesList, Context context, WatchlistFragment watchlistFragment) {
+    public interface ClickAdapterListener {
+        void onItemClicked(int position);
+        void onItemLongClicked(int position);
+    }
+
+    public class MovieCardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+        public ImageView imageViewPoster;
+        public View viewGradientSelected;
+        public ImageView imageViewIconSelected;
+        public CardView cardView;
+
+        MovieCardViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.imageViewPoster = itemView.findViewById(R.id.imageview_movieCard_poster);
+            this.imageViewIconSelected = itemView.findViewById(R.id.imageView_movieCard_selected);
+            this.viewGradientSelected = itemView.findViewById(R.id.gradient_movieCard_selected);
+            this.cardView = itemView.findViewById(R.id.cardview_movieThumbnail);
+            cardView.setOnLongClickListener(this);
+        }
+
+        public void bindView(Movie movie) {
+            if(movie.isSelected()) {
+                imageViewIconSelected.setVisibility(View.VISIBLE);
+                viewGradientSelected.setVisibility(View.VISIBLE);
+            }
+            else {
+                imageViewIconSelected.setVisibility(View.GONE);
+                viewGradientSelected.setVisibility(View.GONE);
+            }
+        }// end bindView()
+
+        @Override
+        public boolean onLongClick(View v) {
+            listener.onItemLongClicked(getAdapterPosition());
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            return true;
+        }
+
+    }// end MovieCardViewHolder class
+
+
+
+
+
+
+    //---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    public RecyclerAdapterMoviesList(ArrayList<Movie> moviesList,
+                                     Context context,
+                                     WatchlistFragment watchlistFragment,
+                                     ClickAdapterListener listener
+
+    ) {
         this.moviesList = moviesList;
         this.context = context;
         selectedMovies = new ArrayList<>();
         this.watchlistFragment = watchlistFragment;
+        this.listener = listener;
+        selectedItems = new SparseBooleanArray();
     }
 
 
 
+
+    //---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
     @NonNull
     @Override
     public MovieCardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_card, parent, false);
+        View view = LayoutInflater
+                .from(parent.getContext())
+                .inflate(R.layout.movie_card, parent, false);
         return new MovieCardViewHolder(view);
     }
 
@@ -51,7 +119,18 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
     public void onBindViewHolder(@NonNull MovieCardViewHolder holder, int position) {
         Movie movie = moviesList.get(position);
 
-        holder.bindView(moviesList.get(position));
+//        holder.bindView(moviesList.get(position));
+
+
+        if (movie.isSelected()) {
+            holder.imageViewIconSelected.setVisibility(View.VISIBLE);
+            holder.viewGradientSelected.setVisibility(View.VISIBLE);
+        }
+
+        holder.itemView.setActivated(selectedItems.get(position, false));
+
+        applyClickEvents(holder, position);
+
 
 
         holder.imageViewPoster.setOnLongClickListener(new View.OnLongClickListener() {
@@ -205,6 +284,80 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<MovieCardVie
 
 
     }// end onBindViewHolder()
+
+    private void applyClickEvents(MovieCardViewHolder holder, final int position) {
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onItemClicked(position);
+            }
+        });
+
+        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                listener.onItemLongClicked(position);
+                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                return true;
+            }
+        });
+    }
+
+    public void toggleSelection(int pos) {
+        currentSelectedIndex = pos;
+        if (selectedItems.get(pos, false)) {
+            selectedItems.delete(pos);
+        } else {
+            selectedItems.put(pos, true);
+        }
+        notifyItemChanged(pos);
+    }
+
+    public void clearSelections() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
+    public List getSelectedItems() {
+        List items =
+                new ArrayList(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+    public void removeData(int position) {
+        moviesList.remove(position);
+        resetCurrentIndex();
+    }
+
+    public void updateData(int position) {
+        moviesList.get(position).setSelected(true);
+        resetCurrentIndex();
+    }
+
+    private void resetCurrentIndex() {
+        currentSelectedIndex = -1;
+    }
+
+
+    public void selectAll() {
+        for (int i = 0; i < getItemCount(); i++)
+            selectedItems.put(i, true);
+        notifyDataSetChanged();
+    }
+
+
+
+
+
+
+
 
     public boolean getActionModeStatus() {
         return actionModeisEnabled;
