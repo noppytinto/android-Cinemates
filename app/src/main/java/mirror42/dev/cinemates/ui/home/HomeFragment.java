@@ -97,7 +97,10 @@ public class HomeFragment extends Fragment {
                     ArrayList<Post> arrayList = homeViewModel.getPostsList().getValue();
                     recyclerAdapterPost.loadNewData(arrayList);
                 }
-
+                case EMPTY: {
+                    ArrayList<Post> arrayList = homeViewModel.getPostsList().getValue();
+                    recyclerAdapterPost.loadNewData(arrayList);
+                }
                 break;
                 case FAILED:
                     break;
