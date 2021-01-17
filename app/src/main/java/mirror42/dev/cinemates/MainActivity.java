@@ -166,7 +166,12 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
             // set profile picture
             User remeberMeUser = loginViewModel.getLoggedUser().getValue();
-            String imagePath = remeberMeUser.getProfilePicturePath();
+            String imagePath = null;
+            try {
+                imagePath = remeberMeUser.getProfilePicturePath();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imagePath, loginMenuItem, this);
         }
         else {

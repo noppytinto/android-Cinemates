@@ -70,13 +70,7 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "onViewCreated() called");
         this.view = view;
         buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
-        buttonUpdateFeed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                User loggedUser = loginViewModel.getLoggedUser().getValue();
-                homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
-            }
-        });
+
 
 //        homeViewModel.applyRemoteConfig();
 
@@ -126,6 +120,15 @@ public class HomeFragment extends Fragment {
                     break;
                 default:
                     buttonUpdateFeed.setVisibility(View.GONE);
+            }
+        });
+
+
+        buttonUpdateFeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                User loggedUser = loginViewModel.getLoggedUser().getValue();
+                homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
             }
         });
     }// end onActivityCreated()
