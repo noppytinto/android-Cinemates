@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         else {
             Toast.makeText(this, "Firebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();
         }
+        remoteConfigServer.releaseListener();
     }
 
     private void showToastOnUiThread(String toastMessage) {

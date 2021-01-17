@@ -114,4 +114,8 @@ public class RemoteConfigServer {
         });
     }// end loadConfigParams()
 
+    public void releaseListener() {
+        listener = null;
+    }
+
 }// end RemoteConfig class
