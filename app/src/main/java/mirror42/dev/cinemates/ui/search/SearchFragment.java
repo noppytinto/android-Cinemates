@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -32,10 +33,12 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
+import mirror42.dev.cinemates.ui.search.SearchViewModel.*;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
-        RecyclerListener.OnClick_RecyclerListener {
+        RecyclerListener.OnClick_RecyclerListener,
+        ChipGroup.OnCheckedChangeListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
@@ -46,7 +49,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;
     private ChipGroup chipGroup;
+    private Chip chipMovie;
+    private Chip chipActor;
+    private Chip chipDirector;
+    private Chip chipUser;
     private FirebaseAnalytics firebaseAnalytics;
+    private SearchType searchType;
 
 
 
@@ -64,8 +72,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //        });
 
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-        firebaseAnalytics = FirebaseAnalytics.getInstance();
-
         return view;
     }
 
@@ -77,22 +83,34 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_searchFragment_search);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
+        chipMovie = view.findViewById(R.id.chip_searchFragment_movie);
+        chipActor = view.findViewById(R.id.chip_searchFragment_actor);
+        chipDirector = view.findViewById(R.id.chip_searchFragment_director);
+        chipUser = view.findViewById(R.id.chip_searchFragment_user);
 
         // setting listeners
         buttonSearch.setOnClickListener(this);
+        chipGroup.setOnCheckedChangeListener(this);
 
         //
         initRecycleView();
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        firebaseAnalytics = FirebaseAnalytics.getInstance();
+        searchType = SearchType.UNIVERSAL;
 
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
             @Override
             public void onChanged(@Nullable ArrayList<Movie> movies) {
-                if(movies!=null) {
+                if (movies != null) {
                     recyclerAdapterSearchPage.loadNewData(movies);
-                }
-                else {
+                } else {
                     Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
@@ -100,91 +118,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
         });
 
-
-        // assigning adapter to recycle
-
-
-//        //restoring state if configuration changes
-//        restoreStateIfRotated(savedInstanceState);
-//        restoreStateIfReplaced();
-    }
-
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        Log.d(TAG, "onSaveInstanceState() called");
-//
-//        outState.putString(QUERY_KEY, query);
-//        outState.putParcelableArrayList(MOVIES_LIST_KEY, moviesList);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        Log.d(TAG, "onPause() called");
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        savedState = new Bundle();
-//        savedState.putString(QUERY_KEY, query);
-//        savedState.putParcelableArrayList(MOVIES_LIST_KEY, moviesList);
-//        Log.d(TAG, "onStop() called");
-//
-//    }
-//
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        Log.d(TAG, "onDestroyView() called");
-//
-//    }
-//
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        Log.d(TAG, "onDestroy() called");
-//
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        Log.d(TAG, "onDetach() called");
-//
-//    }
-//
-//    private void restoreStateIfRotated(Bundle savedInstanceState) {
-//        if(savedInstanceState != null) {
-//            query = savedInstanceState.getString(QUERY_KEY);
-//            moviesList = savedInstanceState.getParcelableArrayList(MOVIES_LIST_KEY);
-//
-//            //
-//            editText_search.setText(query);
-//            recycleAdapterSearchPage.loadNewData(moviesList);
-//        }
-//    }
-//
-//    private void restoreStateIfReplaced() {
-//        if(savedState!=null) {
-//            try {
-//                query = savedState.getString(QUERY_KEY);
-//                moviesList = savedState.getParcelableArrayList(MOVIES_LIST_KEY);
-//
-//                //
-//                editText_search.setText(query);
-//                recycleAdapterSearchPage.loadNewData(moviesList);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-
-
-    //------------------------------------------------------------------------ METHODS
+    }// end onActivityCreated()
 
     @Override
     public void onClick(View v) {
@@ -200,18 +134,50 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 textInputLayout.setError(null);
 
                 //
-                searchViewModel.downloadData(currentSearchTerm);
+                searchViewModel.downloadData(currentSearchTerm, searchType);
             }
             else {
-                textInputLayout.setError("Campo ricerca vuoto");
-
-                Toast toast = Toast.makeText(getContext(),"Campo Cerca vuoto", Toast.LENGTH_SHORT);
+                textInputLayout.setError("Campo vuoto");
+                Toast toast = Toast.makeText(getContext(),"Campo vuoto", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
-
             }
         }
     }
+
+    @Override
+    public void onCheckedChanged(ChipGroup group, int checkedId) {
+        //NOTE: checkedId is -1 no chip is checked
+        if(checkedId == R.id.chip_searchFragment_movie) {
+            searchType = SearchType.MOVIE;
+            textInputLayout.setHint("Cerca film");
+        }
+        else if(checkedId == R.id.chip_searchFragment_actor) {
+            searchType = SearchType.ACTOR;
+            textInputLayout.setHint("Cerca attore");
+        }
+        else if(checkedId == R.id.chip_searchFragment_director) {
+            searchType = SearchType.DIRECTOR;
+            textInputLayout.setHint("Cerca regista");
+        }
+        else if(checkedId == R.id.chip_searchFragment_user) {
+            searchType = SearchType.USER;
+            textInputLayout.setHint("Cerca utente");
+        }
+        else {
+            searchType = SearchType.UNIVERSAL;
+            textInputLayout.setHint("Cerca tutto");
+        }
+
+    }// end onCheckedChanged()
+
+
+
+
+
+    //------------------------------------------------------------------------ METHODS
+
+
 
 
 
@@ -256,7 +222,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         Toast.makeText(getContext(), "item "+position+" long clicked", Toast.LENGTH_SHORT).show();
 
     }
-
 
 
 

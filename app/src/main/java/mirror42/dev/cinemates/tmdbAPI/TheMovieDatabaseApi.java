@@ -113,9 +113,12 @@ public class TheMovieDatabaseApi {
     private String defaultBackdropSize;
     private String defaultPersonImageSize;
 
+    //
+    private static TheMovieDatabaseApi singletonInstance;
+
 
     //--------------------------------------------------------------------------- CONSTRUCTORS
-    public TheMovieDatabaseApi() {
+    private TheMovieDatabaseApi() {
         defaultLanguage = ITALIAN_LANGUAGE;
         posterSizes = new ArrayList<>();
         backgroundImageSizes = new ArrayList<>();
@@ -124,6 +127,15 @@ public class TheMovieDatabaseApi {
         defaultBackdropSize = MEDIUM_BACKGROUND_SIZE;
         defaultPersonImageSize = MEDIUM_PROFILE_SIZE;
         apiConfigurationObject = null;
+    }
+
+    public static TheMovieDatabaseApi getInstance() {
+        if(singletonInstance==null)
+            return new TheMovieDatabaseApi();
+
+        //TODO: should load image configuration data
+
+        return singletonInstance;
     }
 
 
@@ -881,6 +893,25 @@ public class TheMovieDatabaseApi {
 
         return jsonObj;
     }
+
+    public JSONObject getJsonActorsListByName(String name, int page) {
+        JSONObject jsonObj = null;
+        try{
+            String myUrl  = BASE_URL +  "3/search/person?api_key=" + MY_API_KEY +
+                    "&language=" + defaultLanguage +
+                    "&query=" + name +
+                    "&page=" + page +
+                    "&include_adult=" + defaultAdultContentFilter;
+
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
+
+        return jsonObj;
+    }
+
 
     public JSONObject getJsonMovieDetailsById(int movieId) {
         JSONObject jsonObj = null;

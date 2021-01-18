@@ -55,7 +55,7 @@ public class LatestReleasesViewModel extends ViewModel {
         return ()-> {
             Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD LATEST RELEASES");
             int page = givenPage;
-            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
 
             result = new ArrayList<>();

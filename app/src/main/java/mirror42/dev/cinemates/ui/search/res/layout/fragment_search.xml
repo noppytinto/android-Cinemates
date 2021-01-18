@@ -18,14 +18,14 @@
         android:clipToPadding="false"
         android:paddingBottom="40dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/include"
+        app:layout_constraintBottom_toBottomOf="@+id/include_searchFragment_searchBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/include"
-        layout="@layout/bottom_sheet_search_bar"
+        android:id="@+id/include_searchFragment_searchBox"
+        layout="@layout/bottom_sheet_search_box"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

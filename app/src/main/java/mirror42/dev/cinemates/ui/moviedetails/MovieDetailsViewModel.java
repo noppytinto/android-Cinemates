@@ -4,23 +4,19 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.tmdbAPI.model.Person;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.*;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -53,7 +49,7 @@ public class MovieDetailsViewModel extends ViewModel {
         movie = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         addToListStatus = new MutableLiveData<>(AddToListStatus.IDLE);
-        tmdb = new TheMovieDatabaseApi();
+        tmdb = TheMovieDatabaseApi.getInstance();
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
 

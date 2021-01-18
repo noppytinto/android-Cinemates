@@ -85,7 +85,7 @@ public class HomeViewModel extends ViewModel {
     private Runnable createTask(String email, String token) {
         return ()-> {
             Log.d(TAG, "THREAD: HOME PAGE - FETCHING POSTS");
-            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Post> result = null;
 
             try {

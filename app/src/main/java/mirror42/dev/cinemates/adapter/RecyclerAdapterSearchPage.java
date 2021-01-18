@@ -71,7 +71,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<SearchRecord
         // A ViewHolder object is created, passing in the view created from the layout.
         // Finally, the ViewHolder is returned from the method
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_record, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_search_record_movie, parent, false);
         return new SearchRecordViewHolder(view);
     }
 

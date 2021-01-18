@@ -24,7 +24,7 @@ public class MovieBuilder {
     }
 
     public static Movie buildMovie_byID(int movieID) {
-        TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+        TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
         Movie mv = null;
 
         try {

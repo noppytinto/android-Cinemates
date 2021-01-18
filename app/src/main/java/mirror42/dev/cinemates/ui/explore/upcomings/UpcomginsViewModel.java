@@ -65,7 +65,7 @@ public class UpcomginsViewModel extends ViewModel {
         return ()-> {
             Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD UPCOMINGS");
             int page = givenPage;
-            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
 
             result = new ArrayList<>();

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.model.CastCrew;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
@@ -32,9 +33,18 @@ public class SearchViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
 
+    enum SearchType {
+        MOVIE,
+        USER,
+        ACTOR,
+        DIRECTOR,
+        UNIVERSAL,
+        NONE
+    }
 
 
-    //----------------------------------------------- CONSTRUCTORS
+
+    //--------------------------------------------------------- CONSTRUCTORS
 
     public SearchViewModel() {
         moviesList = new MutableLiveData<>();
@@ -42,7 +52,8 @@ public class SearchViewModel extends ViewModel {
     }
 
 
-    //----------------------------------------------- GETTERS/SETTERS
+
+    //--------------------------------------------------------- GETTERS/SETTERS
 
     public void postMoviesList(ArrayList<Movie> moviesList) {
         this.moviesList.postValue(moviesList);
@@ -61,19 +72,47 @@ public class SearchViewModel extends ViewModel {
     }
 
 
-    //----------------------------------------------- METHODS
 
-    public void downloadData(String givenQuery) {
-        Runnable downloadTask = createDownloadTask(givenQuery);
-        Thread t = new Thread(downloadTask, "THREAD: SEARCH PAGE - DOWNLOAD SEARCH RESULTS");
-        t.start();
+    //--------------------------------------------------------- METHODS
+
+    public void downloadData(String givenQuery, SearchType searchType) {
+        switch (searchType) {
+            case MOVIE: {
+                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
+                Thread t = new Thread(searchMoviesTask);
+                t.start();
+            }
+                break;
+            case ACTOR: {
+//                Runnable searchActorsTask = createSearchActorsTask(givenQuery);
+//                Thread t = new Thread(searchActorsTask);
+//                t.start();
+            }
+
+                break;
+            case DIRECTOR: {
+
+            }
+                break;
+            case USER: {
+
+            }
+                break;
+            case UNIVERSAL: {
+                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
+                Thread t = new Thread(searchMoviesTask);
+                t.start();
+            }
+                break;
+        }
+
     }
 
-    private Runnable createDownloadTask(String givenQuery) {
+    private Runnable createSearchMoviesTask(String givenQuery) {
         return ()-> {
-            Log.d(TAG, "THREAD: SEARCH PAGE - DOWNLOAD SEARCH RESULTS");
+            Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH MOVIES");
             String movieTitle = givenQuery;
-            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
 
 
@@ -133,6 +172,87 @@ public class SearchViewModel extends ViewModel {
 
                 // once finished set results
                 postMoviesList(result);
+                postDownloadStatus(DownloadStatus.SUCCESS);
+            } catch (Exception e) {
+                // if the search returns nothing
+                // moviesList will be null
+                e.printStackTrace();
+                postMoviesList(null);
+                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+            }
+        };
+    }// end createDownloadTask()
+
+
+    //todo: createSearchActorsTask()
+    private Runnable createSearchActorsTask(String givenQuery) {
+        return ()-> {
+            Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH ACTORS");
+            String actorName = givenQuery;
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+            ArrayList<CastCrew> result = null;
+
+
+
+            // checking string
+            if((actorName == null) || (actorName.isEmpty())) {
+                postDownloadStatus(DownloadStatus.NOT_INITILIZED);
+                postMoviesList(null);
+            }
+
+            actorName = actorName.trim();
+            result = new ArrayList<>();
+
+            try {
+                // querying TBDb
+                JSONObject jsonObj = tmdb.getJsonActorsListByName(actorName, PAGE_1);
+                JSONArray resultsArray = jsonObj.getJSONArray("results");
+
+                // fetching results
+                for(int i=0; i<resultsArray.length(); i++) {
+                    JSONObject x = resultsArray.getJSONObject(i);
+                    int id = x.getInt("id");
+                    String name = x.getString("name");
+
+                    // if overview is null
+                    // getString() will fail
+                    // (due to the unvailable defaultLanguage version)
+                    // that's why the try-catch
+//                    String overview = null;
+//                    try {
+//                        overview = x.getString("overview");
+//                        if((overview==null) || (overview.isEmpty()))
+//                            overview = "(trama non disponibile in italiano)";
+//                    } catch (Exception e) {
+//                        e.getMessage();
+//                        e.printStackTrace();
+//                        overview = "(trama in italiano non disp.)";
+//                    }
+
+                    // if poster_path is null
+                    // getString() will fail
+                    // that's why the try-catch
+                    String profilePictureUrl = null;
+                    try {
+                        profilePictureUrl = x.getString("profile_path");
+                        profilePictureUrl = tmdb.buildPersonImageUrl(profilePictureUrl);
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                    }
+
+                    //
+                    CastCrew cc = new CastCrew();
+                    cc.setTmdbID(id);
+                    cc.setName(name);
+                    cc.setProfilePictureUrl(profilePictureUrl);
+
+                    result.add(cc);
+                }// for
+
+
+                // once finished set results
+//                postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
                 // if the search returns nothing
