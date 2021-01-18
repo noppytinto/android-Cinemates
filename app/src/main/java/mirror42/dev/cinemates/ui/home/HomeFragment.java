@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,16 +25,10 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 public class HomeFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
-    private TextView textView;
-    private Button updateButton;
-    private EditText editText;
-    private String greetings;
     private RecyclerAdapterPost recyclerAdapterPost;
     private View view;
     private LoginViewModel loginViewModel;
     private Button buttonUpdateFeed;
-
-
 
 
 
@@ -52,16 +44,9 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView() called");
-
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-
-
-
-        return root;
+        return inflater.inflate(R.layout.fragment_home, container, false);
     }
-
-
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -69,18 +54,7 @@ public class HomeFragment extends Fragment {
         this.view = view;
         buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
 
-
-//        homeViewModel.applyRemoteConfig();
-
-        // rx java tests
-//        textView = view.findViewById(R.id.textView_homeFragment_test);
-//        updateButton = view.findViewById(R.id.button_homeFragment_update);
-//        editText = view.findViewById(R.id.editText_homeFragment);
-
-
         initRecyclerView();
-
-
 
     }// end onViewCreated()
 
@@ -95,11 +69,10 @@ public class HomeFragment extends Fragment {
                     ArrayList<Post> arrayList = homeViewModel.getPostsList().getValue();
                     recyclerAdapterPost.loadNewData(arrayList);
                 }
-                case EMPTY: {
-                    ArrayList<Post> arrayList = homeViewModel.getPostsList().getValue();
-                    recyclerAdapterPost.loadNewData(arrayList);
-                }
-                break;
+                    break;
+                case EMPTY:
+                    recyclerAdapterPost.loadNewData(null);
+                    break;
                 case FAILED:
                     break;
             }
@@ -113,9 +86,11 @@ public class HomeFragment extends Fragment {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLoggedUser().getValue();
                     homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
-
-//                    recyclerAdapterPost.loadNewData(arrayList);
                 }
+                    break;
+                case LOGGED_OUT:
+                    buttonUpdateFeed.setVisibility(View.GONE);
+                    recyclerAdapterPost.loadNewData(null);
                     break;
                 case FAILED:
                     break;
