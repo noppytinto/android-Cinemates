@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +19,6 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
@@ -32,7 +29,7 @@ public class LatestReleasesFragment extends Fragment implements
     private final String TAG = this.getClass().getSimpleName();
     private final int PAGE_1 = 1;
     private LatestReleasesViewModel latestReleasesViewModel;
-    private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
+    private RecyclerAdapterExploreLatest recyclerAdapterExploreLatest;
     private View view;
 
 
@@ -57,7 +54,7 @@ public class LatestReleasesFragment extends Fragment implements
         latestReleasesViewModel = new ViewModelProvider(this).get(LatestReleasesViewModel.class);
         latestReleasesViewModel.getMoviesList().observe(getViewLifecycleOwner(), moviesList -> {
             if(moviesList!=null) {
-                recyclerAdapterExplorePage.loadNewData(moviesList);
+                recyclerAdapterExploreLatest.loadNewData(moviesList);
             }
             else {
                 Toast toast = Toast.makeText(getContext(), "errore caricamento Ultime Uscite", Toast.LENGTH_SHORT);
@@ -90,8 +87,8 @@ public class LatestReleasesFragment extends Fragment implements
         recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
-        recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<>(), getContext());
-        recyclerView.setAdapter(recyclerAdapterExplorePage);
+        recyclerAdapterExploreLatest = new RecyclerAdapterExploreLatest(new ArrayList<>(), getContext());
+        recyclerView.setAdapter(recyclerAdapterExploreLatest);
     }
 
 
@@ -104,7 +101,7 @@ public class LatestReleasesFragment extends Fragment implements
 
         try {
             //
-            Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
+            Movie movieSelected = recyclerAdapterExploreLatest.getMoviesList(position);
 
             //
             FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();

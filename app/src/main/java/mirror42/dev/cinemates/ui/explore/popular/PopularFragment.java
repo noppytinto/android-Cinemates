@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
@@ -31,7 +30,7 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
 
     private final int PAGE_1 = 1;
     private PopularViewModel popularViewModel;
-    private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
+    private RecyclerAdaptExplorePopular recyclerAdaptExplorePopular;
     private View view;
 //    private ArrayList<Movie> moviesList;
 //    private final String MOVIES_LIST_KEY = "MOVIE_LIST_KEY";
@@ -59,7 +58,7 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
             @Override
             public void onChanged(@Nullable ArrayList<Movie> movies) {
                 if(movies!=null) {
-                    recyclerAdapterExplorePage.loadNewData(movies);
+                    recyclerAdaptExplorePopular.loadNewData(movies);
                 }
                 else {
                     Toast toast = Toast.makeText(getContext(), "errore caricamento Popolari", Toast.LENGTH_SHORT);
@@ -101,8 +100,8 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
         recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
-        recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<Movie>(), getContext());
-        recyclerView.setAdapter(recyclerAdapterExplorePage);
+        recyclerAdaptExplorePopular = new RecyclerAdaptExplorePopular(new ArrayList<Movie>(), getContext());
+        recyclerView.setAdapter(recyclerAdaptExplorePopular);
     }
 
 
@@ -111,7 +110,7 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
     public void onItemClick(View view, int position) {
         try {
             //
-            Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
+            Movie movieSelected = recyclerAdaptExplorePopular.getMoviesList(position);
 
             //
             FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();

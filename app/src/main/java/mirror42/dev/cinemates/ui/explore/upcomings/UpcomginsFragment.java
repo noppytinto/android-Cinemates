@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterExplorePage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
@@ -32,7 +31,7 @@ public class UpcomginsFragment extends Fragment implements
 
     private final int PAGE_1 = 1;
     private UpcomginsViewModel upcomginsViewModel;
-    private RecyclerAdapterExplorePage recyclerAdapterExplorePage;
+    private RecyclerAdapterExploreUpcoming recyclerAdapterExploreUpcoming;
     private View view;
 //    private ArrayList<Movie> moviesList;
 //    private final String MOVIES_LIST_KEY = "MOVIE_LIST_KEY";
@@ -61,7 +60,7 @@ public class UpcomginsFragment extends Fragment implements
             @Override
             public void onChanged(@Nullable ArrayList<Movie> movies) {
                 if(movies!=null) {
-                    recyclerAdapterExplorePage.loadNewData(movies);
+                    recyclerAdapterExploreUpcoming.loadNewData(movies);
                 }
                 else {
                     Toast toast = Toast.makeText(getContext(), "errore caricamento Prossimamente", Toast.LENGTH_SHORT);
@@ -102,8 +101,8 @@ public class UpcomginsFragment extends Fragment implements
         recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
-        recyclerAdapterExplorePage = new RecyclerAdapterExplorePage(new ArrayList<Movie>(), getContext());
-        recyclerView.setAdapter(recyclerAdapterExplorePage);
+        recyclerAdapterExploreUpcoming = new RecyclerAdapterExploreUpcoming(new ArrayList<Movie>(), getContext());
+        recyclerView.setAdapter(recyclerAdapterExploreUpcoming);
     }
 
 
@@ -116,7 +115,7 @@ public class UpcomginsFragment extends Fragment implements
     public void onItemClick(View view, int position) {
         try {
             //
-            Movie movieSelected = recyclerAdapterExplorePage.getMoviesList(position);
+            Movie movieSelected = recyclerAdapterExploreUpcoming.getMoviesList(position);
 
             //
             FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
