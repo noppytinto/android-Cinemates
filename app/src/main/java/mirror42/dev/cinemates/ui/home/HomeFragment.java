@@ -47,8 +47,6 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate() called");
-
-
     }
 
     @Override
@@ -111,7 +109,7 @@ public class HomeFragment extends Fragment {
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
-                case SUCCESS: {
+                case SUCCESS: case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLoggedUser().getValue();
                     homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
