@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +39,7 @@ public class LoginFragment extends Fragment  implements
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
+    private TextView textViewResetPassword;
     private Button buttonStandardLogin;
     private Button buttonSignUp;
     private ProgressBar spinner;
@@ -76,11 +79,12 @@ public class LoginFragment extends Fragment  implements
         checkBoxRememberMe = view.findViewById(R.id.checkBox_loginFragment_rememberMe);
         remoteConfigServer = RemoteConfigServer.getInstance();
         buttonSignUp = view.findViewById(R.id.button_loginFragment_signUp);
+        textViewResetPassword = view.findViewById(R.id.textView_loginFragment_resetPassword);
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
-
+        textViewResetPassword.setOnClickListener(this);
         //
 
 
@@ -218,6 +222,9 @@ public class LoginFragment extends Fragment  implements
 //                    RC_SIGN_IN);
 
 
+        }
+        else if(v.getId() == textViewResetPassword.getId()){
+            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_resetPasswordFragment);
         }
     }// end onClick()
 

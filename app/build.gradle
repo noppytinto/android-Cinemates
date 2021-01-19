@@ -49,6 +49,7 @@ android {
                 'src/main/java/mirror42/dev/cinemates/ui/userprofile/res',
                 'src/main/java/mirror42/dev/cinemates/ui/userprofile/list/res',
                 'src/main/java/mirror42/dev/cinemates/ui/login/res',
+                'src/main/java/mirror42/dev/cinemates/ui/resetPassword/res',
                 'src/main/java/mirror42/dev/cinemates/res'
 
         ]

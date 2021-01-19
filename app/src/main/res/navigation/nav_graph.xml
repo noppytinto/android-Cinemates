@@ -63,6 +63,9 @@
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_resetPasswordFragment"
+            app:destination="@id/resetPasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -108,4 +111,9 @@
             app:destination="@id/userProfileFragment"
             app:popUpTo="@id/userProfileFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/resetPasswordFragment"
+        android:name="mirror42.dev.cinemates.ui.resetPassword.resetPasswordFragment"
+        android:label="Reset password"
+        tools:layout="@layout/fragment_reset_password" />
 </navigation>

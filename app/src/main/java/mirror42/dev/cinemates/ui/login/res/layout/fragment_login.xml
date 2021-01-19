@@ -22,13 +22,13 @@
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="161dp"
         android:layout_height="50dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="28dp"
         android:text="@string/login_page_sign_up"
         android:textSize="18sp"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
+        app:layout_constraintTop_toBottomOf="@+id/button_loginFragment_standardLogin" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_loginFragment_email"
@@ -77,29 +77,28 @@
             android:textColor="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
 
+
     <Button
         android:id="@+id/button_loginFragment_standardLogin"
         style="@style/Cinemates.Button.Rounded"
-        android:layout_width="200dp"
+        android:layout_width="159dp"
         android:layout_height="60dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="100dp"
         android:text="@string/login_page_login"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.521"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
 
     <CheckBox
         android:id="@+id/checkBox_loginFragment_rememberMe"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="124dp"
         android:text="@string/login_page_remember_me"
         android:textColor="@color/light_blue"
-        app:layout_constraintStart_toStartOf="@+id/button_loginFragment_standardLogin"
-        app:layout_constraintTop_toBottomOf="@+id/button_loginFragment_standardLogin" />
-
+        app:layout_constraintEnd_toStartOf="@+id/textView_loginFragment_resetPassword"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
 
     <ProgressBar
         android:id="@+id/progresBar_loginFragment"
@@ -113,6 +112,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.156" />
+
+    <TextView
+        android:id="@+id/textView_loginFragment_resetPassword"
+        android:layout_width="170dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/login_page_resetPassword"
+        android:textColor="@color/light_blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

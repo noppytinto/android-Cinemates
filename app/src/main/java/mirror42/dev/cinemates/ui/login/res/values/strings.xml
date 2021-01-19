@@ -9,6 +9,7 @@
     <string name="login_page_email">Email</string>
     <string name="login_page_login">login</string>
     <string name="login_page_remember_me">Ricordami</string>
+    <string name="login_page_resetPassword"><u>Password dimenticata?</u></string>
 
     <string name="login_page_email_demo">noto42@outlook.com</string>
     <string name="login_page_password_demo">aaaaaaa</string>
