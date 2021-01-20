@@ -92,7 +92,7 @@ public class MovieDetailsViewModel extends ViewModel {
 //        downloadLatestReleases.execute(1);
 
         Runnable downloadTask = createDownloadTask(movieId);
-        Thread t = new Thread(downloadTask, "THREAD: MOVIE DETAILS PAGE - DOWNLOAD MOVIE DETAILS");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
@@ -365,7 +365,7 @@ public class MovieDetailsViewModel extends ViewModel {
 
     public void addMovieToWatchList(int movieId, String email, String accessToken) {
         Runnable task = createAddToWatchListTask(movieId, email, accessToken);
-        Thread t = new Thread(task, "THREAD: MOVIE DETAILS PAGE - ADD MOVIE TO WATCHLIST");
+        Thread t = new Thread(task);
         t.start();
     }
 
@@ -395,7 +395,6 @@ public class MovieDetailsViewModel extends ViewModel {
                 RequestBody requestBody = new FormBody.Builder()
                         .add("movieid", String.valueOf(movieId))
                         .add("email", email)
-                        .add("access_token", accessToken)
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
 

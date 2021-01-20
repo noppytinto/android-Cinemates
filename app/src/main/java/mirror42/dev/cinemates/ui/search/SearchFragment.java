@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,16 +25,19 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.jakewharton.rxbinding4.widget.RxTextView;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.ui.search.SearchViewModel.SearchType;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
-import mirror42.dev.cinemates.ui.search.SearchViewModel.*;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
@@ -118,7 +122,23 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
         });
 
+        // AUTOMATIC SEARCH
+        // triggered when:
+        // at least 3 chars are typed in (filter)
+        // 1 second later after the last typed character (debounce)
+        RxTextView.textChanges(editText_search)
+                .filter(text -> text.length()>=3)
+                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateSearchResults);
+
     }// end onActivityCreated()
+
+    private void updateSearchResults(CharSequence searchQuery) {
+        currentSearchTerm = searchQuery.toString();
+        searchViewModel.fetchResults(currentSearchTerm, searchType);
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -132,9 +152,10 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
                 //
                 textInputLayout.setError(null);
+                editText_search.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
                 //
-                searchViewModel.downloadData(currentSearchTerm, searchType);
+                searchViewModel.fetchResults(currentSearchTerm, searchType);
             }
             else {
                 textInputLayout.setError("Campo vuoto");

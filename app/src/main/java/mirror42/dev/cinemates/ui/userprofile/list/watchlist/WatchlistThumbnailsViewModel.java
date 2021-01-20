@@ -1,7 +1,5 @@
 package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -69,13 +67,12 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
 
     public void fetchData(String email, String token) {
         Runnable downloadTask = createDownloadTask(email, token);
-        Thread t = new Thread(downloadTask, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
     private Runnable createDownloadTask(String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: USER PROFILE PAGE - FETCH WATCHLIST ELEMENTS");
             HttpUrl httpUrl = null;
             // generating url request
             try {

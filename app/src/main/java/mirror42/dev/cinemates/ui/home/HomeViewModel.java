@@ -78,13 +78,12 @@ public class HomeViewModel extends ViewModel {
 
     public void fetchData(String email, String token) {
         Runnable task = createTask(email, token);
-        Thread t = new Thread(task, "THREAD: HOME PAGE - FETCHING POSTS");
+        Thread t = new Thread(task);
         t.start();
     }
 
     private Runnable createTask(String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: HOME PAGE - FETCHING POSTS");
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Post> result = null;
 
@@ -98,7 +97,6 @@ public class HomeViewModel extends ViewModel {
                 // building request
                 RequestBody requestBody = new FormBody.Builder()
                         .add("email", email)
-                        .add("access_token", token)
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 

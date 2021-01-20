@@ -75,7 +75,7 @@ public class SearchViewModel extends ViewModel {
 
     //--------------------------------------------------------- METHODS
 
-    public void downloadData(String givenQuery, SearchType searchType) {
+    public void fetchResults(String givenQuery, SearchType searchType) {
         switch (searchType) {
             case MOVIE: {
                 Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);

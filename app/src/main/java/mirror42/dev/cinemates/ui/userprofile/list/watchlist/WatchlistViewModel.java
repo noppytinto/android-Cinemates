@@ -65,13 +65,12 @@ public class WatchlistViewModel extends ViewModel {
 
     public void removeMovie(int movieId, String email, String token) {
         Runnable downloadTask = createTask(movieId, email, token);
-        Thread t = new Thread(downloadTask, "THREAD: WATCHLIST PAGE - REMOVE MOVIE");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
     private Runnable createTask(int movieId, String email, String token) {
         return ()-> {
-            Log.d(TAG, "THREAD: WATCHLIST PAGE - REMOVE MOVIE");
             HttpUrl httpUrl = null;
             // generating url request
             try {
@@ -89,7 +88,6 @@ public class WatchlistViewModel extends ViewModel {
                 RequestBody requestBody = new FormBody.Builder()
                         .add("movieid", String.valueOf(movieId))
                         .add("email", email)
-                        .add("access_token", token)
                         .build();
 
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
