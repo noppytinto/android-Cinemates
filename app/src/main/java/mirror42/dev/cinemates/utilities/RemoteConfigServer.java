@@ -2,10 +2,6 @@ package mirror42.dev.cinemates.utilities;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -88,6 +84,18 @@ public class RemoteConfigServer {
         return mFirebaseRemoteConfig.getString("cinemates_data");
     }
 
+    public String getGmailUsername() {
+        return mFirebaseRemoteConfig.getString("gmail_username");
+    }
+
+    public String getGmailAccount() {
+        return mFirebaseRemoteConfig.getString("gmail_account");
+    }
+
+    public String getGmailPass() {
+        return mFirebaseRemoteConfig.getString("gmail_pass");
+    }
+
 
 
     //------------------------------------------------------- METHODS
@@ -96,20 +104,17 @@ public class RemoteConfigServer {
 //        mFirebaseRemoteConfig.fetch(0);
 //        mFirebaseRemoteConfig.activate();
 
-        mFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(new OnCompleteListener<Boolean>() {
-            @Override
-            public void onComplete(@NonNull Task<Boolean> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "remote config task successful");
-                    boolean updated = task.getResult();
+        mFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "remote config task successful");
+                boolean updated = task.getResult();
 
-                    // notify listener
-                    listener.onRemoteConfigLoaded(true);
+                // notify listener
+                listener.onRemoteConfigLoaded(true);
 
-                } else {
-                    Log.d(TAG, "remote config task failed!");
-                    listener.onRemoteConfigLoaded(false);
-                }
+            } else {
+                Log.d(TAG, "remote config task failed!");
+                listener.onRemoteConfigLoaded(false);
             }
         });
     }// end loadConfigParams()

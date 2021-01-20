@@ -113,7 +113,7 @@
     </fragment>
     <fragment
         android:id="@+id/resetPasswordFragment"
-        android:name="mirror42.dev.cinemates.ui.resetPassword.resetPasswordFragment"
+        android:name="mirror42.dev.cinemates.ui.resetPassword.ResetPasswordFragment"
         android:label="Reset password"
         tools:layout="@layout/fragment_reset_password" />
 </navigation>

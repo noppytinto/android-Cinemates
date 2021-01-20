@@ -36,4 +36,16 @@
         <key>cloudinary_upload_base_url</key>
         <value>-</value>
     </entry>
+    <entry>
+        <key>gmail_username</key>
+        <value>cinemates42</value>
+    </entry>
+    <entry>
+        <key>gmail_account</key>
+        <value>cinemates42@gmail.com</value>
+    </entry>
+    <entry>
+        <key>gmail_pass</key>
+        <value>-</value>
+    </entry>
 </defaultsMap>

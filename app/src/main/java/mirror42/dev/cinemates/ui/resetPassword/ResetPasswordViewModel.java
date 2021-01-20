@@ -11,10 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Random;
 
-import mirror42.dev.cinemates.mailAPI.EmailException;
-import mirror42.dev.cinemates.mailAPI.MailSender;
+import mirror42.dev.cinemates.mailAPI.JavaMailAPI;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -27,10 +25,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ResetPasswordViewModel extends ViewModel {
-
     private final String TAG = this.getClass().getSimpleName();
     private MutableLiveData<ResetResult> resetResult;
     private RemoteConfigServer remoteConfigServer;
+    private JavaMailAPI javaMailAPI;
+
 
     public enum ResetResult {
         FAILED,
@@ -41,6 +40,7 @@ public class ResetPasswordViewModel extends ViewModel {
    public ResetPasswordViewModel(){
        resetResult = new MutableLiveData<>(ResetResult.NONE);
        remoteConfigServer = RemoteConfigServer.getInstance();
+       javaMailAPI = new JavaMailAPI(remoteConfigServer.getGmailUsername(), remoteConfigServer.getGmailPass());
    }
 
 
@@ -54,14 +54,12 @@ public class ResetPasswordViewModel extends ViewModel {
     }
 
     public void resetPassword(String email){
-
-
         Random rand = new Random();
         int randomPassword = rand.nextInt(10000) + 132986;
-        //String password = Integer.toString(randomPassword);
-        String password = "aaaaaa";
+        String password = Integer.toString(randomPassword);
+//        String password = "aaaaaa";
         Runnable emailSendTask = sendNewPasswordEmailTask(email,password);
-        Thread t = new Thread(emailSendTask, "THREAD: RESET PASSWORD - SEND EMAIL");
+        Thread t = new Thread(emailSendTask);
         t.start();
         //resetPasswordToServer(email, MyUtilities.SHA256encrypt(password));
     }
@@ -69,18 +67,38 @@ public class ResetPasswordViewModel extends ViewModel {
 
     private Runnable sendNewPasswordEmailTask(String email,String newPassword) {
         return () -> {
-            MailSender sendMail = new MailSender();
+
+            // supported max 29<= sdk
+            String[] recipients = {email};
+            javaMailAPI.set_from("Cinemates");
+            javaMailAPI.setBody("nuova password: " + newPassword);
+            javaMailAPI.set_to(recipients);
+            javaMailAPI.set_subject("Richiesta reset password");
+
             try {
-               boolean isSent =  sendMail.sendAnEmail(email, "Questa è la nuova password" + newPassword);
-               if(isSent)
-                   postResetStatus(ResetResult.SUCCESS);
-               else
-                   postResetStatus(ResetResult.FAILED);
-            } catch (EmailException e) {
-                e.printStackTrace();
+                if (javaMailAPI.send()) {
+                    postResetStatus(ResetResult.SUCCESS);
+                } else {
+                    postResetStatus(ResetResult.FAILED);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                postResetStatus(ResetResult.FAILED);
             }
+
+
+//            MailSender sendMail = new MailSender();
+//            try {
+//               boolean isSent =  sendMail.sendAnEmail(email, "Questa è la nuova password" + newPassword);
+//               if(isSent)
+//                   postResetStatus(ResetResult.SUCCESS);
+//               else
+//                   postResetStatus(ResetResult.FAILED);
+//            } catch (EmailException e) {
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
         };
     }

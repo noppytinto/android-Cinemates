@@ -12,7 +12,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -202,6 +201,9 @@ public class LoginFragment extends Fragment  implements
                 //
                 loginViewModel.login(email, password);
             }
+            else {
+                spinner.setVisibility(View.GONE);
+            }
         }
         else if (v.getId() == buttonSignUp.getId()) {
 
@@ -234,6 +236,11 @@ public class LoginFragment extends Fragment  implements
 
     private boolean checkFields() {
         String email = editTextEmail.getText().toString();
+
+        if( ! android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            textInputLayoutEmail.setError("Il formato mail non e' valido!");
+            return false;
+        }
 
         if (email.isEmpty()) {
             textInputLayoutEmail.setError(getString(R.string.login_page_no_email_error));
