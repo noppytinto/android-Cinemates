@@ -47,11 +47,9 @@ public class LoginViewModel extends ViewModel {
     private MutableLiveData<LoginResult> loginResult;
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
-    private FirebaseUser firebaseUser;
+    private FirebaseUser currentFirebaseUser;
     private boolean rememberMeExists;
     private User basicPendingUser;
-
-
 
     public enum LoginResult {
         INVALID_REQUEST,
@@ -70,7 +68,7 @@ public class LoginViewModel extends ViewModel {
 
 
 
-    //--------------------------------------------------- CONSTRUCTORS
+    //----------------------------------------------------------------------- CONSTRUCTORS
 
     public LoginViewModel() {
         this.user = new MutableLiveData<>();
@@ -82,7 +80,7 @@ public class LoginViewModel extends ViewModel {
 
 
 
-    //--------------------------------------------------- GETTERS/SETTERS
+    //----------------------------------------------------------------------- GETTERS/SETTERS
 
     public LiveData<User> getLoggedUser() {
         return user;
@@ -108,8 +106,8 @@ public class LoginViewModel extends ViewModel {
         this.loginResult.setValue(loginResult);
     }
 
-    public FirebaseUser getFirebaseUser() {
-        return firebaseUser;
+    public FirebaseUser getCurrentFirebaseUser() {
+        return currentFirebaseUser;
     }
 
     public User getPendingUser() {
@@ -117,7 +115,107 @@ public class LoginViewModel extends ViewModel {
     }
 
 
-    //--------------------------------------------------- METHODS
+    //----------------------------------------------------------------------- METHODS
+
+    public void login(String email, String password) {
+        //do login
+//        Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(email, password);
+//
+//        // check pending user exists in firebase DB
+//        Task<AuthResult> loadPendingUserDetailsTask = null;
+//        loginTask.continueWith(new Continuation<AuthResult, Object>() {
+//            @Override
+//            public Object then(@NonNull Task<AuthResult> task) throws Exception {
+//                // if pending user exists
+//                if(task.isSuccessful()) {
+//                    loadPendingUserBasicData();
+//                }
+//                return null;
+//            }
+//        });
+
+
+
+
+
+//        try {
+//            loginTask.continueWithTask(new Continuation<AuthResult, Task<AuthResult>>() {
+//                @Override
+//                public Task<AuthResult> then(@NonNull Task<AuthResult> task) throws Exception {
+//                    task.getException();
+//                    return task;
+//                }
+//            }).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+//                @Override
+//                public void onSuccess(AuthResult authResult) {
+//                    authResult.getUser();
+//                }
+//
+//            }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        try {
+//                            throw loginTask.getException();
+//                        } catch (FirebaseAuthInvalidUserException faiue) {
+//                            faiue.printStackTrace();
+//                            setLoginResult(LoginResult.IS_NOT_PENDING_USER_ANYMORE);
+//                        }  catch(Exception getException) {
+//                            getException.printStackTrace();
+//                        }
+//                    }
+//                });
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+        //check if is a pending user first
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener( task-> {
+            if (task.isSuccessful()) {
+                // Sign in success, update UI with the signed-in user's information
+                currentFirebaseUser = mAuth.getCurrentUser();
+                loadPendingUserDetails();
+            } else {
+                // If sign in fails, display a message to the user.
+                Log.w(TAG, "Autorization server: not a pending user", task.getException());
+                setLoginResult(LoginResult.IS_NOT_PENDING_USER_ANYMORE);
+            }
+        });
+    }// end checkIfIsPendingUser()
+
+    public void loadPendingUserDetails() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("pending_users").document(currentFirebaseUser.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        try {
+                            JSONObject jsonObject = new JSONObject(document.getData());
+                            String email = jsonObject.getString("email");
+                            String profilePicturePath = jsonObject.getString("profilePicturePath");
+
+                            basicPendingUser = new User(email, profilePicturePath);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        setLoginResult(LoginResult.IS_PENDING_USER);
+                    } else {
+                        // NOTE: should not enter this case
+                        //       because of preconditions
+                        Log.d(TAG, "No such document");
+                    }
+
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }// end loadPendingUserBasicData()
 
     public void standardLogin(String email, String password) {
         if(password==null) {
@@ -212,66 +310,13 @@ public class LoginViewModel extends ViewModel {
         return httpUrl;
     }
 
-    public void login(String email, String password) {
-        //check if is pending user first
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener( task-> {
-            if (task.isSuccessful()) {
-                // Sign in success, update UI with the signed-in user's information
-                Log.d(TAG, "Autorization server: email ancora non approvata, controlla la tua posta");
-                firebaseUser = mAuth.getCurrentUser();
-                loadPendingUserBasicData();
-            } else {
-                // If sign in fails, display a message to the user.
-                Log.w(TAG, "Autorization server: not a pending user", task.getException());
-                setLoginResult(LoginResult.IS_NOT_PENDING_USER_ANYMORE);
-            }
-        });
-    }// end checkIfIsPendingUser()
-
-    public void loadPendingUserBasicData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("pending_users").document(firebaseUser.getUid());
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        try {
-                            JSONObject jsonObject = new JSONObject(document.getData());
-                            String email = jsonObject.getString("email");
-                            String profilePicturePath = jsonObject.getString("profilePicturePath");
-
-                            basicPendingUser = new User(email, profilePicturePath);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        setLoginResult(LoginResult.IS_PENDING_USER);
-                    } else {
-                        // NOTE: should not enter this case
-                        //       because of preconditions
-                        Log.d(TAG, "No such document");
-                    }
-
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }// end loadPendingUserBasicData()
-
-
-
     public boolean checkEmailVerificationState() {
-        if(firebaseUser!=null) {
-            return firebaseUser.isEmailVerified();
+        if(currentFirebaseUser !=null) {
+            return currentFirebaseUser.isEmailVerified();
         }
 
         return false;
     }
-
 
     /**
      * PRECONDITIONS:
@@ -282,7 +327,7 @@ public class LoginViewModel extends ViewModel {
      */
     public void insertIntoPostgres() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("pending_users").document(firebaseUser.getUid());
+        DocumentReference docRef = db.collection("pending_users").document(currentFirebaseUser.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -306,31 +351,31 @@ public class LoginViewModel extends ViewModel {
         });
     }
 
-        private RequestBody buildRequestBody(String username,
-                                         String email,
-                                         String password,
-                                         String firstName,
-                                         String lastName,
-                                         String birthday,
-                                         String profilePicturePath,
-                                         String promo,
-                                         String analytics) throws Exception {
-        RequestBody requestBody = new FormBody.Builder()
-                .add("mail", email)
-                .add("username", username)
-                .add("pass", password)
-                .add("firstname", firstName)
-                .add("lastname", lastName)
-                .add("birthday", birthday)
-                .add("profilepicturepath", profilePicturePath)
-                .add("promo", promo)
-                .add("analytics", analytics)
-                .build();
+    private RequestBody buildRequestBody(String username,
+                                     String email,
+                                     String password,
+                                     String firstName,
+                                     String lastName,
+                                     String birthday,
+                                     String profilePicturePath,
+                                     String promo,
+                                     String analytics) throws Exception {
+    RequestBody requestBody = new FormBody.Builder()
+            .add("mail", email)
+            .add("username", username)
+            .add("pass", password)
+            .add("firstname", firstName)
+            .add("lastname", lastName)
+            .add("birthday", birthday)
+            .add("profilepicturepath", profilePicturePath)
+            .add("promo", promo)
+            .add("analytics", analytics)
+            .build();
 
 
 
-        return requestBody;
-    }
+    return requestBody;
+}
 
 
     private void insert(Map<String, Object> document) {
@@ -410,13 +455,13 @@ public class LoginViewModel extends ViewModel {
 
     private void deleteFromPendings() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("pending_users").document(firebaseUser.getUid())
+        db.collection("pending_users").document(currentFirebaseUser.getUid())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                        firebaseUser.delete();
+                        currentFirebaseUser.delete();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -509,10 +554,8 @@ public class LoginViewModel extends ViewModel {
 
     }// end invalidateCurrentAccessToken();
 
-
-
     public void resendVerificationEmail() {
-        firebaseUser.sendEmailVerification()
+        currentFirebaseUser.sendEmailVerification()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -526,8 +569,5 @@ public class LoginViewModel extends ViewModel {
                     }
                 });
     }
-
-
-
 
 }// end LoginViewModel class
