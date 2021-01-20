@@ -20,7 +20,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -53,10 +52,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
     private View view;
     private ChipGroup chipGroup;
-    private Chip chipMovie;
-    private Chip chipActor;
-    private Chip chipDirector;
-    private Chip chipUser;
     private FirebaseAnalytics firebaseAnalytics;
     private SearchType searchType;
 
@@ -87,10 +82,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_searchFragment_search);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
-        chipMovie = view.findViewById(R.id.chip_searchFragment_movie);
-        chipActor = view.findViewById(R.id.chip_searchFragment_actor);
-        chipDirector = view.findViewById(R.id.chip_searchFragment_director);
-        chipUser = view.findViewById(R.id.chip_searchFragment_user);
 
         // setting listeners
         buttonSearch.setOnClickListener(this);
@@ -112,7 +103,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         searchViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
             @Override
             public void onChanged(@Nullable ArrayList<Movie> movies) {
-                if (movies != null) {
+                if (movies != null && movies.size()>0) {
                     recyclerAdapterSearchPage.loadNewData(movies);
                 } else {
                     Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
