@@ -14,8 +14,9 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.CastCrew;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.utilities.MyValues.*;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
+import mirror42.dev.cinemates.ui.search.model.SearchResult;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 
 
 /**
@@ -30,24 +31,17 @@ import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 public class SearchViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private final int PAGE_1 = 1;
-    private MutableLiveData<ArrayList<Movie>> moviesList;
+    private MutableLiveData<ArrayList<SearchResult>> searchResultList;
     private MutableLiveData<DownloadStatus> downloadStatus;
 
-    enum SearchType {
-        MOVIE,
-        USER,
-        ACTOR,
-        DIRECTOR,
-        UNIVERSAL,
-        NONE
-    }
+
 
 
 
     //--------------------------------------------------------- CONSTRUCTORS
 
     public SearchViewModel() {
-        moviesList = new MutableLiveData<>();
+        searchResultList = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
     }
 
@@ -55,12 +49,12 @@ public class SearchViewModel extends ViewModel {
 
     //--------------------------------------------------------- GETTERS/SETTERS
 
-    public void postMoviesList(ArrayList<Movie> moviesList) {
-        this.moviesList.postValue(moviesList);
+    public void postSearchResultList(ArrayList<SearchResult> searchResultList) {
+        this.searchResultList.postValue(searchResultList);
     }
 
-    public LiveData<ArrayList<Movie>> getMoviesList() {
-        return moviesList;
+    public LiveData<ArrayList<SearchResult>> getSearchResultList() {
+        return searchResultList;
     }
 
     public void postDownloadStatus(DownloadStatus downloadStatus) {
@@ -75,7 +69,7 @@ public class SearchViewModel extends ViewModel {
 
     //--------------------------------------------------------- METHODS
 
-    public void fetchResults(String givenQuery, SearchType searchType) {
+    public void fetchResults(String givenQuery, SearchResult.SearchType searchType) {
         switch (searchType) {
             case MOVIE: {
                 Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
@@ -84,21 +78,22 @@ public class SearchViewModel extends ViewModel {
             }
                 break;
             case ACTOR: {
+                //TODO:
 //                Runnable searchActorsTask = createSearchActorsTask(givenQuery);
 //                Thread t = new Thread(searchActorsTask);
 //                t.start();
             }
-
                 break;
             case DIRECTOR: {
-
+                //TODO:
             }
                 break;
             case USER: {
-
+                //TODO:
             }
                 break;
             case UNIVERSAL: {
+                //TODO:
                 Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
                 Thread t = new Thread(searchMoviesTask);
                 t.start();
@@ -113,14 +108,14 @@ public class SearchViewModel extends ViewModel {
             Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH MOVIES");
             String movieTitle = givenQuery;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<Movie> result = null;
+            ArrayList<SearchResult> result = null;
 
 
 
             // checking string
             if((movieTitle == null) || (movieTitle.isEmpty())) {
                 postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postMoviesList(null);
+                postSearchResultList(null);
             }
 
             movieTitle = movieTitle.trim();
@@ -165,19 +160,20 @@ public class SearchViewModel extends ViewModel {
                     }
 
                     //
-                    Movie mv = new Movie(id, title, posterURL, overview);
+                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
+                    mv.setSearchType(SearchResult.SearchType.MOVIE);
                     result.add(mv);
                 }// for
 
 
                 // once finished set results
-                postMoviesList(result);
+                postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
                 // if the search returns nothing
                 // moviesList will be null
                 e.printStackTrace();
-                postMoviesList(null);
+                postSearchResultList(null);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
@@ -197,7 +193,7 @@ public class SearchViewModel extends ViewModel {
             // checking string
             if((actorName == null) || (actorName.isEmpty())) {
                 postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postMoviesList(null);
+                postSearchResultList(null);
             }
 
             actorName = actorName.trim();
@@ -258,12 +254,18 @@ public class SearchViewModel extends ViewModel {
                 // if the search returns nothing
                 // moviesList will be null
                 e.printStackTrace();
-                postMoviesList(null);
+                postSearchResultList(null);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
     }// end createDownloadTask()
 
+    //todo: createSearchUserTask()
+    private Runnable createSearchUserTask() {
+        //TODO:
+
+        return null;
+    }
 
 
 

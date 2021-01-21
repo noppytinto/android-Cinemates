@@ -21,8 +21,8 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     private ArrayList<Post> postList;
     private Context context;
 
-    private static final int ADD_TO_LIST_WATCHLIST = 1;
-    private static final int ADD_TO_LIST_WATCHED = 2;
+    private static final int ADD_TO_WATCHLIST = 1;
+    private static final int ADD_TO_WATCHED_LIST = 2;
 
 
 
@@ -43,10 +43,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         PostType postType = postList.get(position).getPostType();
 
         switch (postType) {
-            case ADD_TO_LIST_WATCHLIST:
-                return ADD_TO_LIST_WATCHLIST;
-            case ADD_TO_LIST_WATCHED:
-                return ADD_TO_LIST_WATCHED;
+            case ADD_TO_WATCHLIST:
+                return ADD_TO_WATCHLIST;
+            case ADD_TO_WATCHED_LIST:
+                return ADD_TO_WATCHED_LIST;
             default:
                 return 0;
         }
@@ -60,10 +60,9 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
         View view;
 
-        if(viewType == ADD_TO_LIST_WATCHLIST) {
+        if(viewType == ADD_TO_WATCHLIST) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.watchlist_post_layout, parent, false);
             return new WatchlistPostViewHolder(view);
-
         }
         else {
             return new WatchlistPostViewHolder(null);
@@ -73,7 +72,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(getItemViewType(position) == ADD_TO_LIST_WATCHLIST) {
+        if(getItemViewType(position) == ADD_TO_WATCHLIST) {
             WatchlistPost watchlistPost = (WatchlistPost) postList.get(position);
             //
             buildWatchlistPost((WatchlistPostViewHolder) holder, watchlistPost);

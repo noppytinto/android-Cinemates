@@ -180,24 +180,6 @@ public class Movie implements Parcelable {
     }
 
 
-
-
-//    private int tmdbID;
-//    private String title;
-//    private String overview;
-//    private String posterURL;
-//    private String backdropURL;
-//    private int duration;
-//    private String releaseStatus;
-//    private String releaseDate;
-//    private ArrayList<String> genres;
-//    private ArrayList<Person> castAndCrew;
-//    private ArrayList<Review> reviews;
-
-
-
-
-
     //------------------------------------------------------------------- PARCEL METHODS
 
     public Movie(Parcel source) {
@@ -228,7 +210,6 @@ public class Movie implements Parcelable {
         dest.writeList(genres);
         dest.writeList(castAndCrew);
         dest.writeList(reviews);
-
     }
 
     // Method to recreate a Question from a Parcel

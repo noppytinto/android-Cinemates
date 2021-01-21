@@ -12,10 +12,10 @@ public class Post {
     private PostType postType;
 
     public enum PostType {
-        ADD_TO_LIST_WATCHLIST,
-        ADD_TO_LIST_WATCHED,
-        ADD_TO_LIST_FAVORITE,
-        ADD_TO_LIST_CUSTOM,
+        ADD_TO_WATCHLIST,
+        ADD_TO_WATCHED_LIST,
+        ADD_TO_FAVORITES_LIST,
+        ADD_TO_CUSTOM_LIST,
         CREATE_LIST,
         NEW_FRIEND,
         REVIEW

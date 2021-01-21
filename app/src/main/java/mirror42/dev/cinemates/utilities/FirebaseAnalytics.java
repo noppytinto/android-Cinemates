@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 
 public class FirebaseAnalytics {
     private static FirebaseAnalytics singletonInstance;
@@ -79,6 +80,24 @@ public class FirebaseAnalytics {
             mFirebaseAnalytics.logEvent(com.google.firebase.analytics.FirebaseAnalytics.Event.SELECT_ITEM, params);
         }
     }
+
+
+    public void logSelectedSearchedMovie(MovieSearchResult movie, String itemCategory, Object screenClass, Context context) {
+        if(haveUserConsensus) {
+            // send to firebase analytics
+            @SuppressLint("MissingPermission")
+            com.google.firebase.analytics.FirebaseAnalytics mFirebaseAnalytics = com.google.firebase.analytics.FirebaseAnalytics.getInstance(context);
+            Bundle params = new Bundle();
+            params.putString(com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_CATEGORY, itemCategory);
+            params.putString(com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_ID, String.valueOf(movie.getTmdbID()));
+            params.putString(com.google.firebase.analytics.FirebaseAnalytics.Param.ITEM_NAME, movie.getTitle());
+            params.putString(com.google.firebase.analytics.FirebaseAnalytics.Param.SCREEN_CLASS, screenClass.getClass().getSimpleName());
+//        Bundle params = new Bundle();
+//        params.putParcelableArray(FirebaseAnalytics.Param.ITEMS, new Bundle[]{item1});
+            mFirebaseAnalytics.logEvent(com.google.firebase.analytics.FirebaseAnalytics.Event.SELECT_ITEM, params);
+        }
+    }
+
 
     public void logLoginEvent(String method, Context context) {
         @SuppressLint("MissingPermission")

@@ -32,10 +32,11 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-import mirror42.dev.cinemates.ui.search.SearchViewModel.SearchType;
+import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
+import mirror42.dev.cinemates.ui.search.model.SearchResult;
+import mirror42.dev.cinemates.ui.search.model.SearchResult.SearchType;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
@@ -53,7 +54,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private View view;
     private ChipGroup chipGroup;
     private FirebaseAnalytics firebaseAnalytics;
-    private SearchType searchType;
+    private SearchResult.SearchType searchType;
 
 
 
@@ -96,13 +97,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         firebaseAnalytics = FirebaseAnalytics.getInstance();
-        searchType = SearchType.UNIVERSAL;
+        searchType = SearchResult.SearchType.UNIVERSAL;
 
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        searchViewModel.getMoviesList().observe(getViewLifecycleOwner(), new Observer<ArrayList<Movie>>() {
+        searchViewModel.getSearchResultList().observe(getViewLifecycleOwner(), new Observer<ArrayList<SearchResult>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<Movie> movies) {
+            public void onChanged(@Nullable ArrayList<SearchResult> movies) {
                 if (movies != null && movies.size()>0) {
                     recyclerAdapterSearchPage.loadNewData(movies);
                 } else {
@@ -209,21 +210,34 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onItemClick(View view, int position) {
         try {
-            Movie movieSelected = recyclerAdapterSearchPage.getMoviesList(position);
+            SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResultList(position);
 
-            firebaseAnalytics.logSelectedMovie(movieSelected, "selected movie in search tab", this, getContext());
+
+            switch (itemSelected.getResultType()) {
+                case MOVIE: {
+                    firebaseAnalytics.logSelectedSearchedMovie((MovieSearchResult) itemSelected, "selected movie in search tab", this, getContext());
 
 //            NavHostFragment.findNavController(FirstFragment.this)
 //                    .navigate(R.id.action_FirstFragment_to_SecondFragment);
 
-            // passing movie to MovieDetailsFragment
+                    // passing movie to MovieDetailsFragment
 //            MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
 //                    action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
 //            NavHostFragment.findNavController(SearchFragment.this).navigate(action);
 
+                    Movie mv = new Movie();
+                    mv.setTmdbID(((MovieSearchResult) itemSelected).getTmdbID());
+                    NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
+                    NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+                }
+                    break;
+                case USER: {
+                    //TODO:
+                }
+                    break;
+            }
 
-            NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
-            NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

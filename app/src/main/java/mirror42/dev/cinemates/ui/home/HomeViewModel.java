@@ -153,7 +153,7 @@ public class HomeViewModel extends ViewModel {
                                         movie.setPosterURL(posterURL);
 
                                         watchlistPost = new WatchlistPost();
-                                        watchlistPost.setPostType(Post.PostType.ADD_TO_LIST_WATCHLIST);
+                                        watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
                                         watchlistPost.setOwner(user);
                                         watchlistPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
                                         watchlistPost.setDescription("ha aggiunt un film alla Watchlist.");
