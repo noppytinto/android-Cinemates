@@ -5,4 +5,7 @@
     <string name="reset_password_Title">Recupera password</string>
     <string name="reset_password_subTitle">Inserisci il tuo indirizzo e-mail nel campo seguente e ti invieremo una mail con all\' interno la tua nuova password </string>
     <string name="reset_password_button_reset">Invia e-mail</string>
+
+    <!-- firebase -->
+    <string name="resetPassword_page_firebase_resetPassword">Reset password page</string>
 </resources>

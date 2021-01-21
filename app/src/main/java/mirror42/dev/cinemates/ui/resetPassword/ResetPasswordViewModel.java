@@ -13,6 +13,7 @@ import java.util.Random;
 
 import mirror42.dev.cinemates.mailAPI.JavaMailAPI;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -30,7 +31,6 @@ public class ResetPasswordViewModel extends ViewModel {
     private RemoteConfigServer remoteConfigServer;
     private JavaMailAPI javaMailAPI;
 
-
     public enum ResetResult {
         FAILED,
         SUCCESS,
@@ -40,11 +40,9 @@ public class ResetPasswordViewModel extends ViewModel {
    public ResetPasswordViewModel(){
        resetResult = new MutableLiveData<>(ResetResult.NONE);
        remoteConfigServer = RemoteConfigServer.getInstance();
-       javaMailAPI = new JavaMailAPI(remoteConfigServer.getGmailUsername(), remoteConfigServer.getGmailPass());
    }
 
-
-
+    // getter and setter
     public void postResetStatus(ResetResult resetResult) {
         this.resetResult.postValue(resetResult);
     }
@@ -53,59 +51,18 @@ public class ResetPasswordViewModel extends ViewModel {
         return resetResult;
     }
 
+
     public void resetPassword(String email){
         Random rand = new Random();
         int randomPassword = rand.nextInt(10000) + 132986;
         String password = Integer.toString(randomPassword);
-//        String password = "aaaaaa";
-        Runnable emailSendTask = sendNewPasswordEmailTask(email,password);
-        Thread t = new Thread(emailSendTask);
-        t.start();
-        //resetPasswordToServer(email, MyUtilities.SHA256encrypt(password));
-    }
-
-
-    private Runnable sendNewPasswordEmailTask(String email,String newPassword) {
-        return () -> {
-
-            // supported max 29<= sdk
-            String[] recipients = {email};
-            javaMailAPI.set_from("Cinemates");
-            javaMailAPI.setBody("nuova password: " + newPassword);
-            javaMailAPI.set_to(recipients);
-            javaMailAPI.set_subject("Richiesta reset password");
-
-            try {
-                if (javaMailAPI.send()) {
-                    postResetStatus(ResetResult.SUCCESS);
-                } else {
-                    postResetStatus(ResetResult.FAILED);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                postResetStatus(ResetResult.FAILED);
-            }
-
-
-//            MailSender sendMail = new MailSender();
-//            try {
-//               boolean isSent =  sendMail.sendAnEmail(email, "Questa è la nuova password" + newPassword);
-//               if(isSent)
-//                   postResetStatus(ResetResult.SUCCESS);
-//               else
-//                   postResetStatus(ResetResult.FAILED);
-//            } catch (EmailException e) {
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
-        };
+        resetPasswordToServer(email, password);
     }
 
     private void resetPasswordToServer(String email, String password){
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_update_password";
+        final String passwordHide = MyUtilities.SHA256encrypt(password);
         try{
             HttpUrl httpUrl = new HttpUrl.Builder()
                     .scheme("https")
@@ -115,7 +72,7 @@ public class ResetPasswordViewModel extends ViewModel {
                     .build();
             RequestBody requestBody = new FormBody.Builder()
                     .add("mail",email)
-                    .add("newpassword",password)
+                    .add("newpassword",passwordHide)
                     .add("typeupdate","RESET")
                     .build();
             Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,remoteConfigServer.getGuestToken());
@@ -135,10 +92,10 @@ public class ResetPasswordViewModel extends ViewModel {
                         Log.v(TAG,"response :" + response);
                         if(response.isSuccessful()) {
                             String responseData = response.body().toString();
-                            Log.v(TAG,"Tutto ok reset password");
-                            postResetStatus(ResetResult.SUCCESS);
+                            Log.v(TAG,"Tutto ok reset password a db");
+                            sendEmail(email,  password);
                         }else{
-                            Log.v(TAG,"fallimento");
+                            Log.v(TAG,"mail non trovata ");
                             postResetStatus(ResetResult.FAILED);
                         }
 
@@ -150,13 +107,42 @@ public class ResetPasswordViewModel extends ViewModel {
 
                 }
             });
-
-
-
         }catch(Exception e){
             e.printStackTrace();
             postResetStatus(ResetResult.FAILED);
         }
+    }
+
+
+    private void sendEmail(String email, String password){
+
+        Runnable emailSendTask = sendNewPasswordEmailTask(email, password);
+        Thread t = new Thread(emailSendTask);
+        t.start();
+    }
+
+
+    private Runnable sendNewPasswordEmailTask(String email,String newPassword) {
+        return () -> {
+            javaMailAPI = new JavaMailAPI(remoteConfigServer.getGmailUsername(), remoteConfigServer.getGmailPass());
+            // supported max 29<= sdk
+            String[] recipients = {email};
+            javaMailAPI.set_from("Cinemates");
+            javaMailAPI.setBody("nuova password: " + newPassword);
+            javaMailAPI.set_to(recipients);
+            javaMailAPI.set_subject("Richiesta reset password");
+
+            try {
+                if (javaMailAPI.send()) {
+                    postResetStatus(ResetResult.SUCCESS);
+                } else {
+                    postResetStatus(ResetResult.FAILED);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                postResetStatus(ResetResult.FAILED);
+            }
+        };
     }
 
 }

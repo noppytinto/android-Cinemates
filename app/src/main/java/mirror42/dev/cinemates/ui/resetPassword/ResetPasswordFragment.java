@@ -14,7 +14,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
 
@@ -25,6 +29,8 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
     private Button resetPassword;
     private View view;
     private ResetPasswordViewModel resetPasswordViewModel;
+    private FirebaseAnalytics firebaseAnalytics;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +41,10 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // firebase logging
+        firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, getString(R.string.resetPassword_page_firebase_resetPassword), getContext());
 
         initViews(view);
 
@@ -52,7 +62,10 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         if(v.getId() == resetPassword.getId()){
             String email = editTextEmail.getText().toString();
-            resetPasswordViewModel.resetPassword(email);
+            if(isVaildMail( email))
+                resetPasswordViewModel.resetPassword(email);
+            else
+                MyUtilities.showCenteredToast( "Formato mail non valido ", getContext());
         }
     }
 
@@ -65,4 +78,16 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
 
         resetPassword.setOnClickListener(this);
     }
+
+    private boolean isVaildMail(String email) {
+        boolean isValid = false;
+        String regex = "^(.+)@(.+)$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+        if (matcher.matches())
+            isValid = true;
+        return isValid;
+    }
+
 }

@@ -107,6 +107,7 @@ public class JavaMailAPI extends javax.mail.Authenticator  {
     }
 
     public void setBody(String _body) {
+        this._body = "";
         this._body = _body;
     }
 
