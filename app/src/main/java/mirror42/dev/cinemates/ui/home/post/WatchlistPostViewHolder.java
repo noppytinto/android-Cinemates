@@ -24,6 +24,8 @@ public class WatchlistPostViewHolder extends RecyclerView.ViewHolder  {
 
     public Button buttonComment;
     public Button buttonLike;
+    public TextView textViewComments;
+    public Button textViewLikes;
 
 
 
@@ -39,8 +41,11 @@ public class WatchlistPostViewHolder extends RecyclerView.ViewHolder  {
         imageViewThumbnail_2 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_2)).findViewById(R.id.imageview_movieThumbnail);
         imageViewThumbnail_3 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_3)).findViewById(R.id.imageview_movieThumbnail);
 
+
         buttonComment = itemView.findViewById(R.id.button_reactionsLayout_comment);
         buttonLike = itemView.findViewById(R.id.button_reactionsLayout_like);
+        textViewComments = itemView.findViewById(R.id.textView_reactionsLayout_comments);
+        textViewLikes = itemView.findViewById(R.id.textButton_reactionsLayout_like);
     }
 
 

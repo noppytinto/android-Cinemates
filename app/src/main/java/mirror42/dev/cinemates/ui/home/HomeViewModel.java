@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchlistPost;
@@ -84,7 +85,6 @@ public class HomeViewModel extends ViewModel {
 
     private Runnable createFetchWatchlistPostTask(String email, String token) {
         return ()-> {
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Post> result = null;
 
             try {
@@ -109,9 +109,10 @@ public class HomeViewModel extends ViewModel {
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         try {
-                            //
+                            // check responses
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
+
                                 // if response contains valid data
                                 if ( ! responseData.equals("null")) {
                                     JSONArray jsonArray = new JSONArray(responseData);
@@ -120,35 +121,8 @@ public class HomeViewModel extends ViewModel {
 
                                     for(int i=0; i<jsonArray.length(); i++) {
                                         JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                                        watchlistPost = buildWatchlistPost(jsonDBobj, email, token);
 
-                                        // getting post owner data
-                                        User user = new User();
-                                        user.setUsername(jsonDBobj.getString("Username"));
-                                        user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
-
-                                        // getting movie data
-                                        Movie movie = new Movie();
-                                        movie.setTmdbID(jsonDBobj.getInt("MovieId"));
-                                        try {
-                                            // if poster_path is null
-                                            // json.getString() will fail
-                                            // that's why the try-catch
-                                            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
-                                            String posterURL = jsonTmdbObj.getString("poster_path");
-                                            posterURL = tmdb.buildPosterUrl(posterURL);
-                                            movie.setPosterURL(posterURL);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        // assembling post
-                                        watchlistPost = new WatchlistPost();
-                                        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
-                                        watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
-                                        watchlistPost.setOwner(user);
-                                        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
-                                        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
-                                        watchlistPost.setMovie(movie);
                                         postsList.add(watchlistPost);
                                     }// for
 
@@ -157,7 +131,8 @@ public class HomeViewModel extends ViewModel {
                                     setPostsList(postsList);
                                     setFetchStatus(FetchStatus.SUCCESS);
 
-                                }// if response contains no data
+                                }
+                                // if response contains no data
                                 else {
                                     setPostsList(null);
                                     setFetchStatus(FetchStatus.EMPTY);
@@ -183,10 +158,6 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
-
-
-
-
     private HttpUrl buildHttpUrl() throws Exception {
         final String dbFunction = "fn_select_watchlist_post";
 
@@ -202,54 +173,96 @@ public class HomeViewModel extends ViewModel {
     }
 
 
-    private WatchlistPost buildWatchlistPost(String jsonString) {
+    private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token) throws Exception{
+        // getting post owner data
+        User user = new User();
+        user.setUsername(jsonDBobj.getString("Username"));
+        user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
+        // getting movie data
+        Movie movie = new Movie();
+        movie.setTmdbID(jsonDBobj.getInt("MovieId"));
+        try {
+            // if poster_path is null
+            // json.getString() will fail
+            // that's why the try-catch
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
+            String posterURL = jsonTmdbObj.getString("poster_path");
+            posterURL = tmdb.buildPosterUrl(posterURL);
+            movie.setPosterURL(posterURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        return null;
+        // getting post reactions
+
+        // assembling post
+        WatchlistPost watchlistPost = new WatchlistPost();
+        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
+        watchlistPost.setOwner(user);
+        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
+        watchlistPost.setMovie(movie);
+        watchlistPost = fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
+        return watchlistPost;
     }
 
+    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, long postId, String email, String token) {
+        try {
+            final String dbFunction = "fn_select_likes";
+            // building db url
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postId))
+                    .add("email", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
+            // calling
+            String responseData;
+            try (Response response = httpClient.newCall(request).execute()) {
+                if ( response.isSuccessful()) {
+                    responseData = response.body().string();
 
-//
-//    public void downloadMovieDetails(ArrayList<Movie> moviesList) {
-//        Runnable task = createDownloadTask(moviesList);
-//        Thread t = new Thread(task, "THREAD: HOME PAGE - DOWNLOAD MOVIE DETAILS");
-//        t.start();
-//    }
-//
-//    private Runnable createDownloadTask(ArrayList<Movie> moviesList) {
-//        return ()-> {
-//            Log.d(TAG, "THREAD: HOME PAGE - DOWNLOAD MOVIE DETAILS");
-//            TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
-//
-//            // TODO: check movie id
-//
-//            Movie result = null;
-//            ArrayList<Post> postList = getPostsList().getValue();
-//
-//            for(Movie m: moviesList) {
-//                try {
-//
-//
-//                    m.setPosterURL(posterURL);
-//
-//                    postsList.getValue().get()
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            ArrayList<Post> postList = getPostsList().getValue();
-//            postList
-//
-//            // once finished set results
-//            setFetchStatus(FetchStatus.MOVIES_DETAILS_DOWNLOADED);
-//            setPostsList(moviesList);
-//        };
-//    }// end createDownloadTask()
-//
+                    if( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        ArrayList<Like> likes = new ArrayList<>();
 
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            Like l = new Like();
+                            User owner = new User();
+                            owner.setUsername(jsonDBobj.getString("Username"));
+                            l.setOwner(owner);
+                            l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
+                            likes.add(l);
+                        }
+                        watchlistPost.setLikes(likes);
+                    }
+                    else {
+
+                    }
+                }
+                else
+                    throw new IOException("Unexpected code " + response);
+
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return watchlistPost;
+    }
 
 
 

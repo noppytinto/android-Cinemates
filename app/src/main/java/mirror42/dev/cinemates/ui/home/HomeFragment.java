@@ -66,8 +66,8 @@ public class HomeFragment extends Fragment {
         homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
-                    ArrayList<Post> arrayList = homeViewModel.getPostsList().getValue();
-                    recyclerAdapterPost.loadNewData(arrayList);
+                    ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
+                    recyclerAdapterPost.loadNewData(postsList);
                 }
                     break;
                 case EMPTY:

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.WatchlistPost;
@@ -106,7 +107,13 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
 
-
+        ArrayList<Like> likes = watchlistPost.getLikes();
+        try {
+            if(likes!=null)
+                holder.textViewLikes.setText(String.valueOf(likes.size()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             String posterUrl_1 = watchlistPost.getMovie().getPosterURL();

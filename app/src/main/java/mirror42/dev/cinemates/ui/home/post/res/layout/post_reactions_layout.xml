@@ -7,12 +7,29 @@
     android:background="@color/dark_blue">
 
     <Button
+        android:id="@+id/button_reactionsLayout_like"
+        style="@style/Cinemates.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/dark_blue"
+        android:textColor="@color/light_blue"
+        app:icon="@drawable/icon_like_light_blue"
+        app:iconGravity="textStart"
+        app:iconTint="@color/light_blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
+        app:layout_constraintTop_toBottomOf="@+id/textButton_reactionsLayout_like"
+        app:rippleColor="@color/netflix_red" />
+
+    <Button
         android:id="@+id/button_reactionsLayout_comment"
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp"
         android:backgroundTint="@color/dark_blue"
-        android:text="12"
         android:textColor="@color/light_blue"
         app:icon="@drawable/icon_comment_light_blue"
         app:iconGravity="textStart"
@@ -20,25 +37,34 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline_reaction"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_reactionsLayout_comments"
         app:rippleColor="@color/yellow" />
 
     <Button
-        android:id="@+id/button_reactionsLayout_like"
+        android:id="@+id/textButton_reactionsLayout_like"
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="30dp"
         android:backgroundTint="@color/dark_blue"
-        android:text="7"
+        android:fontFamily="@font/poppins_medium"
+        android:gravity="center|end"
+        android:paddingTop="0dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="0dp"
+        android:text="0"
+        android:textAlignment="viewEnd"
         android:textColor="@color/light_blue"
-        app:icon="@drawable/icon_like_light_blue"
-        app:iconGravity="textStart"
+        android:textSize="14sp"
+        app:icon="@drawable/ic_heart_outlined_light_blue"
+        app:iconGravity="end|textStart"
+        app:iconSize="15dp"
         app:iconTint="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
         app:layout_constraintTop_toTopOf="parent"
-        app:rippleColor="@color/netflix_red" />
+        app:rippleColor="@color/netflix_red"
+        tools:text="25" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_reaction"
@@ -46,5 +72,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.50121653" />
+
+    <TextView
+        android:id="@+id/textView_reactionsLayout_comments"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:fontFamily="@font/poppins_medium"
+        android:gravity="center|left"
+        android:paddingStart="15dp"
+        android:text="0 commenti"
+        android:textColor="@color/light_blue"
+        app:layout_constraintEnd_toStartOf="@+id/button_reactionsLayout_like"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="10 commenti" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
