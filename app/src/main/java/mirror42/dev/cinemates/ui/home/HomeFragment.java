@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,19 +20,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements RecyclerAdapterPost.ReactionsClickAdapterListener {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
     private View view;
     private LoginViewModel loginViewModel;
     private Button buttonUpdateFeed;
-
+    private RecyclerView recyclerView;
 
 
 
@@ -116,16 +120,48 @@ public class HomeFragment extends Fragment {
 
     private void initRecyclerView() {
         // defining Recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_homeFragment);
+        recyclerView = view.findViewById(R.id.recyclerView_homeFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        recyclerAdapterPost = new RecyclerAdapterPost(new ArrayList<>(), getContext());
+        recyclerAdapterPost = new RecyclerAdapterPost(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterPost);
     }
 
 
+    @Override
+    public void onLikeClicked(int position) {
+//        recyclerAdapterPost.updateLikeCounter(position);
+        Post post = recyclerAdapterPost.getPost(position);
+        long postId = post.getPostId();
 
+        TextView textViewLikeCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textButton_reactionsLayout_like);
+        ImageButton likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
+        ArrayList<Like> likes = post.getLikes();
+        int currentLikesCounter = 0;
+        if(likes!=null) {
+            currentLikesCounter = likes.size();
+        }
+
+        if(likebutton.isActivated()) {
+            if(currentLikesCounter>0) {
+                currentLikesCounter = currentLikesCounter -1;
+            }
+            homeViewModel.removeLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+        }
+        else {
+            currentLikesCounter = currentLikesCounter + 1;
+            homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+        }
+
+        textViewLikeCounter.setText(String.valueOf(currentLikesCounter));
+        Toast.makeText(getContext(), String.valueOf(post.getPostId()), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCommentClicked(int position) {
+
+    }
 
 }// end HomeFragment class

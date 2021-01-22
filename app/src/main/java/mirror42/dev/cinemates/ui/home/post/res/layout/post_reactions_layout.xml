@@ -6,22 +6,20 @@
     android:layout_height="match_parent"
     android:background="@color/dark_blue">
 
-    <Button
+
+    <ImageButton
         android:id="@+id/button_reactionsLayout_like"
-        style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/dark_blue"
-        android:textColor="@color/light_blue"
-        app:icon="@drawable/icon_like_light_blue"
-        app:iconGravity="textStart"
-        app:iconTint="@color/light_blue"
+        android:src="@drawable/bg_states_like_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
         app:layout_constraintTop_toBottomOf="@+id/textButton_reactionsLayout_like"
-        app:rippleColor="@color/netflix_red" />
+        app:rippleColor="@color/netflix_red"
+        />
 
     <Button
         android:id="@+id/button_reactionsLayout_comment"
@@ -38,7 +36,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_reactionsLayout_comments"
-        app:rippleColor="@color/yellow" />
+        app:rippleColor="@color/yellow"
+        />
 
     <Button
         android:id="@+id/textButton_reactionsLayout_like"

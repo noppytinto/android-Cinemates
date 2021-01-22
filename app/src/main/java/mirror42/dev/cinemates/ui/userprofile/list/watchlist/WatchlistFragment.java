@@ -344,9 +344,6 @@ public class WatchlistFragment extends Fragment implements
         actionMode = null;
     }
 
-
-
-
     public void hideMainToolbar() {
         try {
             ((MainActivity) getActivity()).hideToolbar();
@@ -362,7 +359,5 @@ public class WatchlistFragment extends Fragment implements
             e.printStackTrace();
         }
     }
-
-
 
 }// end ListFragment class

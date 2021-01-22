@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <style name="tg" parent="android:Widget">
+        <item name="android:background">@drawable/bg_states_like_button</item>
+    </style>
+
+    <style name="toggleButton"  parent="android:Theme.Black">
+        <item name="android:buttonStyleToggle">@style/tg</item>
+        <item name="android:textOn"></item>
+        <item name="android:textOff"></item>
+    </style>
+
+
+
+
+</resources>

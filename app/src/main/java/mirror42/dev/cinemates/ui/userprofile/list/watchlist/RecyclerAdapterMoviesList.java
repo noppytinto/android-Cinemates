@@ -49,17 +49,6 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
         }
 
         //--------------------------------------------- METHODS
-        public void bindView(Movie movie) {
-            if(movie.isSelected()) {
-                imageViewIconSelected.setVisibility(View.VISIBLE);
-                viewGradientSelected.setVisibility(View.VISIBLE);
-            }
-            else {
-                imageViewIconSelected.setVisibility(View.GONE);
-                viewGradientSelected.setVisibility(View.GONE);
-            }
-        }// end bindView()
-
         @Override
         public boolean onLongClick(View v) {
             listener.onItemLongClicked(getAdapterPosition());
@@ -122,130 +111,6 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
 
         holder.setActivated(selectedItems.get(position, false));
         applyClickEvents(holder, position);
-
-//        holder.imageViewPoster.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                MyUtilities.showCenteredToast("item " + position + " clicked", context);
-//
-//                if( ! actionModeisEnabled) {
-//                    ActionMode.Callback callback = new ActionMode.Callback() {
-//                        @Override
-//                        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//                            MenuInflater menuInflater = mode.getMenuInflater();
-//                            menuInflater.inflate(R.menu.list_menu, menu);
-//                            return true;
-//                        }
-//
-//                        @Override
-//                        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//                            actionModeisEnabled = true;
-//                            clickedItemBehaviour(holder);
-//                            watchlistFragment.hideMainToolbar();
-//                            return true;
-//                        }
-//
-//                        @Override
-//                        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//                            int id = item.getItemId();
-//
-//                            switch (id) {
-//                                case R.id.menuItem_listMenu_delete:
-//                                    // for any selected movie
-//                                    // delete from recycler list
-//                                    for (Movie x : selectedMovies) {
-//                                        moviesList.remove(x);
-//                                    }
-//
-//
-//                                    if (moviesList.size() == 0) {
-//                                        //if list is empty
-//                                        // show message
-//                                    }
-//
-//                                    watchlistFragment.removeMoviesFromList(selectedMovies);
-//
-//                                    mode.finish();
-//                                    break;
-//                                case R.id.menuItem_listMenu_selectAll:
-//                                    // when all items selected
-//                                    if (selectedMovies.size() == moviesList.size()) {
-//                                        allItemsAreSelected = false;
-//                                        selectedMovies.clear();
-//                                        for (Movie m: moviesList) {
-//                                            m.setSelected(false);
-//                                        }
-//                                    } else {
-//                                        allItemsAreSelected = true;
-//                                        selectedMovies.clear();
-//                                        selectedMovies.addAll(moviesList);
-//                                        for (Movie m: moviesList) {
-//                                            m.setSelected(true);
-//                                        }
-//                                    }
-//                                    notifyDataSetChanged();
-//                                    break;
-//                            }// switch
-//                            return true;
-//                        }
-//
-//                        @Override
-//                        public void onDestroyActionMode(ActionMode mode) {
-//                            actionModeisEnabled = false;
-//                            allItemsAreSelected = false;
-//                            selectedMovies.clear();
-//                            for (Movie m: moviesList) {
-//                                m.setSelected(false);
-//                            }
-//                            notifyDataSetChanged();
-////                            clickedItemBehaviour(holder);
-//                            watchlistFragment.showMainToolbar();
-//                        }
-//                    };// new
-//
-//                    // launch action mode
-//                    ((AppCompatActivity) v.getContext()).startActionMode(callback);
-////                    clickedItemBehaviour(holder);
-//
-//                }// if
-//                else {
-//                    clickedItemBehaviour(holder);
-//                }
-//
-//                return true;
-//            }// end OnLongClick()
-//        });
-//
-//        holder.imageViewPoster.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(actionModeisEnabled) {
-//                    clickedItemBehaviour(holder);
-//                }
-//                else {
-//
-//                }
-//            }
-//        });
-
-//        if(allItemsAreSelected) {
-////            holder.imageViewIconSelected.setVisibility(View.VISIBLE);
-////            holder.viewGradientSelected.setVisibility(View.VISIBLE);
-//        }
-//        else{
-////            holder.imageViewIconSelected.setVisibility(View.GONE);
-////            holder.viewGradientSelected.setVisibility(View.GONE);
-//        }
-
-
-//        if (isSelectAll) {
-//            holder.imageViewPoster.setVisibility(View.VISIBLE);
-//            holder.imageViewPoster.setBackgroundColor(Color.GRAY);
-//        }
-//        else {
-//            holder.imageViewPoster.setVisibility(View.GONE);
-//            holder.imageViewPoster.setBackgroundColor(Color.TRANSPARENT);
-//        }
 
         Glide.with(context)  //2
                 .load(movie.getPosterURL()) //3
@@ -327,33 +192,6 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
         }
         notifyDataSetChanged();
     }
-
-
-
-    private void clickedItemBehaviour(MovieCardViewHolder holder) {
-        int position = holder.getAdapterPosition();
-
-        if(position>=0) {
-            Movie m = moviesList.get(position);
-            // if the item was not clicked
-            // then show selected and add to slected list
-            if(holder.imageViewIconSelected.getVisibility() == View.GONE) {
-                holder.imageViewIconSelected.setVisibility(View.VISIBLE);
-                holder.viewGradientSelected.setVisibility(View.VISIBLE);
-                moviesList.get(position).setSelected(true);
-                selectedMovies.add(m);
-            }
-            else {
-                // otw, hide selected and add remove from slected list
-                holder.imageViewIconSelected.setVisibility(View.GONE);
-                holder.viewGradientSelected.setVisibility(View.GONE);
-                moviesList.get(position).setSelected(false);
-                selectedMovies.remove(m);
-            }
-        }
-    }// end clickedItemBehaviour()
-
-
 
     @Override
     public int getItemCount() {

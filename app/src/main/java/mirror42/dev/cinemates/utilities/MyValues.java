@@ -18,6 +18,7 @@ public class MyValues {
         EMPTY,
         SUCCESS,
         MOVIES_DETAILS_DOWNLOADED,
+        REFETCH,
         IDLE
     }
 

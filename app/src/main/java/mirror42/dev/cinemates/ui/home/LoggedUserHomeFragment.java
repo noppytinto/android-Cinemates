@@ -9,10 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
@@ -53,17 +49,6 @@ public class LoggedUserHomeFragment extends Fragment {
 
 
     //------------------------------------------------------------------- METHODS
-
-
-    private void initRecycleView() {
-        // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_homeFragment);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // adding recycle listener for touch detection
-        recyclerAdapterPost = new RecyclerAdapterPost(new ArrayList<>(), getContext());
-        recyclerView.setAdapter(recyclerAdapterPost);
-    }
 
 
 

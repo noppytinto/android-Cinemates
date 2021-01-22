@@ -1,9 +1,14 @@
 package mirror42.dev.cinemates.ui.home.post;
 
 import android.content.Context;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,18 +26,26 @@ import mirror42.dev.cinemates.model.WatchlistPost;
 public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
     private ArrayList<Post> postList;
     private Context context;
+    private ReactionsClickAdapterListener listener;
+    private int currentSelectedElementIndex = -1;
 
     private static final int ADD_TO_WATCHLIST = 1;
     private static final int ADD_TO_WATCHED_LIST = 2;
+
+    public interface ReactionsClickAdapterListener {
+        void onLikeClicked(int position);
+        void onCommentClicked(int position);
+    }
 
 
 
 
     //------------------------------------------------------------------------------- CONSTRUCTORS
 
-    public RecyclerAdapterPost(ArrayList<Post> postList, Context context) {
+    public RecyclerAdapterPost(ArrayList<Post> postList, Context context, ReactionsClickAdapterListener listener) {
         this.postList = postList;
         this.context = context;
+        this.listener = listener;
     }
 
 
@@ -58,7 +71,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View view;
 
         if(viewType == ADD_TO_WATCHLIST) {
@@ -75,10 +87,32 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == ADD_TO_WATCHLIST) {
             WatchlistPost watchlistPost = (WatchlistPost) postList.get(position);
+
+
+
             //
             buildWatchlistPost((WatchlistPostViewHolder) holder, watchlistPost);
         }
     }
+
+//    private void applyClickEvents(RecyclerAdapterMoviesList.MovieCardViewHolder holder, final int position) {
+//        holder.cardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                listener.onItemClicked(position);
+//            }
+//        });
+//
+//        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                listener.onItemLongClicked(position);
+//                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+//                return true;
+//            }
+//        });
+//    }
+
 
 
 
@@ -108,12 +142,19 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
 
         ArrayList<Like> likes = watchlistPost.getLikes();
-        try {
-            if(likes!=null)
-                holder.textViewLikes.setText(String.valueOf(likes.size()));
-        } catch (Exception e) {
-            e.printStackTrace();
+        int likesCount = 0;
+        if(likes!=null) {
+            likesCount = likes.size();
+            String postOwnerUsername = watchlistPost.getOwner().getUsername();
+            for(int i=0; i<likes.size(); i++) {
+                String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
+                if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                    holder.buttonLike.setActivated(true);
+                    break;
+                }
+            }
         }
+        holder.textViewLikes.setText(String.valueOf(likesCount));
 
         try {
             String posterUrl_1 = watchlistPost.getMovie().getPosterURL();
@@ -127,31 +168,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             e.printStackTrace();
         }
 
-//        try {
-//            String posterUrl_2 = watchlistPost.getAddedMovies().get(1).getPosterURL();
-//            Glide.with(context)  //2
-//                    .load(posterUrl_2) //3
-//                    .fallback(R.drawable.broken_image)
-//                    .placeholder(R.drawable.placeholder_image)
-//                    .fitCenter() //4
-//                    .into(holder.imageViewThumbnail_2); //8
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            String posterUrl_3 = watchlistPost.getAddedMovies().get(2).getPosterURL();
-//            Glide.with(context)  //2
-//                    .load(posterUrl_3) //3
-//                    .fallback(R.drawable.broken_image)
-//                    .placeholder(R.drawable.placeholder_image)
-//                    .fitCenter() //4
-//                    .into(holder.imageViewThumbnail_3); //8
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-
         try {
             Glide.with(context)  //2
                     .load(watchlistPost.getOwner().getProfilePicturePath()) //3
@@ -162,6 +178,76 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    //-------------------------------------------------------------------------------------------------- viewholders
+
+    public class WatchlistPostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView imageViewProfilePicture;
+        public TextView textViewUsername;
+        public TextView textViewPublishDate;
+        public ImageButton buttonMore;
+
+        public TextView textViewPostDescription;
+        public ImageView imageViewThumbnail_1;
+        public ImageView imageViewThumbnail_2;
+        public ImageView imageViewThumbnail_3;
+
+        public Button buttonComment;
+        public ImageButton buttonLike;
+        public TextView textViewComments;
+        public Button textViewLikes;
+
+
+
+        public WatchlistPostViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+            textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
+            textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
+
+            textViewPostDescription = itemView.findViewById(R.id.textView_contentWatchlistPost_description);
+            imageViewThumbnail_1 = (itemView.findViewById(R.id.include_conentWatchlistPost_thumbnail_1)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewThumbnail_2 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_2)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewThumbnail_3 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_3)).findViewById(R.id.imageview_movieThumbnail);
+
+
+            buttonComment = itemView.findViewById(R.id.button_reactionsLayout_comment);
+            buttonLike = itemView.findViewById(R.id.button_reactionsLayout_like);
+            textViewComments = itemView.findViewById(R.id.textView_reactionsLayout_comments);
+            textViewLikes = itemView.findViewById(R.id.textButton_reactionsLayout_like);
+
+            //listeners
+            buttonLike.setOnClickListener(this);
+            buttonLike.setActivated(false);
+            buttonComment.setOnClickListener(this);
+            textViewLikes.setOnClickListener(this);
+            textViewComments.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(view.getId() == buttonLike.getId()) {
+                listener.onLikeClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                if(buttonLike.isActivated())
+                    buttonLike.setActivated(false);
+                else
+                    buttonLike.setActivated(true);
+            }
+            else if(view.getId() == buttonComment.getId()) {
+                listener.onCommentClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+        }
+    }// end WatchlistPostViewHolder classe
+
+
+    public void updateLikeCounter(int position) {
+        notifyDataSetChanged();
     }
 
 
