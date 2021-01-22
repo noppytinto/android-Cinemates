@@ -61,4 +61,5 @@ public class WatchlistPost extends Post {
     public void setMovie(Movie movie) {
         this.movie = movie;
     }
+
 }// end WatchlistPost class

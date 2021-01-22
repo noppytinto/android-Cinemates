@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
@@ -66,34 +67,24 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
     //----------------------------------------------- METHODS
 
     public void fetchData(String email, String token) {
-        Runnable downloadTask = createDownloadTask(email, token);
+        Runnable downloadTask = createFetchTask(email, token);
         Thread t = new Thread(downloadTask);
         t.start();
     }
 
-    private Runnable createDownloadTask(String email, String token) {
+    private Runnable createFetchTask(String email, String token) {
         return ()-> {
-            HttpUrl httpUrl = null;
-            // generating url request
-            try {
-                httpUrl = buildHttpUrl();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-            }
-
-            // performing http request
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
-            try {
 
+            try {
+                // generating url request
+                HttpUrl httpUrl = buildHttpUrl();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("email", email)
                         .build();
-
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-                //
+                // performing http request
                 Call call = httpClient.newCall(request);
                 call.enqueue(new Callback() {
                     @Override
@@ -108,7 +99,7 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
                                 String responseData = response.body().string();
                                 ArrayList<Movie> result = null;
 
-                                if (!responseData.equals("null")) {
+                                if ( ! responseData.equals("null")) {
                                     result = new ArrayList<>();
                                     JSONArray jsonArray = new JSONArray(responseData);
                                     String posterURL = null;
@@ -140,6 +131,7 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
                                     }
 
                                     // once finished set results
+                                    Collections.reverse(result);
                                     postMoviesList(result);
                                     postDownloadStatus(DownloadStatus.SUCCESS);
 

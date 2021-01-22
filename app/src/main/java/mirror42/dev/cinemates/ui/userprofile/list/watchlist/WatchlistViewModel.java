@@ -71,28 +71,18 @@ public class WatchlistViewModel extends ViewModel {
 
     private Runnable createTask(int movieId, String email, String token) {
         return ()-> {
-            HttpUrl httpUrl = null;
-            // generating url request
-            try {
-                httpUrl = buildHttpUrl();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-            }
-
-            // performing http request
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
-            try {
 
+            try {
+                // generating url request
+                HttpUrl httpUrl = buildHttpUrl();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("movieid", String.valueOf(movieId))
                         .add("email", email)
                         .build();
-
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-                //
+                // performing http request
                 Call call = httpClient.newCall(request);
                 call.enqueue(new Callback() {
                     @Override
@@ -134,8 +124,8 @@ public class WatchlistViewModel extends ViewModel {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-//                postSelectedMovies(null);
-//                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postSelectedMovies(null);
+                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
     }// end createDownloadTask()

@@ -93,7 +93,6 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     //----------------------------------------------------- search result builders
 
     private void buildMovieSearchResult(MovieSearchResultViewHolder holder, MovieSearchResult searchResult) {
-
         Glide.with(context)  //2
                 .load(searchResult.getPosterURL()) //3
                 .fallback(R.drawable.broken_image)

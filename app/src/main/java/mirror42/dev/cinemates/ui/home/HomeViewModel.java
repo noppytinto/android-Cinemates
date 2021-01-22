@@ -77,33 +77,27 @@ public class HomeViewModel extends ViewModel {
     //-------------------------------------------------------------------------- METHODS
 
     public void fetchData(String email, String token) {
-        Runnable task = createTask(email, token);
-        Thread t = new Thread(task);
+        Runnable watchlistPostTask = createFetchWatchlistPostTask(email, token);
+        Thread t = new Thread(watchlistPostTask);
         t.start();
     }
 
-    private Runnable createTask(String email, String token) {
+    private Runnable createFetchWatchlistPostTask(String email, String token) {
         return ()-> {
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Post> result = null;
 
             try {
-                // build httpurl for remote db
+                // build httpurl and request for remote db
                 HttpUrl httpUrl = buildHttpUrl();
-
-                // build http client
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
-
-                // building request
                 RequestBody requestBody = new FormBody.Builder()
                         .add("email", email)
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-
-                result = new ArrayList<>();
-
                 // performing request
+                result = new ArrayList<>();
                 Call call = httpClient.newCall(request);
                 call.enqueue(new Callback() {
                     @Override
@@ -118,55 +112,52 @@ public class HomeViewModel extends ViewModel {
                             //
                             if (response.isSuccessful()) {
                                 String responseData = response.body().string();
-                                // if response contains data
-                                if (!responseData.equals("null")) {
+                                // if response contains valid data
+                                if ( ! responseData.equals("null")) {
                                     JSONArray jsonArray = new JSONArray(responseData);
-
-                                    ArrayList<Movie> addedMovies = new ArrayList<>();
                                     WatchlistPost watchlistPost;
-                                    ArrayList<Post> arrayList = new ArrayList<>();
+                                    ArrayList<Post> postsList = new ArrayList<>();
+
                                     for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
 
+                                        // getting post owner data
                                         User user = new User();
-                                        user.setUsername(jsonObject.getString("Username"));
-                                        user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+                                        user.setUsername(jsonDBobj.getString("Username"));
+                                        user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
+                                        // getting movie data
                                         Movie movie = new Movie();
-                                        movie.setTmdbID(jsonObject.getInt("MovieId"));
-
-                                        // querying TBDb
-                                        JSONObject jsonObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
-
-
-                                        // if poster_path is null
-                                        // getString() will fail
-                                        // that's why the try-catch
-                                        String posterURL = null;
+                                        movie.setTmdbID(jsonDBobj.getInt("MovieId"));
                                         try {
-                                            posterURL = jsonObj.getString("poster_path");
+                                            // if poster_path is null
+                                            // json.getString() will fail
+                                            // that's why the try-catch
+                                            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
+                                            String posterURL = jsonTmdbObj.getString("poster_path");
                                             posterURL = tmdb.buildPosterUrl(posterURL);
+                                            movie.setPosterURL(posterURL);
                                         } catch (Exception e) {
-                                            e.getMessage();
                                             e.printStackTrace();
                                         }
-                                        movie.setPosterURL(posterURL);
 
+                                        // assembling post
                                         watchlistPost = new WatchlistPost();
+                                        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
                                         watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
                                         watchlistPost.setOwner(user);
-                                        watchlistPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-                                        watchlistPost.setDescription("ha aggiunt un film alla Watchlist.");
+                                        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+                                        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
                                         watchlistPost.setMovie(movie);
-                                        arrayList.add(watchlistPost);
+                                        postsList.add(watchlistPost);
                                     }// for
 
-                                    // once finished set results
-                                    Collections.reverse(arrayList);
-                                    setPostsList(arrayList);
+                                    // once finished set result
+                                    Collections.reverse(postsList);
+                                    setPostsList(postsList);
                                     setFetchStatus(FetchStatus.SUCCESS);
 
-                                }// if no results
+                                }// if response contains no data
                                 else {
                                     setPostsList(null);
                                     setFetchStatus(FetchStatus.EMPTY);

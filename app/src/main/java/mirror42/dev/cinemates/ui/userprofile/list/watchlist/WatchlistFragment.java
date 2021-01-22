@@ -92,9 +92,7 @@ public class WatchlistFragment extends Fragment implements
                 // observing selected movies list
                 watchlistViewModel = new ViewModelProvider(requireActivity()).get(WatchlistViewModel.class);
                 watchlistViewModel.getSelectedMovies().observe(getViewLifecycleOwner(), selectedMovies-> {
-                    if(selectedMovies!=null) {
-
-                    }
+                    //ignore
                 });
             }//if
 
@@ -345,37 +343,6 @@ public class WatchlistFragment extends Fragment implements
 
         actionMode = null;
     }
-
-    private void updateColoredRows() {
-        ArrayList<Integer> selectedItemPositions = recyclerAdapterMoviesList.getSelectedItems();
-        for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
-            recyclerAdapterMoviesList.updateData(selectedItemPositions.get(i));
-        }
-        recyclerAdapterMoviesList.notifyDataSetChanged();
-        actionMode = null;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -222,35 +222,24 @@ public class LoginViewModel extends ViewModel {
             // TODO handle failed password encryption
         }
 
-        //
-        HttpUrl httpUrl = null;
 
-        // generating url request
-        try {
-            httpUrl = buildStandardLoginUrl(email, password);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            setPostLoginResult(LoginResult.INVALID_REQUEST);
-        }
-
-        // performing http request
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
         try {
+            // generating url request
+            HttpUrl httpUrl = buildStandardLoginUrl();
             RequestBody requestBody = new FormBody.Builder()
                 .add("mail", email)
                 .add("pass", password)
                 .build();
             Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
 
-            //
+            // performing http request
             Call call = httpClient.newCall(request);
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     setPostLoginResult(LoginResult.FAILED);
-
                 }
 
                 @Override
@@ -296,7 +285,7 @@ public class LoginViewModel extends ViewModel {
         }
     }// end standardLogin()
 
-    private HttpUrl buildStandardLoginUrl(String email, String password) throws Exception {
+    private HttpUrl buildStandardLoginUrl() throws Exception {
         final String dbFunction = "login";
 
         //
