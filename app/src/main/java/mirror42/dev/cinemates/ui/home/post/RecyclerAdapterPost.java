@@ -18,7 +18,6 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.WatchlistPost;
@@ -95,29 +94,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-//    private void applyClickEvents(RecyclerAdapterMoviesList.MovieCardViewHolder holder, final int position) {
-//        holder.cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                listener.onItemClicked(position);
-//            }
-//        });
-//
-//        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                listener.onItemLongClicked(position);
-//                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-//                return true;
-//            }
-//        });
-//    }
-
-
-
-
-
-
     @Override
     public int getItemCount() {
         return ( (postList != null) && (postList.size() != 0) ? postList.size() : 0);
@@ -140,21 +116,14 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewUsername.setText(watchlistPost.getOwner().getUsername());
         holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
+        holder.textViewLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
 
-        ArrayList<Like> likes = watchlistPost.getLikes();
-        int likesCount = 0;
-        if(likes!=null) {
-            likesCount = likes.size();
-            String postOwnerUsername = watchlistPost.getOwner().getUsername();
-            for(int i=0; i<likes.size(); i++) {
-                String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
-                if(postOwnerUsername.equals(reactionOwnerUsername)) {
-                    holder.buttonLike.setActivated(true);
-                    break;
-                }
-            }
-        }
-        holder.textViewLikes.setText(String.valueOf(likesCount));
+        if(watchlistPost.isLikedByMe())
+            holder.buttonLike.setActivated(true);
+        else
+            holder.buttonLike.setActivated(false);
+
+        // TODO: set commented by me
 
         try {
             String posterUrl_1 = watchlistPost.getMovie().getPosterURL();
@@ -244,11 +213,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             }
         }
     }// end WatchlistPostViewHolder classe
-
-
-    public void updateLikeCounter(int position) {
-        notifyDataSetChanged();
-    }
 
 
 

@@ -11,6 +11,8 @@ public class Post {
     private ArrayList<Comment> comments;
     private String description;
     private PostType postType;
+    private boolean isLikedByMe;
+    private boolean isCommentedByMe;
 
 
     public enum PostType {
@@ -95,6 +97,64 @@ public class Post {
 
     //---------------------------------------------------------------------- METHODS
 
+
+    public boolean isLikedByMe() {
+        return isLikedByMe;
+    }
+
+    public void setLikedByMe() {
+        boolean res = false;
+        if(likes!=null && likes.size()>0) {
+            String postOwnerUsername = this.getOwner().getUsername();
+            for(int i=0; i<likes.size(); i++) {
+                String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
+                if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                    res = true;
+                    break;
+                }
+            }
+        }
+
+        isLikedByMe = res;
+    }
+
+    public boolean isCommentedByMe() {
+        return isCommentedByMe;
+    }
+
+    public void setCommentedByMe() {
+        boolean res = false;
+        if(comments!=null && comments.size()>0) {
+            String postOwnerUsername = this.getOwner().getUsername();
+            for(int i=0; i<comments.size(); i++) {
+                String reactionOwnerUsername = comments.get(i).getOwner().getUsername();
+                if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                    res = true;
+                    break;
+                }
+            }
+        }
+
+        isCommentedByMe = res;
+    }
+
+    public int getCommentsCount() {
+        int count = 0;
+        if(comments!=null && comments.size()>0) {
+            count = comments.size();
+        }
+
+        return count;
+    }
+
+    public int getLikesCount() {
+        int count = 0;
+        if(likes!=null && likes.size()>0) {
+            count = likes.size();
+        }
+
+        return count;
+    }
 
 
 

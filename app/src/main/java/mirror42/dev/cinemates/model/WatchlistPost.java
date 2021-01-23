@@ -10,7 +10,6 @@ public class WatchlistPost extends Post {
     private String thumbnail_2_url;
     private String thumbnail_3_url;
     private ArrayList<Movie> addedMovies;
-
     private Movie movie;
 
 

@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
@@ -134,28 +133,24 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
 //        recyclerAdapterPost.updateLikeCounter(position);
         Post post = recyclerAdapterPost.getPost(position);
         long postId = post.getPostId();
-
-        TextView textViewLikeCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textButton_reactionsLayout_like);
+        String currentLoggedUserEmail = loginViewModel.getLoggedUser().getValue().getEmail();
+        TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textButton_reactionsLayout_like);
         ImageButton likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
-        ArrayList<Like> likes = post.getLikes();
-        int currentLikesCounter = 0;
-        if(likes!=null) {
-            currentLikesCounter = likes.size();
-        }
-
+        // updating likes counter
+        int currentLikesCounter = Integer.parseInt(likesCounter.getText().toString());
         if(likebutton.isActivated()) {
             if(currentLikesCounter>0) {
-                currentLikesCounter = currentLikesCounter -1;
+                currentLikesCounter = currentLikesCounter - 1;
             }
-            homeViewModel.removeLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
         else {
             currentLikesCounter = currentLikesCounter + 1;
             homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
 
-        textViewLikeCounter.setText(String.valueOf(currentLikesCounter));
+        likesCounter.setText(String.valueOf(currentLikesCounter));
         Toast.makeText(getContext(), String.valueOf(post.getPostId()), Toast.LENGTH_SHORT).show();
     }
 

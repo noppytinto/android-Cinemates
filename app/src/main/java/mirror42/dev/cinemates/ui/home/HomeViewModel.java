@@ -204,7 +204,7 @@ public class HomeViewModel extends ViewModel {
         watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
         watchlistPost.setMovie(movie);
-        watchlistPost = fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
+        fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
         return watchlistPost;
     }
 
@@ -225,7 +225,7 @@ public class HomeViewModel extends ViewModel {
                     .build();
             Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-            // calling
+            // calling synchronously
             String responseData;
             try (Response response = httpClient.newCall(request).execute()) {
                 if ( response.isSuccessful()) {
@@ -240,19 +240,15 @@ public class HomeViewModel extends ViewModel {
                             Like l = new Like();
                             User owner = new User();
                             owner.setUsername(jsonDBobj.getString("Username"));
+
                             l.setOwner(owner);
                             l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
                             likes.add(l);
                         }
                         watchlistPost.setLikes(likes);
-                    }
-                    else {
-
+                        watchlistPost.setLikedByMe();
                     }
                 }
-                else
-                    throw new IOException("Unexpected code " + response);
-
             }catch (Exception e) {
                 e.printStackTrace();
             }
@@ -309,11 +305,9 @@ public class HomeViewModel extends ViewModel {
                                 if (responseData.equals("true")) {
                                     setFetchStatus(FetchStatus.REFETCH);
                                 }
-                                else {
-                                }
-                            } // if response is unsuccessful
-                            else {
+
                             }
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
