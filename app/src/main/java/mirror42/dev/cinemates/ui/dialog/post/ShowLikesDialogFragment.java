@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,10 +19,15 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 
 public class ShowLikesDialogFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
-    private ShowLikesDialogViewModel showLikesDialogViewModel;
     private ArrayList<User> usersList;
     private View view;
     private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
+
+
+
+
+
+
 
     public ShowLikesDialogFragment(ArrayList<User> usersList) {
         this.usersList = usersList;
@@ -47,12 +51,8 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showLikesDialogViewModel = new ViewModelProvider(this).get(ShowLikesDialogViewModel.class);
-        // TODO: Use the ViewModel
-
         initRecyclerView();
         recyclerAdapterShowLikesDialog.loadNewData(usersList);
-
     }
 
 

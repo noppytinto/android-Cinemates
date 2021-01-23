@@ -35,7 +35,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         void onLikeButtonClicked(int position);
         void onShowLikesClicked(int position);
         void onCommentButtonClicked(int position);
-        void onShowCommentssClicked(int position);
+        void onShowCommentsClicked(int position);
     }
 
 
@@ -225,7 +225,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
             else if(view.getId() == buttonShowComments.getId()) {
-                listener.onShowCommentssClicked(getAdapterPosition());
+                listener.onShowCommentsClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
         }

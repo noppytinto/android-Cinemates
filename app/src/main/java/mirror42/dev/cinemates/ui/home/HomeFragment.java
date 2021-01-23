@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +27,8 @@ import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
-public class HomeFragment extends Fragment implements RecyclerAdapterPost.ReactionsClickAdapterListener {
+public class HomeFragment extends Fragment implements
+        RecyclerAdapterPost.ReactionsClickAdapterListener{
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
@@ -154,7 +154,7 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
         }
 
         likesCounter.setText(String.valueOf(currentLikesCounter));
-        Toast.makeText(getContext(), String.valueOf(currentPost.getPostId()), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), String.valueOf(currentPost.getPostId()), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -168,15 +168,21 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
 
     @Override
     public void onCommentButtonClicked(int position) {
+        Post currentPost = recyclerAdapterPost.getPost(position);
+        long postId = currentPost.getPostId();
+        ArrayList<Comment> comments = currentPost.getComments();
 
+        DialogFragment newFragment = new ShowCommentsDialogFragment(comments, postId, homeViewModel);
+        newFragment.show(getActivity().getSupportFragmentManager(), "ShowCommentsDialogFragment");
     }
 
     @Override
-    public void onShowCommentssClicked(int position) {
+    public void onShowCommentsClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
+        long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
 
-        DialogFragment newFragment = new ShowCommentsDialogFragment(comments);
+        DialogFragment newFragment = new ShowCommentsDialogFragment(comments, postId, homeViewModel);
         newFragment.show(getActivity().getSupportFragmentManager(), "ShowCommentsDialogFragment");
     }
 
