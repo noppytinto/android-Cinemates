@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/dark_blue">
 
 
@@ -13,16 +13,17 @@
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="@color/dark_blue"
         app:icon="@drawable/icon_like_light_blue"
         app:iconGravity="textStart"
         app:iconTint="@color/bg_like_button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
         app:layout_constraintTop_toBottomOf="@+id/button_reactionsLayout_showLikes"
-        app:rippleColor="@color/netflix_red"
-        />
+        app:rippleColor="@color/netflix_red" />
 
     <Button
         android:id="@+id/button_reactionsLayout_comment"
@@ -30,16 +31,17 @@
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="@color/dark_blue"
         app:icon="@drawable/icon_comment_light_blue"
         app:iconGravity="textStart"
         app:iconTint="@color/light_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline_reaction"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_reactionsLayout_showComments"
-        app:rippleColor="@color/yellow"
-        />
+        app:rippleColor="@color/yellow" />
 
     <Button
         android:id="@+id/button_reactionsLayout_showLikes"
