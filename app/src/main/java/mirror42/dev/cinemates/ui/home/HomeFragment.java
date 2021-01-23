@@ -20,8 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
 import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -171,7 +173,11 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
 
     @Override
     public void onShowCommentssClicked(int position) {
+        Post currentPost = recyclerAdapterPost.getPost(position);
+        ArrayList<Comment> comments = currentPost.getComments();
 
+        DialogFragment newFragment = new ShowCommentsDialogFragment(comments);
+        newFragment.show(getActivity().getSupportFragmentManager(), "ShowCommentsDialogFragment");
     }
 
 }// end HomeFragment class

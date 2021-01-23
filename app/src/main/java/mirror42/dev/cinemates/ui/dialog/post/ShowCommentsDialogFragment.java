@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,16 +16,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.Comment;
 
-public class ShowLikesDialogFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
-    private ShowLikesDialogViewModel showLikesDialogViewModel;
-    private ArrayList<User> usersList;
+
+public class ShowCommentsDialogFragment extends DialogFragment implements RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
+    private ArrayList<Comment> commentsList;
     private View view;
-    private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
+    private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;
 
-    public ShowLikesDialogFragment(ArrayList<User> usersList) {
-        this.usersList = usersList;
+    public ShowCommentsDialogFragment(ArrayList<Comment> commentsList) {
+        this.commentsList = commentsList;
     }
 
     @NotNull
@@ -38,40 +37,31 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        this.view = inflater.inflate(R.layout.dialog_show_likes, null);
+        this.view = inflater.inflate(R.layout.dialog_show_comments, null);
         builder.setView(view);
-                // Add action buttons
+        // Add action buttons
         return builder.create();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showLikesDialogViewModel = new ViewModelProvider(this).get(ShowLikesDialogViewModel.class);
-        // TODO: Use the ViewModel
 
         initRecyclerView();
-        recyclerAdapterShowLikesDialog.loadNewData(usersList);
+        recyclerAdapterShowCommentsDialog.loadNewData(commentsList);
 
     }
-
-
-
-
-
-
-
 
     //------------------------------------------------------- METHODS
 
     private void initRecyclerView() {
         // defining Recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_showLikesDialogFragment);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_showCommentsDialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        recyclerAdapterShowLikesDialog = new RecyclerAdapterShowLikesDialog(new ArrayList<>(), getContext(), this);
-        recyclerView.setAdapter(recyclerAdapterShowLikesDialog);
+        recyclerAdapterShowCommentsDialog = new RecyclerAdapterShowCommentsDialog(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterShowCommentsDialog);
     }
 
 
@@ -79,4 +69,5 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
     public void onItemClicked(int position) {
 
     }
-}// end ShowLikesDialogFragment class
+
+}// end ShowCommentsDialogFragment class

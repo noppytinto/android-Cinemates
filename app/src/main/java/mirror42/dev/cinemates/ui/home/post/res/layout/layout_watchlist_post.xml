@@ -27,7 +27,7 @@
 
             <include
                 android:id="@+id/include_postOwnerLayout"
-                layout="@layout/post_owner_layout"
+                layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +36,7 @@
 
             <include
                 android:id="@+id/include_postContentLayout"
-                layout="@layout/content_watchlist_post_layout"
+                layout="@layout/layout_content_watchlist_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +45,7 @@
 
             <include
                 android:id="@+id/include_postReactionsLayout"
-                layout="@layout/post_reactions_layout"
+                layout="@layout/layout_post_reactions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

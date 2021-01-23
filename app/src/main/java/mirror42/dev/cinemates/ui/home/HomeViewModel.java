@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
@@ -205,8 +206,12 @@ public class HomeViewModel extends ViewModel {
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
         watchlistPost.setMovie(movie);
         fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
+        fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
         return watchlistPost;
     }
+
+
+    //----------------- likes
 
     private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, long postId, String email, String token) {
         try {
@@ -261,7 +266,6 @@ public class HomeViewModel extends ViewModel {
 
         return watchlistPost;
     }
-
 
     public void removeLike(long postId, String email, String token) {
         Runnable task = createRemoveLikeTask(postId, email, token);
@@ -384,6 +388,68 @@ public class HomeViewModel extends ViewModel {
             }
         };
     }
+
+
+    //----------------- comments
+
+    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, long postId, String email, String token) {
+        try {
+            final String dbFunction = "fn_select_comments";
+            // building db url
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postId))
+                    .add("email", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+            // calling synchronously
+            String responseData;
+            try (Response response = httpClient.newCall(request).execute()) {
+                if ( response.isSuccessful()) {
+                    responseData = response.body().string();
+
+                    if( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        ArrayList<Comment> comments = new ArrayList<>();
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            Comment cm = new Comment();
+                            User owner = new User();
+                            owner.setFirstName(jsonDBobj.getString("Name"));
+                            owner.setLastName(jsonDBobj.getString("LastName"));
+                            owner.setUsername(jsonDBobj.getString("Username"));
+                            owner.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+
+                            cm.setOwner(owner);
+                            cm.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
+                            cm.setText(jsonDBobj.getString("Text"));
+                            comments.add(cm);
+                        }
+                        watchlistPost.setComments(comments);
+                        watchlistPost.setCommentedByMe();
+                    }
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return watchlistPost;
+    }
+
+
+
+
 
 
 }// end HomeViewModel class

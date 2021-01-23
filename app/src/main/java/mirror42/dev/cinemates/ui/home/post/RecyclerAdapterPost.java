@@ -73,7 +73,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         View view;
 
         if(viewType == ADD_TO_WATCHLIST) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.watchlist_post_layout, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_watchlist_post, parent, false);
             return new WatchlistPostViewHolder(view);
         }
         else {
@@ -117,6 +117,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
         holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
+        holder.buttonShowComments.setText(String.valueOf(watchlistPost.getCommentsCount()) + " commenti");
 
         if(watchlistPost.isLikedByMe())
             holder.buttonLike.setActivated(true);

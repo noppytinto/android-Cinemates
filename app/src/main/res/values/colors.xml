@@ -19,8 +19,13 @@
     <color name="red">#F8475C</color>
     <color name="divider">#FED23F</color>
     <color name="darkSemiTransparent">#C6000000</color>
-    <color name="light_blue_2">#4786B3</color>
     <color name="netflix_red">#E50914</color>
+
+
+    <!-- variations -->
+    <color name="light_blue_2">#4786B3</color>
+    <color name="light_blue_3">#006FBF</color>
+
 
 
 
