@@ -26,16 +26,26 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_showCommentsDialog"
-        android:layout_width="396dp"
-        android:layout_height="360dp"
+        android:layout_width="390dp"
+        android:layout_height="253dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_showCommentsDialog_title" />
+
+    <include
+        android:id="@+id/include_showCommentsDialog"
+        layout="@layout/layout_write_comment_box"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerView_showCommentsDialog"
+        app:layout_constraintStart_toStartOf="@+id/recyclerView_showCommentsDialog"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView_showCommentsDialog" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
