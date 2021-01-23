@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,13 +128,13 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
 
 
     @Override
-    public void onLikeClicked(int position) {
+    public void onLikeButtonClicked(int position) {
 //        recyclerAdapterPost.updateLikeCounter(position);
-        Post post = recyclerAdapterPost.getPost(position);
-        long postId = post.getPostId();
+        Post currentPost = recyclerAdapterPost.getPost(position);
+        long postId = currentPost.getPostId();
         String currentLoggedUserEmail = loginViewModel.getLoggedUser().getValue().getEmail();
-        TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textButton_reactionsLayout_like);
-        ImageButton likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
+        TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_showLikes);
+        Button likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
         // updating likes counter
         int currentLikesCounter = Integer.parseInt(likesCounter.getText().toString());
@@ -151,11 +150,21 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
         }
 
         likesCounter.setText(String.valueOf(currentLikesCounter));
-        Toast.makeText(getContext(), String.valueOf(post.getPostId()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), String.valueOf(currentPost.getPostId()), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onCommentClicked(int position) {
+    public void onShowLikesClicked(int position) {
+
+    }
+
+    @Override
+    public void onCommentButtonClicked(int position) {
+
+    }
+
+    @Override
+    public void onShowCommentssClicked(int position) {
 
     }
 

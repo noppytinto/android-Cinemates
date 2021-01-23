@@ -32,8 +32,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ADD_TO_WATCHED_LIST = 2;
 
     public interface ReactionsClickAdapterListener {
-        void onLikeClicked(int position);
-        void onCommentClicked(int position);
+        void onLikeButtonClicked(int position);
+        void onShowLikesClicked(int position);
+        void onCommentButtonClicked(int position);
+        void onShowCommentssClicked(int position);
     }
 
 
@@ -116,7 +118,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewUsername.setText(watchlistPost.getOwner().getUsername());
         holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
-        holder.textViewLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
+        holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
 
         if(watchlistPost.isLikedByMe())
             holder.buttonLike.setActivated(true);
@@ -165,9 +167,9 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewThumbnail_3;
 
         public Button buttonComment;
-        public ImageButton buttonLike;
-        public TextView textViewComments;
-        public Button textViewLikes;
+        public Button buttonLike;
+        public Button buttonShowComments;
+        public Button buttonShowLikes;
 
 
 
@@ -186,21 +188,21 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
             buttonComment = itemView.findViewById(R.id.button_reactionsLayout_comment);
             buttonLike = itemView.findViewById(R.id.button_reactionsLayout_like);
-            textViewComments = itemView.findViewById(R.id.textView_reactionsLayout_comments);
-            textViewLikes = itemView.findViewById(R.id.textButton_reactionsLayout_like);
+            buttonShowComments = itemView.findViewById(R.id.button_reactionsLayout_showComments);
+            buttonShowLikes = itemView.findViewById(R.id.button_reactionsLayout_showLikes);
 
             //listeners
             buttonLike.setOnClickListener(this);
             buttonLike.setActivated(false);
             buttonComment.setOnClickListener(this);
-            textViewLikes.setOnClickListener(this);
-            textViewComments.setOnClickListener(this);
+            buttonShowLikes.setOnClickListener(this);
+            buttonShowComments.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if(view.getId() == buttonLike.getId()) {
-                listener.onLikeClicked(getAdapterPosition());
+                listener.onLikeButtonClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 if(buttonLike.isActivated())
                     buttonLike.setActivated(false);
@@ -208,7 +210,15 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                     buttonLike.setActivated(true);
             }
             else if(view.getId() == buttonComment.getId()) {
-                listener.onCommentClicked(getAdapterPosition());
+                listener.onCommentButtonClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+            else if(view.getId() == buttonShowLikes.getId()) {
+                listener.onShowLikesClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+            else if(view.getId() == buttonShowComments.getId()) {
+                listener.onShowCommentssClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
         }

@@ -7,17 +7,20 @@
     android:background="@color/dark_blue">
 
 
-    <ImageButton
+    <Button
         android:id="@+id/button_reactionsLayout_like"
+        style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/dark_blue"
-        android:src="@drawable/bg_states_like_button"
+        app:icon="@drawable/icon_like_light_blue"
+        app:iconGravity="textStart"
+        app:iconTint="@color/bg_like_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
-        app:layout_constraintTop_toBottomOf="@+id/textButton_reactionsLayout_like"
+        app:layout_constraintTop_toBottomOf="@+id/button_reactionsLayout_showLikes"
         app:rippleColor="@color/netflix_red"
         />
 
@@ -28,19 +31,18 @@
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/dark_blue"
-        android:textColor="@color/light_blue"
         app:icon="@drawable/icon_comment_light_blue"
         app:iconGravity="textStart"
         app:iconTint="@color/light_blue"
         app:layout_constraintEnd_toStartOf="@+id/guideline_reaction"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_reactionsLayout_comments"
+        app:layout_constraintTop_toBottomOf="@+id/button_reactionsLayout_showComments"
         app:rippleColor="@color/yellow"
         />
 
     <Button
-        android:id="@+id/textButton_reactionsLayout_like"
+        android:id="@+id/button_reactionsLayout_showLikes"
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="30dp"
@@ -72,18 +74,26 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.50121653" />
 
-    <TextView
-        android:id="@+id/textView_reactionsLayout_comments"
+    <Button
+        android:id="@+id/button_reactionsLayout_showComments"
+        style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:fontFamily="@font/poppins_medium"
+        android:backgroundTint="@color/dark_blue"
+        android:fontFamily="@font/poppins"
         android:gravity="center|left"
-        android:paddingStart="15dp"
+        android:paddingTop="0dp"
+        android:paddingLeft="15dp"
+        android:paddingBottom="0dp"
+        android:textSize="10sp"
         android:text="0 commenti"
+        android:textAllCaps="false"
         android:textColor="@color/light_blue"
         app:layout_constraintEnd_toStartOf="@+id/button_reactionsLayout_like"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="10 commenti" />
+        tools:text="10 commenti"
+        app:rippleColor="@color/yellow"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
