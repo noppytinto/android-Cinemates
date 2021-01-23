@@ -67,6 +67,7 @@
         android:padding="0.5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_user_primary_blue" />
+        app:srcCompat="@drawable/icon_user_primary_blue"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

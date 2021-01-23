@@ -9,31 +9,30 @@
 
     <TextView
         android:id="@+id/textView_userProfileFragment_email"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
         android:fontFamily="@font/poppins_medium"
-        android:text="-"
+        android:text="test@mail.com"
         android:textAlignment="textStart"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView_userProfileFragment_profilePicture"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView_userProfileFragment_profilePicture"
-        app:layout_constraintTop_toTopOf="@+id/imageView_userProfileFragment_profilePicture" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView_userProfileFragment_profilePicture" />
 
     <ImageView
         android:id="@+id/imageView_userProfileFragment_profilePicture"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/shape_circle_light_blue"
+        android:elevation="@dimen/default_elevation"
+        app:srcCompat="@drawable/icon_user_primary_blue"
+        android:padding="1.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/user_icon_light_blue" />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_userProfileFragment_logout"
@@ -56,11 +55,12 @@
         layout="@layout/account_verification_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_userProfileFragment_profilePicture" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_email"
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/include_userProfileFragment_content"
