@@ -15,7 +15,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/shape_circle_light_blue"
         android:elevation="@dimen/default_elevation"
-        android:padding="2dp"
+        android:padding="1.5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

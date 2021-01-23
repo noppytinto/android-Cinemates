@@ -15,7 +15,7 @@
         android:fontFamily="@font/poppins_medium"
         android:paddingStart="15dp"
         android:text="Persone a cui piace"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
         android:textColor="@color/light_blue"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -117,7 +117,15 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
         holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
-        holder.buttonShowComments.setText(String.valueOf(watchlistPost.getCommentsCount()) + " commenti");
+
+        int commentsCount = watchlistPost.getCommentsCount();
+        if(commentsCount==1) {
+            holder.buttonShowComments.setText(commentsCount + " commento");
+        }
+        else {
+            holder.buttonShowComments.setText(commentsCount + " commenti");
+        }
+
 
         if(watchlistPost.isLikedByMe())
             holder.buttonLike.setActivated(true);

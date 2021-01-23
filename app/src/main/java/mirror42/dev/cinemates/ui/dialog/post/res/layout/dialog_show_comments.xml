@@ -8,7 +8,6 @@
     tools:context=".ui.dialog.post.ShowCommentsDialogFragment">
 
 
-
     <TextView
         android:id="@+id/textView_showCommentsDialog_title"
         android:layout_width="0dp"
@@ -17,7 +16,7 @@
         android:fontFamily="@font/poppins_medium"
         android:paddingStart="15dp"
         android:text="Commenti"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
         android:textColor="@color/light_blue"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
