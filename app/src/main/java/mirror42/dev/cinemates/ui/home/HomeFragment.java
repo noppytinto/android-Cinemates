@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
@@ -155,7 +157,11 @@ public class HomeFragment extends Fragment implements RecyclerAdapterPost.Reacti
 
     @Override
     public void onShowLikesClicked(int position) {
+        Post currentPost = recyclerAdapterPost.getPost(position);
+        ArrayList<User> users = currentPost.getLikesOwnersList();
 
+        DialogFragment newFragment = new ShowLikesDialogFragment(users);
+        newFragment.show(getActivity().getSupportFragmentManager(), "ShowLikesDialogFragment");
     }
 
     @Override

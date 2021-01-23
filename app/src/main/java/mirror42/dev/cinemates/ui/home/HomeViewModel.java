@@ -239,7 +239,10 @@ public class HomeViewModel extends ViewModel {
                             JSONObject jsonDBobj = jsonArray.getJSONObject(i);
                             Like l = new Like();
                             User owner = new User();
+                            owner.setFirstName(jsonDBobj.getString("Name"));
+                            owner.setLastName(jsonDBobj.getString("LastName"));
                             owner.setUsername(jsonDBobj.getString("Username"));
+                            owner.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                             l.setOwner(owner);
                             l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));

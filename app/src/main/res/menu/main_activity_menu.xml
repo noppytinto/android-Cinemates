@@ -7,10 +7,12 @@
         android:icon="@drawable/notification_icon_light_blue"
         app:showAsAction="always"
         android:visible="false"
+
         />
     <item
         android:id="@+id/menu_item_login"
         android:title="@string/login_page_login"
         android:icon="@drawable/user_icon_light_blue"
-        app:showAsAction="ifRoom" />
+        android:elevation="10dp"
+        app:showAsAction="always" />
 </menu>

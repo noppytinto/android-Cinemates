@@ -32,46 +32,6 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
         void onItemLongClicked(int position);
     }
 
-    class MovieCardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
-        public ImageView imageViewPoster;
-        public View viewGradientSelected;
-        public ImageView imageViewIconSelected;
-        public CardView cardView;
-
-        //--------------------------------------------- CONSTRUCTORS
-        MovieCardViewHolder(@NonNull View itemView) {
-            super(itemView);
-            this.imageViewPoster = itemView.findViewById(R.id.imageview_movieCard_poster);
-            this.imageViewIconSelected = itemView.findViewById(R.id.imageView_movieCard_selected);
-            this.viewGradientSelected = itemView.findViewById(R.id.gradient_movieCard_selected);
-            this.cardView = itemView.findViewById(R.id.cardview_movieCard);
-            cardView.setOnLongClickListener(this);
-        }
-
-        //--------------------------------------------- METHODS
-        @Override
-        public boolean onLongClick(View v) {
-            listener.onItemLongClicked(getAdapterPosition());
-            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            return true;
-        }
-
-        public void setActivated(boolean activate) {
-            if(activate) {
-                imageViewIconSelected.setVisibility(View.VISIBLE);
-                viewGradientSelected.setVisibility(View.VISIBLE);
-            }
-            else {
-                imageViewIconSelected.setVisibility(View.GONE);
-                viewGradientSelected.setVisibility(View.GONE);
-            }
-        }
-
-    }// end MovieCardViewHolder class
-
-
-
-
 
 
     //---------------------------------------------------------------------------------------------------- CONSTRUCTORS
@@ -81,9 +41,9 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
                                      ClickAdapterListener listener) {
         this.moviesList = moviesList;
         this.context = context;
-        selectedMovies = new ArrayList<>();
         this.listener = listener;
-        selectedItems = new SparseBooleanArray();
+        this.selectedMovies = new ArrayList<>();
+        this.selectedItems = new SparseBooleanArray();
     }
 
 
@@ -211,4 +171,42 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
         notifyDataSetChanged();
     }
 
+
+    //---------------------------------------------------------------------- VIEWHOLDERS
+    class MovieCardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+        public ImageView imageViewPoster;
+        public View viewGradientSelected;
+        public ImageView imageViewIconSelected;
+        public CardView cardView;
+
+        //--------------------------------------------- CONSTRUCTORS
+        MovieCardViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.imageViewPoster = itemView.findViewById(R.id.imageview_movieCard_poster);
+            this.imageViewIconSelected = itemView.findViewById(R.id.imageView_movieCard_selected);
+            this.viewGradientSelected = itemView.findViewById(R.id.gradient_movieCard_selected);
+            this.cardView = itemView.findViewById(R.id.cardview_movieCard);
+            cardView.setOnLongClickListener(this);
+        }
+
+        //--------------------------------------------- METHODS
+        @Override
+        public boolean onLongClick(View v) {
+            listener.onItemLongClicked(getAdapterPosition());
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            return true;
+        }
+
+        public void setActivated(boolean activate) {
+            if(activate) {
+                imageViewIconSelected.setVisibility(View.VISIBLE);
+                viewGradientSelected.setVisibility(View.VISIBLE);
+            }
+            else {
+                imageViewIconSelected.setVisibility(View.GONE);
+                viewGradientSelected.setVisibility(View.GONE);
+            }
+        }
+
+    }// end MovieCardViewHolder class
 }// end RecyclerAdapterWatchlist class

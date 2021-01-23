@@ -156,6 +156,18 @@ public class Post {
         return count;
     }
 
+    public ArrayList<User> getLikesOwnersList() {
+        ArrayList<User> list = new ArrayList<>();
+
+        if(likes!=null && likes.size()>0) {
+            for(Like l: likes) {
+                list.add(l.getOwner());
+            }
+        }
+
+        return list;
+    }
+
 
 
 }// end Post class
