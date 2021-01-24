@@ -173,9 +173,10 @@ public class HomeFragment extends Fragment implements
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
+        int currentCommentsCount = currentPost.getCommentsCount();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId);
+        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId, position, currentCommentsCount);
         showCommentsDialogFragment.setListener(this);
         showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
     }
@@ -185,19 +186,33 @@ public class HomeFragment extends Fragment implements
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
+        int currentCommentsCount = currentPost.getCommentsCount();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId);
+        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId, position, currentCommentsCount);
         showCommentsDialogFragment.setListener(this);
         showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
-    public void onAddCommentClicked(String commentText, long postId) {
+    public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount) {
         homeViewModel.addComment(
                 postId,
                 commentText,
                 loginViewModel.getLoggedUser().getValue().getEmail(),
                 loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+        // updating comments counter
+        TextView commentsCounter = recyclerView.getLayoutManager()
+                .findViewByPosition(position)
+                .findViewById(R.id.button_reactionsLayout_showComments);
+        commentsCount = commentsCount + 1;
+
+        if(commentsCount==1) {
+            commentsCounter.setText(commentsCount + " commento");
+        }
+        else {
+            commentsCounter.setText(commentsCount + " commenti");
+        }
     }
 }// end HomeFragment class

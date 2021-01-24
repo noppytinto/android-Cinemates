@@ -46,9 +46,8 @@
     <Button
         android:id="@+id/button_reactionsLayout_showLikes"
         style="@style/Cinemates.Button.TextButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginStart="128dp"
         android:backgroundTint="@color/dark_blue"
         android:fontFamily="@font/poppins_medium"
         android:gravity="center|end"
@@ -64,8 +63,6 @@
         app:iconSize="15dp"
         app:iconTint="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline_reaction"
         app:layout_constraintTop_toTopOf="parent"
         app:rippleColor="@color/netflix_red"
         tools:text="25" />
@@ -80,9 +77,8 @@
     <Button
         android:id="@+id/button_reactionsLayout_showComments"
         style="@style/Cinemates.Button.TextButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginEnd="64dp"
         android:backgroundTint="@color/dark_blue"
         android:fontFamily="@font/poppins_semibold"
         android:gravity="center|left"
@@ -93,7 +89,6 @@
         android:textAllCaps="false"
         android:textColor="@color/light_blue"
         android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@+id/button_reactionsLayout_like"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:rippleColor="@color/yellow"

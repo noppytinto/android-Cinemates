@@ -29,10 +29,12 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     private ImageButton buttonComment;
     private TextInputEditText editTextComment;
     private Long postId;
+    private int position;
+    private int commentsCount;
     AddCommentButtonListener listener;
 
     public interface AddCommentButtonListener {
-        public void onAddCommentClicked(String commentText, long postId);
+        public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
     }
 
     public ShowCommentsDialogFragment() {
@@ -41,11 +43,13 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         // Use `newInstance` instead as shown below
     }
 
-    public static ShowCommentsDialogFragment getInstance(ArrayList<Comment> commentsList, long postId) {
+    public static ShowCommentsDialogFragment getInstance(ArrayList<Comment> commentsList, long postId, int position, int commentsCount) {
         ShowCommentsDialogFragment frag = new ShowCommentsDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable("commentsList", commentsList);
         args.putLong("postId", postId);
+        args.putInt("position", position);
+        args.putInt("commentsCount", commentsCount);
         frag.setArguments(args);
         return frag;
     }
@@ -76,13 +80,15 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         super.onActivityCreated(savedInstanceState);
         commentsList = (ArrayList<Comment>) getArguments().getSerializable("commentsList");
         postId = getArguments().getLong("postId");
+        position = getArguments().getInt("position");
+        commentsCount = getArguments().getInt("commentsCount");
 
         buttonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String commentText = editTextComment.getText().toString();
                 if( ! commentText.isEmpty()) {
-                    listener.onAddCommentClicked(commentText, postId);
+                    listener.onAddCommentClicked(commentText, postId, position, commentsCount);
 
                     final Toast toast = Toast.makeText(getContext(), "commento pubblicato, aggiorna.", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
