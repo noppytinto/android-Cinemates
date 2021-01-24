@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -39,6 +40,8 @@ public class RecyclerAdapterShowCommentsDialog
 
     }
 
+
+
     //----------------------------------------------------------------------- METHODS
 
     @NonNull
@@ -60,6 +63,11 @@ public class RecyclerAdapterShowCommentsDialog
 
         holder.textViewFullName.setText(firstName + " " + lastName);
         holder.textViewCommentText.setText(commentText);
+
+        //
+//        if(comment.isNewItem()) {
+//            holder.cardView.setActivated(false);
+//        }
 
         Glide.with(context)  //2
                 .load(profilePictureUrl) //3
@@ -84,6 +92,11 @@ public class RecyclerAdapterShowCommentsDialog
         notifyDataSetChanged();
     }
 
+    public void addItem(Comment newItem) {
+        comments.add(newItem);
+        notifyDataSetChanged();
+    }
+
 
 
 
@@ -97,6 +110,7 @@ public class RecyclerAdapterShowCommentsDialog
         public ImageView imageViewProfilePicture;
         public TextView textViewFullName;
         public TextView textViewCommentText;
+        public CardView cardView;
 
 
 
@@ -107,6 +121,7 @@ public class RecyclerAdapterShowCommentsDialog
             this.imageViewProfilePicture = itemView.findViewById(R.id.imageView_userCommentListItem_profilePicture);
             this.textViewFullName = itemView.findViewById(R.id.textView_userCommentListItem_fullName);
             this.textViewCommentText = itemView.findViewById(R.id.textView_userCommentListItem_commentText);
+            this.cardView = itemView.findViewById(R.id.cardView_userCommentListItem);
 
             this.imageViewProfilePicture.setOnClickListener(this);
         }

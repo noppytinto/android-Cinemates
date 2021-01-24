@@ -177,6 +177,9 @@ public class HomeViewModel extends ViewModel {
         // getting post owner data
         User user = new User();
         user.setUsername(jsonDBobj.getString("Username"));
+        user.setFirstName(jsonDBobj.getString("Name"));
+        user.setLastName(jsonDBobj.getString("LastName"));
+
         user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
         // getting movie data

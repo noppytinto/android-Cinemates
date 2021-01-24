@@ -5,12 +5,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.User;
 
 
 public class ShowCommentsDialogFragment extends DialogFragment implements RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
@@ -31,10 +34,18 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     private Long postId;
     private int position;
     private int commentsCount;
+    private User reactionOwner;
     AddCommentButtonListener listener;
+    private RecyclerView recyclerView;
 
     public interface AddCommentButtonListener {
         public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        reactionOwner = null;
     }
 
     public ShowCommentsDialogFragment() {
@@ -43,10 +54,11 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         // Use `newInstance` instead as shown below
     }
 
-    public static ShowCommentsDialogFragment getInstance(ArrayList<Comment> commentsList, long postId, int position, int commentsCount) {
+    public static ShowCommentsDialogFragment getInstance(User reactionOwner, ArrayList<Comment> commentsList, long postId, int position, int commentsCount) {
         ShowCommentsDialogFragment frag = new ShowCommentsDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable("commentsList", commentsList);
+        args.putSerializable("reactionOwner", reactionOwner);
         args.putLong("postId", postId);
         args.putInt("position", position);
         args.putInt("commentsCount", commentsCount);
@@ -60,7 +72,6 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
 
 
     @Override
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.dialog_show_comments, container);
@@ -82,36 +93,59 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         postId = getArguments().getLong("postId");
         position = getArguments().getInt("position");
         commentsCount = getArguments().getInt("commentsCount");
+        reactionOwner = (User) getArguments().getSerializable("reactionOwner");
 
         buttonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String commentText = editTextComment.getText().toString();
                 if( ! commentText.isEmpty()) {
-                    listener.onAddCommentClicked(commentText, postId, position, commentsCount);
+                    editTextComment.setText("");
+                    editTextComment.clearFocus();
+                    Comment newComment = new Comment();
+                    newComment.setText(commentText);
+                    newComment.setOwner(reactionOwner);
+                    newComment.setIsNewItem(true);
+                    recyclerAdapterShowCommentsDialog.addItem(newComment);
+                    editTextComment.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
-                    final Toast toast = Toast.makeText(getContext(), "commento pubblicato, aggiorna.", Toast.LENGTH_SHORT);
+
+                    listener.onAddCommentClicked(commentText, postId, position, commentsCount);
+                    moveRecyclerToBottom();
+
+                    final Toast toast = Toast.makeText(getContext(), "commento pubblicato.", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
-                    dismiss();
+//                    dismiss();
                 }
             }
         });
 
-        recyclerAdapterShowCommentsDialog.loadNewData(commentsList);
 
+        recyclerAdapterShowCommentsDialog.loadNewData(commentsList);
+        moveRecyclerToBottom();
     }
 
     //------------------------------------------------------- METHODS
 
+    private void moveRecyclerToBottom() {
+        if(commentsList != null && commentsList.size()>0) {
+            recyclerView.smoothScrollToPosition(commentsList.size()-1);
+        }
+    }
+
     private void initRecyclerView() {
         // defining Recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_showCommentsDialog);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView = view.findViewById(R.id.recyclerView_showCommentsDialog);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+//        linearLayoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
         recyclerAdapterShowCommentsDialog = new RecyclerAdapterShowCommentsDialog(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterShowCommentsDialog);
+
     }
 
 

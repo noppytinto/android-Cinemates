@@ -3,9 +3,9 @@ package mirror42.dev.cinemates.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Date;
+import java.io.Serializable;
 
-public class User {
+public class User implements Serializable {
     private String username;
     private String email;
     private String password;

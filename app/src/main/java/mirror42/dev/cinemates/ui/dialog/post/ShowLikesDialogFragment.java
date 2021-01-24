@@ -1,17 +1,16 @@
 package mirror42.dev.cinemates.ui.dialog.post;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -24,34 +23,41 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
     private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
 
 
-
-
-
-
-
-    public ShowLikesDialogFragment(ArrayList<User> usersList) {
-        this.usersList = usersList;
+    public ShowLikesDialogFragment() {
+        // Empty constructor is required for DialogFragment
+        // Make sure not to add arguments to the constructor
+        // Use `newInstance` instead as shown below
     }
 
-    @NotNull
+
+
+
+    public static ShowLikesDialogFragment getInstance(ArrayList<User> usersList) {
+        ShowLikesDialogFragment frag = new ShowLikesDialogFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("usersList", usersList);
+        frag.setArguments(args);
+        return frag;
+    }
+
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        this.view = inflater.inflate(R.layout.dialog_show_likes, null);
-        builder.setView(view);
-                // Add action buttons
-        return builder.create();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.dialog_show_likes, container);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.view = view;
+        initRecyclerView();
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initRecyclerView();
+        usersList = (ArrayList<User>) getArguments().getSerializable("usersList");
         recyclerAdapterShowLikesDialog.loadNewData(usersList);
     }
 
@@ -67,6 +73,7 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
     private void initRecyclerView() {
         // defining Recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView_showLikesDialogFragment);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection

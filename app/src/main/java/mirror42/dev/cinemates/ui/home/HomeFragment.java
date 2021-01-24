@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -164,8 +163,9 @@ public class HomeFragment extends Fragment implements
         Post currentPost = recyclerAdapterPost.getPost(position);
         ArrayList<User> users = currentPost.getLikesOwnersList();
 
-        DialogFragment newFragment = new ShowLikesDialogFragment(users);
-        newFragment.show(getActivity().getSupportFragmentManager(), "ShowLikesDialogFragment");
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        ShowLikesDialogFragment dialog = ShowLikesDialogFragment.getInstance(users);
+        dialog.show(fm, "ShowLikesDialogFragment");
     }
 
     @Override
@@ -174,11 +174,17 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
         int currentCommentsCount = currentPost.getCommentsCount();
+        User reactionOwner = loginViewModel.getLoggedUser().getValue();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId, position, currentCommentsCount);
-        showCommentsDialogFragment.setListener(this);
-        showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
+        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
+                reactionOwner,
+                comments,
+                postId,
+                position,
+                currentCommentsCount);
+        dialog.setListener(this);
+        dialog.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
@@ -187,11 +193,17 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
         int currentCommentsCount = currentPost.getCommentsCount();
+        User reactionOwner = currentPost.getOwner();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId, position, currentCommentsCount);
-        showCommentsDialogFragment.setListener(this);
-        showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
+        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
+                reactionOwner,
+                comments,
+                postId,
+                position,
+                currentCommentsCount);
+        dialog.setListener(this);
+        dialog.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
