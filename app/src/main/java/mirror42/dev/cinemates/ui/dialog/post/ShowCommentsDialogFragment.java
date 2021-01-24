@@ -5,6 +5,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -98,6 +100,8 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         buttonComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
+                buttonComment.startAnimation(buttonAnim);
                 String commentText = editTextComment.getText().toString();
                 if( ! commentText.isEmpty()) {
                     editTextComment.setText("");
@@ -106,7 +110,7 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
                     newComment.setText(commentText);
                     newComment.setOwner(reactionOwner);
                     newComment.setIsNewItem(true);
-                    recyclerAdapterShowCommentsDialog.addItem(newComment);
+                    recyclerAdapterShowCommentsDialog.addPlaceholderitem(newComment);
                     editTextComment.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
 

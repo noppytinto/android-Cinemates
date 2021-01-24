@@ -92,8 +92,8 @@ public class RecyclerAdapterShowCommentsDialog
         notifyDataSetChanged();
     }
 
-    public void addItem(Comment newItem) {
-        comments.add(newItem);
+    public void addPlaceholderitem(Comment item) {
+        comments.add(item);
         notifyDataSetChanged();
     }
 

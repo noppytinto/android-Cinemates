@@ -1,7 +1,7 @@
 package mirror42.dev.cinemates.model;
 
 public class Reaction {
-    private User owner;
+    protected User owner;
     private long publishDateMillis;
 
     public Reaction() {

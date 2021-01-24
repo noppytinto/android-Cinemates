@@ -87,6 +87,10 @@ public class RecyclerAdapterShowLikesDialog extends RecyclerView.Adapter<Recycle
         notifyDataSetChanged();
     }
 
+    public void addPlaceholderItem(User item) {
+        usersList.add(item);
+        notifyDataSetChanged();
+    }
 
 
 

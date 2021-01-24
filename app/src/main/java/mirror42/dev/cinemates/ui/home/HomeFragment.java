@@ -20,12 +20,14 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
 import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener,
@@ -143,48 +145,74 @@ public class HomeFragment extends Fragment implements
 
         // updating likes counter
         int currentLikesCounter = Integer.parseInt(likesCounter.getText().toString());
-        if(likebutton.isActivated()) {
-            if(currentLikesCounter>0) {
+        if(likebutton.isActivated()) { //remove like
+            if(currentLikesCounter>0)
                 currentLikesCounter = currentLikesCounter - 1;
-            }
+
             homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            // removing like from current cached list
+            ArrayList<Like> currentLikes = currentPost.getLikes();
+            if(currentLikes!=null && currentLikes.size()>0) {
+                Like placeholderLike = new Like();
+                placeholderLike.setOwner(loginViewModel.getLoggedUser().getValue());
+                currentLikes.remove(placeholderLike);
+            }
         }
-        else {
+        else { //add like
             currentLikesCounter = currentLikesCounter + 1;
             homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            // adding placehoder like to the current cached list
+            RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
+            Like placeholderLike = new Like();
+            User currentUser = loginViewModel.getLoggedUser().getValue();
+            String completeProfilePictureUrl =  remoteConfigServer.getCloudinaryDownloadBaseUrl() + currentUser.getProfilePicturePath();
+            currentUser.setProfilePicturePath(completeProfilePictureUrl);
+            placeholderLike.setOwner(currentUser);
+            ArrayList<Like> currentLikes = currentPost.getLikes();
+            if(currentLikes==null)
+                currentLikes = new ArrayList<>();
+
+            currentLikes.add(placeholderLike);
         }
 
         likesCounter.setText(String.valueOf(currentLikesCounter));
-//        Toast.makeText(getContext(), String.valueOf(currentPost.getPostId()), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onShowLikesClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
-        ArrayList<User> users = currentPost.getLikesOwnersList();
-
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowLikesDialogFragment dialog = ShowLikesDialogFragment.getInstance(users);
-        dialog.show(fm, "ShowLikesDialogFragment");
+        int likesCount = currentPost.getLikesCount();
+        if(likesCount!=0) {
+            ArrayList<User> users = currentPost.getLikesOwnersList();
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ShowLikesDialogFragment dialog = ShowLikesDialogFragment.getInstance(users);
+            dialog.show(fm, "ShowLikesDialogFragment");
+        }
     }
 
     @Override
     public void onCommentButtonClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
-        long postId = currentPost.getPostId();
-        ArrayList<Comment> comments = currentPost.getComments();
-        int currentCommentsCount = currentPost.getCommentsCount();
-        User reactionOwner = loginViewModel.getLoggedUser().getValue();
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
-                reactionOwner,
-                comments,
-                postId,
-                position,
-                currentCommentsCount);
-        dialog.setListener(this);
-        dialog.show(fm, "showCommentsDialogFragment");
+        int commentsCount = currentPost.getCommentsCount();
+        if(commentsCount>0) {
+            long postId = currentPost.getPostId();
+            ArrayList<Comment> comments = currentPost.getComments();
+            int currentCommentsCount = currentPost.getCommentsCount();
+            User reactionOwner = loginViewModel.getLoggedUser().getValue();
+
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
+                    reactionOwner,
+                    comments,
+                    postId,
+                    position,
+                    currentCommentsCount);
+            dialog.setListener(this);
+            dialog.show(fm, "showCommentsDialogFragment");
+        }
     }
 
     @Override

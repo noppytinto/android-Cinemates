@@ -151,7 +151,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
             else {
                 textInputLayout.setError("Campo vuoto");
-                Toast toast = Toast.makeText(getContext(),"Campo vuoto", Toast.LENGTH_SHORT);
+                final Toast toast = Toast.makeText(getContext(),"Campo vuoto", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
