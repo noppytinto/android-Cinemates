@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.model;
 
-public class Comment extends Reaction{
+import java.io.Serializable;
+
+public class Comment extends Reaction implements Serializable {
     private String text;
 
     public String getText() {

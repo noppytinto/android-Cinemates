@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +29,8 @@ import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class HomeFragment extends Fragment implements
-        RecyclerAdapterPost.ReactionsClickAdapterListener{
+        RecyclerAdapterPost.ReactionsClickAdapterListener,
+        ShowCommentsDialogFragment.AddCommentButtonListener {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
@@ -172,8 +174,10 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
 
-        DialogFragment newFragment = new ShowCommentsDialogFragment(comments, postId, homeViewModel);
-        newFragment.show(getActivity().getSupportFragmentManager(), "ShowCommentsDialogFragment");
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId);
+        showCommentsDialogFragment.setListener(this);
+        showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
@@ -182,8 +186,18 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
 
-        DialogFragment newFragment = new ShowCommentsDialogFragment(comments, postId, homeViewModel);
-        newFragment.show(getActivity().getSupportFragmentManager(), "ShowCommentsDialogFragment");
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        ShowCommentsDialogFragment showCommentsDialogFragment = ShowCommentsDialogFragment.getInstance(comments, postId);
+        showCommentsDialogFragment.setListener(this);
+        showCommentsDialogFragment.show(fm, "showCommentsDialogFragment");
     }
 
+    @Override
+    public void onAddCommentClicked(String commentText, long postId) {
+        homeViewModel.addComment(
+                postId,
+                commentText,
+                loginViewModel.getLoggedUser().getValue().getEmail(),
+                loginViewModel.getLoggedUser().getValue().getAccessToken());
+    }
 }// end HomeFragment class
