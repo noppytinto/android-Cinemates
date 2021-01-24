@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.dialog.post;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -34,14 +36,16 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     private ImageButton buttonComment;
     private TextInputEditText editTextComment;
     private Long postId;
-    private int position;
+    private int postPosition;
     private int commentsCount;
     private User reactionOwner;
     AddCommentButtonListener listener;
     private RecyclerView recyclerView;
 
     public interface AddCommentButtonListener {
-        public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
+        void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
+        void onDeleteCommentClicked(long commentId, int commentPosition, int position, int commentsCount);
+
     }
 
     @Override
@@ -85,6 +89,7 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         this.view = view;
         buttonComment = view.findViewById(R.id.include_showCommentsDialog).findViewById(R.id.button_commentDialog);
         editTextComment = view.findViewById(R.id.include_showCommentsDialog).findViewById(R.id.editText_commentDialog);
+        buttonComment = view.findViewById(R.id.include_showCommentsDialog).findViewById(R.id.button_commentDialog);
         initRecyclerView();
     }
 
@@ -93,7 +98,7 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         super.onActivityCreated(savedInstanceState);
         commentsList = (ArrayList<Comment>) getArguments().getSerializable("commentsList");
         postId = getArguments().getLong("postId");
-        position = getArguments().getInt("position");
+        postPosition = getArguments().getInt("position");
         commentsCount = getArguments().getInt("commentsCount");
         reactionOwner = (User) getArguments().getSerializable("reactionOwner");
 
@@ -114,10 +119,10 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
                     editTextComment.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
 
-                    listener.onAddCommentClicked(commentText, postId, position, commentsCount);
+                    listener.onAddCommentClicked(commentText, postId, postPosition, commentsCount);
                     moveRecyclerToBottom();
 
-                    final Toast toast = Toast.makeText(getContext(), "commento pubblicato.", Toast.LENGTH_SHORT);
+                    final Toast toast = Toast.makeText(getContext(), "Commento pubblicato.", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
 //                    dismiss();
@@ -156,6 +161,33 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     @Override
     public void onItemClicked(int position) {
 
+    }
+
+    @Override
+    public void onDeleteButtonPressed(int commentPosition) {
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Vuoi eliminare il commento?")
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Toast toast = Toast.makeText(getContext(), "Operazione annullata.", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                })
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Comment currentComment = recyclerAdapterShowCommentsDialog.getComment(commentPosition);
+                        recyclerAdapterShowCommentsDialog.removeItem(currentComment);
+                        listener.onDeleteCommentClicked(currentComment.getId(), commentPosition, postPosition, commentsCount);
+                        dismiss();
+                        final Toast toast = Toast.makeText(getContext(), "Commento eliminato.", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                })
+        .show();
     }
 
 }// end ShowCommentsDialogFragment class

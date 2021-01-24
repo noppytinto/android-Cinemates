@@ -129,8 +129,8 @@ public class Post {
             for(int i=0; i<comments.size(); i++) {
                 String reactionOwnerUsername = comments.get(i).getOwner().getUsername();
                 if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                    comments.get(i).setIsMine(true);
                     res = true;
-                    break;
                 }
             }
         }

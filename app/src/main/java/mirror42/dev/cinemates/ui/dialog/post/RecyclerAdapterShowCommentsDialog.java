@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,8 +26,10 @@ public class RecyclerAdapterShowCommentsDialog
     private Context context;
     private ClickAdapterListener listener;
 
+
     interface ClickAdapterListener {
         void onItemClicked(int position);
+        void onDeleteButtonPressed(int position);
     }
 
     //----------------------------------------------------------------------- CONSTRUCTORS
@@ -64,6 +67,13 @@ public class RecyclerAdapterShowCommentsDialog
         holder.textViewFullName.setText(firstName + " " + lastName);
         holder.textViewCommentText.setText(commentText);
 
+        if(comment.isMine()) {
+            holder.buttonDelete.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.buttonDelete.setVisibility(View.GONE);
+        }
+
         //
 //        if(comment.isNewItem()) {
 //            holder.cardView.setActivated(false);
@@ -98,6 +108,10 @@ public class RecyclerAdapterShowCommentsDialog
     }
 
 
+    public void removeItem(Comment item) {
+        comments.remove(item);
+        notifyDataSetChanged();
+    }
 
 
 
@@ -111,6 +125,8 @@ public class RecyclerAdapterShowCommentsDialog
         public TextView textViewFullName;
         public TextView textViewCommentText;
         public CardView cardView;
+        private ImageButton buttonDelete;
+
 
 
 
@@ -122,8 +138,10 @@ public class RecyclerAdapterShowCommentsDialog
             this.textViewFullName = itemView.findViewById(R.id.textView_userCommentListItem_fullName);
             this.textViewCommentText = itemView.findViewById(R.id.textView_userCommentListItem_commentText);
             this.cardView = itemView.findViewById(R.id.cardView_userCommentListItem);
+            this.buttonDelete = itemView.findViewById(R.id.imageButton_userCommentListItem_delete);
 
             this.imageViewProfilePicture.setOnClickListener(this);
+            this.buttonDelete.setOnClickListener(this);
         }
 
 
@@ -134,6 +152,11 @@ public class RecyclerAdapterShowCommentsDialog
             if(v.getId() == imageViewProfilePicture.getId()) {
                 //TODO: show profile
                 listener.onItemClicked(getAdapterPosition());
+
+            }
+            else if(v.getId() == buttonDelete.getId()) {
+                //TODO: show profile
+                listener.onDeleteButtonPressed(getAdapterPosition());
 
             }
         }

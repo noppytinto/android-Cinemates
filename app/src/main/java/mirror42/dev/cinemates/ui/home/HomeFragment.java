@@ -184,7 +184,7 @@ public class HomeFragment extends Fragment implements
     public void onShowLikesClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
         int likesCount = currentPost.getLikesCount();
-        if(likesCount!=0) {
+        if(likesCount>0) {
             ArrayList<User> users = currentPost.getLikesOwnersList();
             FragmentManager fm = getActivity().getSupportFragmentManager();
             ShowLikesDialogFragment dialog = ShowLikesDialogFragment.getInstance(users);
@@ -254,5 +254,35 @@ public class HomeFragment extends Fragment implements
         else {
             commentsCounter.setText(commentsCount + " commenti");
         }
+    }
+
+    @Override
+    public void onDeleteCommentClicked(long commentId, int commentPosition, int postPosition, int commentsCount) {
+        try {
+            TextView commentsCounter = recyclerView.getLayoutManager()
+                    .findViewByPosition(postPosition)
+                    .findViewById(R.id.button_reactionsLayout_showComments);
+
+            if(commentsCount>0)
+                commentsCount = commentsCount - 1;
+
+            if(commentsCount==1) {
+                commentsCounter.setText(commentsCount + " commento");
+            }
+            else {
+                commentsCounter.setText(commentsCount + " commenti");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        homeViewModel.deleteComment(
+                commentId,
+                loginViewModel.getLoggedUser().getValue().getEmail(),
+                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+
+
+
     }
 }// end HomeFragment class

@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Comment extends Reaction implements Serializable {
     private String text;
     private boolean isNewItem;
+    private boolean isMine;
 
     public String getText() {
         return text;
@@ -20,5 +21,13 @@ public class Comment extends Reaction implements Serializable {
 
     public void setIsNewItem(boolean isNewItem) {
         this.isNewItem = isNewItem;
+    }
+
+    public boolean isMine() {
+        return isMine;
+    }
+
+    public void setIsMine(boolean mine) {
+        isMine = mine;
     }
 }
