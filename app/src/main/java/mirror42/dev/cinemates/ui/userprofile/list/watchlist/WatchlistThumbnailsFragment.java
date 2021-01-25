@@ -1,6 +1,12 @@
 package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,13 +15,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -23,7 +22,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.userprofile.UserProfileFragmentDirections;
+import mirror42.dev.cinemates.ui.userprofile.PersonalProfileFragmentDirections;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 
@@ -135,8 +134,8 @@ public class WatchlistThumbnailsFragment extends Fragment implements View.OnClic
             if(movies!=null) {
                 Movie[] m = movies.toArray(new Movie[0]);
 
-                UserProfileFragmentDirections.ActionUserProfileFragmentToListFragment action =
-                        UserProfileFragmentDirections.actionUserProfileFragmentToListFragment(m);
+                PersonalProfileFragmentDirections.ActionPersonalProfileFragmentToListFragment action =
+                        PersonalProfileFragmentDirections.actionPersonalProfileFragmentToListFragment(m);
                 action.setListTitle("Watchlist");
                 action.setListDescription("");
                 NavHostFragment.findNavController(WatchlistThumbnailsFragment.this).navigate(action);

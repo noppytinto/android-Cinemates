@@ -138,7 +138,7 @@ public class LoginFragment extends Fragment  implements
                         // show restricted user profile page
                         MyUtilities.showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
                         Navigation.findNavController(view).popBackStack();
-                        Navigation.findNavController(view).navigate(R.id.action_global_userProfileFragment);
+                        Navigation.findNavController(view).navigate(R.id.action_global_personalProfileFragment);
                     }
                 }
                     break;
