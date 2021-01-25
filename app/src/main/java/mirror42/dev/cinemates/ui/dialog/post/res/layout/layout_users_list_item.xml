@@ -6,13 +6,14 @@
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_userListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/dark_blue"
+        android:backgroundTint="@color/primary_blue"
         app:cardCornerRadius="7dp"
         app:cardElevation="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -34,7 +35,7 @@
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/shape_circle_light_blue"
                 android:elevation="@dimen/default_elevation"
-                android:padding="0.5dp"
+                android:padding="1dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

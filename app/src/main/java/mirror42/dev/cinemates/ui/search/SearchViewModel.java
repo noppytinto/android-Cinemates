@@ -7,16 +7,31 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.CastCrew;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
+import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
+import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
+import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 /**
@@ -33,6 +48,7 @@ public class SearchViewModel extends ViewModel {
     private final int PAGE_1 = 1;
     private MutableLiveData<ArrayList<SearchResult>> searchResultList;
     private MutableLiveData<DownloadStatus> downloadStatus;
+    private RemoteConfigServer remoteConfigServer;
 
 
 
@@ -43,6 +59,7 @@ public class SearchViewModel extends ViewModel {
     public SearchViewModel() {
         searchResultList = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
+        remoteConfigServer = RemoteConfigServer.getInstance();
     }
 
 
@@ -69,15 +86,17 @@ public class SearchViewModel extends ViewModel {
 
     //--------------------------------------------------------- METHODS
 
-    public void fetchResults(String givenQuery, SearchResult.SearchType searchType) {
+    public void fetchResults(String givenQuery, SearchResult.SearchType searchType, User loggedUser) {
         switch (searchType) {
             case MOVIE: {
+                // ignore loggedUser
                 Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
                 Thread t = new Thread(searchMoviesTask);
                 t.start();
             }
                 break;
             case ACTOR: {
+                // ignore loggedUser
                 //TODO:
 //                Runnable searchActorsTask = createSearchActorsTask(givenQuery);
 //                Thread t = new Thread(searchActorsTask);
@@ -85,11 +104,14 @@ public class SearchViewModel extends ViewModel {
             }
                 break;
             case DIRECTOR: {
+                // ignore loggedUser
                 //TODO:
             }
                 break;
             case USER: {
-                //TODO:
+                Runnable task = createSearchUsersTask(givenQuery, loggedUser);
+                Thread t = new Thread(task);
+                t.start();
             }
                 break;
             case UNIVERSAL: {
@@ -101,6 +123,85 @@ public class SearchViewModel extends ViewModel {
                 break;
         }
 
+    }
+
+    private Runnable createSearchUsersTask(String givenQuery, User loggedUser) {
+        return ()-> {
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_search_users";
+                HttpUrl httpUrl = new HttpUrl.Builder()
+                        .scheme("https")
+                        .host(remoteConfigServer.getAzureHostName())
+                        .addPathSegments(remoteConfigServer.getPostgrestPath())
+                        .addPathSegment(dbFunction)
+                        .build();
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("search_term", givenQuery)
+                        .add("email", loggedUser.getEmail())
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+                // performing request
+                ArrayList<SearchResult> result = new ArrayList<>();
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                // if response contains valid data
+                                if ( ! responseData.equals("null")) {
+                                    JSONArray jsonArray = new JSONArray(responseData);
+
+                                    for(int i=0; i<jsonArray.length(); i++) {
+                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+
+                                        UserSearchResult userSearchResult = new UserSearchResult();
+                                        userSearchResult.setUsername(jsonDBobj.getString("Username"));
+                                        userSearchResult.setFirstName(jsonDBobj.getString("Name"));
+                                        userSearchResult.setLastName(jsonDBobj.getString("LastName"));
+                                        userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+
+                                        result.add(userSearchResult);
+                                    }// for
+
+                                    // once finished set result
+//                                    Collections.reverse(postsList);
+                                    postSearchResultList(result);
+                                    postDownloadStatus(DownloadStatus.SUCCESS);
+
+                                }
+                                // if response contains no data
+                                else {
+                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                                }
+                            } // if response is unsuccessful
+                            else {
+                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+            }
+        };
     }
 
     private Runnable createSearchMoviesTask(String givenQuery) {
@@ -161,7 +262,6 @@ public class SearchViewModel extends ViewModel {
 
                     //
                     MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
-                    mv.setSearchType(SearchResult.SearchType.MOVIE);
                     result.add(mv);
                 }// for
 

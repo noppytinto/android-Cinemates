@@ -45,14 +45,12 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     public interface AddCommentButtonListener {
         void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
         void onDeleteCommentClicked(long commentId, int commentPosition, int position, int commentsCount);
-
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        reactionOwner = null;
-    }
+
+
+
+    //------------------------------------------------------------------------------- ANDROID METHODS
 
     public ShowCommentsDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -144,7 +142,17 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         moveRecyclerToBottom();
     }
 
-    //------------------------------------------------------- METHODS
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        reactionOwner = null;
+    }
+
+
+
+    //------------------------------------------------------------------------------- METHODS
 
     private void moveRecyclerToBottom() {
         if(commentsList != null && commentsList.size()>0) {
@@ -164,7 +172,6 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         recyclerAdapterShowCommentsDialog = new RecyclerAdapterShowCommentsDialog(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterShowCommentsDialog);
     }
-
 
     @Override
     public void onItemClicked(int position) {

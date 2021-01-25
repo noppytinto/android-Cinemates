@@ -1,7 +1,7 @@
 package mirror42.dev.cinemates.ui.search.model;
 
 public class SearchResult {
-    private SearchType searchType;
+    protected SearchType searchType;
 
     public enum SearchType {
         MOVIE,

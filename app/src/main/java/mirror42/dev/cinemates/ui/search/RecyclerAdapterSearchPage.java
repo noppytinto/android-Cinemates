@@ -4,8 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,14 +20,18 @@ import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
 import mirror42.dev.cinemates.ui.search.viewholders.MovieSearchResultViewHolder;
-import mirror42.dev.cinemates.ui.search.viewholders.UserSearchResultViewHolder;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
     private ArrayList<SearchResult> searchResultList;
     private Context context;
+    private SearchResultListener listener;
 
     private static final int SEARCH_TYPE_MOVIE = 1;
     private static final int SEARCH_TYPE_USER = 2;
+
+    interface SearchResultListener {
+        void onUserSearchResultClicked(int position);
+    }
 
 
 
@@ -67,7 +74,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             return new MovieSearchResultViewHolder(view);
         }
         else if(viewType == SEARCH_TYPE_USER) {
-            //TODO: inflate layout
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_users_list_item, parent, false);
             return new UserSearchResultViewHolder(view);
         }
         else {
@@ -105,7 +112,15 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }
 
     private void buildUserSearchResult(UserSearchResultViewHolder holder, UserSearchResult searchResult) {
-        //TODO:
+        Glide.with(context)  //2
+                .load(searchResult.getProfilePictureUrl()) //3
+                .fallback(R.drawable.broken_image)
+                .placeholder(R.drawable.placeholder_image)
+                .circleCrop() //4
+                .into(holder.imageViewProfilePicture); //8
+
+        holder.textViewFullName.setText(searchResult.getFirstName() + " " + searchResult.getLastName());
+        holder.textViewUsername.setText("@" + searchResult.getUsername());
     }
 
 
@@ -131,5 +146,35 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         notifyDataSetChanged();
     }
 
+
+
+    //------------------------------------------------------------ VIEWHOLDERS
+
+    public class UserSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private CardView cardView;
+        private ImageView imageViewProfilePicture;
+        private TextView textViewFullName;
+        private TextView textViewUsername;
+
+
+
+        public UserSearchResultViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            cardView = itemView.findViewById(R.id.cardView_userListItem);
+            imageViewProfilePicture = itemView.findViewById(R.id.imageView_userListItem_profilePicture);
+            textViewFullName = itemView.findViewById(R.id.textView_userListItem_fullName);
+            textViewUsername = itemView.findViewById(R.id.textView_userListItem_username);
+
+            cardView.setOnClickListener(this);
+
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            listener.onUserSearchResultClicked(getAdapterPosition());
+        }
+    }// end UserSearchResultViewHolder class
 
 }// end RecycleAdapterSearch class

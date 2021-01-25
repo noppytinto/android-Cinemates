@@ -8,6 +8,7 @@ public class UserSearchResult extends SearchResult{
 
 
     public UserSearchResult() {
+        searchType = SearchType.USER;
     }
 
     public String getProfilePictureUrl() {

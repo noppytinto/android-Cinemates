@@ -20,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -33,7 +34,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.listener.RecyclerListener;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult.SearchType;
@@ -55,6 +58,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private ChipGroup chipGroup;
     private FirebaseAnalytics firebaseAnalytics;
     private SearchResult.SearchType searchType;
+    private LoginViewModel loginViewModel;
+    private Chip chipUsersFilter;
+    private User loggedUser;
 
 
 
@@ -83,6 +89,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_searchFragment_search);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
+        chipUsersFilter = view.findViewById(R.id.include_searchFragment_searchBox).findViewById(R.id.chip_searchFragment_user);
 
         // setting listeners
         buttonSearch.setOnClickListener(this);
@@ -114,6 +121,22 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
         });
 
+        //
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+            switch (loginResult) {
+                case SUCCESS: case REMEMBER_ME_EXISTS: {
+                    chipUsersFilter.setVisibility(View.VISIBLE);
+                    loggedUser = loginViewModel.getLoggedUser().getValue();
+                }
+                break;
+                default:
+                    textInputLayout.setHint("Cerca tutto");
+                    searchType = SearchType.UNIVERSAL;
+                    chipUsersFilter.setVisibility(View.GONE);
+            }
+        });
+
         // AUTOMATIC SEARCH
         // triggered when:
         // at least 3 chars are typed in (filter)
@@ -128,7 +151,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     private void updateSearchResults(CharSequence searchQuery) {
         currentSearchTerm = searchQuery.toString();
-        searchViewModel.fetchResults(currentSearchTerm, searchType);
+        searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
     }
 
 
@@ -147,7 +170,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 editText_search.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
                 //
-                searchViewModel.fetchResults(currentSearchTerm, searchType);
+                searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -198,7 +221,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     private void initRecycleView() {
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_searchFragment);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_searchFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection

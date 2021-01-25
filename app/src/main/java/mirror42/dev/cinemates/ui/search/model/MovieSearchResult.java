@@ -7,10 +7,11 @@ public class MovieSearchResult extends SearchResult {
     private String posterURL;
 
     public MovieSearchResult() {
-
+        searchType = SearchResult.SearchType.MOVIE;
     }
 
     public MovieSearchResult(int tmdbID, String title, String overview, String posterURL) {
+        this();
         this.tmdbID = tmdbID;
         this.title = title;
         this.overview = overview;
