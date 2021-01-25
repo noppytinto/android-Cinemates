@@ -27,7 +27,6 @@ import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
 import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
 import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener,
@@ -133,7 +132,6 @@ public class HomeFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterPost);
     }
 
-
     @Override
     public void onLikeButtonClicked(int position) {
 //        recyclerAdapterPost.updateLikeCounter(position);
@@ -164,11 +162,8 @@ public class HomeFragment extends Fragment implements
             homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
 
             // adding placehoder like to the current cached list
-            RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();
             Like placeholderLike = new Like();
             User currentUser = loginViewModel.getLoggedUser().getValue();
-            String completeProfilePictureUrl =  remoteConfigServer.getCloudinaryDownloadBaseUrl() + currentUser.getProfilePicturePath();
-            currentUser.setProfilePicturePath(completeProfilePictureUrl);
             placeholderLike.setOwner(currentUser);
             ArrayList<Like> currentLikes = currentPost.getLikes();
             if(currentLikes==null)
@@ -195,13 +190,32 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onCommentButtonClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
+        long postId = currentPost.getPostId();
+        ArrayList<Comment> comments = currentPost.getComments();
+        int currentCommentsCount = currentPost.getCommentsCount();
+        User reactionOwner = loginViewModel.getLoggedUser().getValue();
 
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
+                reactionOwner,
+                comments,
+                postId,
+                position,
+                currentCommentsCount);
+        dialog.setListener(this);
+        dialog.show(fm, "showCommentsDialogFragment");
+    }
+
+    @Override
+    public void onShowCommentsClicked(int position) {
+        Post currentPost = recyclerAdapterPost.getPost(position);
         int commentsCount = currentPost.getCommentsCount();
+
         if(commentsCount>0) {
             long postId = currentPost.getPostId();
             ArrayList<Comment> comments = currentPost.getComments();
             int currentCommentsCount = currentPost.getCommentsCount();
-            User reactionOwner = loginViewModel.getLoggedUser().getValue();
+            User reactionOwner = currentPost.getOwner();
 
             FragmentManager fm = getActivity().getSupportFragmentManager();
             ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
@@ -213,25 +227,6 @@ public class HomeFragment extends Fragment implements
             dialog.setListener(this);
             dialog.show(fm, "showCommentsDialogFragment");
         }
-    }
-
-    @Override
-    public void onShowCommentsClicked(int position) {
-        Post currentPost = recyclerAdapterPost.getPost(position);
-        long postId = currentPost.getPostId();
-        ArrayList<Comment> comments = currentPost.getComments();
-        int currentCommentsCount = currentPost.getCommentsCount();
-        User reactionOwner = currentPost.getOwner();
-
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
-                reactionOwner,
-                comments,
-                postId,
-                position,
-                currentCommentsCount);
-        dialog.setListener(this);
-        dialog.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
@@ -285,4 +280,5 @@ public class HomeFragment extends Fragment implements
 
 
     }
+
 }// end HomeFragment class

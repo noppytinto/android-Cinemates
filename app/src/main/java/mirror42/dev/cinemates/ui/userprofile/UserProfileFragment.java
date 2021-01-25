@@ -87,7 +87,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     User user = loginViewModel.getLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
 
-                    ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                    ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                     textViewEmail.setText(user.getEmail());
                 }
                     break;
@@ -98,7 +98,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         User user = loginViewModel.getLoggedUser().getValue();
                         String profilePicturePath = user.getProfilePicturePath();
 
-                        ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                        ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                         textViewEmail.setText(user.getEmail());
                     }  catch (Exception e) {
                     e.printStackTrace();
@@ -113,7 +113,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         try {
                             String profilePicturePath = user.getProfilePicturePath();
 
-                            ImageUtilities.loadCircularImageInto(remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath, profilePicture, getContext());
+                            ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                             textViewEmail.setText(user.getEmail());
                         } catch (Exception e) {
                             e.printStackTrace();

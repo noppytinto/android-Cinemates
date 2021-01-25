@@ -103,6 +103,9 @@ public class RecyclerAdapterShowCommentsDialog
     }
 
     public void addPlaceholderitem(Comment item) {
+        if(comments == null)
+            comments = new ArrayList<>();
+
         comments.add(item);
         notifyDataSetChanged();
     }

@@ -122,12 +122,14 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
                     newComment.setText(commentText);
                     newComment.setOwner(reactionOwner);
                     newComment.setIsNewItem(true);
+//                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
                     recyclerAdapterShowCommentsDialog.addPlaceholderitem(newComment);
                     editTextComment.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
-
                     listener.onAddCommentClicked(commentText, postId, postPosition, commentsCount);
                     moveRecyclerToBottom();
+
+                    //TODO: get new reaction id from db for delete to be allowed
 
                     final Toast toast = Toast.makeText(getContext(), "Commento pubblicato.", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
@@ -161,7 +163,6 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
         // adding recycle listener for touch detection
         recyclerAdapterShowCommentsDialog = new RecyclerAdapterShowCommentsDialog(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterShowCommentsDialog);
-
     }
 
 
