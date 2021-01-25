@@ -10,6 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/dark_blue"
@@ -58,11 +59,13 @@
                 android:id="@+id/imageButton_userCommentListItem_delete"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
+                android:layout_marginTop="4dp"
                 android:backgroundTint="@color/dark_blue"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_close_light_blue" />
+                app:srcCompat="@drawable/ic_close_light_blue"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

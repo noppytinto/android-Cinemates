@@ -84,6 +84,13 @@ public class ShowCommentsDialogFragment extends DialogFragment implements Recycl
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(getDialog() != null)
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;

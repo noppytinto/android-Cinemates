@@ -61,7 +61,12 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
         recyclerAdapterShowLikesDialog.loadNewData(usersList);
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(getDialog() != null)
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
 
 
 
