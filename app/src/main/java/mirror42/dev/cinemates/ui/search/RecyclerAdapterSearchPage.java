@@ -137,7 +137,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.size() : 0);
     }
 
-    public SearchResult getSearchResultList(int position) {
+    public SearchResult getSearchResult(int position) {
         return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.get(position) : null);
     }
 

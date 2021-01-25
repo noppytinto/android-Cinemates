@@ -27,7 +27,7 @@ import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 
-public class UserProfileFragment extends Fragment implements View.OnClickListener {
+public class PersonalProfileFragment extends Fragment implements View.OnClickListener {
     private final String TAG = getClass().getSimpleName();
     private View view;
     private ImageView profilePicture;
@@ -75,6 +75,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         includeUserProfileContent = view.findViewById(R.id.include_userProfileFragment_content);
         hideResendEmail();
 
+
+    }// end onViewCreated()
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         // firebase logging
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.logScreenEvent(this, "User profile page", getContext());
@@ -90,7 +96,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                     textViewEmail.setText(user.getEmail());
                 }
-                    break;
+                break;
                 case LOGGED_OUT:
                     break;
                 case REMEMBER_ME_EXISTS:
@@ -101,7 +107,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                         textViewEmail.setText(user.getEmail());
                     }  catch (Exception e) {
-                    e.printStackTrace();
+                        e.printStackTrace();
                     }
                     break;
                 case IS_PENDING_USER: {
@@ -120,13 +126,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         }
                     }
                 }
-                    break;
+                break;
                 case IS_NOT_PENDING_USER_ANYMORE:
                     hideResendEmail();
                     break;
             }// switch
         });
-    }// end onViewCreated()
+    }
 
     @Override
     public void onResume() {

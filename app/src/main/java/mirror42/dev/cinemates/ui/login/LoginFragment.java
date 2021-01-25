@@ -109,7 +109,7 @@ public class LoginFragment extends Fragment  implements
 
                     NavController navController = Navigation.findNavController(view);
                     navController.popBackStack();
-                    navController.navigate(R.id.userProfileFragment);
+                    navController.navigate(R.id.personalProfileFragment);
                 }
                     break;
                 case INVALID_CREDENTIALS:

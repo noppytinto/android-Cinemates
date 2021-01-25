@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
-public class UserProfileViewModel extends ViewModel {
+public class PersonalProfileViewModel extends ViewModel {
     private final String TAG = this.getClass().getSimpleName();
     private MutableLiveData<User> user;
     private RemoteConfigServer remoteConfigServer;
@@ -20,7 +20,7 @@ public class UserProfileViewModel extends ViewModel {
 
     //----------------------------------------------------------------- CONSTRUCTORS
 
-    public UserProfileViewModel() {
+    public PersonalProfileViewModel() {
         this.user = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();

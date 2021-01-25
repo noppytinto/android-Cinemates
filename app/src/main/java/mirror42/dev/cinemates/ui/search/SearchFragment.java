@@ -41,12 +41,14 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult.SearchType;
+import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
         RecyclerListener.OnClick_RecyclerListener,
-        ChipGroup.OnCheckedChangeListener {
+        ChipGroup.OnCheckedChangeListener,
+        RecyclerAdapterSearchPage.SearchResultListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
@@ -63,7 +65,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private Chip chipUsersFilter;
     private User loggedUser;
     private TextView textViewTitle;
-
+    private RecyclerView recyclerView;
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
@@ -220,15 +222,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     //------------------------------------------------------------------------ METHODS
 
-
-
-
-
-    //--------------------------------- RECYCLER METHODS
-
     private void initRecycleView() {
         // defining Recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_searchFragment);
+        recyclerView = view.findViewById(R.id.recyclerView_searchFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
@@ -240,8 +236,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onItemClick(View view, int position) {
         try {
-            SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResultList(position);
-
+            SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
 
             switch (itemSelected.getResultType()) {
                 case MOVIE: {
@@ -262,11 +257,22 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 }
                     break;
                 case USER: {
-                    //TODO:
+                    String username = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getUsername();
+                    String firstName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getFirstName();
+                    String lastName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getLastName();
+                    String profilePictureUrl = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getProfilePictureUrl();
+                    User user = new User();
+                    user.setUsername(username);
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setProfilePicturePath(profilePictureUrl);
+
+
+
+
                 }
                     break;
             }
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,5 +286,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     }
 
 
+    @Override
+    public void onUserSearchResultClicked(int position) {
+//        TextView textViewUsername = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textView_userListItem_username);
+//        String username = textViewUsername.getText().toString();
 
+
+    }
 }// end SearchFragment class
