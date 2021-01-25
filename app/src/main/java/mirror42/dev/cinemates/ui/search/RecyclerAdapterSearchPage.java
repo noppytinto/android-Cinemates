@@ -142,7 +142,10 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }
 
     public void loadNewData(ArrayList<SearchResult> newSearchResultList) {
-        searchResultList = newSearchResultList;
+        if(newSearchResultList==null)
+            searchResultList = new ArrayList<>();
+        else
+            searchResultList = newSearchResultList;
         notifyDataSetChanged();
     }
 

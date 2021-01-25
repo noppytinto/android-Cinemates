@@ -23,7 +23,7 @@
         app:layout_constraintBottom_toTopOf="@+id/include_searchFragment_searchBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_searchFragment_title" />
 
     <include
         android:id="@+id/include_searchFragment_searchBox"
@@ -36,7 +36,7 @@
         android:elevation="10dp"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView_searchFragment_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -44,8 +44,10 @@
         android:fontFamily="@font/poppins_bold"
         android:text="Risultati ricerca:"
         android:textColor="@color/light_blue"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

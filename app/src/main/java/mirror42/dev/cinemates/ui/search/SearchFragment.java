@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,7 +51,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
     private FloatingActionButton buttonSearch;
-    private TextInputEditText editText_search;
+    private TextInputEditText editTextSearch;
     private TextInputLayout textInputLayout;
     private String currentSearchTerm;
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
@@ -61,6 +62,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private LoginViewModel loginViewModel;
     private Chip chipUsersFilter;
     private User loggedUser;
+    private TextView textViewTitle;
 
 
 
@@ -85,11 +87,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated() called");
         this.view = view;
-        editText_search = view.findViewById(R.id.editText_searchFragment);
+        editTextSearch = view.findViewById(R.id.editText_searchFragment);
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_searchFragment_search);
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
         chipUsersFilter = view.findViewById(R.id.include_searchFragment_searchBox).findViewById(R.id.chip_searchFragment_user);
+        textViewTitle = view.findViewById(R.id.textView_searchFragment_title);
 
         // setting listeners
         buttonSearch.setOnClickListener(this);
@@ -110,11 +113,15 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getSearchResultList().observe(getViewLifecycleOwner(), new Observer<ArrayList<SearchResult>>() {
             @Override
-            public void onChanged(@Nullable ArrayList<SearchResult> movies) {
-                if (movies != null && movies.size()>0) {
-                    recyclerAdapterSearchPage.loadNewData(movies);
+            public void onChanged(@Nullable ArrayList<SearchResult> results) {
+                textViewTitle.setVisibility(View.VISIBLE);
+                if (results != null && results.size()>0) {
+                    textViewTitle.setText("Risultati per: " + currentSearchTerm);
+                    recyclerAdapterSearchPage.loadNewData(results);
                 } else {
-                    Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
+                    recyclerAdapterSearchPage.loadNewData(null);
+                    textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
+                    final Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 }
@@ -141,7 +148,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         // triggered when:
         // at least 3 chars are typed in (filter)
         // 1 second later after the last typed character (debounce)
-        RxTextView.textChanges(editText_search)
+        RxTextView.textChanges(editTextSearch)
                 .filter(text -> text.length()>=3)
                 .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
                 .observeOn(AndroidSchedulers.mainThread())
@@ -160,14 +167,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         if(v.getId() == buttonSearch.getId()) {
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
             buttonSearch.startAnimation(buttonAnim);
-            currentSearchTerm = editText_search.getText().toString();
+            currentSearchTerm = editTextSearch.getText().toString();
 
             if( ! currentSearchTerm.isEmpty()) {
                 firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
 
                 //
                 textInputLayout.setError(null);
-                editText_search.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
+                editTextSearch.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
                 //
                 searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);

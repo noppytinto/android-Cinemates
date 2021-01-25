@@ -184,6 +184,7 @@ public class SearchViewModel extends ViewModel {
                                 }
                                 // if response contains no data
                                 else {
+                                    postSearchResultList(null);
                                     postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                                 }
                             } // if response is unsuccessful
