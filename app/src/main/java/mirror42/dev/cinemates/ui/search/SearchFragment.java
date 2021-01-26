@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.listener.RecyclerListener;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -46,7 +45,6 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
-        RecyclerListener.OnClick_RecyclerListener,
         ChipGroup.OnCheckedChangeListener,
         RecyclerAdapterSearchPage.SearchResultListener {
 
@@ -153,11 +151,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         // triggered when:
         // at least 3 chars are typed in (filter)
         // 1 second later after the last typed character (debounce)
-        RxTextView.textChanges(editTextSearch)
-                .filter(text -> text.length()>=3)
-                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::updateSearchResults);
+        if( ! searchButtonPressed) {
+            RxTextView.textChanges(editTextSearch)
+                    .filter(text -> text.length()>=3)
+                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::updateSearchResults);
+        }
+
 
     }// end onActivityCreated()
 
@@ -204,7 +205,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onCheckedChanged(ChipGroup group, int checkedId) {
-        //NOTE: checkedId is -1 no chip is checked
+        //NOTE: checkedId is -1 if no chip is checked
+        previousSearchTerm = "-";
+
         if(checkedId == R.id.chip_searchFragment_movie) {
             searchType = SearchType.MOVIE;
             textInputLayout.setHint("Cerca film");
@@ -243,37 +246,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
         recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterSearchPage);
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        try {
-            SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
-
-            switch (itemSelected.getResultType()) {
-                case MOVIE: {
-
-                }
-                    break;
-                case USER: {
-
-
-
-
-
-                }
-                    break;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onItemLongClick(View view, int position) {
-        Toast.makeText(getContext(), "item "+position+" long clicked", Toast.LENGTH_SHORT).show();
-
     }
 
     @Override

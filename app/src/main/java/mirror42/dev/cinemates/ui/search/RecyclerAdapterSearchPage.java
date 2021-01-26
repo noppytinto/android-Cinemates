@@ -35,7 +35,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
 
 
-    //------------------------------------------------------------------------CONSTRUCTORS
+    //------------------------------------------------------------------------ CONSTRUCTORS
 
     public RecyclerAdapterSearchPage(ArrayList<SearchResult> searchResultList, Context context, SearchResultListener listener) {
         this.searchResultList = searchResultList;
@@ -148,7 +148,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
 
 
-    //------------------------------------------------------------ VIEWHOLDERS
+    //------------------------------------------------------------------ VIEWHOLDERS
 
     public class UserSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private CardView cardView;
@@ -176,9 +176,9 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }// end UserSearchResultViewHolder class
 
     public class MovieSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public ImageView imageViewSearchRecordPoster = null;
-        public TextView textViewSearchRecordMovieTitle = null;
-        public TextView textViewSearchRecordOverview = null;
+        public ImageView imageViewSearchRecordPoster;
+        public TextView textViewSearchRecordMovieTitle;
+        public TextView textViewSearchRecordOverview;
         private CardView cardView;
 
 
@@ -190,13 +190,13 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             this.textViewSearchRecordOverview = (TextView) itemView.findViewById(R.id.textview_searchRecord_overview);
             this.cardView = itemView.findViewById(R.id.cardview_searchRecord);
             cardView.setOnClickListener(this);
-
         }
 
         @Override
         public void onClick(View v) {
             listener.onMovieSearchResultClicked(getAdapterPosition(), v);
         }
+
     }// end MovieSearchResultViewHolder class
 
 }// end RecycleAdapterSearch class
