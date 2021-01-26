@@ -67,6 +67,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private TextView textViewTitle;
     private RecyclerView recyclerView;
     private String previousSearchTerm;
+    private boolean searchButtonPressed;
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
@@ -118,6 +119,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             @Override
             public void onChanged(@Nullable ArrayList<SearchResult> results) {
                 textViewTitle.setVisibility(View.VISIBLE);
+                searchButtonPressed = false;
                 if (results != null && results.size()>0) {
                     textViewTitle.setText("Risultati per: " + currentSearchTerm);
                     recyclerAdapterSearchPage.loadNewData(results);
@@ -165,13 +167,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             previousSearchTerm = currentSearchTerm;
             searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
         }
-
     }
 
 
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonSearch.getId()) {
+            searchButtonPressed = true;
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
             buttonSearch.startAnimation(buttonAnim);
             currentSearchTerm = editTextSearch.getText().toString();
@@ -188,7 +190,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                     //
                     searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
                 }
-
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -196,6 +197,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
+        }
+        else {
         }
     }
 
