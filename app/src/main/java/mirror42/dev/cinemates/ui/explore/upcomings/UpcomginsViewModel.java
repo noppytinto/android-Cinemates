@@ -1,7 +1,5 @@
 package mirror42.dev.cinemates.ui.explore.upcomings;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -12,8 +10,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 
 public class UpcomginsViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -57,13 +55,12 @@ public class UpcomginsViewModel extends ViewModel {
 
     public void downloadData(int givenPage) {
         Runnable downloadTask = createDownloadTask(givenPage);
-        Thread t = new Thread(downloadTask, "THREAD: EXPLORE PAGE - DOWNLOAD UPCOMINGS");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
     private Runnable createDownloadTask(int givenPage) {
         return ()-> {
-            Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD UPCOMINGS");
             int page = givenPage;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;

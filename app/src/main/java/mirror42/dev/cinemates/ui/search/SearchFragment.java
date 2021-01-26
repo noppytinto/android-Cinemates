@@ -64,7 +64,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private User loggedUser;
     private TextView textViewTitle;
     private RecyclerView recyclerView;
-    private String previousSearchTerm;
+    private String previousSearchTerm; //if the new search term equals the previous one, then don't start any search
     private boolean searchButtonPressed;
 
 
@@ -81,8 +81,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //            }
 //        });
 
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_search, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -121,7 +120,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 if (results != null && results.size()>0) {
                     textViewTitle.setText("Risultati per: " + currentSearchTerm);
                     recyclerAdapterSearchPage.loadNewData(results);
-                } else {
+                }
+                else {
                     recyclerAdapterSearchPage.loadNewData(null);
                     textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
                     final Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
@@ -149,16 +149,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
         // AUTOMATIC SEARCH
         // triggered when:
-        // at least 3 chars are typed in (filter)
+        // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
         // 1 second later after the last typed character (debounce)
-        if( ! searchButtonPressed) {
-            RxTextView.textChanges(editTextSearch)
-                    .filter(text -> text.length()>=3)
-                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::updateSearchResults);
-        }
-
+        RxTextView.textChanges(editTextSearch)
+                .filter(text -> text.length()>=3 && !searchButtonPressed)
+                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateSearchResults);
 
     }// end onActivityCreated()
 
@@ -191,6 +188,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                     //
                     searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
                 }
+                else {
+                    searchButtonPressed = false;
+                }
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -206,7 +206,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onCheckedChanged(ChipGroup group, int checkedId) {
         //NOTE: checkedId is -1 if no chip is checked
-        previousSearchTerm = "-";
+        previousSearchTerm = "-"; // if the filter has been changed, then reset previous search term
 
         if(checkedId == R.id.chip_searchFragment_movie) {
             searchType = SearchType.MOVIE;
