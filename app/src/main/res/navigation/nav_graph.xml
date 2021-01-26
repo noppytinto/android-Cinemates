@@ -46,7 +46,7 @@
         android:id="@+id/personalProfileFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.PersonalProfileFragment"
         android:label="@string/user_profile"
-        tools:layout="@layout/fragment_user_profile" >
+        tools:layout="@layout/fragment_personal_profile" >
         <action
             android:id="@+id/action_personalProfileFragment_to_listFragment"
             app:destination="@id/listFragment" />

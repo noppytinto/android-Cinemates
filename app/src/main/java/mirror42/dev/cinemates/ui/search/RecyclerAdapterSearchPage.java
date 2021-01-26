@@ -19,11 +19,10 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
-import mirror42.dev.cinemates.ui.search.viewholders.MovieSearchResultViewHolder;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
     private ArrayList<SearchResult> searchResultList;
-    private Context context;
+    private final Context context;
     private SearchResultListener listener;
 
     private static final int SEARCH_TYPE_MOVIE = 1;
@@ -37,9 +36,10 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
     //------------------------------------------------------------------------CONSTRUCTORS
 
-    public RecyclerAdapterSearchPage(ArrayList<SearchResult> searchResultList, Context context) {
+    public RecyclerAdapterSearchPage(ArrayList<SearchResult> searchResultList, Context context, SearchResultListener listener) {
         this.searchResultList = searchResultList;
         this.context = context;
+        this.listener = listener;
     }
 
 
@@ -97,6 +97,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }
 
 
+
     //----------------------------------------------------- search result builders
 
     private void buildMovieSearchResult(MovieSearchResultViewHolder holder, MovieSearchResult searchResult) {
@@ -122,11 +123,6 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         holder.textViewFullName.setText(searchResult.getFirstName() + " " + searchResult.getLastName());
         holder.textViewUsername.setText("@" + searchResult.getUsername());
     }
-
-
-
-
-
 
 
 
@@ -179,5 +175,20 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             listener.onUserSearchResultClicked(getAdapterPosition());
         }
     }// end UserSearchResultViewHolder class
+
+    public class MovieSearchResultViewHolder extends RecyclerView.ViewHolder{
+        public ImageView imageViewSearchRecordPoster = null;
+        public TextView textViewSearchRecordMovieTitle = null;
+        public TextView textViewSearchRecordOverview = null;
+
+
+        public MovieSearchResultViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            this.imageViewSearchRecordPoster = (ImageView) itemView.findViewById(R.id.imageview_searchRecord_poster);
+            this.textViewSearchRecordMovieTitle = (TextView) itemView.findViewById(R.id.textview_searchRecord_movie_title);
+            this.textViewSearchRecordOverview = (TextView) itemView.findViewById(R.id.textview_searchRecord_overview);
+        }
+    }// end MovieSearchResultViewHolder class
 
 }// end RecycleAdapterSearch class

@@ -54,25 +54,25 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profile, container, false);
+        return inflater.inflate(R.layout.fragment_personal_profile, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        profilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
-        textViewEmail = view.findViewById(R.id.textView_userProfileFragment_email);
+        profilePicture = view.findViewById(R.id.imageView_personalProfileFragment_profilePicture);
+        textViewEmail = view.findViewById(R.id.textView_personalProfileFragment_email);
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
-        buttonLogout = view.findViewById(R.id.button_userProfileFragment_logout);
+        buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
         remoteConfigServer = RemoteConfigServer.getInstance();
         // setting listeners
         buttonLogout.setOnClickListener(this);
         //
         buttonResendEmail = view.findViewById(R.id.button_userProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);
-        includeAccountActivationView = view.findViewById(R.id.include_userProfileFragment_accountVerification);
-        includeUserProfileContent = view.findViewById(R.id.include_userProfileFragment_content);
+        includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
+        includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_content);
         hideResendEmail();
 
 
