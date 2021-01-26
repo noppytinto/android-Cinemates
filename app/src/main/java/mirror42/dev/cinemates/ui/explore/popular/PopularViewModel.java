@@ -10,10 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 
 public class PopularViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -97,6 +98,7 @@ public class PopularViewModel extends ViewModel {
 
 
                 // once finished set results
+                Collections.shuffle(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {

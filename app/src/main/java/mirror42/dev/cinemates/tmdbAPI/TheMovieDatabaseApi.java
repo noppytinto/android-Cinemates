@@ -986,7 +986,7 @@ public class TheMovieDatabaseApi {
 
         try{
             String myUrl  = BASE_URL +  "3/movie/upcoming?api_key=" + MY_API_KEY +
-                    "&language=" + "en" +
+                    "&language=" + defaultLanguage +
                     "&page=" + page;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
@@ -1011,8 +1011,10 @@ public class TheMovieDatabaseApi {
 
         try{
             String myUrl  = BASE_URL +  "3/movie/popular?api_key=" + MY_API_KEY +
-                    "&language=" + "en" +
-                    "&page=" + page;
+                    "&language=" + defaultLanguage +
+                    "&page=" + page +
+                    "&region=" + defaultLanguage;
+
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();

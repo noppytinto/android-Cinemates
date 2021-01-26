@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
@@ -99,6 +100,7 @@ public class UpcomginsViewModel extends ViewModel {
 
 
                 // once finished set results
+                Collections.shuffle(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {

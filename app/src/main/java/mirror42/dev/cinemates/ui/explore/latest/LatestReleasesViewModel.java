@@ -1,16 +1,18 @@
 package mirror42.dev.cinemates.ui.explore.latest;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Collections;
+
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 
 public class LatestReleasesViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -47,13 +49,12 @@ public class LatestReleasesViewModel extends ViewModel {
 
     public void downloadData(int givenPage) {
         Runnable downloadTask = createDownloadTask(givenPage);
-        Thread t = new Thread(downloadTask, "THREAD: EXPLORE PAGE - DOWNLOAD LATEST RELEASES");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
     private Runnable createDownloadTask(int givenPage) {
         return ()-> {
-            Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD LATEST RELEASES");
             int page = givenPage;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
@@ -91,6 +92,7 @@ public class LatestReleasesViewModel extends ViewModel {
 
 
                 // once finished set results
+                Collections.shuffle(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {

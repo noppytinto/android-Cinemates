@@ -41,7 +41,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-    //------------------------------------------------------------------------------- CONSTRUCTORS
+    //-------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     public RecyclerAdapterPost(ArrayList<Post> postList, Context context, ReactionsClickAdapterListener listener) {
         this.postList = postList;
@@ -51,7 +51,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-    //------------------------------------------------------------------------------- CONSTRUCTORS
+    //-------------------------------------------------------------------------------------------------- METHODS
 
     @Override
     public int getItemViewType(int position) {
@@ -70,7 +70,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
+        View view = null;
 
         if(viewType == ADD_TO_WATCHLIST) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_watchlist_post, parent, false);
@@ -110,7 +110,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
 
-    //--------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------
 
     private void buildWatchlistPost(WatchlistPostViewHolder holder, WatchlistPost watchlistPost) {
         holder.textViewUsername.setText(watchlistPost.getOwner().getUsername());

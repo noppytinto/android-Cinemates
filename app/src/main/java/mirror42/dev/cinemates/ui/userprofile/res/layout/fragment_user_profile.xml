@@ -7,6 +7,35 @@
     tools:context=".ui.userprofile.UserProfileFragment">
 
 
+    <TextView
+        android:id="@+id/textView_userProfileFragment_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins_light"
+        android:text="@mario"
+        android:textAlignment="textStart"
+        android:textColor="@color/light_blue"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView_userProfileFragment_fullName"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_fullName"
+        app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_fullName" />
+
+    <Button
+        android:id="@+id/button_userProfileFragment_acceptRequest"
+        style="@style/Cinemates.Button.Rounded.Outlined"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:text="Accetta richiesta"
+        android:visibility="gone"
+        app:icon="@drawable/ic_accept_yellow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_userProfileFragment_follow"
+        tools:visibility="visible" />
+
     <ImageView
         android:id="@+id/imageView_userProfileFragment_profilePicture"
         android:layout_width="100dp"
@@ -30,21 +59,23 @@
         android:text="Mario Rossi"
         android:textAlignment="textStart"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView_userProfileFragment_profilePicture" />
 
     <Button
-        android:id="@+id/button_userProfileFragment_addAsFriend"
+        android:id="@+id/button_userProfileFragment_follow"
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_marginTop="24dp"
-        android:text="Aggiungi come amico"
+        android:text="Segui"
+        app:icon="@drawable/add_icon_black"
+        app:iconTint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_fullName" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_username" />
 </androidx.constraintlayout.widget.ConstraintLayout>

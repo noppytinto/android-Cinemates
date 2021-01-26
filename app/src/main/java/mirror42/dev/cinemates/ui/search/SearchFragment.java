@@ -47,7 +47,6 @@ import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 public class SearchFragment extends Fragment implements View.OnClickListener,
         ChipGroup.OnCheckedChangeListener,
         RecyclerAdapterSearchPage.SearchResultListener {
-
     private final String TAG = this.getClass().getSimpleName();
     private SearchViewModel searchViewModel;
     private FloatingActionButton buttonSearch;
@@ -197,6 +196,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 final Toast toast = Toast.makeText(getContext(),"Campo vuoto", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
+                searchButtonPressed = false;
             }
         }
         else {
@@ -258,7 +258,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         NavHostFragment.findNavController(SearchFragment.this).navigate(action);
     }
 
-
     @Override
     public void onUserSearchResultClicked(int position, View v) {
         SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
@@ -274,5 +273,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setProfilePicturePath(profilePictureUrl);
+
+        NavGraphDirections.ActionGlobalUserProfileFragment action = NavGraphDirections.actionGlobalUserProfileFragment(user);
+        NavHostFragment.findNavController(SearchFragment.this).navigate(action);
     }
+
 }// end SearchFragment class

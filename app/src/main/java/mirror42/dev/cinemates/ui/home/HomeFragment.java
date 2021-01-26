@@ -271,10 +271,6 @@ public class HomeFragment extends Fragment implements
                 commentId,
                 loginViewModel.getLoggedUser().getValue().getEmail(),
                 loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-
-
-
     }
 
 }// end HomeFragment class

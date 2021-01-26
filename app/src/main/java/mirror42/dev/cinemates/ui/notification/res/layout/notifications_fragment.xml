@@ -7,6 +7,7 @@
     tools:context=".ui.notification.NotificationsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_notificationFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -26,6 +27,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_bold"
         android:text="Notifiche"
+        android:textAlignment="center"
         android:textColor="@color/light_blue"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"

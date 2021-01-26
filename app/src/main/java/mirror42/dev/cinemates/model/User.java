@@ -1,11 +1,14 @@
 package mirror42.dev.cinemates.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+public class User implements Serializable, Parcelable {
     private String username;
     private String email;
     private String password;
@@ -63,6 +66,8 @@ public class User implements Serializable {
 
 
     //----------------------------------------------- GETTERS/SETTERS
+
+
 
     public String getFirstName() {
         return firstName;
@@ -149,6 +154,10 @@ public class User implements Serializable {
         return analytics;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
     //----------------------------------------------- METHODS
 
     public static User parseUserFromJsonObject(JSONObject jsonObject) {
@@ -187,12 +196,47 @@ public class User implements Serializable {
         return null;
     }
 
+    protected User(Parcel in) {
+        username = in.readString();
+        email = in.readString();
+        password = in.readString();
+        firstName = in.readString();
+        lastName = in.readString();
+        birthDate = in.readString();
+        profilePicturePath = in.readString();
+        accessToken = in.readString();
+        promo = in.readByte() != 0;
+        analytics = in.readByte() != 0;
+    }
 
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
 
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-
-
-
-
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(username);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(firstName);
+        dest.writeString(lastName);
+        dest.writeString(birthDate);
+        dest.writeString(profilePicturePath);
+        dest.writeString(accessToken);
+        dest.writeByte((byte) (promo ? 1 : 0));
+        dest.writeByte((byte) (analytics ? 1 : 0));
+    }
 }// end User class

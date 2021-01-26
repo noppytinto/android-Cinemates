@@ -12,13 +12,22 @@ import androidx.lifecycle.ViewModelProvider;
 
 import mirror42.dev.cinemates.R;
 
-public class NotificationsFragment extends Fragment {
-
+public class NotificationsFragment extends Fragment implements
+        RecylerAdapterNotifications.OnNotificationClickedListener {
     private NotificationsViewModel mViewModel;
+
+
+
+    //-------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     public static NotificationsFragment newInstance() {
         return new NotificationsFragment();
     }
+
+
+
+
+    //-------------------------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -33,4 +42,17 @@ public class NotificationsFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-}
+
+
+    //-------------------------------------------------------------------------------------------------- METHODS
+
+    @Override
+    public void onFollowRequestNotificationClicked(int position) {
+
+    }
+
+
+
+
+
+}// end NotificationsFragment class
