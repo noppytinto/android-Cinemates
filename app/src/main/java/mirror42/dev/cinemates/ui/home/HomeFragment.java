@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment implements
                 case SUCCESS: case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLoggedUser().getValue();
-                    homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
+                    homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
                 }
                     break;
                 case LOGGED_OUT:
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 User loggedUser = loginViewModel.getLoggedUser().getValue();
-                homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken());
+                homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
             }
         });
     }// end onActivityCreated()

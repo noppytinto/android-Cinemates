@@ -78,13 +78,13 @@ public class HomeViewModel extends ViewModel {
 
     //-------------------------------------------------------------------------- METHODS
 
-    public void fetchData(String email, String token) {
-        Runnable watchlistPostTask = createFetchWatchlistPostTask(email, token);
+    public void fetchData(String email, String token, String loggedUsername) {
+        Runnable watchlistPostTask = createFetchWatchlistPostTask(email, token, loggedUsername);
         Thread t = new Thread(watchlistPostTask);
         t.start();
     }
 
-    private Runnable createFetchWatchlistPostTask(String email, String token) {
+    private Runnable createFetchWatchlistPostTask(String email, String token, String loggedUsername) {
         return ()-> {
             ArrayList<Post> result = null;
 
@@ -122,7 +122,7 @@ public class HomeViewModel extends ViewModel {
 
                                     for(int i=0; i<jsonArray.length(); i++) {
                                         JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        watchlistPost = buildWatchlistPost(jsonDBobj, email, token);
+                                        watchlistPost = buildWatchlistPost(jsonDBobj, email, token, loggedUsername);
 
                                         postsList.add(watchlistPost);
                                     }// for
@@ -173,7 +173,7 @@ public class HomeViewModel extends ViewModel {
         return httpUrl;
     }
 
-    private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token) throws Exception{
+    private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
         // getting post owner data
         User user = new User();
         user.setUsername(jsonDBobj.getString("Username"));
@@ -208,7 +208,7 @@ public class HomeViewModel extends ViewModel {
         watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
         watchlistPost.setMovie(movie);
-        fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
+        fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
         fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
         return watchlistPost;
     }
@@ -216,7 +216,7 @@ public class HomeViewModel extends ViewModel {
 
     //----------------- likes
 
-    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, long postId, String email, String token) {
+    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_likes";
             // building db url
@@ -257,7 +257,7 @@ public class HomeViewModel extends ViewModel {
                             likes.add(l);
                         }
                         watchlistPost.setLikes(likes);
-                        watchlistPost.setLikedByMe();
+                        watchlistPost.setLikedByMe(loggedUsername);
                     }
                 }
             }catch (Exception e) {

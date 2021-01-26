@@ -102,13 +102,12 @@ public class Post {
         return isLikedByMe;
     }
 
-    public void setLikedByMe() {
+    public void setLikedByMe(String loggedUser) {
         boolean res = false;
         if(likes!=null && likes.size()>0) {
-            String postOwnerUsername = this.getOwner().getUsername();
             for(int i=0; i<likes.size(); i++) {
                 String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
-                if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                if(loggedUser.equals(reactionOwnerUsername)) {
                     res = true;
                     break;
                 }
