@@ -66,6 +66,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private User loggedUser;
     private TextView textViewTitle;
     private RecyclerView recyclerView;
+    private String previousSearchTerm;
 
 
     //------------------------------------------------------------------------ LIFECYCLE METHODS
@@ -160,7 +161,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     private void updateSearchResults(CharSequence searchQuery) {
         currentSearchTerm = searchQuery.toString();
-        searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+        if( ! currentSearchTerm.equals(previousSearchTerm)) {
+            previousSearchTerm = currentSearchTerm;
+            searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+        }
+
     }
 
 
@@ -172,14 +177,18 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             currentSearchTerm = editTextSearch.getText().toString();
 
             if( ! currentSearchTerm.isEmpty()) {
-                firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
+                if( ! currentSearchTerm.equals(previousSearchTerm)) {
+                    previousSearchTerm = currentSearchTerm;
+                    firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
 
-                //
-                textInputLayout.setError(null);
-                editTextSearch.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
+                    //
+                    textInputLayout.setError(null);
+                    editTextSearch.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
 
-                //
-                searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+                    //
+                    searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+                }
+
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -228,8 +237,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
-        recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext());
+//        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
+        recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
 
@@ -240,32 +249,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
             switch (itemSelected.getResultType()) {
                 case MOVIE: {
-                    firebaseAnalytics.logSelectedSearchedMovie((MovieSearchResult) itemSelected, "selected movie in search tab", this, getContext());
 
-//            NavHostFragment.findNavController(FirstFragment.this)
-//                    .navigate(R.id.action_FirstFragment_to_SecondFragment);
-
-                    // passing movie to MovieDetailsFragment
-//            MainFragmentDirections.ActionMainFragmentToMovieDetailsFragment
-//                    action = MainFragmentDirections.actionMainFragmentToMovieDetailsFragment(recycleAdapterSearchPage.getMoviesList(position));
-//            NavHostFragment.findNavController(SearchFragment.this).navigate(action);
-
-                    Movie mv = new Movie();
-                    mv.setTmdbID(((MovieSearchResult) itemSelected).getTmdbID());
-                    NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
-                    NavHostFragment.findNavController(SearchFragment.this).navigate(action);
                 }
                     break;
                 case USER: {
-                    String username = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getUsername();
-                    String firstName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getFirstName();
-                    String lastName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getLastName();
-                    String profilePictureUrl = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getProfilePictureUrl();
-                    User user = new User();
-                    user.setUsername(username);
-                    user.setFirstName(firstName);
-                    user.setLastName(lastName);
-                    user.setProfilePicturePath(profilePictureUrl);
+
 
 
 
@@ -285,12 +273,31 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     }
 
+    @Override
+    public void onMovieSearchResultClicked(int position, View v) {
+        SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
+        firebaseAnalytics.logSelectedSearchedMovie((MovieSearchResult) itemSelected, "selected movie in search tab", this, getContext());
+        Movie mv = new Movie();
+        mv.setTmdbID(((MovieSearchResult) itemSelected).getTmdbID());
+        NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
+        NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+    }
+
 
     @Override
-    public void onUserSearchResultClicked(int position) {
+    public void onUserSearchResultClicked(int position, View v) {
+        SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
 //        TextView textViewUsername = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textView_userListItem_username);
 //        String username = textViewUsername.getText().toString();
 
-
+        String username = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getUsername();
+        String firstName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getFirstName();
+        String lastName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getLastName();
+        String profilePictureUrl = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getProfilePictureUrl();
+        User user = new User();
+        user.setUsername(username);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setProfilePicturePath(profilePictureUrl);
     }
 }// end SearchFragment class

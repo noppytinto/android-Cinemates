@@ -189,16 +189,20 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             builder.setPositiveButton("Fatto", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    for(Integer x: res) {
-                        Log.d(TAG, "clicked item index is " + x);
+                    try {
+                        for(Integer x: res) {
+                            Log.d(TAG, "clicked item index is " + x);
 
-                        if(x==0) {
-                            // add movie to watchlist
-                            User user = loginViewModel.getLoggedUser().getValue();
-                            movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
+                            if(x==0) {
+                                // add movie to watchlist
+                                User user = loginViewModel.getLoggedUser().getValue();
+                                movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
+                            }
+
+    //                        Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
                         }
-
-                        Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -206,10 +210,18 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                     if(isChecked) {
-                        res.add(which);
+                        try {
+                            res.add(which);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     else {
-                        res.remove(which);
+                        try {
+                            res.remove(which);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });

@@ -29,7 +29,8 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     private static final int SEARCH_TYPE_USER = 2;
 
     interface SearchResultListener {
-        void onUserSearchResultClicked(int position);
+        void onUserSearchResultClicked(int position, View v);
+        void onMovieSearchResultClicked(int position, View v);
     }
 
 
@@ -164,22 +165,21 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_userListItem_profilePicture);
             textViewFullName = itemView.findViewById(R.id.textView_userListItem_fullName);
             textViewUsername = itemView.findViewById(R.id.textView_userListItem_username);
-
             cardView.setOnClickListener(this);
-
         }
-
 
         @Override
         public void onClick(View v) {
-            listener.onUserSearchResultClicked(getAdapterPosition());
+            listener.onUserSearchResultClicked(getAdapterPosition(), v);
         }
+
     }// end UserSearchResultViewHolder class
 
-    public class MovieSearchResultViewHolder extends RecyclerView.ViewHolder{
+    public class MovieSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView imageViewSearchRecordPoster = null;
         public TextView textViewSearchRecordMovieTitle = null;
         public TextView textViewSearchRecordOverview = null;
+        private CardView cardView;
 
 
         public MovieSearchResultViewHolder(@NonNull View itemView) {
@@ -188,6 +188,14 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             this.imageViewSearchRecordPoster = (ImageView) itemView.findViewById(R.id.imageview_searchRecord_poster);
             this.textViewSearchRecordMovieTitle = (TextView) itemView.findViewById(R.id.textview_searchRecord_movie_title);
             this.textViewSearchRecordOverview = (TextView) itemView.findViewById(R.id.textview_searchRecord_overview);
+            this.cardView = itemView.findViewById(R.id.cardview_searchRecord);
+            cardView.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onMovieSearchResultClicked(getAdapterPosition(), v);
         }
     }// end MovieSearchResultViewHolder class
 
