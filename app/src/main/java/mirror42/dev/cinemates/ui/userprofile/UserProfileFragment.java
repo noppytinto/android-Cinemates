@@ -1,12 +1,14 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,18 +19,38 @@ import com.bumptech.glide.Glide;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
-public class UserProfileFragment extends Fragment {
+public class UserProfileFragment extends Fragment implements View.OnClickListener {
     private UserProfileViewModel mViewModel;
+    private LoginViewModel loginViewModel;
     private View view;
     private ImageView imageViewProfilePicture;
     private TextView textViewfullName;
     private TextView textViewusername;
+    private TextView textViewMessage;
     private Button buttonFollow;
     private Button buttonAcceptFollow;
+    private User owner;
 
     public static UserProfileFragment newInstance() {
         return new UserProfileFragment();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mViewModel.checkIsFriend(
+                loginViewModel.getLoggedUser().getValue().getUsername(),
+                owner.getUsername(),
+                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+        mViewModel.checkHeFollowsYou(
+                owner.getUsername(),
+                loginViewModel.getLoggedUser().getValue().getUsername(),
+                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+
     }
 
     @Override
@@ -44,13 +66,20 @@ public class UserProfileFragment extends Fragment {
         imageViewProfilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
         textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
+        textViewMessage = view.findViewById(R.id.textView_userProfileFragment_message);
+
         buttonFollow = view.findViewById(R.id.button_userProfileFragment_follow);
+        buttonAcceptFollow = view.findViewById(R.id.button_userProfileFragment_acceptRequest);
+
+        buttonFollow.setOnClickListener(this);
+        buttonAcceptFollow.setOnClickListener(this);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
             User user = args.getUserArgument();
 
             if(user!=null) {
+                owner = user;
                 String profilePictureUrl = user.getProfilePicturePath();
                 Glide.with(getContext())  //2
                         .load(profilePictureUrl) //3
@@ -63,23 +92,115 @@ public class UserProfileFragment extends Fragment {
                 textViewusername.setText("@" + user.getUsername());
             }
         }
-
-
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        });
+
+
         mViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
-        // TODO: Use the ViewModel
+        mViewModel.getTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+//            buttonAcceptFollow.setVisibility(View.GONE);
+
+            switch (taskStatus) {
+                case REQUEST_SENT_SUCCESSFULLY: {
+                    buttonFollow.setVisibility(View.VISIBLE);
+                    buttonFollow.setEnabled(false);
+                    buttonFollow.setText("Richiesta inviata");
+                    final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                    break;
+                case FRIEND_CHECK_COMPLETE:
+                    if(mViewModel.isFriend()) {
+                        buttonFollow.setVisibility(View.GONE);
+                        final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                    else {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                        final Toast toast = Toast.makeText(getContext(), "non siete amici :(", Toast.LENGTH_SHORT);
+//                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                        mViewModel.checkMyFollowIsPending(
+                                loginViewModel.getLoggedUser().getValue().getUsername(),
+                                owner.getUsername(),
+                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+                    }
+                    break;
+                case MY_FOLLOW_REQUEST_PENDING: {
+                    buttonFollow.setVisibility(View.VISIBLE);
+                    buttonFollow.setEnabled(false);
+                    buttonFollow.setText("Richiesta inviata");
+                }
+                    break;
+                case HIS_FOLLOW_REQUEST_PENDING: {
+                    buttonAcceptFollow.setVisibility(View.VISIBLE);
+                    textViewMessage.setVisibility(View.GONE);
+                }
+                break;
+                case HIS_FOLLOW_REQUEST_NOT_PENDING: {
+                    buttonAcceptFollow.setVisibility(View.GONE);
+                }
+                break;
+                case HIS_FOLLOW_REQUEST_ACCEPTED: {
+                    buttonAcceptFollow.setVisibility(View.GONE);
+                    final Toast toast = Toast.makeText(getContext(), "richiesta accettata", Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                    textViewMessage.setVisibility(View.VISIBLE);
+                }
+                break;
+                case HE_FOLLOWS_YOU: {
+                    textViewMessage.setVisibility(View.VISIBLE);
+
+                }
+                    break;
+                case HE_DOESNT_FOLLOw_YOU: {
+                    textViewMessage.setVisibility(View.GONE);
+
+                    mViewModel.checkHisFollowIsPendingTask(
+                            owner.getUsername(),
+                            loginViewModel.getLoggedUser().getValue().getUsername(),
+                            loginViewModel.getLoggedUser().getValue().getAccessToken());
+                }
+                    break;
+                case FAILED: {
+                    final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                    break;
+                default:
+
+            }
+        });
 
 
+    }
 
-
-
-
-
-
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == buttonFollow.getId()) {
+            mViewModel.sendFollowRequest(
+                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    owner.getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+        }
+        else if(v.getId() == buttonAcceptFollow.getId()) {
+            mViewModel.acceptFollowRequest(
+                    owner.getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+        }
     }
 
 }// end UserProfileFragment class

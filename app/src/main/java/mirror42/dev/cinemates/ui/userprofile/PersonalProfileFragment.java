@@ -69,7 +69,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         // setting listeners
         buttonLogout.setOnClickListener(this);
         //
-        buttonResendEmail = view.findViewById(R.id.button_userProfileFragment_resendEmail);
+        buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);
         includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
         includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_content);
