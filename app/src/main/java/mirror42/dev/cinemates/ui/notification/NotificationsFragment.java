@@ -75,12 +75,13 @@ public class NotificationsFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
         notificationsViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            swipeRefreshLayout.setRefreshing(false);
             switch (fetchStatus) {
                 case SUCCESS: {
                     recyclerAdapterNotifications.loadNewData(notificationsViewModel.getNotificationsList().getValue());
-                    swipeRefreshLayout.setRefreshing(false);
                 }
                     break;
+                default:
             }
         });
 
