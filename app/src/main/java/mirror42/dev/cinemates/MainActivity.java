@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         remoteConfigServer.setListener(this);
         remoteConfigServer.loadConfigParams();
 
-        startNotificationRefreshWorker();
+//        startNotificationRefreshWorker();
 
 //        startFCM();
     }
