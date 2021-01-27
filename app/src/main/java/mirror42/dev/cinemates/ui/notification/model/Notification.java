@@ -5,12 +5,17 @@ import android.os.Parcelable;
 
 import mirror42.dev.cinemates.model.User;
 
-public class Notification implements Parcelable {
+public class Notification implements Parcelable, Comparable<Notification>{
     private long postId;
     private User owner;
     private long dateInMillis;
     protected NotificationType notificationType;
+    private User sender;
 
+    @Override
+    public int compareTo(Notification o) {
+        return Long.compare(this.dateInMillis, o.dateInMillis);
+    }
 
 
     public enum NotificationType {
@@ -18,15 +23,25 @@ public class Notification implements Parcelable {
     }
 
 
+
     //------------------------------------------------------------------------------- CONSTRUCTORS
 
     public Notification() {
+
     }
+
+
 
 
     //------------------------------------------------------------------------------- GETTERS/SETTERS
 
+    public User getSender() {
+        return sender;
+    }
 
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
 
 
     public long getPostId() {

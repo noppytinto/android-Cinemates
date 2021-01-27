@@ -32,8 +32,8 @@ public class UserProfileViewModel extends ViewModel {
         REQUEST_SENT_SUCCESSFULLY,
         MY_FOLLOW_REQUEST_PENDING,
         MY_FOLLOW_REQUEST_NOT_PENDING,
-        HIS_FOLLOW_REQUEST_PENDING,
-        HIS_FOLLOW_REQUEST_NOT_PENDING,
+        HIS_FOLLOW_REQUEST_IS_PENDING,
+        HIS_FOLLOW_REQUEST_IS_NOT_PENDING,
         HIS_FOLLOW_REQUEST_ACCEPTED,
         HE_FOLLOWS_YOU,
         HE_DOESNT_FOLLOw_YOU,
@@ -347,10 +347,10 @@ public class UserProfileViewModel extends ViewModel {
                                         e.printStackTrace();
                                     }
                                     if(res) {
-                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_PENDING);
+                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_IS_PENDING);
                                     }
                                     else {
-                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_NOT_PENDING);
+                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_IS_NOT_PENDING);
                                     }
                                 }
                                 // if response contains no data

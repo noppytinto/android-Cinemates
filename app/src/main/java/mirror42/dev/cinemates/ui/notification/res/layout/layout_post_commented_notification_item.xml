@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_postCommentedNotificationItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/dark_blue"
+        app:cardCornerRadius="7dp"
+        app:cardElevation="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView_postCommentedNotificationItem_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="ha commentato il tuo post."
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView_postCommentedNotificationItem_profilePicture"
+                app:layout_constraintStart_toStartOf="@+id/textView_postCommentedNotificationItem_fullName"
+                app:layout_constraintTop_toBottomOf="@+id/textView_postCommentedNotificationItem_fullName" />
+
+            <ImageView
+                android:id="@+id/imageView_postCommentedNotificationItem_profilePicture"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/shape_circle_light_blue"
+                android:elevation="@dimen/default_elevation"
+                android:padding="1dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/icon_user_primary_blue" />
+
+            <TextView
+                android:id="@+id/textView_postCommentedNotificationItem_fullName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Mario Rossi"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintStart_toEndOf="@+id/imageView_postCommentedNotificationItem_profilePicture"
+                app:layout_constraintTop_toTopOf="@+id/imageView_postCommentedNotificationItem_profilePicture" />
+
+            <TextView
+                android:id="@+id/textView_postCommentedNotificationItem_username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins"
+                android:text="(@mario)"
+                android:textColor="@color/light_blue"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView_postCommentedNotificationItem_fullName"
+                app:layout_constraintStart_toEndOf="@+id/textView_postCommentedNotificationItem_fullName"
+                app:layout_constraintTop_toTopOf="@+id/textView_postCommentedNotificationItem_fullName" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -108,14 +108,14 @@ public class NotificationsFragment extends Fragment implements
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
 //                        myUpdateOperation();
-                        notificationsViewModel.fetchData(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+                        notificationsViewModel.fetchNotifications(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
                     }
                 }
         );
 
 
         try {
-            notificationsViewModel.fetchData(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+            notificationsViewModel.fetchNotifications(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,6 +161,16 @@ public class NotificationsFragment extends Fragment implements
         NavController navController = NavHostFragment.findNavController(NotificationsFragment.this);
         navController.popBackStack();
         navController.navigate(action);
+
+    }
+
+    @Override
+    public void onPostLikedNotificationClicked(int position) {
+
+    }
+
+    @Override
+    public void onPostCommentedNotificationClicked(int position) {
 
     }
 

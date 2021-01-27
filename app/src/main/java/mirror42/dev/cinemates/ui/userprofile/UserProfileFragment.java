@@ -148,12 +148,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                             buttonFollow.setText("Richiesta inviata");
                         }
                         break;
-                        case HIS_FOLLOW_REQUEST_PENDING: {
+                        case MY_FOLLOW_REQUEST_NOT_PENDING: {
+                            buttonFollow.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                        case HIS_FOLLOW_REQUEST_IS_PENDING: {
                             buttonAcceptFollow.setVisibility(View.VISIBLE);
                             textViewMessage.setVisibility(View.GONE);
                         }
                         break;
-                        case HIS_FOLLOW_REQUEST_NOT_PENDING: {
+                        case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
                             buttonAcceptFollow.setVisibility(View.GONE);
                         }
                         break;
@@ -217,9 +221,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
-
     }
 
     @Override
