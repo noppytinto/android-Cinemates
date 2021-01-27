@@ -75,7 +75,6 @@ public class HomeViewModel extends ViewModel {
 
 
 
-
     //-------------------------------------------------------------------------- METHODS
 
     public void fetchData(String email, String token, String loggedUsername) {
@@ -438,7 +437,7 @@ public class HomeViewModel extends ViewModel {
                             comments.add(cm);
                         }
                         watchlistPost.setComments(comments);
-                        watchlistPost.setCommentedByMe();
+//                        watchlistPost.setCommentedByMe();
                     }
                 }
             }catch (Exception e) {

@@ -125,11 +125,13 @@
         android:id="@+id/action_global_userProfileFragment"
         app:destination="@id/userProfileFragment"
         app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_close_exit" />
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/notificationsFragment"
         android:name="mirror42.dev.cinemates.ui.notification.NotificationsFragment"
-        android:label="notifications_fragment"
+        android:label="Notifiche"
         tools:layout="@layout/notifications_fragment" >
         <argument
             android:name="notifications_args"
@@ -139,5 +141,7 @@
         android:id="@+id/action_global_notificationsFragment"
         app:destination="@id/notificationsFragment"
         app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_close_exit" />
+        app:exitAnim="@anim/fragment_close_exit"
+        app:popEnterAnim="@anim/fragment_open_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 </navigation>

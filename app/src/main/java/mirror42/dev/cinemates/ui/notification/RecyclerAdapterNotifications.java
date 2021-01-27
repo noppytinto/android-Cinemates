@@ -20,7 +20,7 @@ import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
 import mirror42.dev.cinemates.ui.notification.model.Notification;
 import mirror42.dev.cinemates.ui.notification.model.Notification.NotificationType;
 
-public class RecylerAdapterNotifications extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ArrayList<Notification> notificationsList;
     private OnNotificationClickedListener listener;
     private Context context;
@@ -37,7 +37,7 @@ public class RecylerAdapterNotifications extends RecyclerView.Adapter<RecyclerVi
 
     //------------------------------------------------------------------------------- CONSTRUCTORS
 
-    public RecylerAdapterNotifications(ArrayList<Notification> notificationsList, Context context, OnNotificationClickedListener listener) {
+    public RecyclerAdapterNotifications(ArrayList<Notification> notificationsList, Context context, OnNotificationClickedListener listener) {
         this.notificationsList = notificationsList;
         this.context = context;
         this.listener = listener;
@@ -86,12 +86,12 @@ public class RecylerAdapterNotifications extends RecyclerView.Adapter<RecyclerVi
     }
 
     private void buildWatchlistPost(FollowRequestViewHolder holder, FollowRequestNotification followRequestNotification) {
-        holder.textViewFullName.setText(followRequestNotification.getOwner().getFullName());
-        holder.textViewUsername.setText(followRequestNotification.getOwner().getUsername());
+        holder.textViewFullName.setText(followRequestNotification.getSender().getFullName());
+        holder.textViewUsername.setText("(@" + followRequestNotification.getSender().getUsername() + ")");
 
         try {
             Glide.with(context)  //2
-                    .load(followRequestNotification.getOwner().getProfilePicturePath()) //3
+                    .load(followRequestNotification.getSender().getProfilePicturePath()) //3
                     .fallback(R.drawable.broken_image)
                     .placeholder(R.drawable.placeholder_image)
                     .circleCrop() //4
@@ -113,7 +113,7 @@ public class RecylerAdapterNotifications extends RecyclerView.Adapter<RecyclerVi
         return ( (notificationsList != null) && (notificationsList.size() != 0) ? notificationsList.size() : 0);
     }
 
-    public Notification getPost(int position) {
+    public Notification getNotification(int position) {
         return ( (notificationsList != null) && (notificationsList.size() != 0) ? notificationsList.get(position) : null);
     }
 

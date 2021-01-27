@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_followRequestNotificationItem"
@@ -35,7 +34,8 @@
                 android:fontFamily="@font/poppins_medium"
                 android:text="ti ha inviato una richiesta di amicizia."
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView_followRequestNotificationItem_profilePicture"
                 app:layout_constraintStart_toStartOf="@+id/textView_followRequestNotificationItem_fullName"
                 app:layout_constraintTop_toBottomOf="@+id/textView_followRequestNotificationItem_fullName" />
 
@@ -74,7 +74,7 @@
                 android:fontFamily="@font/poppins"
                 android:text="(@mario)"
                 android:textColor="@color/light_blue"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView_followRequestNotificationItem_fullName"
                 app:layout_constraintStart_toEndOf="@+id/textView_followRequestNotificationItem_fullName"
                 app:layout_constraintTop_toTopOf="@+id/textView_followRequestNotificationItem_fullName" />

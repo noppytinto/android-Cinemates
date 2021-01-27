@@ -68,7 +68,7 @@ public class UserProfileViewModel extends ViewModel {
 
 //-------------------------------------------------------------------------- METHODS
 
-    public void checkIsFriend(String senderUsername, String receiverUsername, String token) {
+    public void checkYouFollowHim(String senderUsername, String receiverUsername, String token) {
         Runnable task = createCheckIsFriendTask(senderUsername, receiverUsername, token);
         Thread t = new Thread(task);
         t.start();

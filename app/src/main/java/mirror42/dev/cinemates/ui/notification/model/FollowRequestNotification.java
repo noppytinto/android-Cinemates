@@ -4,6 +4,7 @@ import mirror42.dev.cinemates.model.User;
 
 public class FollowRequestNotification extends Notification {
     private User sender;
+
     //------------------------------------------------------------------------------- CONSTRUCTORS
 
     public FollowRequestNotification() {

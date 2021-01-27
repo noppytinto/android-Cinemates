@@ -78,5 +78,8 @@
     <string name="remove">Rimuovi</string>
     <string name="select_all">Seleziona tutto</string>
     <string name="search_all">Cerca tutto</string>
+    <string name="channel_name">cinemates_channel</string>
+    <string name="channel_description">cinemates_notification_channel</string>
+    <string name="msg_token_fmt">FCM token: </string>
 
 </resources>
