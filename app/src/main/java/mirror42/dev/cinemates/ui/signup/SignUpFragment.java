@@ -2,12 +2,12 @@ package mirror42.dev.cinemates.ui.signup;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -18,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,7 +25,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -41,7 +39,6 @@ import java.io.IOException;
 import java.util.Locale;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -79,7 +76,6 @@ public class SignUpFragment extends Fragment implements
     private Button buttonUpload;
     private ImageButton buttonDatePicker;
     private MaterialDatePicker.Builder<Long> materialDatePickerBuilder;
-    private ProgressBar spinner;
     private SignUpViewModel signUpViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
@@ -87,6 +83,8 @@ public class SignUpFragment extends Fragment implements
     private static int PICK_IMAGE = 30;
     private String filePath;
     private ImageView imageViewProfilePicture;
+    //
+    private ProgressDialog progressDialog;
 
 
 
@@ -104,6 +102,7 @@ public class SignUpFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         remoteConfigServer = RemoteConfigServer.getInstance();
+
 
 //        spinner = view.findViewById(R.id.progresBar_signUpFragment);
         textInputLayoutUsername = view.findViewById(R.id.textInputLayout_signUpFragment_username);
@@ -130,7 +129,6 @@ public class SignUpFragment extends Fragment implements
         //
         buttonUpload = view.findViewById(R.id.button_signUpFragment_upload);
         imageViewProfilePicture = view.findViewById(R.id.imageView_signUpFragment_profilePicture);
-        spinner = view.findViewById(R.id.progressBar_signUpFragment);
         // setting listeners
         buttonUpload.setOnClickListener(this);
         buttonsignUp.setOnClickListener(this);
@@ -138,30 +136,22 @@ public class SignUpFragment extends Fragment implements
         checkBoxPromo.setOnCheckedChangeListener(this);
         checkBoxAnalytics.setOnCheckedChangeListener(this);
         checkBoxTermsAndConditions.setOnCheckedChangeListener(this);
-//        editTextUsername.setOnEditorActionListener(this);
-        //
 
-        // firebase logging
+        // fast sign up
+        fastSignUp();
+
+    }// end onViewCreated class
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.logScreenEvent(this, "Sign-Up page", getContext());
 
         //
         signUpViewModel = new ViewModelProvider(this).get(SignUpViewModel.class);
-        signUpViewModel.getUser().observe(getViewLifecycleOwner(), new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                if (user != null) {
-
-
-                } else {
-
-                }
-            }
-        });
-
-
         signUpViewModel.getFirebaseAuthState().observe(getViewLifecycleOwner(), firebaseSignUpServerCodeState -> {
-            spinner.setVisibility(View.GONE);
+            hideProgressDialog();
 
             switch (firebaseSignUpServerCodeState) {
                 case SIGN_UP_SUCCESS:
@@ -185,8 +175,6 @@ public class SignUpFragment extends Fragment implements
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
                     break;
                 case NO_PENDING_USER_COLLISION:
-                    spinner.setVisibility(View.VISIBLE);
-
                     signUpViewModel.insertUserInFirebaseDB();
                     break;
                 case USERNAME_EMAIL_COLLISION:
@@ -218,10 +206,7 @@ public class SignUpFragment extends Fragment implements
 
 
 
-        // fast sign up
-        fastSignUp();
-
-    }// end onViewCreated class
+    }
 
     @Override
     public void onClick(View v) {
@@ -244,7 +229,7 @@ public class SignUpFragment extends Fragment implements
             boolean repeatPasswordMatches = checkRepeatPasswordMatch();
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
-                spinner.setVisibility(View.VISIBLE);
+                showProgressDialog();
                 String profilePicturePath = filePath;
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
@@ -329,6 +314,21 @@ public class SignUpFragment extends Fragment implements
         i.setType("image/*");
      startActivityForResult(i, PICK_IMAGE);
     }
+
+
+    private void showProgressDialog() {
+        //notes: Declare progressDialog before so you can use .hide() later!
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Operazione in corso...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if(progressDialog!=null)
+            progressDialog.hide();
+    }
+
 
 
     @Override

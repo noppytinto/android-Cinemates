@@ -109,6 +109,13 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
+    public void clearList() {
+        postList.clear();
+        notifyDataSetChanged();
+    }
+
+
+
 
     //--------------------------------------------------------------------------------------------------
 

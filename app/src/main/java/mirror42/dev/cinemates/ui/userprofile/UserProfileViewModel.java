@@ -20,7 +20,6 @@ public class UserProfileViewModel extends ViewModel {
     private MutableLiveData<FollowStatus> hisFollowStatus;
     private MutableLiveData<FollowStatus> mySendFollowStatus;
     private MutableLiveData<FollowStatus> hisSendFollowStatus;
-
     private RemoteConfigServer remoteConfigServer;
 
     public enum FollowStatus {
@@ -34,7 +33,8 @@ public class UserProfileViewModel extends ViewModel {
         HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED,
         HE_FOLLOWS_ME,
         HE_DOESNT_FOLLOW_ME,
-        FAILED, IDLE
+        FAILED,
+        IDLE
     }
 
 
@@ -139,8 +139,7 @@ public class UserProfileViewModel extends ViewModel {
             } catch (Exception e) {
                 e.printStackTrace();
                 setMyFollowStatus(FollowStatus.FAILED);
-            }
-            finally {
+            } finally {
                 if (response != null) {
                     response.close();
                 }

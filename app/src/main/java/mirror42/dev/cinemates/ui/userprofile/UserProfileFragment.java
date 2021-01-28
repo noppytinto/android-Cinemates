@@ -199,7 +199,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonFollow.getId()) {

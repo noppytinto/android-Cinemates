@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.home;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ public class HomeFragment extends Fragment implements
     private LoginViewModel loginViewModel;
     private Button buttonUpdateFeed;
     private RecyclerView recyclerView;
+    private ProgressDialog progressDialog;
 
 
 
@@ -68,6 +70,7 @@ public class HomeFragment extends Fragment implements
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            hideProgressDialog();
             switch (fetchStatus) {
                 case SUCCESS: {
                     ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
@@ -107,6 +110,10 @@ public class HomeFragment extends Fragment implements
         buttonUpdateFeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                showProgressDialog();
+
+                recyclerAdapterPost.clearList();
+
                 User loggedUser = loginViewModel.getLoggedUser().getValue();
                 homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
             }
@@ -117,6 +124,19 @@ public class HomeFragment extends Fragment implements
 
 
     //------------------------------------------------------------------------------- METHODS
+
+    private void showProgressDialog() {
+        //notes: Declare progressDialog before so you can use .hide() later!
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Refresh in corso...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if(progressDialog!=null)
+            progressDialog.hide();
+    }
 
     private void initRecyclerView() {
         // defining Recycler view

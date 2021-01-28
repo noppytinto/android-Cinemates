@@ -179,7 +179,10 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     }
 
 
-
+    public void clearList() {
+        notificationsList.clear();
+        notifyDataSetChanged();
+    }
 
 
 

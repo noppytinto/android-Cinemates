@@ -104,7 +104,6 @@ public class Notification implements Parcelable, Comparable<Notification>{
         notificationType = NotificationType.values()[in.readInt()];
     }
 
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(postId);

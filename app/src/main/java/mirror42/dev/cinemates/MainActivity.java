@@ -2,6 +2,7 @@ package mirror42.dev.cinemates;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     private LoginViewModel loginViewModel;
     private ImageView toolbarLogo;
     private Toolbar toolbar;
+    private ProgressDialog progressDialog;
 
 
 
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         // observe activity about login
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(this, loginResult -> {
+            hideProgressDialog();
             switch (loginResult) {
                 case SUCCESS: {
                     User user = loginViewModel.getLoggedUser().getValue();
@@ -224,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     //---------------------------------------------------------------------------------------------- METHODS
 
     private void init() {
+        showProgressDialog();
         remoteConfigServer = RemoteConfigServer.getInstance();
         remoteConfigServer.setListener(this);
         remoteConfigServer.loadConfigParams();
@@ -232,6 +236,20 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
 //        startFCM();
     }
+
+    private void showProgressDialog() {
+        //notes: Declare progressDialog before so you can use .hide() later!
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Avvio in corso...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if(progressDialog!=null)
+            progressDialog.hide();
+    }
+
 
     private void startNotificationRefreshWorker() {
         WorkRequest notificationRefreshRequest =

@@ -84,15 +84,24 @@ public class NotificationsFragment extends Fragment implements
          * performs a swipe-to-refresh gesture.
          */
         swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        Toast.makeText(getContext(), "onRefresh called from SwipeRefreshLayout", Toast.LENGTH_SHORT).show();
+                () -> {
+                    Toast.makeText(getContext(), "refresh in corso", Toast.LENGTH_SHORT).show();
 
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
+                    recyclerAdapterNotifications.clearList();
+
+                    // This method performs the actual data-refresh operation.
+                    // The method calls setRefreshing(false) when it's finished.
 //                        myUpdateOperation();
-                        notificationsViewModel.fetchNotifications(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                                 loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
+
+                        notificationsViewModel.fetchNotifications(
+                                loginViewModel.getLoggedUser().getValue().getEmail(),
+                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    }
+
+                    else {
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 }
         );
@@ -101,15 +110,12 @@ public class NotificationsFragment extends Fragment implements
 
 
         // fetch notifications, only if the user is logged
-        if(loginViewModel!=null && (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+        if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                     loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
             notificationsViewModel.fetchNotifications(
                     loginViewModel.getLoggedUser().getValue().getEmail(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
-
-
-
-
     }
 
     @Override
