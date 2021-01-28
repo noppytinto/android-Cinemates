@@ -241,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         //notes: Declare progressDialog before so you can use .hide() later!
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Avvio in corso...");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
     }

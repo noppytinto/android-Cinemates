@@ -67,6 +67,8 @@ public class NotificationsFragment extends Fragment implements
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
         notificationsViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
+
             switch (fetchStatus) {
                 case SUCCESS: {
                     recyclerAdapterNotifications.loadNewData(notificationsViewModel.getNotificationsList().getValue());
@@ -85,8 +87,6 @@ public class NotificationsFragment extends Fragment implements
          */
         swipeRefreshLayout.setOnRefreshListener(
                 () -> {
-                    Toast.makeText(getContext(), "refresh in corso", Toast.LENGTH_SHORT).show();
-
                     recyclerAdapterNotifications.clearList();
 
                     // This method performs the actual data-refresh operation.

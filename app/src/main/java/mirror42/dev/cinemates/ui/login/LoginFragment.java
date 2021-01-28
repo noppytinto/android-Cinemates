@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,12 +41,12 @@ public class LoginFragment extends Fragment  implements
     private TextView textViewResetPassword;
     private Button buttonStandardLogin;
     private Button buttonSignUp;
-    private ProgressBar spinner;
     private CheckBox checkBoxRememberMe;
     private LoginViewModel loginViewModel;
     private View view;
     private RemoteConfigServer remoteConfigServer;
     private boolean rememberMeIsActive;
+    private ProgressDialog progressDialog;
 
 
 
@@ -69,7 +69,6 @@ public class LoginFragment extends Fragment  implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        spinner = view.findViewById(R.id.progresBar_loginFragment);
         editTextEmail =  view.findViewById(R.id.editText_loginFragment_email);
         editTextPassword = view.findViewById(R.id.editText_loginFragment_password);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayout_loginFragment_email);
@@ -94,6 +93,8 @@ public class LoginFragment extends Fragment  implements
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+            hideProgressDialog();
+
             switch (loginResult) {
                 case SUCCESS: {
                     User user = loginViewModel.getLoggedUser().getValue();
@@ -113,20 +114,15 @@ public class LoginFragment extends Fragment  implements
                 }
                     break;
                 case INVALID_CREDENTIALS:
-                    spinner.setVisibility(View.GONE);
                     MyUtilities.showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
                     break;
                 case FAILED:
-                    spinner.setVisibility(View.GONE);
                     MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
                     break;
                 case INVALID_REQUEST:
-                    spinner.setVisibility(View.GONE);
                     MyUtilities.showCenteredToast("Authentication server:\ncannot make request! D:", getContext());
                     break;
                 case IS_PENDING_USER: {
-                    spinner.setVisibility(View.GONE);
-
                     // checking if email verification has been clicked
                     boolean accountEnabled = loginViewModel.checkEmailVerificationState();
                     if(accountEnabled) {
@@ -184,7 +180,7 @@ public class LoginFragment extends Fragment  implements
     @Override
     public void onClick(View v) {
         if (v.getId() == buttonStandardLogin.getId()) {
-            spinner.setVisibility(View.VISIBLE);
+            showProgressDialog();
 
             // firebase logging
             FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -202,7 +198,7 @@ public class LoginFragment extends Fragment  implements
                 loginViewModel.login(email, password);
             }
             else {
-                spinner.setVisibility(View.GONE);
+                hideProgressDialog();
             }
         }
         else if (v.getId() == buttonSignUp.getId()) {
@@ -233,6 +229,21 @@ public class LoginFragment extends Fragment  implements
 
 
     //-------------------------------------------------------------------------------- METHODS
+
+    private void showProgressDialog() {
+        //notes: Declare progressDialog before so you can use .hide() later!
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Login in corso...");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if(progressDialog!=null)
+            progressDialog.hide();
+    }
 
     private boolean checkFields() {
         String email = editTextEmail.getText().toString();

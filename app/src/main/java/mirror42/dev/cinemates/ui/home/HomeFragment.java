@@ -129,6 +129,8 @@ public class HomeFragment extends Fragment implements
         //notes: Declare progressDialog before so you can use .hide() later!
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Refresh in corso...");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
     }
