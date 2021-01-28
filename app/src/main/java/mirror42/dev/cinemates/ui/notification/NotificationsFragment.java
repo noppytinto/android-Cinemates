@@ -39,19 +39,12 @@ public class NotificationsFragment extends Fragment implements
 
 
 
-    //-------------------------------------------------------------------------------------------------- CONSTRUCTORS
-
-
-
-
-
     //-------------------------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -66,8 +59,6 @@ public class NotificationsFragment extends Fragment implements
         this.view = view;
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_notificationsFragment);
         initRecyclerView();
-
-
     }
 
     @Override
@@ -85,14 +76,7 @@ public class NotificationsFragment extends Fragment implements
             }
         });
 
-
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
-            switch (loginResult) {
-
-            }
-        });
-
 
 
         /*
@@ -114,11 +98,16 @@ public class NotificationsFragment extends Fragment implements
         );
 
 
-        try {
-            notificationsViewModel.fetchNotifications(loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
-        } catch (Exception e) {
-            e.printStackTrace();
+
+
+        // fetch notifications, only if the user is logged
+        if(loginViewModel!=null && (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+            notificationsViewModel.fetchNotifications(
+                    loginViewModel.getLoggedUser().getValue().getEmail(),
+                    loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
+
+
 
 
     }
@@ -142,6 +131,16 @@ public class NotificationsFragment extends Fragment implements
 
 
     //-------------------------------------------------------------------------------------------------- METHODS
+
+    private void initRecyclerView() {
+        // defining Recycler view
+        recyclerView = view.findViewById(R.id.recyclerView_notificationFragment);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // adding recycle listener for touch detection
+        recyclerAdapterNotifications = new RecyclerAdapterNotifications(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterNotifications);
+    }
 
     @Override
     public void onFollowRequestNotificationClicked(int position) {
@@ -174,15 +173,6 @@ public class NotificationsFragment extends Fragment implements
 
     }
 
-    private void initRecyclerView() {
-        // defining Recycler view
-        recyclerView = view.findViewById(R.id.recyclerView_notificationFragment);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // adding recycle listener for touch detection
-        recyclerAdapterNotifications = new RecyclerAdapterNotifications(new ArrayList<>(), getContext(), this);
-        recyclerView.setAdapter(recyclerAdapterNotifications);
-    }
 
 
 

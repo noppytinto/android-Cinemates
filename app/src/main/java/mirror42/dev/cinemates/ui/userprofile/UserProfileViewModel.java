@@ -1,20 +1,12 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -24,58 +16,90 @@ import okhttp3.Response;
 
 public class UserProfileViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
-    private MutableLiveData<TaskStatus> taskStatus;
-    private RemoteConfigServer remoteConfigServer;
-    private boolean isFriend;
+    private MutableLiveData<FollowStatus> myFollowStatus;
+    private MutableLiveData<FollowStatus> hisFollowStatus;
+    private MutableLiveData<FollowStatus> mySendFollowStatus;
+    private MutableLiveData<FollowStatus> hisSendFollowStatus;
 
-    public enum TaskStatus {
+    private RemoteConfigServer remoteConfigServer;
+
+    public enum FollowStatus {
+        I_FOLLOW_HIM,
+        I_DONT_FOLLOW_HIM,
         REQUEST_SENT_SUCCESSFULLY,
-        MY_FOLLOW_REQUEST_PENDING,
-        MY_FOLLOW_REQUEST_NOT_PENDING,
+        MY_FOLLOW_REQUEST_IS_PENDING,
+        MY_FOLLOW_REQUEST_IS_NOT_PENDING,
         HIS_FOLLOW_REQUEST_IS_PENDING,
         HIS_FOLLOW_REQUEST_IS_NOT_PENDING,
-        HIS_FOLLOW_REQUEST_ACCEPTED,
-        HE_FOLLOWS_YOU,
-        HE_DOESNT_FOLLOw_YOU,
-        FRIEND_CHECK_COMPLETE, FAILED, IDLE
+        HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED,
+        HE_FOLLOWS_ME,
+        HE_DOESNT_FOLLOW_ME,
+        FAILED, IDLE
     }
+
+
 
     //-------------------------------------------------------------------------- CONSTRUCTORS
 
     public UserProfileViewModel() {
-        taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
+        myFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
+        hisFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
+        mySendFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
+        hisSendFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
 
 
     //-------------------------------------------------------------------------- GETTERS/SETTERS
 
-    public LiveData<TaskStatus> getTaskStatus() {
-        return taskStatus;
+    public LiveData<FollowStatus> getMyFollowStatus() {
+        return myFollowStatus;
     }
 
-    public void setTaskStatus(TaskStatus taskStatus) {
-        this.taskStatus.postValue(taskStatus);
+    public void setMyFollowStatus(FollowStatus followStatus) {
+        this.myFollowStatus.postValue(followStatus);
     }
 
-    public boolean isFriend() {
-        return isFriend;
+    public LiveData<FollowStatus> getHisFollowStatus() {
+        return hisFollowStatus;
     }
 
-    public void setIsFriend(boolean friend) {
-        isFriend = friend;
+    public void setHisFollowStatus(FollowStatus followStatus) {
+        this.hisFollowStatus.postValue(followStatus);
     }
 
-//-------------------------------------------------------------------------- METHODS
-
-    public void checkYouFollowHim(String senderUsername, String receiverUsername, String token) {
-        Runnable task = createCheckIsFriendTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+    public LiveData<FollowStatus> getMySendFollowStatus() {
+        return mySendFollowStatus;
     }
 
-    private Runnable createCheckIsFriendTask(String senderUsername, String receiverUsername, String token) {
+    public void setMySendFollowStatuss(FollowStatus followStatus) {
+        this.mySendFollowStatus.postValue(followStatus);
+    }
+
+    public LiveData<FollowStatus> getHisSendFollowStatus() {
+        return hisSendFollowStatus;
+    }
+
+    public void setHisSendFollowStatus(FollowStatus followStatus) {
+        this.hisSendFollowStatus.postValue(followStatus);
+    }
+
+
+
+    //-------------------------------------------------------------------------- METHODS
+
+    // my follow status
+
+    public void checkIfollowHim(String senderUsername, String receiverUsername, String token) {
+        Runnable task_1 = createCheckIfollowHimTask(senderUsername, receiverUsername, token);
+        Thread t_1 = new Thread(task_1);
+        t_1.start();
+    }
+
+    private Runnable createCheckIfollowHimTask(String senderUsername, String receiverUsername, String token) {
         return ()-> {
+            Response response = null;
+
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_check_is_friend";
@@ -93,133 +117,36 @@ public class UserProfileViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
-                    }
+                response = httpClient.newCall(request).execute();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                // check response
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    try {
-                                        boolean res = Boolean.parseBoolean(responseData);
-                                        setIsFriend(res);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    setTaskStatus(TaskStatus.FRIEND_CHECK_COMPLETE);
-                                }
-                                // if response contains no data
-                                else {
-                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setTaskStatus(TaskStatus.FAILED);
-                        }
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean iFollowHim = Boolean.parseBoolean(responseData);
+
+                        if(iFollowHim) setMyFollowStatus(FollowStatus.I_FOLLOW_HIM);
+                        else setMyFollowStatus(FollowStatus.I_DONT_FOLLOW_HIM);
                     }
-                });
+                    // if response contains no data
+                    else setMyFollowStatus(FollowStatus.FAILED);
+                }
+                // if response is unsuccessful
+                else setMyFollowStatus(FollowStatus.FAILED);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
+                setMyFollowStatus(FollowStatus.FAILED);
+            }
+            finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         };
-    }// end createCheckIsFriendTask()
-
-    public void checkHeFollowsYou(String senderUsername, String receiverUsername, String token) {
-        Runnable task = createcheckHeFollowYouTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
-    }
-
-    private Runnable createcheckHeFollowYouTask(String senderUsername, String receiverUsername, String token) {
-        return ()-> {
-            try {
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_check_is_friend";
-                HttpUrl httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("sender_username", senderUsername)
-                        .add("receiver_username", receiverUsername)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    boolean res = false;
-                                    try {
-                                        res = Boolean.parseBoolean(responseData);
-                                        setIsFriend(res);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    if(res) {
-                                        setTaskStatus(TaskStatus.HE_FOLLOWS_YOU);
-
-                                    }
-                                    else {
-                                        setTaskStatus(TaskStatus.HE_DOESNT_FOLLOw_YOU);
-
-                                    }
-                                }
-                                // if response contains no data
-                                else {
-                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setTaskStatus(TaskStatus.FAILED);
-                        }
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
-            }
-        };
-    }// end createCheckIsFriendTask()
+    }// end createCheckIfollowHimTask()
 
     public void checkMyFollowIsPending(String senderUsername, String receiverUsername, String token) {
         Runnable task = createCheckMyFollowIsPendingTask(senderUsername, receiverUsername, token);
@@ -229,6 +156,8 @@ public class UserProfileViewModel extends ViewModel {
 
     private Runnable createCheckMyFollowIsPendingTask(String senderUsername, String receiverUsername, String token) {
         return ()-> {
+            Response response = null;
+
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_check_follow_request_sent";
@@ -246,59 +175,106 @@ public class UserProfileViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
-                    }
+                response = httpClient.newCall(request).execute();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    boolean res = false;
-                                    try {
-                                        res = Boolean.parseBoolean(responseData);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    if(res) {
-                                        setTaskStatus(TaskStatus.MY_FOLLOW_REQUEST_PENDING);
-                                    }
-                                    else {
-                                        setTaskStatus(TaskStatus.MY_FOLLOW_REQUEST_NOT_PENDING);
-                                    }
-                                }
-                                // if response contains no data
-                                else {
-//                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setTaskStatus(TaskStatus.FAILED);
-                        }
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean myfollowIsPending = Boolean.parseBoolean(responseData);
+
+                        if(myfollowIsPending)
+                            setMyFollowStatus(FollowStatus.MY_FOLLOW_REQUEST_IS_PENDING);
+                        else
+                            setMyFollowStatus(FollowStatus.MY_FOLLOW_REQUEST_IS_NOT_PENDING);
+
                     }
-                });
+                    // if response contains no data
+                    else setMyFollowStatus(FollowStatus.FAILED);
+
+                } // if response is unsuccessful
+                else setMyFollowStatus(FollowStatus.FAILED);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
+                setMyFollowStatus(FollowStatus.FAILED);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         };
-    }// end createFollowIsPendingTask()
+    }// end createCheckMyFollowIsPendingTask()
 
-    public void checkHisFollowIsPendingTask(String senderUsername, String receiverUsername, String token) {
+
+
+    // his follow status
+
+    public void checkHeFollowsMe(String senderUsername, String receiverUsername, String token) {
+        Runnable task = createcheckHeFollowMeTask(senderUsername, receiverUsername, token);
+        Thread t = new Thread(task);
+        t.start();
+    }
+
+    private Runnable createcheckHeFollowMeTask(String senderUsername, String receiverUsername, String token) {
+        return ()-> {
+            Response response = null;
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_check_is_friend";
+                HttpUrl httpUrl = new HttpUrl.Builder()
+                        .scheme("https")
+                        .host(remoteConfigServer.getAzureHostName())
+                        .addPathSegments(remoteConfigServer.getPostgrestPath())
+                        .addPathSegment(dbFunction)
+                        .build();
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("sender_username", senderUsername)
+                        .add("receiver_username", receiverUsername)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean heFollowsMe = Boolean.parseBoolean(responseData);
+
+                        if(heFollowsMe)
+                            setHisFollowStatus(FollowStatus.HE_FOLLOWS_ME);
+                        else
+                            setHisFollowStatus(FollowStatus.HE_DOESNT_FOLLOW_ME);
+                    }
+                    // if response contains no data
+                    else {
+                        setHisFollowStatus(FollowStatus.FAILED);
+                    }
+                } // if response is unsuccessful
+                else {
+                    setHisFollowStatus(FollowStatus.FAILED);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                setHisFollowStatus(FollowStatus.FAILED);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        };
+    }// end createcheckHeFollowMeTask()
+
+    public void checkHisFollowIsPending(String senderUsername, String receiverUsername, String token) {
         Runnable task = createCheckHisFollowIsPendingTask(senderUsername, receiverUsername, token);
         Thread t = new Thread(task);
         t.start();
@@ -306,6 +282,8 @@ public class UserProfileViewModel extends ViewModel {
 
     private Runnable createCheckHisFollowIsPendingTask(String senderUsername, String receiverUsername, String token) {
         return ()-> {
+            Response response = null;
+
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_check_follow_request_sent";
@@ -323,58 +301,41 @@ public class UserProfileViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
-                    }
+                response = httpClient.newCall(request).execute();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                // check response
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    boolean res = false;
-                                    try {
-                                        res = Boolean.parseBoolean(responseData);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    if(res) {
-                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_IS_PENDING);
-                                    }
-                                    else {
-                                        setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_IS_NOT_PENDING);
-                                    }
-                                }
-                                // if response contains no data
-                                else {
-//                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setTaskStatus(TaskStatus.FAILED);
-                        }
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean hisFollowIsPending = Boolean.parseBoolean(responseData);
+                        if(hisFollowIsPending)
+                            setHisFollowStatus(FollowStatus.HIS_FOLLOW_REQUEST_IS_PENDING);
+                        else
+                            setHisFollowStatus(FollowStatus.HIS_FOLLOW_REQUEST_IS_NOT_PENDING);
+
                     }
-                });
+                    // if response contains no data
+                    else setHisFollowStatus(FollowStatus.FAILED);
+                }
+                // if response is unsuccessful
+                else setHisFollowStatus(FollowStatus.FAILED);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
+                setHisFollowStatus(FollowStatus.FAILED);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         };
-    }// end createFollowIsPendingTask()
+    }// end createCheckHisFollowIsPendingTask()
 
+
+
+    // send/accept follow requests
 
     public void sendFollowRequest(String senderUsername, String receiverUsername, String token) {
         Runnable task = createSendFollowRequestTask(senderUsername, receiverUsername, token);
@@ -384,6 +345,8 @@ public class UserProfileViewModel extends ViewModel {
 
     private Runnable createSendFollowRequestTask(String senderUsername, String receiverUsername, String token) {
         return ()-> {
+            Response response = null;
+
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_send_follow_request";
@@ -401,55 +364,34 @@ public class UserProfileViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean requestSentSuccessfully = Boolean.parseBoolean(responseData);
+
+                        if(requestSentSuccessfully)
+                            setMySendFollowStatuss(FollowStatus.REQUEST_SENT_SUCCESSFULLY);
+                        else
+                            setMySendFollowStatuss(FollowStatus.FAILED);
                     }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    boolean res = false;
-                                    try {
-                                        res = Boolean.parseBoolean(responseData);
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    if(res) {
-                                        setTaskStatus(TaskStatus.REQUEST_SENT_SUCCESSFULLY);
-                                    }
-                                    else {
-                                        setTaskStatus(TaskStatus.FAILED);
-                                    }
-                                }
-                                // if response contains no data
-                                else {
-                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setTaskStatus(TaskStatus.FAILED);
-                        }
-                    }
-                });
+                    // if response contains no data
+                    else setMySendFollowStatuss(FollowStatus.FAILED);
+                }
+                // if response is unsuccessful
+                else setMySendFollowStatuss(FollowStatus.FAILED);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
+                setMySendFollowStatuss(FollowStatus.FAILED);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         };
     }// end createSendFollowRequestTask()
@@ -462,6 +404,8 @@ public class UserProfileViewModel extends ViewModel {
 
     private Runnable createAcceptFollowRequestTask(String senderUsername, String receiverUsername, String token) {
         return ()-> {
+            Response response = null;
+
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_accept_follow_request";
@@ -479,43 +423,33 @@ public class UserProfileViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setTaskStatus(TaskStatus.FAILED);
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean requestSentSuccessfully = Boolean.parseBoolean(responseData);
+
+                        if(requestSentSuccessfully)
+                            setHisSendFollowStatus(FollowStatus.HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED);
+                        else
+                            setHisSendFollowStatus(FollowStatus.FAILED);
                     }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    setTaskStatus(TaskStatus.HIS_FOLLOW_REQUEST_ACCEPTED);
-                                }
-                                // if response contains no data
-                                else {
-                                    setTaskStatus(TaskStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setTaskStatus(TaskStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setTaskStatus(TaskStatus.FAILED);
-                        }
-                    }
-                });
-
+                    // if response contains no data
+                    else setHisSendFollowStatus(FollowStatus.FAILED);
+                }
+                // if response is unsuccessful
+                else setHisSendFollowStatus(FollowStatus.FAILED);
             } catch (Exception e) {
                 e.printStackTrace();
-                setTaskStatus(TaskStatus.FAILED);
+                setHisSendFollowStatus(FollowStatus.FAILED);
+            }  finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         };
     }// end createAcceptFollowRequestTask()

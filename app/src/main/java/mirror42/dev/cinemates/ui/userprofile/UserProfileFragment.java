@@ -43,24 +43,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     //-------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public void onResume() {
-        super.onResume();
-        try {
-            mViewModel.checkYouFollowHim(
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
-                    profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-            mViewModel.checkHeFollowsYou(
-                    profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_user_profile, container, false);
@@ -88,150 +70,184 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             if(user!=null) {
                 profileOwner = user;
                 String profilePictureUrl = user.getProfilePicturePath();
-                Glide.with(getContext())  //2
-                        .load(profilePictureUrl) //3
-                        .fallback(R.drawable.broken_image)
-                        .placeholder(R.drawable.placeholder_image)
-                        .circleCrop() //4
-                        .into(imageViewProfilePicture); //8
+                Glide.with(getContext())
+                        .load(profilePictureUrl)
+                        .fallback(R.drawable.user_icon_dark_blue)
+                        .placeholder(R.drawable.user_icon_dark_blue)
+                        .circleCrop()
+                        .into(imageViewProfilePicture);
 
                 textViewfullName.setText(user.getFullName());
                 textViewusername.setText("@" + user.getUsername());
-
-
-
-
-
-                loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-                loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
-                });
-
-                mViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
-                mViewModel.getTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-//            buttonAcceptFollow.setVisibility(View.GONE);
-
-                    switch (taskStatus) {
-                        case REQUEST_SENT_SUCCESSFULLY: {
-                            buttonFollow.setVisibility(View.VISIBLE);
-                            buttonFollow.setEnabled(false);
-                            buttonFollow.setText("Richiesta inviata");
-                            final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-
-//                            sendFollowNotification("test");
-                        }
-                        break;
-                        case FRIEND_CHECK_COMPLETE:
-                            if(mViewModel.isFriend()) {
-                                buttonFollow.setVisibility(View.GONE);
-                                final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
-                                toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-                            }
-                            else {
-                                buttonFollow.setVisibility(View.VISIBLE);
-                                final Toast toast = Toast.makeText(getContext(), "non siete amici :(", Toast.LENGTH_SHORT);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-                                toast.show();
-
-                                mViewModel.checkMyFollowIsPending(
-                                        loginViewModel.getLoggedUser().getValue().getUsername(),
-                                        profileOwner.getUsername(),
-                                        loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-                            }
-                            break;
-                        case MY_FOLLOW_REQUEST_PENDING: {
-                            buttonFollow.setVisibility(View.VISIBLE);
-                            buttonFollow.setEnabled(false);
-                            buttonFollow.setText("Richiesta inviata");
-                        }
-                        break;
-                        case MY_FOLLOW_REQUEST_NOT_PENDING: {
-                            buttonFollow.setVisibility(View.VISIBLE);
-                        }
-                        break;
-                        case HIS_FOLLOW_REQUEST_IS_PENDING: {
-                            buttonAcceptFollow.setVisibility(View.VISIBLE);
-                            textViewMessage.setVisibility(View.GONE);
-                        }
-                        break;
-                        case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
-                            buttonAcceptFollow.setVisibility(View.GONE);
-                        }
-                        break;
-                        case HIS_FOLLOW_REQUEST_ACCEPTED: {
-                            buttonAcceptFollow.setVisibility(View.GONE);
-                            final Toast toast = Toast.makeText(getContext(), "richiesta accettata", Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            textViewMessage.setVisibility(View.VISIBLE);
-                        }
-                        break;
-                        case HE_FOLLOWS_YOU: {
-                            textViewMessage.setVisibility(View.VISIBLE);
-
-                        }
-                        break;
-                        case HE_DOESNT_FOLLOw_YOU: {
-                            textViewMessage.setVisibility(View.GONE);
-
-                            mViewModel.checkHisFollowIsPendingTask(
-                                    profileOwner.getUsername(),
-                                    loginViewModel.getLoggedUser().getValue().getUsername(),
-                                    loginViewModel.getLoggedUser().getValue().getAccessToken());
-                        }
-                        break;
-                        case FAILED: {
-                            final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
-                        break;
-                        default:
-
-                    }
-                });
-
-
-
-
-
-
-
-
-
-
             }
-
-
-
-
-
-
-
-
-        }
-        else {
-
         }
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+
+        if (loginViewModel != null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                        loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
+            mViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
+            mViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case I_FOLLOW_HIM: {
+                        buttonFollow.setVisibility(View.GONE);
+                        final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                        break;
+                    case I_DONT_FOLLOW_HIM: {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                        final Toast toast = Toast.makeText(getContext(), "non siete amici :(", Toast.LENGTH_SHORT);
+                        toast.show();
+
+                        //
+                        mViewModel.checkMyFollowIsPending(
+                                loginViewModel.getLoggedUser().getValue().getUsername(),
+                                profileOwner.getUsername(),
+                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+                    }
+                        break;
+                    case MY_FOLLOW_REQUEST_IS_PENDING: {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                        buttonFollow.setEnabled(false);
+                        buttonFollow.setText("Richiesta inviata");
+                    }
+                    break;
+                    case MY_FOLLOW_REQUEST_IS_NOT_PENDING: {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                    case REQUEST_SENT_SUCCESSFULLY: {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                        buttonFollow.setEnabled(false);
+                        buttonFollow.setText("Richiesta inviata");
+                        final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
+                        toast.show();
+
+//                            sendFollowNotification("test");
+                    }
+                    break;
+                    case FAILED: {
+                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                    break;
+                    default:
+                }
+            });
+
+            mViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case HE_FOLLOWS_ME: {
+                        textViewMessage.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                    case HE_DOESNT_FOLLOW_ME: {
+                        textViewMessage.setVisibility(View.GONE);
+
+                        mViewModel.checkHisFollowIsPending(
+                                profileOwner.getUsername(),
+                                loginViewModel.getLoggedUser().getValue().getUsername(),
+                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    }
+                    break;
+                    case HIS_FOLLOW_REQUEST_IS_PENDING: {
+                        buttonAcceptFollow.setVisibility(View.VISIBLE);
+                        textViewMessage.setVisibility(View.GONE);
+                    }
+                    break;
+                    case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
+                        buttonAcceptFollow.setVisibility(View.GONE);
+                    }
+                    break;
+                    case FAILED: {
+                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                    break;
+                    default:
+
+                }
+            });
+
+        }
+
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                     loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
+            mViewModel.checkIfollowHim(
+                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    profileOwner.getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            mViewModel.checkHeFollowsMe(
+                    profileOwner.getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonFollow.getId()) {
+            mViewModel.getMySendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case REQUEST_SENT_SUCCESSFULLY: {
+                        buttonFollow.setVisibility(View.VISIBLE);
+                        buttonFollow.setEnabled(false);
+                        buttonFollow.setText("Richiesta inviata");
+                        final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
+                        toast.show();
+
+//                            sendFollowNotification("test");
+                    }
+                    break;
+                    case FAILED: {
+                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                    break;
+                    default:
+                }
+            });
+
             mViewModel.sendFollowRequest(
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
         else if(v.getId() == buttonAcceptFollow.getId()) {
+            mViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED: {
+                        buttonAcceptFollow.setVisibility(View.GONE);
+                        final Toast toast = Toast.makeText(getContext(), "richiesta accettata", Toast.LENGTH_SHORT);
+                        toast.show();
+                        textViewMessage.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                    case FAILED: {
+                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                    break;
+                    default:
+                }
+            });
+
             mViewModel.acceptFollowRequest(
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getUsername(),
@@ -240,7 +256,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     }
 
 
+
     //-------------------------------------------------------------------------- MY METHODS
+
+    //TODO: on testing
     public void sendFollowNotification(String senderUsername) {
         // Create an explicit intent for an Activity in your app
         Bundle bundle = new Bundle();
