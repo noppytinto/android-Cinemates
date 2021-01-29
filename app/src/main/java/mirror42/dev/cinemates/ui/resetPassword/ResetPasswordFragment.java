@@ -1,6 +1,5 @@
 package mirror42.dev.cinemates.ui.resetPassword;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -53,9 +52,9 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
         resetPasswordViewModel =  new ViewModelProvider(this).get(ResetPasswordViewModel.class);
         resetPasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), resetResult -> {
             if(resetResult == ResetPasswordViewModel.ResetResult.SUCCESS)
-                showCenteredToast( "Reset password completo ", getContext());
+                showCenteredToast( "Reset password completo ");
             else if(resetResult == ResetPasswordViewModel.ResetResult.FAILED)
-                showCenteredToast( "Reset password fallito ", getContext());
+                showCenteredToast( "Reset password fallito ");
         });
     }
 
@@ -67,7 +66,7 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
             if(isVaildMail( email))
                 resetPasswordViewModel.resetPassword(email);
             else
-                showCenteredToast( "Formato mail non valido ", getContext());
+                showCenteredToast( "Formato mail non valido ");
         }
     }
 
@@ -92,8 +91,8 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
         return isValid;
     }
 
-    public static void showCenteredToast(String message, Context context) {
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }

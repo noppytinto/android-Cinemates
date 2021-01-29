@@ -1,6 +1,5 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -159,7 +158,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                 // insert into postgrest database
                 // and show new user profile page
                 loginViewModel.resendVerificationEmail();
-                showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.", getContext());
+                showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
                 buttonResendEmail.setText("Email attivazione reinviata!");
                 buttonResendEmail.setEnabled(false);
             }
@@ -186,8 +185,8 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         includeUserProfileContent.setVisibility(View.VISIBLE);
     }
 
-    public static void showCenteredToast(String message, Context context) {
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }

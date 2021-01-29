@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -102,7 +101,7 @@ public class LoginFragment extends Fragment  implements
                 case SUCCESS: {
                     User user = loginViewModel.getLoggedUser().getValue();
                     try {
-                        showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
+                        showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -117,13 +116,13 @@ public class LoginFragment extends Fragment  implements
                 }
                     break;
                 case INVALID_CREDENTIALS:
-                    showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
+                    showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente");
                     break;
                 case FAILED:
-                    showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
+                    showCenteredToast("Authentication server:\nCannot establish connection! D:");
                     break;
                 case INVALID_REQUEST:
-                    showCenteredToast("Authentication server:\ncannot make request! D:", getContext());
+                    showCenteredToast("Authentication server:\ncannot make request! D:");
                     break;
                 case IS_PENDING_USER: {
                     // checking if email verification has been clicked
@@ -135,7 +134,7 @@ public class LoginFragment extends Fragment  implements
                     }
                     else {
                         // show restricted user profile page
-                        showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+                        showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta");
                         Navigation.findNavController(view).popBackStack();
                         Navigation.findNavController(view).navigate(R.id.action_global_personalProfileFragment);
                     }
@@ -282,8 +281,8 @@ public class LoginFragment extends Fragment  implements
 
     }
 
-    public static void showCenteredToast(String message, Context context) {
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }

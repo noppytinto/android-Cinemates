@@ -310,8 +310,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    private void showCenteredToast() {
-
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     //TODO: on testing
