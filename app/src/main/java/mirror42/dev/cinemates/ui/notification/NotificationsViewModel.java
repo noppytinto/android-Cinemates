@@ -302,7 +302,7 @@ public class NotificationsViewModel extends ViewModel {
 
 
     // rxjava
-    public Observable<ArrayList<Notification>> createFollowNotificationsObservable(String email, String token) {
+    public Observable<ArrayList<Notification>> getFollowNotifications(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -362,7 +362,7 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    public Observable<ArrayList<Notification>> createLikeNotificationsObservable(String email, String token) {
+    public Observable<ArrayList<Notification>> getLikeNotifications(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -422,7 +422,7 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    public Observable<ArrayList<Notification>> createCommentNotificationsObservable(String email, String token) {
+    public Observable<ArrayList<Notification>> getCommentNotificaionts(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -483,16 +483,23 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    public Observable<ArrayList<Notification>> createNotificationsObservable(String email, String token) {
+
+    /**
+     * notes: notifications are ordered by date (DESC order)
+     * @param email
+     * @param token
+     * @return
+     */
+    public Observable<ArrayList<Notification>> getNotifications(String email, String token) {
         Observable<ArrayList<Notification>> followNotificationsObservable =
-                createFollowNotificationsObservable(email, token);
+                getFollowNotifications(email, token);
 
         Observable<ArrayList<Notification>> likeNotificationsObservable =
-                createLikeNotificationsObservable(email, token);
+                getLikeNotifications(email, token);
 
 
         Observable<ArrayList<Notification>> commentNotificationsObservable =
-                createCommentNotificationsObservable(email, token);
+                getCommentNotificaionts(email, token);
 
 
         Observable<ArrayList<Notification>> combinedNotificationsObservable =
@@ -503,7 +510,6 @@ public class NotificationsViewModel extends ViewModel {
                             combinedNotifications.addAll(followNotifications);
                             combinedNotifications.addAll(likeNotifications);
                             combinedNotifications.addAll(commentsNotifications);
-//                            Collections.sort(combinedNotifications, Collections.reverseOrder());
                             return combinedNotifications;
                         }
                 );

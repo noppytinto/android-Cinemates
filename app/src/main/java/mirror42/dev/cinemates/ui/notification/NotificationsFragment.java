@@ -172,14 +172,14 @@ public class NotificationsFragment extends Fragment implements
     }
 
     private void drawNotifications() {
-        Observable<ArrayList<Notification>> combinedNotificationsObservable =
-                notificationsViewModel.createNotificationsObservable(
+        Observable<ArrayList<Notification>> notificationsObservable =
+                notificationsViewModel.getNotifications(
                         loginViewModel.getLoggedUser().getValue().getEmail(),
                         loginViewModel.getLoggedUser().getValue().getAccessToken()
                 );
 
 
-        notificationsSubscriber = combinedNotificationsObservable
+        notificationsSubscriber = notificationsObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( notificationsList -> recyclerAdapterNotifications.loadNewData(notificationsList),
