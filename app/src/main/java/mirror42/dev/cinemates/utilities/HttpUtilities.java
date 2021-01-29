@@ -1,15 +1,9 @@
 package mirror42.dev.cinemates.utilities;
 
 import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import javax.net.ssl.HttpsURLConnection;
 
-import okhttp3.Headers;
+import java.io.IOException;
+
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -172,6 +166,7 @@ public class HttpUtilities {
 
         return request;
     }
+
 
 //    public static Request buildRemoteDBrequest(String dbFunctionName, String token) {
 //        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();

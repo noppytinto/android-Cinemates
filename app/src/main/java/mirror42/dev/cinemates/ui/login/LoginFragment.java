@@ -1,8 +1,10 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -99,7 +102,7 @@ public class LoginFragment extends Fragment  implements
                 case SUCCESS: {
                     User user = loginViewModel.getLoggedUser().getValue();
                     try {
-                        MyUtilities.showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
+                        showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail(), getContext());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -114,13 +117,13 @@ public class LoginFragment extends Fragment  implements
                 }
                     break;
                 case INVALID_CREDENTIALS:
-                    MyUtilities.showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
+                    showCenteredToast("Authentication server:\nCredenziali non valide\no utente inesistente", getContext());
                     break;
                 case FAILED:
-                    MyUtilities.showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
+                    showCenteredToast("Authentication server:\nCannot establish connection! D:", getContext());
                     break;
                 case INVALID_REQUEST:
-                    MyUtilities.showCenteredToast("Authentication server:\ncannot make request! D:", getContext());
+                    showCenteredToast("Authentication server:\ncannot make request! D:", getContext());
                     break;
                 case IS_PENDING_USER: {
                     // checking if email verification has been clicked
@@ -132,7 +135,7 @@ public class LoginFragment extends Fragment  implements
                     }
                     else {
                         // show restricted user profile page
-                        MyUtilities.showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
+                        showCenteredToast("Authentication server:\nemail ancora non approvata\ncontrolla la tua posta", getContext());
                         Navigation.findNavController(view).popBackStack();
                         Navigation.findNavController(view).navigate(R.id.action_global_personalProfileFragment);
                     }
@@ -228,7 +231,7 @@ public class LoginFragment extends Fragment  implements
 
 
 
-    //-------------------------------------------------------------------------------- METHODS
+    //-------------------------------------------------------------------------------- MY METHODS
 
     private void showProgressDialog() {
         //notes: Declare progressDialog before so you can use .hide() later!
@@ -278,5 +281,12 @@ public class LoginFragment extends Fragment  implements
         textInputLayoutPassword.setError(null);
 
     }
+
+    public static void showCenteredToast(String message, Context context) {
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
 
 }// end LoginFragment class

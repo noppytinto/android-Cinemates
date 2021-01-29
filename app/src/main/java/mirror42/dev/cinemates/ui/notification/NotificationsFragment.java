@@ -73,40 +73,21 @@ public class NotificationsFragment extends Fragment implements
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
-//        notificationsViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-//            swipeRefreshLayout.setRefreshing(false);
-//            Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
-//
-//            switch (fetchStatus) {
-//                case SUCCESS: {
-//                    recyclerAdapterNotifications.loadNewData(notificationsViewModel.getNotificationsList().getValue());
-//                }
-//                    break;
-//                default:
-//            }
-//        });
-
-
-
         /*
          * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
          * performs a swipe-to-refresh gesture.
          */
-        swipeRefreshLayout.setOnRefreshListener(
-                () -> {
-                    recyclerAdapterNotifications.clearList();
+        swipeRefreshLayout.setOnRefreshListener( () -> {
+            // This method performs the actual data-refresh operation.
+            // The method calls setRefreshing(false) when it's finished.
+            recyclerAdapterNotifications.clearList();
+            if(currentUserIsLogged()) {
+                loadNotifications();
+            }
 
-                    // This method performs the actual data-refresh operation.
-                    // The method calls setRefreshing(false) when it's finished.
-                    if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                                                 loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-                        drawNotifications();
-                    }
-
-                    swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
-                }
-        );
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), "Refresh completato.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
@@ -114,26 +95,10 @@ public class NotificationsFragment extends Fragment implements
         super.onResume();
 
         // fetch notifications, only if the user is logged
-        if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                                     loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-
-//            notificationsViewModel.fetchNotifications(
-//                    loginViewModel.getLoggedUser().getValue().getEmail(),
-//                    loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-            drawNotifications();
-
+        if(currentUserIsLogged()) {
+            loadNotifications();
         }
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (notificationsSubscriber != null && !notificationsSubscriber.isDisposed()) {
-            notificationsSubscriber.dispose();
-        }
-    }
-
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -144,12 +109,15 @@ public class NotificationsFragment extends Fragment implements
         if(notification_item!=null)
             notification_item.setVisible(false);
 
-
         if(login_item!=null)
             login_item.setVisible(false);
     }
 
-
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        disposeSubscribers();
+    }
 
 
 
@@ -167,23 +135,29 @@ public class NotificationsFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterNotifications);
     }
 
-    private void handleExceptionsMessages(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-
-    private void drawNotifications() {
+    private void loadNotifications() {
         Observable<ArrayList<Notification>> notificationsObservable =
                 notificationsViewModel.getNotifications(
                         loginViewModel.getLoggedUser().getValue().getEmail(),
-                        loginViewModel.getLoggedUser().getValue().getAccessToken()
-                );
-
+                        loginViewModel.getLoggedUser().getValue().getAccessToken());
 
         notificationsSubscriber = notificationsObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( notificationsList -> recyclerAdapterNotifications.loadNewData(notificationsList),
-                        this::handleExceptionsMessages);
+                .subscribe(
+                        this::updateUI,
+                        this::handleErrors);
+    }
+
+    private void updateUI(ArrayList<Notification> notifications) {
+        if(notifications==null || notifications.size()==0)
+            Toast.makeText(getContext(), "Nessuna notifica.", Toast.LENGTH_SHORT).show();
+        else
+            recyclerAdapterNotifications.loadNewData(notifications);
+    }
+
+    private void handleErrors(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -217,7 +191,15 @@ public class NotificationsFragment extends Fragment implements
 
     }
 
+    private boolean currentUserIsLogged() {
+        return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                            loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
+    }
 
-
+    private void disposeSubscribers() {
+        if (notificationsSubscriber != null && !notificationsSubscriber.isDisposed()) {
+            notificationsSubscriber.dispose();
+        }
+    }
 
 }// end NotificationsFragment class

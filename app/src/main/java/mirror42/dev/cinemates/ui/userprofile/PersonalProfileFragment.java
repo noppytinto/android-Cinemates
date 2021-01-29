@@ -1,7 +1,9 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +26,6 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 
@@ -157,7 +159,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                 // insert into postgrest database
                 // and show new user profile page
                 loginViewModel.resendVerificationEmail();
-                MyUtilities.showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.", getContext());
+                showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.", getContext());
                 buttonResendEmail.setText("Email attivazione reinviata!");
                 buttonResendEmail.setEnabled(false);
             }
@@ -184,4 +186,9 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         includeUserProfileContent.setVisibility(View.VISIBLE);
     }
 
+    public static void showCenteredToast(String message, Context context) {
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 }// end UserProfileFragment class

@@ -3,6 +3,7 @@ package mirror42.dev.cinemates.ui.signup;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -155,21 +157,21 @@ public class SignUpFragment extends Fragment implements
 
             switch (firebaseSignUpServerCodeState) {
                 case SIGN_UP_SUCCESS:
-                    MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
+                    showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:success" , getContext());
                     break;
                 case SIGN_UP_FAILURE:
-                    MyUtilities.showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
+                    showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure", getContext());
                     break;
                 case VERIFICATION_MAIL_SENT:
-                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
+                    showCenteredToast("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta", getContext());
                     Navigation.findNavController(view).popBackStack();
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
                     break;
                 case VERIFICATION_MAIL_NOT_SENT:
-                    MyUtilities.showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
+                    showCenteredToast("Firebase sign-up server:\nVerification email NOT sent", getContext());
                     break;
                 case PENDING_USER_COLLISION:
-                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
+                    showCenteredToast("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"", getContext());
                     textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
                     Navigation.findNavController(view).popBackStack();
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
@@ -178,24 +180,24 @@ public class SignUpFragment extends Fragment implements
                     signUpViewModel.insertUserInFirebaseDB();
                     break;
                 case USERNAME_EMAIL_COLLISION:
-                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nusername+email gia' presente", getContext());
+                    showCenteredToast("Firebase sign-up server:\nusername+email gia' presente", getContext());
                     textInputLayoutUsername.setError("username+email gia' presente");
                     textInputLayoutEmail.setError("username+email gia' presente");
                     break;
                 case USERNAME_COLLISION:
-                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nusername gia' presente", getContext());
+                    showCenteredToast("Firebase sign-up server:\nusername gia' presente", getContext());
                     textInputLayoutUsername.setError("username gia' presente");
                     break;
                 case EMAIL_COLLISION:
-                    MyUtilities.showCenteredToastLong("Firebase sign-up server:\nemail gia' presente", getContext());
+                    showCenteredToast("Firebase sign-up server:\nemail gia' presente", getContext());
                     textInputLayoutEmail.setError("email gia' presente");
                     break;
                 case GENERIC_POSTGREST_ERROR:
-                    MyUtilities.showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
+                    showCenteredToast("Firebase sign-up server:\nerrore postgrest", getContext());
                     textInputLayoutEmail.setError("email gia' presente");
                     break;
                 case WEAK_PASSWORD:
-                    MyUtilities.showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
+                    showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5", getContext());
                     textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
                     break;
                 case NO_POSTGRES_USER_COLLISION:
@@ -234,7 +236,7 @@ public class SignUpFragment extends Fragment implements
                 signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
             }
             else {
-                MyUtilities.showCenteredToastLong("Completare prima tutti i campi evidenziati in rosso.", getContext());
+                showCenteredToast("Completare prima tutti i campi evidenziati in rosso.", getContext());
             }
 
 
@@ -473,6 +475,12 @@ public class SignUpFragment extends Fragment implements
         editTextFirstName.setText("mrfoo");
         editTextLastName.setText("bar");
         editTextBirthDate.setText("1-1-1970");
+    }
+
+    public static void showCenteredToast(String message, Context context) {
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 

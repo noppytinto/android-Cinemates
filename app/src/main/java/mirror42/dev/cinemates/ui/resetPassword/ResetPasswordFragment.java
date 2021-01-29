@@ -1,10 +1,13 @@
 package mirror42.dev.cinemates.ui.resetPassword;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +22,6 @@ import java.util.regex.Pattern;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 
 
 public class ResetPasswordFragment extends Fragment implements View.OnClickListener{
@@ -51,9 +53,9 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
         resetPasswordViewModel =  new ViewModelProvider(this).get(ResetPasswordViewModel.class);
         resetPasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), resetResult -> {
             if(resetResult == ResetPasswordViewModel.ResetResult.SUCCESS)
-                MyUtilities.showCenteredToast( "Reset password completo ", getContext());
+                showCenteredToast( "Reset password completo ", getContext());
             else if(resetResult == ResetPasswordViewModel.ResetResult.FAILED)
-                MyUtilities.showCenteredToast( "Reset password fallito ", getContext());
+                showCenteredToast( "Reset password fallito ", getContext());
         });
     }
 
@@ -65,7 +67,7 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
             if(isVaildMail( email))
                 resetPasswordViewModel.resetPassword(email);
             else
-                MyUtilities.showCenteredToast( "Formato mail non valido ", getContext());
+                showCenteredToast( "Formato mail non valido ", getContext());
         }
     }
 
@@ -89,5 +91,12 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
             isValid = true;
         return isValid;
     }
+
+    public static void showCenteredToast(String message, Context context) {
+        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
 
 }

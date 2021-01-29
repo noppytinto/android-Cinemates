@@ -21,6 +21,10 @@ import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -28,7 +32,7 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import static mirror42.dev.cinemates.MainActivity.CHANNEL_ID;
 
 public class UserProfileFragment extends Fragment implements View.OnClickListener {
-    private UserProfileViewModel mViewModel;
+    private UserProfileViewModel userProfileViewModel;
     private LoginViewModel loginViewModel;
     private View view;
     private ImageView imageViewProfilePicture;
@@ -38,6 +42,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private Button buttonFollow;
     private Button buttonAcceptFollow;
     private User profileOwner;
+    private Disposable iFollowHimSubscriber;
+    private boolean iFollowHim;
 
 
     //-------------------------------------------------------------------------- ANDROID METHODS
@@ -88,11 +94,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
-        if (loginViewModel != null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                                        loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-            mViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
-            mViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-                switch (taskStatus) {
+        if (currentUserIsLogged()) {
+            userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
+            userProfileViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
+                switch (followStatus) {
                     case I_FOLLOW_HIM: {
                         buttonFollow.setVisibility(View.GONE);
                         final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
@@ -106,7 +111,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         toast.show();
 
                         //
-                        mViewModel.checkMyFollowIsPending(
+                        userProfileViewModel.checkMyFollowIsPending(
                                 loginViewModel.getLoggedUser().getValue().getUsername(),
                                 profileOwner.getUsername(),
                                 loginViewModel.getLoggedUser().getValue().getAccessToken());
@@ -142,8 +147,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 }
             });
 
-            mViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-                switch (taskStatus) {
+            userProfileViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
+                switch (followStatus) {
                     case HE_FOLLOWS_ME: {
                         textViewMessage.setVisibility(View.VISIBLE);
                     }
@@ -151,7 +156,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     case HE_DOESNT_FOLLOW_ME: {
                         textViewMessage.setVisibility(View.GONE);
 
-                        mViewModel.checkHisFollowIsPending(
+                        userProfileViewModel.checkHisFollowIsPending(
                                 profileOwner.getUsername(),
                                 loginViewModel.getLoggedUser().getValue().getUsername(),
                                 loginViewModel.getLoggedUser().getValue().getAccessToken());
@@ -177,21 +182,41 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             });
 
         }
-
     }
+
+
 
     @Override
     public void onResume() {
         super.onResume();
+        if(currentUserIsLogged()) {
+            Observable<Boolean> iFollowHimStatusObservable =
+                    userProfileViewModel.getIfollowHimStatus(
+                            loginViewModel.getLoggedUser().getValue().getUsername(),
+                            profileOwner.getUsername(),
+                            loginViewModel.getLoggedUser().getValue().getAccessToken());
 
-        if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                                     loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-            mViewModel.checkIfollowHim(
+            iFollowHimSubscriber = iFollowHimStatusObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            result -> iFollowHim = result,
+                            this::handleErrors);
+
+            if(iFollowHim) {
+                buttonFollow.setVisibility(View.GONE);
+                final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+
+
+            userProfileViewModel.checkIfollowHim(
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
 
-            mViewModel.checkHeFollowsMe(
+            userProfileViewModel.checkHeFollowsMe(
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
@@ -199,10 +224,20 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    private void updateUIonIfollowHimCheckComplete() {
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        disposeSubscribers();
+    }
+
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonFollow.getId()) {
-            mViewModel.getMySendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            userProfileViewModel.getMySendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case REQUEST_SENT_SUCCESSFULLY: {
                         buttonFollow.setVisibility(View.VISIBLE);
@@ -223,13 +258,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 }
             });
 
-            mViewModel.sendFollowRequest(
+            userProfileViewModel.sendFollowRequest(
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
         }
         else if(v.getId() == buttonAcceptFollow.getId()) {
-            mViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED: {
                         buttonAcceptFollow.setVisibility(View.GONE);
@@ -247,7 +282,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 }
             });
 
-            mViewModel.acceptFollowRequest(
+            userProfileViewModel.acceptFollowRequest(
                     profileOwner.getUsername(),
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     loginViewModel.getLoggedUser().getValue().getAccessToken());
@@ -256,7 +291,28 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
 
 
+
+
     //-------------------------------------------------------------------------- MY METHODS
+
+    private boolean currentUserIsLogged() {
+        return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
+    }
+
+    private void disposeSubscribers() {
+        if (iFollowHimSubscriber != null && !iFollowHimSubscriber.isDisposed()) {
+            iFollowHimSubscriber.dispose();
+        }
+    }
+
+    private void handleErrors(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void showCenteredToast() {
+
+    }
 
     //TODO: on testing
     public void sendFollowNotification(String senderUsername) {

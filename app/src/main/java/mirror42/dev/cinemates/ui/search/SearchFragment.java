@@ -185,8 +185,7 @@ public class SearchFragment extends Fragment implements
 //                                                    ()->{spinner.setVisibility(View.GONE);});
 
                 }
-                else
-                    searchButtonPressed = false;
+                else searchButtonPressed = false;
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -196,77 +195,6 @@ public class SearchFragment extends Fragment implements
                 searchButtonPressed = false;
             }
         }
-    }
-
-    private void updateResults(ArrayList<SearchResult> searchResults) {
-        recyclerAdapterSearchPage.loadNewData(searchResults);
-    }
-
-    public Observable<ArrayList<SearchResult>> createMoviesListObservable(String givenQuery) {
-        return Observable.create( emitter -> {
-            final int PAGE_1 = 1;
-            String movieTitle = givenQuery;
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<SearchResult> result = null;
-
-            movieTitle = movieTitle.trim();
-            result = new ArrayList<>();
-
-
-            try {
-                // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
-
-                // fetching results
-                for (int i = 0; i < resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-                    int id = x.getInt("id");
-                    String title = x.getString("title");
-
-                    // if overview is null
-                    // getString() will fail
-                    // (due to the unvailable defaultLanguage version)
-                    // that's why the try-catch
-                    String overview = null;
-                    try {
-                        overview = x.getString("overview");
-                        if ((overview == null) || (overview.isEmpty()))
-                            overview = "(trama non disponibile in italiano)";
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                        overview = "(trama in italiano non disp.)";
-                    }
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String posterURL = null;
-                    try {
-                        posterURL = x.getString("poster_path");
-                        posterURL = tmdb.buildPosterUrl(posterURL);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                    }
-
-                    //
-                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
-                    result.add(mv);
-                }// for
-                // once finished set results
-                emitter.onNext(result);
-                emitter.onComplete();
-
-            } catch (Exception e) {
-                // if the search returns nothing
-                // moviesList will be null
-                e.printStackTrace();
-                emitter.onError(e);
-            }
-
-        });
     }
 
     @Override
@@ -300,13 +228,7 @@ public class SearchFragment extends Fragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        if (disposableSearchTerm != null && !disposableSearchTerm.isDisposed()) {
-            disposableSearchTerm.dispose();
-        }
-
-        if (disposable_2 != null && !disposable_2.isDisposed()) {
-            disposable_2.dispose();
-        }
+        disposeSubscribers();
     }
 
 
@@ -374,6 +296,88 @@ public class SearchFragment extends Fragment implements
 
         NavGraphDirections.ActionGlobalUserProfileFragment action = NavGraphDirections.actionGlobalUserProfileFragment(user);
         NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+    }
+
+
+
+    //--- on testing
+    private void disposeSubscribers() {
+        if (disposableSearchTerm != null && !disposableSearchTerm.isDisposed()) {
+            disposableSearchTerm.dispose();
+        }
+
+        if (disposable_2 != null && !disposable_2.isDisposed()) {
+            disposable_2.dispose();
+        }
+    }
+    private void updateResults(ArrayList<SearchResult> searchResults) {
+        recyclerAdapterSearchPage.loadNewData(searchResults);
+    }
+    private Observable<ArrayList<SearchResult>> createMoviesListObservable(String givenQuery) {
+        return Observable.create( emitter -> {
+            final int PAGE_1 = 1;
+            String movieTitle = givenQuery;
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+            ArrayList<SearchResult> result = null;
+
+            movieTitle = movieTitle.trim();
+            result = new ArrayList<>();
+
+
+            try {
+                // querying TBDb
+                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
+                JSONArray resultsArray = jsonObj.getJSONArray("results");
+
+                // fetching results
+                for (int i = 0; i < resultsArray.length(); i++) {
+                    JSONObject x = resultsArray.getJSONObject(i);
+                    int id = x.getInt("id");
+                    String title = x.getString("title");
+
+                    // if overview is null
+                    // getString() will fail
+                    // (due to the unvailable defaultLanguage version)
+                    // that's why the try-catch
+                    String overview = null;
+                    try {
+                        overview = x.getString("overview");
+                        if ((overview == null) || (overview.isEmpty()))
+                            overview = "(trama non disponibile in italiano)";
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                        overview = "(trama in italiano non disp.)";
+                    }
+
+                    // if poster_path is null
+                    // getString() will fail
+                    // that's why the try-catch
+                    String posterURL = null;
+                    try {
+                        posterURL = x.getString("poster_path");
+                        posterURL = tmdb.buildPosterUrl(posterURL);
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                    }
+
+                    //
+                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
+                    result.add(mv);
+                }// for
+                // once finished set results
+                emitter.onNext(result);
+                emitter.onComplete();
+
+            } catch (Exception e) {
+                // if the search returns nothing
+                // moviesList will be null
+                e.printStackTrace();
+                emitter.onError(e);
+            }
+
+        });
     }
 
 }// end SearchFragment class

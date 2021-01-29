@@ -1,9 +1,6 @@
 package mirror42.dev.cinemates.utilities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
-import android.widget.Toast;
 
 import androidx.security.crypto.EncryptedFile;
 import androidx.security.crypto.MasterKey;
@@ -195,38 +192,6 @@ public class MyUtilities {
         return hex;
     }
 
-    public static void showToast(String message, Context context) {
-        // print response
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-        toast.show();
-    }// end showToastOnUiThread()
-
-    public static void showCenteredToast(String message, Context context) {
-        // print response
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }// end showToastOnUiThread()
-
-    public static void showCenteredToastLong(String message, Context context) {
-        // print response
-        final Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }// end showToastOnUiThread()
-
-    public static void showCenteredToastOnUiThread(String message, Activity activity) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // print response
-                final Toast toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-        });
-    }// end showToastOnUiThread()
-
     public static String convertUserInJSonString(User user) {
         String string = null;
 
@@ -248,17 +213,6 @@ public class MyUtilities {
         }
         return string;
     }
-
-    public static void showToastOnUiThread(String message, Activity activity) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // print response
-                final Toast toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-    }// end showToastOnUiThread()
 
     public static String convertStringDateToStringSqlDate(String date) {
         if(date==null || date.isEmpty()) return null;
