@@ -21,10 +21,7 @@ import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -190,25 +187,25 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     public void onResume() {
         super.onResume();
         if(currentUserIsLogged()) {
-            Observable<Boolean> iFollowHimStatusObservable =
-                    userProfileViewModel.getIfollowHimStatus(
-                            loginViewModel.getLoggedUser().getValue().getUsername(),
-                            profileOwner.getUsername(),
-                            loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-            iFollowHimSubscriber = iFollowHimStatusObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            result -> iFollowHim = result,
-                            this::handleErrors);
-
-            if(iFollowHim) {
-                buttonFollow.setVisibility(View.GONE);
-                final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
+//            Observable<Boolean> iFollowHimStatusObservable =
+//                    userProfileViewModel.getIfollowHimStatus(
+//                            loginViewModel.getLoggedUser().getValue().getUsername(),
+//                            profileOwner.getUsername(),
+//                            loginViewModel.getLoggedUser().getValue().getAccessToken());
+//
+//            iFollowHimSubscriber = iFollowHimStatusObservable
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(
+//                            result -> iFollowHim = result,
+//                            this::handleErrors);
+//
+//            if(iFollowHim) {
+//                buttonFollow.setVisibility(View.GONE);
+//                final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
+//                toast.setGravity(Gravity.CENTER, 0, 0);
+//                toast.show();
+//            }
 
 
             userProfileViewModel.checkIfollowHim(
