@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.CastCrew;
+import mirror42.dev.cinemates.model.pojo.Actor;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
@@ -286,7 +286,7 @@ public class SearchViewModel extends ViewModel {
             Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH ACTORS");
             String actorName = givenQuery;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<CastCrew> result = null;
+            ArrayList<Actor> result = null;
 
 
 
@@ -338,9 +338,9 @@ public class SearchViewModel extends ViewModel {
                     }
 
                     //
-                    CastCrew cc = new CastCrew();
+                    Actor cc = new Actor();
                     cc.setTmdbID(id);
-                    cc.setName(name);
+                    cc.setFullName(name);
                     cc.setProfilePictureUrl(profilePictureUrl);
 
                     result.add(cc);

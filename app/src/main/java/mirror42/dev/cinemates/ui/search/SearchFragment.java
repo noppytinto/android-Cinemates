@@ -160,11 +160,6 @@ public class SearchFragment extends Fragment implements
             buttonSearch.startAnimation(buttonAnim);
             currentSearchTerm = editTextSearch.getText().toString();
 
-
-
-
-
-
             if( ! currentSearchTerm.isEmpty()) {
                 if( ! currentSearchTerm.equals(previousSearchTerm)) {
                     previousSearchTerm = currentSearchTerm;

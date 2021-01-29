@@ -27,9 +27,10 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { // for email api
-            url "https://maven.java.net/content/groups/public/"
-        }
+        // for email api
+        maven {url "https://maven.java.net/content/groups/public/"}
+        // firebase rxjava wrapper
+        maven { url "https://jitpack.io" }
     }
 }
 

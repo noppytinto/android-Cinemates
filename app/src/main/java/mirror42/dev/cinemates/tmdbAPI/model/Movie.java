@@ -3,22 +3,44 @@ package mirror42.dev.cinemates.tmdbAPI.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Movie implements Parcelable {
-//    private static final long serialVersionUID = 1L;
+public class Movie implements Parcelable, Serializable {
+    private final static long serialVersionUID = 2241477881506269391L;
+    @SerializedName("id")
+    @Expose
     private int tmdbID;
+    @SerializedName("title")
+    @Expose
     private String title;
+    @SerializedName("overview")
+    @Expose
     private String overview;
+    @SerializedName("poster_path")
+    @Expose
     private String posterURL;
+    @SerializedName("backdrop_path")
+    @Expose
     private String backdropURL;
+    @SerializedName("runtime")
+    @Expose
     private int duration;
+    @SerializedName("status")
+    @Expose
     private String releaseStatus;
+    @SerializedName("release_date")
+    @Expose
     private String releaseDate;
     private ArrayList<String> genres;
     private ArrayList<Person> castAndCrew;
     private ArrayList<Review> reviews;
     private boolean isSelected;
+
+
 
 
     //------------------------------------------------------------------- CONSTRUCTORS
@@ -180,7 +202,7 @@ public class Movie implements Parcelable {
     }
 
 
-    //------------------------------------------------------------------- PARCEL METHODS
+    //------------------------------------------------------------------- PARCELLABLE METHODS
 
     public Movie(Parcel source) {
         this.tmdbID = source.readInt();

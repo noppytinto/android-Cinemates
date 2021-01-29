@@ -19,12 +19,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
+import mirror42.dev.cinemates.ui.notification.model.Notification;
 
 public class NotificationsFragment extends Fragment implements
         RecyclerAdapterNotifications.OnNotificationClickedListener {
@@ -35,6 +41,7 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
+    private Disposable notificationsSubscriber;
 
 
 
@@ -105,18 +112,66 @@ public class NotificationsFragment extends Fragment implements
                     }
                 }
         );
+    }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // fetch notifications, only if the user is logged
         if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
                                      loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-            notificationsViewModel.fetchNotifications(
-                    loginViewModel.getLoggedUser().getValue().getEmail(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+//            notificationsViewModel.fetchNotifications(
+//                    loginViewModel.getLoggedUser().getValue().getEmail(),
+//                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            Observable<ArrayList<Notification>> followNotificationsObservable =
+                    notificationsViewModel.createFollowNotificationsObservable(
+                                                loginViewModel.getLoggedUser().getValue().getEmail(),
+                                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            Observable<ArrayList<Notification>> likeNotificationsObservable =
+                    notificationsViewModel.createLikeNotificationsObservable(
+                            loginViewModel.getLoggedUser().getValue().getEmail(),
+                            loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            Observable<ArrayList<Notification>> commentNotificationsObservable =
+                    notificationsViewModel.createCommentNotificationsObservable(
+                            loginViewModel.getLoggedUser().getValue().getEmail(),
+                            loginViewModel.getLoggedUser().getValue().getAccessToken());
+
+            Observable<ArrayList<Notification>> combinedNotificationsObservable =
+                    Observable.combineLatest(
+                                    followNotificationsObservable, likeNotificationsObservable, commentNotificationsObservable,
+                                    (followNotifications, likeNotifications, commentsNotifications) -> {
+                                        final ArrayList<Notification> combinedNotifications = new ArrayList<>();
+                                        combinedNotifications.addAll(followNotifications);
+                                        combinedNotifications.addAll(likeNotifications);
+                                        combinedNotifications.addAll(commentsNotifications);
+                                        Collections.sort(combinedNotifications, Collections.reverseOrder());
+
+                                        return combinedNotifications;
+                                    }
+                            );
+
+
+            notificationsSubscriber = combinedNotificationsObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe( notificationsList -> recyclerAdapterNotifications.loadNewData(notificationsList),
+                                this::handleExceptionsMessages);
         }
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (notificationsSubscriber != null && !notificationsSubscriber.isDisposed()) {
+            notificationsSubscriber.dispose();
+        }
+    }
+
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
@@ -130,6 +185,10 @@ public class NotificationsFragment extends Fragment implements
 
         if(login_item!=null)
             login_item.setVisible(false);
+    }
+
+    private void handleExceptionsMessages(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
 

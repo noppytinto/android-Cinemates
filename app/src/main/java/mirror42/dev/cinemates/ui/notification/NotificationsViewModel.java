@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import io.reactivex.rxjava3.core.Observable;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
 import mirror42.dev.cinemates.ui.notification.model.Notification;
@@ -31,7 +33,7 @@ public class NotificationsViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Notification>> notificationsList;
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
-    private ArrayList<Notification> tempResult;
+    private ArrayList<Notification> tempRes;
 
     private final String FOLLOW_REQUEST_NOTIFICATION_TYPE = "FR";
     private final String POST_LIKED_NOTIFICATION_TYPE = "PL";
@@ -45,7 +47,7 @@ public class NotificationsViewModel extends ViewModel {
         notificationsList = new MutableLiveData<>();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
-        tempResult = new ArrayList<>();
+        tempRes = new ArrayList<>();
     }
 
 
@@ -123,7 +125,7 @@ public class NotificationsViewModel extends ViewModel {
                     // if response contains valid data
                     if ( ! responseData.equals("null")) {
                         JSONArray jsonArray = new JSONArray(responseData);
-                        tempResult = new ArrayList<>();
+                        tempRes = new ArrayList<>();
 
                         for(int i=0; i<jsonArray.length(); i++) {
                             FollowRequestNotification followRequestNotification = new FollowRequestNotification();
@@ -136,7 +138,7 @@ public class NotificationsViewModel extends ViewModel {
                             followRequestNotification.setSender(sender);
                             followRequestNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
 
-                            tempResult.add(followRequestNotification);
+                            tempRes.add(followRequestNotification);
                         }// for
                     }
                 }
@@ -195,7 +197,7 @@ public class NotificationsViewModel extends ViewModel {
                             postLikedNotification.setPostId(jsonDBobj.getLong("fk_Post"));
                             postLikedNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
 
-                            tempResult.add(postLikedNotification);
+                            tempRes.add(postLikedNotification);
                         }// for
                     }
                 }
@@ -254,13 +256,13 @@ public class NotificationsViewModel extends ViewModel {
                             postCommentedNotification.setPostId(jsonDBobj.getLong("fk_Post"));
                             postCommentedNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
 
-                            tempResult.add(postCommentedNotification);
+                            tempRes.add(postCommentedNotification);
                         }// for
 
                         // once finished set result
-                        Collections.sort(tempResult);
-                        Collections.reverse(tempResult);
-                        setNotificationsList(tempResult);
+                        Collections.sort(tempRes);
+                        Collections.reverse(tempRes);
+                        setNotificationsList(tempRes);
                         setFetchStatus(FetchStatus.SUCCESS);
 
                     }
@@ -286,5 +288,198 @@ public class NotificationsViewModel extends ViewModel {
             }
         };
     }// end createFetchCommentsNotificationsTask()
+
+    private HttpUrl buildHttpUrl(String dbFunctionName) {
+        return new HttpUrl.Builder()
+                .scheme("https")
+                .host(remoteConfigServer.getAzureHostName())
+                .addPathSegments(remoteConfigServer.getPostgrestPath())
+                .addPathSegment(dbFunctionName)
+                .build();
+    }
+
+
+
+    // rxjava
+    public Observable<ArrayList<Notification>> createFollowNotificationsObservable(String email, String token) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Notification> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_select_notifications";
+                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", email)
+                        .add("notification_type", FOLLOW_REQUEST_NOTIFICATION_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            FollowRequestNotification followRequestNotification = new FollowRequestNotification();
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            User sender = new User();
+                            sender.setFirstName(jsonDBobj.getString("sender_fname"));
+                            sender.setLastName(jsonDBobj.getString("sender_lname"));
+                            sender.setUsername(jsonDBobj.getString("sender_username"));
+                            sender.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            followRequestNotification.setSender(sender);
+                            followRequestNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
+
+                            tempResult.add(followRequestNotification);
+                        }// for
+                    }
+
+                    // once finished set result
+                    emitter.onNext(tempResult);
+                    emitter.onComplete();
+                }
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }
+
+    public Observable<ArrayList<Notification>> createLikeNotificationsObservable(String email, String token) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Notification> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_select_notifications";
+                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", email)
+                        .add("notification_type", POST_LIKED_NOTIFICATION_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            PostLikedNotification postLikedNotification = new PostLikedNotification();
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            User sender = new User();
+                            sender.setFirstName(jsonDBobj.getString("sender_fname"));
+                            sender.setLastName(jsonDBobj.getString("sender_lname"));
+                            sender.setUsername(jsonDBobj.getString("sender_username"));
+                            sender.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            postLikedNotification.setSender(sender);
+                            postLikedNotification.setPostId(jsonDBobj.getLong("fk_Post"));
+                            postLikedNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
+
+                            tempResult.add(postLikedNotification);
+                        }// for
+                    }
+
+                    emitter.onNext(tempResult);
+                    emitter.onComplete();
+                }
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }
+
+    public Observable<ArrayList<Notification>> createCommentNotificationsObservable(String email, String token) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Notification> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_select_notifications";
+                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", email)
+                        .add("notification_type", POST_COMMENTED_NOTIFICATION_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            PostCommentedNotification postCommentedNotification = new PostCommentedNotification();
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            User sender = new User();
+                            sender.setFirstName(jsonDBobj.getString("sender_fname"));
+                            sender.setLastName(jsonDBobj.getString("sender_lname"));
+                            sender.setUsername(jsonDBobj.getString("sender_username"));
+                            sender.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            postCommentedNotification.setSender(sender);
+                            postCommentedNotification.setPostId(jsonDBobj.getLong("fk_Post"));
+                            postCommentedNotification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
+
+                            tempResult.add(postCommentedNotification);
+                        }// for
+                    }
+
+                    // once finished set result
+                    emitter.onNext(tempResult);
+                    emitter.onComplete();
+                }
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }
 
 }// end NotificationsViewModel class
