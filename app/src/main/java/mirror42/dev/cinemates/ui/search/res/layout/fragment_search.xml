@@ -5,8 +5,8 @@
     android:id="@+id/layout_searchFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_blue"
     android:layout_marginBottom="5dp"
+    android:background="@color/primary_blue"
     tools:context=".ui.search.SearchFragment">
 
 
@@ -30,10 +30,10 @@
         layout="@layout/bottom_sheet_search_box"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:elevation="10dp"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView_searchFragment_title"
@@ -47,6 +47,19 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_searchFragment"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerView_searchFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/recyclerView_searchFragment"
         tools:visibility="visible" />
 
 

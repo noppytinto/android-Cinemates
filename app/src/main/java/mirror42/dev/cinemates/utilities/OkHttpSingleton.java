@@ -12,9 +12,12 @@ public class OkHttpSingleton {
     private static OkHttpClient client;
 
 
+
+    //-------------------------------------------------------------------- CONSTRUCTORS
+
     private OkHttpSingleton(Context context) {
         File httpCacheDirectory = new File(context.getCacheDir(), "http-cache");
-        int cacheSize = 50 * 1024 * 1024; // 50 MiB
+        int cacheSize = 50 * 1024 * 1024; // 50 MB cache
         Cache cache = new Cache(httpCacheDirectory, cacheSize);
         client = new OkHttpClient.Builder()
                 .cache(cache)
@@ -24,7 +27,7 @@ public class OkHttpSingleton {
 
 
 
-    //-------------------------------------------------------- METHODS
+    //-------------------------------------------------------------------- MY METHODS
 
     public static OkHttpSingleton getInstance(Context context) {
         if(singletonInstance==null)
@@ -36,12 +39,6 @@ public class OkHttpSingleton {
     public static OkHttpClient getClient() {
         return client;
     }
-
-
-
-
-
-
 
 
 

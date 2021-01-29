@@ -126,12 +126,11 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
 
         int commentsCount = watchlistPost.getCommentsCount();
-        if(commentsCount==1) {
+        if(commentsCount==1)
             holder.buttonShowComments.setText(commentsCount + " commento");
-        }
-        else {
+        else
             holder.buttonShowComments.setText(commentsCount + " commenti");
-        }
+
 
 
         if(watchlistPost.isLikedByMe())
@@ -156,8 +155,8 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         try {
             Glide.with(context)  //2
                     .load(watchlistPost.getOwner().getProfilePicturePath()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
                     .into(holder.imageViewProfilePicture); //8
         } catch (Exception e) {

@@ -207,7 +207,6 @@ public class SearchViewModel extends ViewModel {
 
     private Runnable createSearchMoviesTask(String givenQuery) {
         return ()-> {
-            Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH MOVIES");
             String movieTitle = givenQuery;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<SearchResult> result = null;

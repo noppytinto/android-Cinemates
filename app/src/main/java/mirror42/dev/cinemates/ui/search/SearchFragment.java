@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,13 +28,19 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jakewharton.rxbinding4.widget.RxTextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
@@ -44,7 +50,8 @@ import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
-public class SearchFragment extends Fragment implements View.OnClickListener,
+public class SearchFragment extends Fragment implements
+        View.OnClickListener,
         ChipGroup.OnCheckedChangeListener,
         RecyclerAdapterSearchPage.SearchResultListener {
     private final String TAG = this.getClass().getSimpleName();
@@ -65,21 +72,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
     private RecyclerView recyclerView;
     private String previousSearchTerm; //if the new search term equals the previous one, then don't start any search
     private boolean searchButtonPressed;
+    private ProgressBar spinner;
+    private Disposable disposableSearchTerm;
+    private Disposable disposable_2;
 
 
-    //------------------------------------------------------------------------ LIFECYCLE METHODS
+
+    //------------------------------------------------------------------------ ANDROID METHODS
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        final EditText editText = view.findViewById(R.id.editText_searchFragment);
-//        searchViewModel.getQuery().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                editText.setText(s);
-//            }
-//        });
-
         return inflater.inflate(R.layout.fragment_search, container, false);
     }
 
@@ -93,40 +95,37 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         chipGroup = view.findViewById(R.id.chipGroup_searchFragment);
         chipUsersFilter = view.findViewById(R.id.include_searchFragment_searchBox).findViewById(R.id.chip_searchFragment_user);
         textViewTitle = view.findViewById(R.id.textView_searchFragment_title);
-
-        // setting listeners
+        spinner = view.findViewById(R.id.progressBar_searchFragment);
         buttonSearch.setOnClickListener(this);
         chipGroup.setOnCheckedChangeListener(this);
+        firebaseAnalytics = FirebaseAnalytics.getInstance();
+        searchType = SearchResult.SearchType.UNIVERSAL;
 
         //
         initRecycleView();
-
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        firebaseAnalytics = FirebaseAnalytics.getInstance();
-        searchType = SearchResult.SearchType.UNIVERSAL;
 
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        searchViewModel.getSearchResultList().observe(getViewLifecycleOwner(), new Observer<ArrayList<SearchResult>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<SearchResult> results) {
-                textViewTitle.setVisibility(View.VISIBLE);
-                searchButtonPressed = false;
-                if (results != null && results.size()>0) {
-                    textViewTitle.setText("Risultati per: " + currentSearchTerm);
-                    recyclerAdapterSearchPage.loadNewData(results);
-                }
-                else {
-                    recyclerAdapterSearchPage.loadNewData(null);
-                    textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
-                    final Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
+        searchViewModel.getSearchResultList().observe(getViewLifecycleOwner(), searchResults -> {
+            textViewTitle.setVisibility(View.VISIBLE);
+            spinner.setVisibility(View.GONE);
+            searchButtonPressed = false;
+
+            if (searchResults != null && searchResults.size()>0) {
+                textViewTitle.setText("Risultati per: " + currentSearchTerm);
+                recyclerAdapterSearchPage.loadNewData(searchResults);
+            }
+            else {
+                recyclerAdapterSearchPage.loadNewData(null);
+                textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
+                final Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
 
@@ -134,7 +133,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
-                case SUCCESS: case REMEMBER_ME_EXISTS: {
+                case SUCCESS:
+                case REMEMBER_ME_EXISTS: {
                     chipUsersFilter.setVisibility(View.VISIBLE);
                     loggedUser = loginViewModel.getLoggedUser().getValue();
                 }
@@ -146,39 +146,32 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             }
         });
 
-        // AUTOMATIC SEARCH
-        // triggered when:
-        // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
-        // 1 second later after the last typed character (debounce)
-        RxTextView.textChanges(editTextSearch)
-                .filter(text -> text.length()>=3 && !searchButtonPressed)
-                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::updateSearchResults);
+        //
+        enableSearchOnTyping();
 
     }// end onActivityCreated()
-
-    private void updateSearchResults(CharSequence searchQuery) {
-        currentSearchTerm = searchQuery.toString();
-        if( ! currentSearchTerm.equals(previousSearchTerm)) {
-            previousSearchTerm = currentSearchTerm;
-            searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
-        }
-    }
-
 
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonSearch.getId()) {
+            spinner.setVisibility(View.VISIBLE);
             searchButtonPressed = true;
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
             buttonSearch.startAnimation(buttonAnim);
             currentSearchTerm = editTextSearch.getText().toString();
 
+
+
+
+
+
             if( ! currentSearchTerm.isEmpty()) {
                 if( ! currentSearchTerm.equals(previousSearchTerm)) {
                     previousSearchTerm = currentSearchTerm;
-                    firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
+
+                    // don't log user searches
+                    if(chipGroup.getCheckedChipId() != R.id.chip_searchFragment_user)
+                        firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
 
                     //
                     textInputLayout.setError(null);
@@ -186,10 +179,19 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
                     //
                     searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+
+                    // create observable
+//                    Observable<ArrayList<SearchResult>> currentSearchTermObservable = createMoviesListObservable(currentSearchTerm);
+//                    disposable_2 = currentSearchTermObservable
+//                                        .subscribeOn(Schedulers.io())
+//                                        .observeOn(AndroidSchedulers.mainThread())
+//                                        .subscribe( searchResult -> {recyclerAdapterSearchPage.loadNewData(searchResult);},
+//                                                    error -> { error.printStackTrace();},
+//                                                    ()->{spinner.setVisibility(View.GONE);});
+
                 }
-                else {
+                else
                     searchButtonPressed = false;
-                }
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -199,8 +201,77 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
                 searchButtonPressed = false;
             }
         }
-        else {
-        }
+    }
+
+    private void updateResults(ArrayList<SearchResult> searchResults) {
+        recyclerAdapterSearchPage.loadNewData(searchResults);
+    }
+
+    public Observable<ArrayList<SearchResult>> createMoviesListObservable(String givenQuery) {
+        return Observable.create( emitter -> {
+            final int PAGE_1 = 1;
+            String movieTitle = givenQuery;
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+            ArrayList<SearchResult> result = null;
+
+            movieTitle = movieTitle.trim();
+            result = new ArrayList<>();
+
+
+            try {
+                // querying TBDb
+                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
+                JSONArray resultsArray = jsonObj.getJSONArray("results");
+
+                // fetching results
+                for (int i = 0; i < resultsArray.length(); i++) {
+                    JSONObject x = resultsArray.getJSONObject(i);
+                    int id = x.getInt("id");
+                    String title = x.getString("title");
+
+                    // if overview is null
+                    // getString() will fail
+                    // (due to the unvailable defaultLanguage version)
+                    // that's why the try-catch
+                    String overview = null;
+                    try {
+                        overview = x.getString("overview");
+                        if ((overview == null) || (overview.isEmpty()))
+                            overview = "(trama non disponibile in italiano)";
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                        overview = "(trama in italiano non disp.)";
+                    }
+
+                    // if poster_path is null
+                    // getString() will fail
+                    // that's why the try-catch
+                    String posterURL = null;
+                    try {
+                        posterURL = x.getString("poster_path");
+                        posterURL = tmdb.buildPosterUrl(posterURL);
+                    } catch (Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                    }
+
+                    //
+                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
+                    result.add(mv);
+                }// for
+                // once finished set results
+                emitter.onNext(result);
+                emitter.onComplete();
+
+            } catch (Exception e) {
+                // if the search returns nothing
+                // moviesList will be null
+                e.printStackTrace();
+                emitter.onError(e);
+            }
+
+        });
     }
 
     @Override
@@ -231,11 +302,21 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
     }// end onCheckedChanged()
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (disposableSearchTerm != null && !disposableSearchTerm.isDisposed()) {
+            disposableSearchTerm.dispose();
+        }
+
+        if (disposable_2 != null && !disposable_2.isDisposed()) {
+            disposable_2.dispose();
+        }
+    }
 
 
 
-
-    //------------------------------------------------------------------------ METHODS
+    //------------------------------------------------------------------------ MY METHODS
 
     private void initRecycleView() {
         // defining Recycler view
@@ -246,6 +327,28 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 //        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
         recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterSearchPage);
+    }
+
+    private void enableSearchOnTyping() {
+        // AUTOMATIC SEARCH on typing
+        // triggered when:
+        // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
+        // 1 second later after the last typed character (debounce)
+        RxTextView.textChanges(editTextSearch)
+                .filter(text -> text.length()>=3 && !searchButtonPressed)
+                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::search);
+    }
+
+    private void search(CharSequence searchQuery) {
+        currentSearchTerm = searchQuery.toString();
+
+        if( ! currentSearchTerm.equals(previousSearchTerm)) {
+            spinner.setVisibility(View.VISIBLE);
+            previousSearchTerm = currentSearchTerm;
+            searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+        }
     }
 
     @Override

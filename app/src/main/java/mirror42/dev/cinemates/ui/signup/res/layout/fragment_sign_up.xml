@@ -53,7 +53,7 @@
                 app:layout_constraintHorizontal_bias="0.526"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:startIconDrawable="@drawable/user_icon_light_blue">
+                app:startIconDrawable="@drawable/icon_user_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_username"

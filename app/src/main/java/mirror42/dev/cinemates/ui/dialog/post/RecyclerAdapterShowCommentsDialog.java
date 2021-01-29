@@ -67,12 +67,11 @@ public class RecyclerAdapterShowCommentsDialog
         holder.textViewFullName.setText(firstName + " " + lastName);
         holder.textViewCommentText.setText(commentText);
 
-        if(comment.isMine()) {
+        if(comment.isMine())
             holder.buttonDelete.setVisibility(View.VISIBLE);
-        }
-        else {
+        else
             holder.buttonDelete.setVisibility(View.GONE);
-        }
+
 
         //
 //        if(comment.isNewItem()) {
@@ -81,8 +80,8 @@ public class RecyclerAdapterShowCommentsDialog
 
         Glide.with(context)  //2
                 .load(profilePictureUrl) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
+                .fallback(R.drawable.icon_user_dark_blue)
+                .placeholder(R.drawable.icon_user_dark_blue)
                 .circleCrop()
                 .into(holder.imageViewProfilePicture); //8
     }

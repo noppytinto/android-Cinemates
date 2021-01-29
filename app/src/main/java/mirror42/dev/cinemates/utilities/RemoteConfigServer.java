@@ -15,7 +15,7 @@ public class RemoteConfigServer {
     private RemoteConfigListener listener;
 
     public interface RemoteConfigListener {
-        public void onRemoteConfigLoaded(boolean taskIsSuccessful);
+        public void onRemoteParamsLoaded(boolean taskIsSuccessful);
     }
 
 
@@ -106,16 +106,11 @@ public class RemoteConfigServer {
 
         mFirebaseRemoteConfig.fetchAndActivate().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Log.d(TAG, "remote config task successful");
                 boolean updated = task.getResult();
-
                 // notify listener
-                listener.onRemoteConfigLoaded(true);
-
-            } else {
-                Log.d(TAG, "remote config task failed!");
-                listener.onRemoteConfigLoaded(false);
-            }
+                listener.onRemoteParamsLoaded(true);
+            } else
+                listener.onRemoteParamsLoaded(false);
         });
     }// end loadConfigParams()
 

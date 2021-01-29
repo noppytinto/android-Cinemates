@@ -208,7 +208,7 @@ public class HomeViewModel extends ViewModel {
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
         watchlistPost.setMovie(movie);
         fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-        fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token);
+        fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
         return watchlistPost;
     }
 
@@ -256,7 +256,7 @@ public class HomeViewModel extends ViewModel {
                             likes.add(l);
                         }
                         watchlistPost.setLikes(likes);
-                        watchlistPost.setLikedByMe(loggedUsername);
+                        watchlistPost.setIsLikedByMe(loggedUsername);
                     }
                 }
             }catch (Exception e) {
@@ -394,7 +394,7 @@ public class HomeViewModel extends ViewModel {
 
     //----------------- comments
 
-    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, long postId, String email, String token) {
+    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_comments";
             // building db url
@@ -437,7 +437,7 @@ public class HomeViewModel extends ViewModel {
                             comments.add(cm);
                         }
                         watchlistPost.setComments(comments);
-//                        watchlistPost.setCommentedByMe();
+                        watchlistPost.setIsCommentedByMe(loggedUsername);
                     }
                 }
             }catch (Exception e) {

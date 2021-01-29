@@ -102,12 +102,12 @@ public class Post {
         return isLikedByMe;
     }
 
-    public void setLikedByMe(String loggedUser) {
+    public void setIsLikedByMe(String loggedUsername) {
         boolean res = false;
         if(likes!=null && likes.size()>0) {
             for(int i=0; i<likes.size(); i++) {
                 String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
-                if(loggedUser.equals(reactionOwnerUsername)) {
+                if(loggedUsername.equals(reactionOwnerUsername)) {
                     res = true;
                     break;
                 }
@@ -121,13 +121,12 @@ public class Post {
         return isCommentedByMe;
     }
 
-    public void setCommentedByMe() {
+    public void setIsCommentedByMe(String loggedUsername) {
         boolean res = false;
         if(comments!=null && comments.size()>0) {
-            String postOwnerUsername = this.getOwner().getUsername();
             for(int i=0; i<comments.size(); i++) {
                 String reactionOwnerUsername = comments.get(i).getOwner().getUsername();
-                if(postOwnerUsername.equals(reactionOwnerUsername)) {
+                if(loggedUsername.equals(reactionOwnerUsername)) {
                     comments.get(i).setIsMine(true);
                     res = true;
                 }

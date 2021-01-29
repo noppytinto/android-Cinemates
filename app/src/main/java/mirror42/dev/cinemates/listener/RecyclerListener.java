@@ -10,15 +10,14 @@ import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerListener extends RecyclerView.SimpleOnItemTouchListener {
+    private final OnClick_RecyclerListener listener;
+    private final GestureDetectorCompat gestureDetector;
+
     public interface OnClick_RecyclerListener {
         void onItemClick(View view, int position);
         void onItemLongClick(View view, int position);
 
     }
-
-    private final OnClick_RecyclerListener listener;
-    private final GestureDetectorCompat gestureDetector;
-
 
 
     //---------------------------------------------------------------- CONSTRUCTORS
@@ -47,7 +46,6 @@ public class RecyclerListener extends RecyclerView.SimpleOnItemTouchListener {
         });
     }
 
-
     @Override
     public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
         // to intercept all touch events
@@ -64,4 +62,5 @@ public class RecyclerListener extends RecyclerView.SimpleOnItemTouchListener {
         // and we will be stucked
         //return super.onInterceptTouchEvent(rv, e);
     }
+
 }// end RecyclerViewSearchListener class

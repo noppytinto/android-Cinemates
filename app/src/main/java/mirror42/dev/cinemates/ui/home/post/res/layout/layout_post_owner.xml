@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/user_icon_dark_blue" />
+        app:srcCompat="@drawable/icon_user_dark_blue" />
 
     <TextView
         android:id="@+id/textView_postOwnerLayout_username"

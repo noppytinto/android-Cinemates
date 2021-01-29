@@ -76,7 +76,7 @@ public class ImageUtilities {
         Drawable drawable = null;
 
         try {
-            drawable = context.getResources().getDrawable(R.drawable.user_icon_light_blue);
+            drawable = context.getResources().getDrawable(R.drawable.icon_user_light_blue);
             menuItem.setIcon(drawable);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,7 +89,7 @@ public class ImageUtilities {
         Drawable defaultProfilePicture = null;
 
         try {
-            defaultProfilePicture = context.getResources().getDrawable(R.drawable.user_icon_light_blue);
+            defaultProfilePicture = context.getResources().getDrawable(R.drawable.icon_user_light_blue);
         } catch (Resources.NotFoundException e) {
             e.printStackTrace();
         }

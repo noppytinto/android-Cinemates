@@ -72,8 +72,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 String profilePictureUrl = user.getProfilePicturePath();
                 Glide.with(getContext())
                         .load(profilePictureUrl)
-                        .fallback(R.drawable.user_icon_dark_blue)
-                        .placeholder(R.drawable.user_icon_dark_blue)
+                        .fallback(R.drawable.icon_user_dark_blue)
+                        .placeholder(R.drawable.icon_user_dark_blue)
                         .circleCrop()
                         .into(imageViewProfilePicture);
 
@@ -277,7 +277,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.user_icon_dark_blue)
+                .setSmallIcon(R.drawable.icon_user_dark_blue)
                 .setContentTitle("Nuova richiesta di seguirti")
                 .setContentText(senderUsername + " chiede di seguirti.")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
