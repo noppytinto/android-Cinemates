@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -71,21 +70,22 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
-        notificationsViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
-
-            switch (fetchStatus) {
-                case SUCCESS: {
-                    recyclerAdapterNotifications.loadNewData(notificationsViewModel.getNotificationsList().getValue());
-                }
-                    break;
-                default:
-            }
-        });
-
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
+
+//        notificationsViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+//            swipeRefreshLayout.setRefreshing(false);
+//            Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
+//
+//            switch (fetchStatus) {
+//                case SUCCESS: {
+//                    recyclerAdapterNotifications.loadNewData(notificationsViewModel.getNotificationsList().getValue());
+//                }
+//                    break;
+//                default:
+//            }
+//        });
+
 
 
         /*
@@ -98,18 +98,13 @@ public class NotificationsFragment extends Fragment implements
 
                     // This method performs the actual data-refresh operation.
                     // The method calls setRefreshing(false) when it's finished.
-//                        myUpdateOperation();
                     if(loginViewModel!=null && ((loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
                                                  loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS)) {
-
-                        notificationsViewModel.fetchNotifications(
-                                loginViewModel.getLoggedUser().getValue().getEmail(),
-                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                        drawNotifications();
                     }
 
-                    else {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(getContext(), "refresh completato", Toast.LENGTH_SHORT).show();
                 }
         );
     }
@@ -126,41 +121,8 @@ public class NotificationsFragment extends Fragment implements
 //                    loginViewModel.getLoggedUser().getValue().getEmail(),
 //                    loginViewModel.getLoggedUser().getValue().getAccessToken());
 
-            Observable<ArrayList<Notification>> followNotificationsObservable =
-                    notificationsViewModel.createFollowNotificationsObservable(
-                                                loginViewModel.getLoggedUser().getValue().getEmail(),
-                                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+            drawNotifications();
 
-            Observable<ArrayList<Notification>> likeNotificationsObservable =
-                    notificationsViewModel.createLikeNotificationsObservable(
-                            loginViewModel.getLoggedUser().getValue().getEmail(),
-                            loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-            Observable<ArrayList<Notification>> commentNotificationsObservable =
-                    notificationsViewModel.createCommentNotificationsObservable(
-                            loginViewModel.getLoggedUser().getValue().getEmail(),
-                            loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-            Observable<ArrayList<Notification>> combinedNotificationsObservable =
-                    Observable.combineLatest(
-                                    followNotificationsObservable, likeNotificationsObservable, commentNotificationsObservable,
-                                    (followNotifications, likeNotifications, commentsNotifications) -> {
-                                        final ArrayList<Notification> combinedNotifications = new ArrayList<>();
-                                        combinedNotifications.addAll(followNotifications);
-                                        combinedNotifications.addAll(likeNotifications);
-                                        combinedNotifications.addAll(commentsNotifications);
-                                        Collections.sort(combinedNotifications, Collections.reverseOrder());
-
-                                        return combinedNotifications;
-                                    }
-                            );
-
-
-            notificationsSubscriber = combinedNotificationsObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe( notificationsList -> recyclerAdapterNotifications.loadNewData(notificationsList),
-                                this::handleExceptionsMessages);
         }
     }
 
@@ -187,9 +149,7 @@ public class NotificationsFragment extends Fragment implements
             login_item.setVisible(false);
     }
 
-    private void handleExceptionsMessages(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
+
 
 
 
@@ -205,6 +165,25 @@ public class NotificationsFragment extends Fragment implements
         // adding recycle listener for touch detection
         recyclerAdapterNotifications = new RecyclerAdapterNotifications(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterNotifications);
+    }
+
+    private void handleExceptionsMessages(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void drawNotifications() {
+        Observable<ArrayList<Notification>> combinedNotificationsObservable =
+                notificationsViewModel.createNotificationsObservable(
+                        loginViewModel.getLoggedUser().getValue().getEmail(),
+                        loginViewModel.getLoggedUser().getValue().getAccessToken()
+                );
+
+
+        notificationsSubscriber = combinedNotificationsObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe( notificationsList -> recyclerAdapterNotifications.loadNewData(notificationsList),
+                        this::handleExceptionsMessages);
     }
 
     @Override

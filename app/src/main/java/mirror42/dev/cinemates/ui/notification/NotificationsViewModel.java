@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import mirror42.dev.cinemates.model.User;
@@ -480,6 +481,52 @@ public class NotificationsViewModel extends ViewModel {
                 }
             }
         });
+    }
+
+    public Observable<ArrayList<Notification>> createNotificationsObservable(String email, String token) {
+        Observable<ArrayList<Notification>> followNotificationsObservable =
+                createFollowNotificationsObservable(email, token);
+
+        Observable<ArrayList<Notification>> likeNotificationsObservable =
+                createLikeNotificationsObservable(email, token);
+
+
+        Observable<ArrayList<Notification>> commentNotificationsObservable =
+                createCommentNotificationsObservable(email, token);
+
+
+        Observable<ArrayList<Notification>> combinedNotificationsObservable =
+                Observable.combineLatest(
+                        followNotificationsObservable, likeNotificationsObservable, commentNotificationsObservable,
+                        (followNotifications, likeNotifications, commentsNotifications) -> {
+                            final ArrayList<Notification> combinedNotifications = new ArrayList<>();
+                            combinedNotifications.addAll(followNotifications);
+                            combinedNotifications.addAll(likeNotifications);
+                            combinedNotifications.addAll(commentsNotifications);
+//                            Collections.sort(combinedNotifications, Collections.reverseOrder());
+                            return combinedNotifications;
+                        }
+                );
+
+
+        Observable<ArrayList<Notification>> sortedCombinedNotificationsObservable =
+                combinedNotificationsObservable
+                        .map(this::sortNotificationsList);
+
+        return sortedCombinedNotificationsObservable;
+    }
+
+
+    /**
+     * sorting in DESC order
+     * @param list
+     * @return
+     */
+    ArrayList<Notification> sortNotificationsList(List<Notification> list) {
+        ArrayList<Notification> sortedList = new ArrayList<>();
+        sortedList.addAll(list);
+        Collections.sort(sortedList);
+        return sortedList;
     }
 
 }// end NotificationsViewModel class

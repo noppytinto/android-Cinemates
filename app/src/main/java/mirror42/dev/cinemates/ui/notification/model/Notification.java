@@ -13,8 +13,15 @@ public class Notification implements Parcelable, Comparable<Notification>{
     private User sender;
 
     @Override
-    public int compareTo(Notification o) {
-        return Long.compare(this.dateInMillis, o.dateInMillis);
+    public int compareTo(Notification another) {
+        if(this.dateInMillis > another.dateInMillis)
+            return -1;
+        else if(this.dateInMillis < another.dateInMillis)
+            return 1;
+
+        return 0;
+
+//        return Long.compare(this.dateInMillis, o.dateInMillis);
     }
 
 
