@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.SerialDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
@@ -40,7 +40,7 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
-    private Disposable notificationsSubscriber;
+    private SerialDisposable notificationsSubscription;
 
 
 
@@ -70,6 +70,7 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        notificationsSubscription = new SerialDisposable();
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
@@ -116,7 +117,7 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        disposeSubscribers();
+//        disposeSubscribers();
     }
 
 
@@ -136,17 +137,15 @@ public class NotificationsFragment extends Fragment implements
     }
 
     private void loadNotifications() {
-        Observable<ArrayList<Notification>> notificationsObservable =
-                notificationsViewModel.getNotifications(
-                        loginViewModel.getLoggedUser().getValue().getEmail(),
-                        loginViewModel.getLoggedUser().getValue().getAccessToken());
-
-        notificationsSubscriber = notificationsObservable
+        Observable<ArrayList<Notification>> notificationsObservable = notificationsViewModel.getNotifications(
+                                                                        loginViewModel.getLoggedUser().getValue().getEmail(),
+                                                                        loginViewModel.getLoggedUser().getValue().getAccessToken())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::updateUI,
-                        this::handleErrors);
+                .observeOn(AndroidSchedulers.mainThread());
+
+        notificationsSubscription.set(notificationsObservable
+                                        .subscribe( this::updateUI,
+                                                    this::handleErrors));
     }
 
     private void updateUI(ArrayList<Notification> notifications) {
@@ -197,8 +196,8 @@ public class NotificationsFragment extends Fragment implements
     }
 
     private void disposeSubscribers() {
-        if (notificationsSubscriber != null && !notificationsSubscriber.isDisposed()) {
-            notificationsSubscriber.dispose();
+        if (notificationsSubscription != null && !notificationsSubscription.isDisposed()) {
+            notificationsSubscription.dispose();
         }
     }
 
