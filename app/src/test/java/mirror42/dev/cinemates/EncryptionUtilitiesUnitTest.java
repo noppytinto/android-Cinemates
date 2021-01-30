@@ -13,7 +13,7 @@ public class EncryptionUtilitiesUnitTest {
         String expected = "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb";
         String actual = MyUtilities.SHA256encrypt(testValue);
 
-        assertEquals(expected, actual, "test if ");
+        assertEquals(expected, actual);
     }
 
     @Test

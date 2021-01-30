@@ -37,10 +37,13 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.SerialDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.tmdbAPI.model.Cast;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
@@ -73,8 +76,9 @@ public class SearchFragment extends Fragment implements
     private String previousSearchTerm; //if the new search term equals the previous one, then don't start any search
     private boolean searchButtonPressed;
     private ProgressBar spinner;
-    private Disposable disposableSearchTerm;
+    private SerialDisposable searchSubscription;
     private Disposable disposable_2;
+    private ArrayList<Cast> actorsList;
 
 
 
@@ -108,6 +112,7 @@ public class SearchFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        searchSubscription = new SerialDisposable();
 
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
@@ -175,15 +180,6 @@ public class SearchFragment extends Fragment implements
                     //
                     searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
 
-                    // create observable
-//                    Observable<ArrayList<SearchResult>> currentSearchTermObservable = createMoviesListObservable(currentSearchTerm);
-//                    disposable_2 = currentSearchTermObservable
-//                                        .subscribeOn(Schedulers.io())
-//                                        .observeOn(AndroidSchedulers.mainThread())
-//                                        .subscribe( searchResult -> {recyclerAdapterSearchPage.loadNewData(searchResult);},
-//                                                    error -> { error.printStackTrace();},
-//                                                    ()->{spinner.setVisibility(View.GONE);});
-
                 }
                 else searchButtonPressed = false;
             }
@@ -207,7 +203,7 @@ public class SearchFragment extends Fragment implements
             textInputLayout.setHint("Cerca film");
         }
         else if(checkedId == R.id.chip_searchFragment_actor) {
-            searchType = SearchType.ACTOR;
+            searchType = SearchType.CAST;
             textInputLayout.setHint("Cerca attore");
         }
         else if(checkedId == R.id.chip_searchFragment_director) {
@@ -246,16 +242,46 @@ public class SearchFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
 
+    private void search(String query, SearchType searchType) {
+        switch (searchType) {
+            case MOVIE:
+                break;
+            case CAST:
+                searchCast(currentSearchTerm);
+                break;
+            case USER:
+                break;
+            default:
+        }
+    }
+
+    private void searchCast(String searchTerm) {
+        Observable<ArrayList<SearchResult>> notificationsObservable =
+                searchViewModel.getCastSearchResultObservable(searchTerm, 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        searchSubscription.set(notificationsObservable
+                .subscribe( this::drawCastSearchResult,
+                            this::handleErrors));
+    }
+
+    private void handleErrors(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+
     private void enableSearchOnTyping() {
         // AUTOMATIC SEARCH on typing
         // triggered when:
         // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
         // 1 second later after the last typed character (debounce)
-        RxTextView.textChanges(editTextSearch)
-                .filter(text -> text.length()>=3 && !searchButtonPressed)
-                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::search);
+        Observable<CharSequence> searchTermObservable = RxTextView.textChanges(editTextSearch)
+                                                    .filter(text -> text.length()>=3 && !searchButtonPressed)
+                                                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                                                    .observeOn(AndroidSchedulers.mainThread());
+
+        searchSubscription.set(searchTermObservable.subscribe(this::search));
     }
 
     private void search(CharSequence searchQuery) {
@@ -268,6 +294,10 @@ public class SearchFragment extends Fragment implements
         }
     }
 
+    private void drawCastSearchResult(ArrayList<SearchResult> searchResults) {
+        recyclerAdapterSearchPage.loadNewData(searchResults);
+    }
+
     @Override
     public void onMovieSearchResultClicked(int position, View v) {
         SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
@@ -276,6 +306,11 @@ public class SearchFragment extends Fragment implements
         mv.setTmdbID(((MovieSearchResult) itemSelected).getTmdbID());
         NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
         NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+    }
+
+    @Override
+    public void onCastSearchResultClicked(int position, View v) {
+
     }
 
     @Override
@@ -300,12 +335,10 @@ public class SearchFragment extends Fragment implements
 
 
 
+
+
     //--- on testing
     private void disposeSubscribers() {
-        if (disposableSearchTerm != null && !disposableSearchTerm.isDisposed()) {
-            disposableSearchTerm.dispose();
-        }
-
         if (disposable_2 != null && !disposable_2.isDisposed()) {
             disposable_2.dispose();
         }
@@ -373,10 +406,8 @@ public class SearchFragment extends Fragment implements
             } catch (Exception e) {
                 // if the search returns nothing
                 // moviesList will be null
-                e.printStackTrace();
                 emitter.onError(e);
             }
-
         });
     }
 

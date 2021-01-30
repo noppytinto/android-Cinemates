@@ -21,7 +21,6 @@ import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
 
-import io.reactivex.rxjava3.disposables.Disposable;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -31,7 +30,6 @@ import static mirror42.dev.cinemates.MainActivity.CHANNEL_ID;
 public class UserProfileFragment extends Fragment implements View.OnClickListener {
     private UserProfileViewModel userProfileViewModel;
     private LoginViewModel loginViewModel;
-    private View view;
     private ImageView imageViewProfilePicture;
     private TextView textViewfullName;
     private TextView textViewusername;
@@ -39,8 +37,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private Button buttonFollow;
     private Button buttonAcceptFollow;
     private User profileOwner;
-    private Disposable iFollowHimSubscriber;
-    private boolean iFollowHim;
+
 
 
     //-------------------------------------------------------------------------- ANDROID METHODS
@@ -54,7 +51,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.view = view;
         imageViewProfilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
         textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
@@ -97,15 +93,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 switch (followStatus) {
                     case I_FOLLOW_HIM: {
                         buttonFollow.setVisibility(View.GONE);
-                        final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
+                        showCenteredToast("sei un suo follower");
                     }
                         break;
                     case I_DONT_FOLLOW_HIM: {
                         buttonFollow.setVisibility(View.VISIBLE);
-                        final Toast toast = Toast.makeText(getContext(), "non siete amici :(", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("NON sei un suo follower");
+
 
                         //
                         userProfileViewModel.checkMyFollowIsPending(
@@ -129,15 +123,15 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         buttonFollow.setVisibility(View.VISIBLE);
                         buttonFollow.setEnabled(false);
                         buttonFollow.setText("Richiesta inviata");
-                        final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("richiesta inviata");
+
 
 //                            sendFollowNotification("test");
                     }
                     break;
                     case FAILED: {
-                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("operazione annullata");
+
                     }
                     break;
                     default:
@@ -169,8 +163,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     }
                     break;
                     case FAILED: {
-                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("operazione annullata");
+
                     }
                     break;
                     default:
@@ -181,33 +175,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-
-
     @Override
     public void onResume() {
         super.onResume();
         if(currentUserIsLogged()) {
-//            Observable<Boolean> iFollowHimStatusObservable =
-//                    userProfileViewModel.getIfollowHimStatus(
-//                            loginViewModel.getLoggedUser().getValue().getUsername(),
-//                            profileOwner.getUsername(),
-//                            loginViewModel.getLoggedUser().getValue().getAccessToken());
-//
-//            iFollowHimSubscriber = iFollowHimStatusObservable
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(
-//                            result -> iFollowHim = result,
-//                            this::handleErrors);
-//
-//            if(iFollowHim) {
-//                buttonFollow.setVisibility(View.GONE);
-//                final Toast toast = Toast.makeText(getContext(), "siete amici :D", Toast.LENGTH_SHORT);
-//                toast.setGravity(Gravity.CENTER, 0, 0);
-//                toast.show();
-//            }
-
-
             userProfileViewModel.checkIfollowHim(
                     loginViewModel.getLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
@@ -221,16 +192,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void updateUIonIfollowHimCheckComplete() {
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        disposeSubscribers();
-    }
-
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonFollow.getId()) {
@@ -240,15 +201,15 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         buttonFollow.setVisibility(View.VISIBLE);
                         buttonFollow.setEnabled(false);
                         buttonFollow.setText("Richiesta inviata");
-                        final Toast toast = Toast.makeText(getContext(), "richiesta inviata", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("richiesta inviata");
+
 
 //                            sendFollowNotification("test");
                     }
                     break;
                     case FAILED: {
-                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("operazione annullata");
+
                     }
                     break;
                     default:
@@ -265,14 +226,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                 switch (taskStatus) {
                     case HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED: {
                         buttonAcceptFollow.setVisibility(View.GONE);
-                        final Toast toast = Toast.makeText(getContext(), "richiesta accettata", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("richiesta accettata");
                         textViewMessage.setVisibility(View.VISIBLE);
                     }
                     break;
                     case FAILED: {
-                        final Toast toast = Toast.makeText(getContext(), "operazione annullata!", Toast.LENGTH_SHORT);
-                        toast.show();
+                        showCenteredToast("operazione annullata");
+
                     }
                     break;
                     default:
@@ -295,16 +255,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private boolean currentUserIsLogged() {
         return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
                 loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
-    }
-
-    private void disposeSubscribers() {
-        if (iFollowHimSubscriber != null && !iFollowHimSubscriber.isDisposed()) {
-            iFollowHimSubscriber.dispose();
-        }
-    }
-
-    private void handleErrors(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     public void showCenteredToast(String message) {

@@ -6,7 +6,7 @@ public class SearchResult {
     public enum SearchType {
         MOVIE,
         USER,
-        ACTOR,
+        CAST,
         DIRECTOR,
         UNIVERSAL,
         NONE

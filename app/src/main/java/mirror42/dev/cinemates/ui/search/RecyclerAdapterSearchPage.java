@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.ui.search.model.CastSearchResult;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
@@ -27,10 +28,12 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
     private static final int SEARCH_TYPE_MOVIE = 1;
     private static final int SEARCH_TYPE_USER = 2;
+    private static final int SEARCH_TYPE_CAST = 3;
 
     interface SearchResultListener {
         void onUserSearchResultClicked(int position, View v);
         void onMovieSearchResultClicked(int position, View v);
+        void onCastSearchResultClicked(int position, View v);
     }
 
 
@@ -58,6 +61,8 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         switch (searchType) {
             case MOVIE:
                 return SEARCH_TYPE_MOVIE;
+            case CAST:
+                return SEARCH_TYPE_CAST;
             case USER:
                 return SEARCH_TYPE_USER;
             default:
@@ -74,6 +79,10 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_search_record_movie, parent, false);
             return new MovieSearchResultViewHolder(view);
         }
+        else if(viewType == SEARCH_TYPE_CAST) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_search_record_cast, parent, false);
+            return new CastSearchResultViewHolder(view);
+        }
         else if(viewType == SEARCH_TYPE_USER) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_users_list_item, parent, false);
             return new UserSearchResultViewHolder(view);
@@ -86,14 +95,19 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == SEARCH_TYPE_MOVIE) {
-            MovieSearchResult movieSearchResult = (MovieSearchResult) searchResultList.get(position);
+            MovieSearchResult searchResult = (MovieSearchResult) searchResultList.get(position);
             //
-            buildMovieSearchResult((MovieSearchResultViewHolder) holder, movieSearchResult);
+            buildMovieSearchResult((MovieSearchResultViewHolder) holder, searchResult);
         }
         else if(getItemViewType(position) == SEARCH_TYPE_USER) {
-            UserSearchResult userSearchResult = (UserSearchResult) searchResultList.get(position);
+            UserSearchResult searchResult = (UserSearchResult) searchResultList.get(position);
             //
-            buildUserSearchResult((UserSearchResultViewHolder) holder, userSearchResult);
+            buildUserSearchResult((UserSearchResultViewHolder) holder, searchResult);
+        }
+        else if(getItemViewType(position) == SEARCH_TYPE_CAST) {
+            CastSearchResult searchResult = (CastSearchResult) searchResultList.get(position);
+            //
+            buildActorSearchResult((CastSearchResultViewHolder) holder, searchResult);
         }
     }
 
@@ -124,6 +138,20 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         holder.textViewFullName.setText(searchResult.getFirstName() + " " + searchResult.getLastName());
         holder.textViewUsername.setText("@" + searchResult.getUsername());
     }
+
+    private void buildActorSearchResult(CastSearchResultViewHolder holder, CastSearchResult searchResult) {
+        Glide.with(context)  //2
+                .load(searchResult.getProfilePictureURL()) //3
+                .fallback(R.drawable.icon_user_dark_blue)
+                .placeholder(R.drawable.icon_user_dark_blue)
+                .fitCenter() //4
+                .into(holder.imageViewProfilePicture); //8
+
+        holder.textViewFullName.setText(searchResult.getFullName());
+        holder.textViewKnownFor.setText(searchResult.getKnwonForAsString());
+    }
+
+
 
 
 
@@ -198,5 +226,28 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         }
 
     }// end MovieSearchResultViewHolder class
+
+    public class CastSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        public ImageView imageViewProfilePicture;
+        public TextView textViewFullName;
+        public TextView textViewKnownFor;
+        private CardView cardView;
+
+
+        public CastSearchResultViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.imageViewProfilePicture = itemView.findViewById(R.id.imageview_searchRecordActor_profilePicture);
+            this.textViewFullName =  itemView.findViewById(R.id.textView_searchRecordActor_name);
+            this.textViewKnownFor =  itemView.findViewById(R.id.textView_searchRecordActor_knownFor);
+            this.cardView = itemView.findViewById(R.id.cardview_searchRecordActor);
+            cardView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onCastSearchResultClicked(getAdapterPosition(), v);
+        }
+
+    }// end CastSearchResultViewHolder class
 
 }// end RecycleAdapterSearch class

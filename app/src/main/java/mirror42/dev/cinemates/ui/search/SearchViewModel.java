@@ -14,9 +14,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.pojo.Actor;
+import io.reactivex.rxjava3.core.Observable;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.tmdbAPI.model.Cast;
+import mirror42.dev.cinemates.ui.search.model.CastSearchResult;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
 import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
@@ -86,6 +88,7 @@ public class SearchViewModel extends ViewModel {
 
     //--------------------------------------------------------- METHODS
 
+
     public void fetchResults(String givenQuery, SearchResult.SearchType searchType, User loggedUser) {
         switch (searchType) {
             case MOVIE: {
@@ -95,17 +98,12 @@ public class SearchViewModel extends ViewModel {
                 t.start();
             }
                 break;
-            case ACTOR: {
+            case CAST: {
                 // ignore loggedUser
                 //TODO:
 //                Runnable searchActorsTask = createSearchActorsTask(givenQuery);
 //                Thread t = new Thread(searchActorsTask);
 //                t.start();
-            }
-                break;
-            case DIRECTOR: {
-                // ignore loggedUser
-                //TODO:
             }
                 break;
             case USER: {
@@ -286,7 +284,7 @@ public class SearchViewModel extends ViewModel {
             Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH ACTORS");
             String actorName = givenQuery;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<Actor> result = null;
+            ArrayList<Cast> result = null;
 
 
 
@@ -338,7 +336,7 @@ public class SearchViewModel extends ViewModel {
                     }
 
                     //
-                    Actor cc = new Actor();
+                    Cast cc = new Cast();
                     cc.setTmdbID(id);
                     cc.setFullName(name);
                     cc.setProfilePictureUrl(profilePictureUrl);
@@ -370,6 +368,86 @@ public class SearchViewModel extends ViewModel {
 
 
 
+    // rxjava
 
+//    public Observable<ArrayList<SearchResult>> getMoviesSearchResultObservable(String searchTerm, int page) {
+//        return Observable.create(emitter -> {
+//            try {
+//                // we first search the actor
+//                TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+//                ArrayList<Movie> movies = api.getMoviesByTitle(searchTerm, page);
+//
+//                // for each candidate actor, we build a SearchResult object
+//                ArrayList<SearchResult> searchResults = new ArrayList<>();
+//                for(Movie x: movies) {
+//                    SearchResult searchResult = buildActorSearchResult(x);
+//                    if(searchResult!=null) {
+//                        searchResults.add(searchResult);
+//                    }
+//                }
+//
+//                // then we emit the result
+//                emitter.onNext(searchResults);
+//                emitter.onComplete();
+//            } catch (Exception e) {
+//                emitter.onError(e);
+//            }
+//        });
+//    }
+
+
+
+    public Observable<ArrayList<SearchResult>> getCastSearchResultObservable(String searchTerm, int page) {
+        return Observable.create(emitter -> {
+            try {
+                // we first search the actor
+                TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+                ArrayList<Cast> casts = api.getCastByName(searchTerm, page);
+
+                // for each candidate actor, we build a SearchResult object
+                ArrayList<SearchResult> searchResults = new ArrayList<>();
+                for(Cast x: casts) {
+                    CastSearchResult searchResult = buildCastSearchResult(x);
+                    if(searchResult!=null) {
+                        searchResults.add(searchResult);
+                    }
+                }
+
+                // then we emit the result
+                emitter.onNext(searchResults);
+                emitter.onComplete();
+            } catch (Exception e) {
+                emitter.onError(e);
+            }
+        });
+    }
+
+
+
+    private CastSearchResult buildCastSearchResult(Cast item) {
+        if(item==null) return null;
+
+        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+        CastSearchResult searchResult = new CastSearchResult.Builder(item.getTmdbID(), item.getFullName())
+                .setKnownFor(item.getKnownFor())
+                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
+                .build();
+
+        return searchResult;
+    }
+
+//    private SearchResult buildMovieSearchResult(Actor item) {
+//        if(item==null) return null;
+//
+//        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+//        MovieSearchResult searchResult = new MovieSearchResult.Builder(item.getTmdbID(), item.getFullName())
+//                .setBio(item.getBiography())
+//                .setBirthDate(item.getBirthDate())
+//                .setKnownFor(item.getKnownFor())
+//                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
+//                .build();
+//
+//        return searchResult;
+//    }
 
 }// end SearchViewModel class

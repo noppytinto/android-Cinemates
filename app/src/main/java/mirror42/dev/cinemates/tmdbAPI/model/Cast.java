@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.model.pojo;
+package mirror42.dev.cinemates.tmdbAPI.model;
 
 
 import android.os.Parcel;
@@ -10,9 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-
-public class Actor implements Parcelable, Serializable {
+public class Cast implements Parcelable, Serializable {
     private final static long serialVersionUID = 4553482479516231157L;
     @SerializedName("id")
     @Expose
@@ -48,7 +46,7 @@ public class Actor implements Parcelable, Serializable {
     /**
      * No args constructor for use in serialization
      */
-    public Actor() {
+    public Cast() {
     }
 
 
@@ -74,7 +72,7 @@ public class Actor implements Parcelable, Serializable {
         this.fullName = fullName;
     }
 
-    public String getBirthday() {
+    public String getBirthDate() {
         return birthday;
     }
 
@@ -133,17 +131,17 @@ public class Actor implements Parcelable, Serializable {
 
 
     //----------------------------------------------------------------- PARCELABLE METHODS
-    public final static Parcelable.Creator<Actor> CREATOR = new Parcelable.Creator<Actor>() {
-        public Actor createFromParcel(Parcel in) {
-            return new Actor(in);
+    public final static Parcelable.Creator<Cast> CREATOR = new Parcelable.Creator<Cast>() {
+        public Cast createFromParcel(Parcel in) {
+            return new Cast(in);
         }
-        public Actor[] newArray(int size) {
-            return (new Actor[size]);
+        public Cast[] newArray(int size) {
+            return (new Cast[size]);
         }
     };
 
 
-    protected Actor(Parcel in) {
+    protected Cast(Parcel in) {
         this.tmdbID = ((Integer) in.readValue((Integer.class.getClassLoader())));
         in.readList(this.knownFor, (Movie.class.getClassLoader()));
         this.department = ((String) in.readValue((String.class.getClassLoader())));

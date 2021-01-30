@@ -1,11 +1,22 @@
 package mirror42.dev.cinemates.tmdbAPI;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.tmdbAPI.model.Cast;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 
 /**
@@ -73,7 +84,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 public class TheMovieDatabaseApi {
     // api configuration data
     private final String BASE_URL = "https://api.themoviedb.org/";
-    private final String MY_API_KEY = "632f90b0d342606c53a9ffd5fc5ed32e";
+    private static final String TMDB_API_KEY = "632f90b0d342606c53a9ffd5fc5ed32e";
     private JSONObject apiConfigurationObject;
     private static ArrayList<String> posterSizes;
     private static ArrayList<String> backgroundImageSizes;
@@ -191,7 +202,9 @@ public class TheMovieDatabaseApi {
         return baseImageUrl;
     }
 
-
+    public String getBaseURL() {
+        return BASE_URL;
+    }
 
     //--------------------------------------------------------------------------- PUBLIC METHODS
     public void trySearch(String movieTitle){
@@ -204,7 +217,7 @@ public class TheMovieDatabaseApi {
 
         if( ! movieTitle.isEmpty()) {
             // creating TBDb url
-            String url = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String url = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&include_adult" + defaultAdultContentFilter;
@@ -234,7 +247,7 @@ public class TheMovieDatabaseApi {
 
         if( ! movieTitle.isEmpty()) {
             // creating TBDb url
-            String url = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String url = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&page=" + page +
@@ -271,7 +284,7 @@ public class TheMovieDatabaseApi {
 
         if( ! movieTitle.isEmpty()) {
             // creating TBDb url
-            String url = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String url = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&include_adult" + defaultAdultContentFilter;
@@ -304,7 +317,7 @@ public class TheMovieDatabaseApi {
 
         if( ! movieTitle.isEmpty()) {
             // creating TBDb url
-            String url = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String url = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&page=" + page +
@@ -338,7 +351,7 @@ public class TheMovieDatabaseApi {
         movieTitle = movieTitle.trim();
         if( ! movieTitle.isEmpty()) {
             // creating TBDb url
-            String url = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String url = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&include_adult" + defaultAdultContentFilter;
@@ -832,7 +845,7 @@ public class TheMovieDatabaseApi {
         String result = null;
         try{
             // creating TBDb url
-            result = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            result = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&include_adult=" + defaultAdultContentFilter;
@@ -849,7 +862,7 @@ public class TheMovieDatabaseApi {
     public String buildURLforMovieDetailsById(int movieId) {
         String result = null;
         try{
-            result = BASE_URL + "3/movie/" + movieId + "?api_key=" + MY_API_KEY + "&language=" + defaultLanguage;
+            result = BASE_URL + "3/movie/" + movieId + "?api_key=" + TMDB_API_KEY + "&language=" + defaultLanguage;
             return result;
         } catch (Exception e) {
             e.getMessage();
@@ -879,7 +892,7 @@ public class TheMovieDatabaseApi {
     public JSONObject getJsonMoviesListByTitle(String movieTitle, int page) {
         JSONObject jsonObj = null;
         try{
-            String myUrl  = BASE_URL +  "3/search/movie?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/search/movie?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + movieTitle +
                     "&page=" + page +
@@ -897,7 +910,7 @@ public class TheMovieDatabaseApi {
     public JSONObject getJsonActorsListByName(String name, int page) {
         JSONObject jsonObj = null;
         try{
-            String myUrl  = BASE_URL +  "3/search/person?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/search/person?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&query=" + name +
                     "&page=" + page +
@@ -918,7 +931,7 @@ public class TheMovieDatabaseApi {
         try{
             String myUrl = BASE_URL + "3/movie/" +
                     movieId +
-                    "?api_key=" + MY_API_KEY +
+                    "?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
@@ -934,7 +947,7 @@ public class TheMovieDatabaseApi {
         try{
             myUrl = BASE_URL + "3/movie/" +
                     movieId +
-                    "?api_key=" + MY_API_KEY +
+                    "?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage;
         } catch (Exception e) {
             e.getMessage();
@@ -947,7 +960,7 @@ public class TheMovieDatabaseApi {
     public JSONObject getJsonCreditsById(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieId + "/credits?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "/credits?api_key=" + TMDB_API_KEY;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.getMessage();
@@ -965,7 +978,7 @@ public class TheMovieDatabaseApi {
         }
 
         try{
-            String myUrl  = BASE_URL +  "3/movie/now_playing?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/movie/now_playing?api_key=" + TMDB_API_KEY +
                     "&language=" + "en" +
                     "&page=" + page;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
@@ -985,7 +998,7 @@ public class TheMovieDatabaseApi {
         }
 
         try{
-            String myUrl  = BASE_URL +  "3/movie/upcoming?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/movie/upcoming?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&page=" + page;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
@@ -1010,7 +1023,7 @@ public class TheMovieDatabaseApi {
         }
 
         try{
-            String myUrl  = BASE_URL +  "3/movie/popular?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/movie/popular?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&page=" + page +
                     "&region=" + defaultLanguage;
@@ -1033,7 +1046,7 @@ public class TheMovieDatabaseApi {
         }
 
         try{
-            String myUrl  = BASE_URL +  "3/movie/top_rated?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/movie/top_rated?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage +
                     "&page=" + page +
                     "&region=" + defaultLanguage;
@@ -1053,7 +1066,7 @@ public class TheMovieDatabaseApi {
     public JSONObject getAllJsonMoviesGenres() {
         JSONObject jsonObj = null;
         try{
-            String myUrl  = BASE_URL +  "3/genre/movie/list?api_key=" + MY_API_KEY +
+            String myUrl  = BASE_URL +  "3/genre/movie/list?api_key=" + TMDB_API_KEY +
                     "&language=" + defaultLanguage;
 
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
@@ -1071,7 +1084,7 @@ public class TheMovieDatabaseApi {
     private JSONObject getJsonMovieDetailsByIdFallback(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieId + "?api_key=" + MY_API_KEY + "&language=" + ENGISH_LANGUAGE;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "?api_key=" + TMDB_API_KEY + "&language=" + ENGISH_LANGUAGE;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1083,7 +1096,7 @@ public class TheMovieDatabaseApi {
     private JSONObject getJsonMovieImageListById(int movieId) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/movie/" + movieId + "/images?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/movie/" + movieId + "/images?api_key=" + TMDB_API_KEY;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1095,7 +1108,7 @@ public class TheMovieDatabaseApi {
     private JSONObject getJsonPersonById(int personID) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/person/" + personID + "?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/person/" + personID + "?api_key=" + TMDB_API_KEY;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1114,7 +1127,7 @@ public class TheMovieDatabaseApi {
     private JSONObject getJsonTrending(String mediaType, String timeWindow) {
         JSONObject jsonObj = null;
         try{
-            String myUrl = BASE_URL + "3/trending/" + mediaType + "/" + timeWindow + "?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/trending/" + mediaType + "/" + timeWindow + "?api_key=" + TMDB_API_KEY;
             jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1134,7 +1147,7 @@ public class TheMovieDatabaseApi {
     public void loadImagesConfigurationData() {
         try{
             // getting api configuration object
-            String myUrl = BASE_URL + "3/configuration?api_key=" + MY_API_KEY;
+            String myUrl = BASE_URL + "3/configuration?api_key=" + TMDB_API_KEY;
             JSONObject obj = HttpUtilities.getJsonObjectFromUrl(myUrl);
             apiConfigurationObject = obj.getJSONObject("images");
 
@@ -1229,6 +1242,99 @@ public class TheMovieDatabaseApi {
 
 
     //--------------------------------- retrofit versions
+    private final static String TMDB_API_VERSION = "3";
+    private final static String DEFAULT_LANGUAGE = "it";
+    private final static String INCLUDE_ADULT = "false";
+    private final static String SEARCH_ACTORS_URL = TMDB_API_VERSION +  "/search/person?" +
+                                                    "api_key=" + TMDB_API_KEY +
+                                                    "&language=" + DEFAULT_LANGUAGE +
+                                                    "&include_adult=" + INCLUDE_ADULT;
+    private final static String SEARCH_MOVIES_URL = TMDB_API_VERSION +  "/search/movie?" +
+                                                    "api_key=" + TMDB_API_KEY +
+                                                    "&language=" + DEFAULT_LANGUAGE +
+                                                    "&include_adult=" + INCLUDE_ADULT;
+
+    private interface RetrofitAPI {
+        @GET(SEARCH_ACTORS_URL)
+        Call<ActorSearchResult> searchActorsByName(@Query("query") String query,
+                                                   @Query("page") int page);
+
+        @GET(SEARCH_MOVIES_URL)
+        Call<MovieSearchResult> searchMoviessByTitle(@Query("query") String query,
+                                                     @Query("page") int page);
+    }
+
+    private class ActorSearchResult {
+        @SerializedName("results")
+        @Expose
+        private ArrayList<Cast> result;
+        public ArrayList<Cast> getActors() {
+            return result;
+        }
+    }
+
+    private class MovieSearchResult {
+        @SerializedName("results")
+        @Expose
+        private ArrayList<Movie> result;
+        public ArrayList<Movie> getMovies() {
+            return result;
+        }
+    }
+
+    public ArrayList<Cast> getCastByName(String query, int page) {
+        ArrayList<Cast> result = new ArrayList<>();
+        if(query==null || query.isEmpty() || page<=0)
+            return result;
+
+        final Retrofit restAdapter = new Retrofit.Builder()
+                                            .addConverterFactory(GsonConverterFactory.create())
+                                            .baseUrl(getBaseURL())
+                                            .build();
+        final RetrofitAPI tmdbAPI = restAdapter.create(RetrofitAPI.class);
+
+        try {
+            Call<ActorSearchResult> call = tmdbAPI.searchActorsByName(query, page);
+            Response<ActorSearchResult> response = call.execute();
+
+            if(response.isSuccessful()) {
+                ActorSearchResult temp = response.body();
+                result = temp.getActors();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }// end getActorsByName()
+
+    public ArrayList<Movie> getMoviesByTitle(String query, int page) {
+        ArrayList<Movie> result = new ArrayList<>();
+        if(query==null || query.isEmpty() || page<=0)
+            return result;
+
+        final Retrofit restAdapter = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(getBaseURL())
+                .build();
+        final RetrofitAPI tmdbAPI = restAdapter.create(RetrofitAPI.class);
+
+        try {
+            Call<MovieSearchResult> call = tmdbAPI.searchMoviessByTitle(query, page);
+            Response<MovieSearchResult> response = call.execute();
+
+            if(response.isSuccessful()) {
+                MovieSearchResult temp = response.body();
+                result = temp.getMovies();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }// end getMoviesByTitle()
 
 
 
