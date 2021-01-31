@@ -114,14 +114,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     private void buildFollowNotificationItem(FollowRequestNotificationViewHolder holder, FollowRequestNotification followRequestNotification) {
         holder.textViewFullName.setText(followRequestNotification.getSender().getFullName());
-        holder.textViewUsername.setText("(@" + followRequestNotification.getSender().getUsername() + ")");
         holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(followRequestNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
                     .load(followRequestNotification.getSender().getProfilePicturePath()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
                     .into(holder.imageViewProfilePicture); //8
         } catch (Exception e) {
@@ -131,14 +130,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     private void buildPostLikedNotificationItem(PostLikedNotificationViewHolder holder, PostLikedNotification postLikedNotification) {
         holder.textViewFullName.setText(postLikedNotification.getSender().getFullName());
-        holder.textViewUsername.setText("(@" + postLikedNotification.getSender().getUsername() + ")");
         holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postLikedNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
                     .load(postLikedNotification.getSender().getProfilePicturePath()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
                     .into(holder.imageViewProfilePicture); //8
         } catch (Exception e) {
@@ -148,14 +146,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     private void buildPostCommentedNotificationItem(PostCommentedNotificationViewHolder holder, PostCommentedNotification postCommentedNotification) {
         holder.textViewFullName.setText(postCommentedNotification.getSender().getFullName());
-        holder.textViewUsername.setText("(@" + postCommentedNotification.getSender().getUsername() + ")");
         holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postCommentedNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
                     .load(postCommentedNotification.getSender().getProfilePicturePath()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
                     .into(holder.imageViewProfilePicture); //8
         } catch (Exception e) {
@@ -194,7 +191,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     class FollowRequestNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
-        public TextView textViewUsername;
         public TextView textViewFullName;
         public TextView textViewPublishDate;
         private CardView cardView;
@@ -202,7 +198,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public FollowRequestNotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_followRequestNotificationItem_profilePicture);
-            textViewUsername = itemView.findViewById(R.id.textView_followRequestNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_followRequestNotificationItem_fullName);
             textViewPublishDate = itemView.findViewById(R.id.textView_followRequestNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_followRequestNotificationItem);
@@ -218,7 +213,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     class PostLikedNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
-        public TextView textViewUsername;
         public TextView textViewFullName;
         public TextView textViewPublishDate;
         private CardView cardView;
@@ -226,7 +220,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public PostLikedNotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postLikedNotificationItem_profilePicture);
-            textViewUsername = itemView.findViewById(R.id.textView_postLikedNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_postLikedNotificationItem_fullName);
             textViewPublishDate = itemView.findViewById(R.id.textView_postLikedNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_postLikedNotificationItem);
@@ -242,7 +235,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     class PostCommentedNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
-        public TextView textViewUsername;
         public TextView textViewFullName;
         public TextView textViewPublishDate;
         private CardView cardView;
@@ -250,7 +242,6 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public PostCommentedNotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postCommentedNotificationItem_profilePicture);
-            textViewUsername = itemView.findViewById(R.id.textView_postCommentedNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_postCommentedNotificationItem_fullName);
             textViewPublishDate = itemView.findViewById(R.id.textView_postCommentedNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_postCommentedNotificationItem);

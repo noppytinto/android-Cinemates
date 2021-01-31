@@ -33,12 +33,10 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.disposables.SerialDisposable;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.tmdbAPI.model.Cast;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
@@ -59,7 +57,6 @@ public class SearchFragment extends Fragment implements
     private TextInputLayout textInputLayout;
     private String currentSearchTerm;
     private RecyclerAdapterSearchPage recyclerAdapterSearchPage;
-    private View view;
     private ChipGroup chipGroup;
     private FirebaseAnalytics firebaseAnalytics;
     private SearchResult.SearchType searchType;
@@ -72,8 +69,6 @@ public class SearchFragment extends Fragment implements
     private boolean searchButtonPressed;
     private ProgressBar spinner;
     private SerialDisposable searchSubscription;
-    private Disposable disposable_2;
-    private ArrayList<Cast> actorsList;
 
 
 
@@ -87,7 +82,6 @@ public class SearchFragment extends Fragment implements
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated() called");
-        this.view = view;
         editTextSearch = view.findViewById(R.id.editText_searchFragment);
         textInputLayout = view.findViewById(R.id.editTextLayout_searchFragment);
         buttonSearch = view.findViewById(R.id.button_searchFragment_search);
@@ -101,7 +95,7 @@ public class SearchFragment extends Fragment implements
         searchType = SearchResult.SearchType.UNIVERSAL;
 
         //
-        initRecycleView();
+        initRecycleView(view);
     }
 
     @Override
@@ -221,7 +215,7 @@ public class SearchFragment extends Fragment implements
 
     //------------------------------------------------------------------------ MY METHODS
 
-    private void initRecycleView() {
+    private void initRecycleView(View view) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_searchFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -231,9 +225,6 @@ public class SearchFragment extends Fragment implements
         recyclerAdapterSearchPage = new RecyclerAdapterSearchPage(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
-
-
-
 
     private void enableSearchOnTyping() {
         // AUTOMATIC SEARCH on typing
@@ -257,7 +248,6 @@ public class SearchFragment extends Fragment implements
             searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
         }
     }
-
 
     @Override
     public void onMovieSearchResultClicked(int position, View v) {

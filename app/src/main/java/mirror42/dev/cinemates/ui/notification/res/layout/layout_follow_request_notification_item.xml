@@ -28,16 +28,14 @@
 
             <TextView
                 android:id="@+id/textView_followRequestNotificationItem_publishDate"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="19dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/poppins_medium"
-                android:textAlignment="viewEnd"
                 android:textColor="@color/light_blue"
                 android:textSize="10sp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView_followRequestNotificationItem_text"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView_followRequestNotificationItem_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView_followRequestNotificationItem_text"
                 tools:text="2 min fa" />
 
             <TextView
@@ -79,19 +77,6 @@
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/imageView_followRequestNotificationItem_profilePicture"
                 app:layout_constraintTop_toTopOf="@+id/imageView_followRequestNotificationItem_profilePicture" />
-
-            <TextView
-                android:id="@+id/textView_followRequestNotificationItem_username"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:fontFamily="@font/poppins"
-                android:text="(@mario)"
-                android:textColor="@color/light_blue"
-                android:textSize="10sp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView_followRequestNotificationItem_fullName"
-                app:layout_constraintStart_toEndOf="@+id/textView_followRequestNotificationItem_fullName"
-                app:layout_constraintTop_toTopOf="@+id/textView_followRequestNotificationItem_fullName" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
