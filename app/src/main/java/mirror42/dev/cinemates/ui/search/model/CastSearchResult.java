@@ -95,4 +95,5 @@ public class CastSearchResult extends SearchResult {
     public String getDepartment() {
         return department;
     }
+
 }// end ActorSearchResult class

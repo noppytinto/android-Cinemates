@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import mirror42.dev.cinemates.model.User;
 
@@ -30,10 +31,10 @@ public class MyUtilities {
 
     /**
      * Return date in specified format.
-     * @param milliSeconds Date in milliseconds
+     * @param millis Date in milliseconds
      * @return String representing date in specified format
      */
-    public static String convertMillisInDate(long milliSeconds)
+    public static String convertMillisInDate(long millis)
     {
         // date format examples
         // System.out.println(getDate(82233213123L, "dd/MM/yyyy hh:mm:ss.SSS"));
@@ -43,7 +44,7 @@ public class MyUtilities {
 
         // Create a calendar object that will convert the date and time value in milliseconds to date.
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
+        calendar.setTimeInMillis(millis);
         return formatter.format(calendar.getTime());
     }
 
@@ -68,6 +69,46 @@ public class MyUtilities {
         }
 
         return result;
+    }
+
+    public static String convertMillisToReadableTimespan(long millis) {
+        if(millis<0) return "";
+
+        String res = "";
+        long currentTimeMillis = System.currentTimeMillis();
+        long timespan = currentTimeMillis-millis;
+
+        long seconds = (TimeUnit.MILLISECONDS.toSeconds(timespan));
+
+        if(seconds>=60) {
+            long minutes = (TimeUnit.MILLISECONDS.toMinutes(timespan));
+            if(minutes>=60) {
+                long hours = (TimeUnit.MILLISECONDS.toHours(timespan));
+                if(hours>=24) {
+                    long days = (TimeUnit.MILLISECONDS.toDays(timespan));
+
+                    if(days==1)
+                        res = days + " giorno fa";
+                    else
+                        res = days + " giorni fa";
+                }
+                else {
+                    if(hours==1)
+                        res = hours + " ora fa";
+                    else
+                        res = hours + " ore fa";
+                }
+            }
+            else {
+                if(minutes==1)
+                    res = minutes + " minuto fa";
+                else
+                    res = minutes + " minuti fa";
+            }
+        }
+        else res = "pochi secondi fa";
+
+        return res;
     }
 
     public static void encryptFile(String filename, String rawData, Context context) {

@@ -27,6 +27,20 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/textView_followRequestNotificationItem_publishDate"
+                android:layout_width="0dp"
+                android:layout_height="19dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/light_blue"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView_followRequestNotificationItem_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView_followRequestNotificationItem_text"
+                tools:text="2 min fa" />
+
+            <TextView
                 android:id="@+id/textView_followRequestNotificationItem_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

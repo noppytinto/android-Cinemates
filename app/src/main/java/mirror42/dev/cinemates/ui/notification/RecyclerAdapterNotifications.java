@@ -17,10 +17,11 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
-import mirror42.dev.cinemates.ui.notification.model.PostCommentedNotification;
-import mirror42.dev.cinemates.ui.notification.model.PostLikedNotification;
 import mirror42.dev.cinemates.ui.notification.model.Notification;
 import mirror42.dev.cinemates.ui.notification.model.Notification.NotificationType;
+import mirror42.dev.cinemates.ui.notification.model.PostCommentedNotification;
+import mirror42.dev.cinemates.ui.notification.model.PostLikedNotification;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 
 public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private ArrayList<Notification> notificationsList;
@@ -114,6 +115,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private void buildFollowNotificationItem(FollowRequestNotificationViewHolder holder, FollowRequestNotification followRequestNotification) {
         holder.textViewFullName.setText(followRequestNotification.getSender().getFullName());
         holder.textViewUsername.setText("(@" + followRequestNotification.getSender().getUsername() + ")");
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(followRequestNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
@@ -130,6 +132,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private void buildPostLikedNotificationItem(PostLikedNotificationViewHolder holder, PostLikedNotification postLikedNotification) {
         holder.textViewFullName.setText(postLikedNotification.getSender().getFullName());
         holder.textViewUsername.setText("(@" + postLikedNotification.getSender().getUsername() + ")");
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postLikedNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
@@ -146,6 +149,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private void buildPostCommentedNotificationItem(PostCommentedNotificationViewHolder holder, PostCommentedNotification postCommentedNotification) {
         holder.textViewFullName.setText(postCommentedNotification.getSender().getFullName());
         holder.textViewUsername.setText("(@" + postCommentedNotification.getSender().getUsername() + ")");
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postCommentedNotification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
@@ -192,6 +196,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewFullName;
+        public TextView textViewPublishDate;
         private CardView cardView;
 
         public FollowRequestNotificationViewHolder(@NonNull View itemView) {
@@ -199,6 +204,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_followRequestNotificationItem_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_followRequestNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_followRequestNotificationItem_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_followRequestNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_followRequestNotificationItem);
             cardView.setOnClickListener(this);
         }
@@ -214,6 +220,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewFullName;
+        public TextView textViewPublishDate;
         private CardView cardView;
 
         public PostLikedNotificationViewHolder(@NonNull View itemView) {
@@ -221,6 +228,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postLikedNotificationItem_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postLikedNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_postLikedNotificationItem_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_postLikedNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_postLikedNotificationItem);
             cardView.setOnClickListener(this);
         }
@@ -236,6 +244,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewFullName;
+        public TextView textViewPublishDate;
         private CardView cardView;
 
         public PostCommentedNotificationViewHolder(@NonNull View itemView) {
@@ -243,6 +252,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postCommentedNotificationItem_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postCommentedNotificationItem_username);
             textViewFullName = itemView.findViewById(R.id.textView_postCommentedNotificationItem_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_postCommentedNotificationItem_publishDate);
             cardView = itemView.findViewById(R.id.cardView_postCommentedNotificationItem);
             cardView.setOnClickListener(this);
         }

@@ -21,6 +21,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.WatchlistPost;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 
 public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
     private ArrayList<Post> postList;
@@ -121,7 +122,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void buildWatchlistPost(WatchlistPostViewHolder holder, WatchlistPost watchlistPost) {
         holder.textViewUsername.setText(watchlistPost.getOwner().getUsername());
-        holder.textViewPublishDate.setText(String.valueOf(watchlistPost.getPublishDateMillis()));
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
         holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
 
