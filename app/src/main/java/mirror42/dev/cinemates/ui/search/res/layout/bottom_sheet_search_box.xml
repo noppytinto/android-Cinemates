@@ -51,18 +51,11 @@
             android:text="film" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_searchFragment_actor"
+            android:id="@+id/chip_searchFragment_cast"
             style="@style/Cinemates.Button.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="attore" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_searchFragment_director"
-            style="@style/Cinemates.Button.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="regista" />
+            android:text="cast" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_searchFragment_user"

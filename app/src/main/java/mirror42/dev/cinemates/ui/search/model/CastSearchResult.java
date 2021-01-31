@@ -7,6 +7,7 @@ import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 public class CastSearchResult extends SearchResult {
     private final int tmdbID;
     private final String fullName;
+    private final String department;
     private final String profilePictureURL;
     private final ArrayList<Movie> knownFor;
 
@@ -14,6 +15,7 @@ public class CastSearchResult extends SearchResult {
         this.searchType        = SearchType.CAST;
         this.tmdbID            = builder.tmdbID;
         this.fullName          = builder.fullName;
+        this.department        = builder.department;
         this.profilePictureURL = builder.profilePictureURL;
         this.knownFor          = builder.knownFor;
     }
@@ -24,6 +26,7 @@ public class CastSearchResult extends SearchResult {
         private final String fullName;
 
         // optional parameters
+        private String department  = null;
         private String profilePictureURL  = null;
         private ArrayList<Movie> knownFor = new ArrayList<>();
 
@@ -37,6 +40,11 @@ public class CastSearchResult extends SearchResult {
 
         public Builder setProfilePicture(String val) {
             this.profilePictureURL = val;
+            return this;
+        }
+
+        public Builder setDepartment(String val) {
+            this.department = val;
             return this;
         }
 
@@ -59,7 +67,7 @@ public class CastSearchResult extends SearchResult {
             for(Movie x: knownFor) {
                 String title = x.getTitle();
                 if(title!=null)
-                    res = res.concat(x.getTitle() + " • ");
+                    res = res.concat(x.getTitle() + "  •  ");
             }
             if(res!=null && !res.isEmpty())
                 res = res.substring(0, res.length()-2);
@@ -82,5 +90,9 @@ public class CastSearchResult extends SearchResult {
 
     public ArrayList<Movie> getKnownFor() {
         return knownFor;
+    }
+
+    public String getDepartment() {
+        return department;
     }
 }// end ActorSearchResult class

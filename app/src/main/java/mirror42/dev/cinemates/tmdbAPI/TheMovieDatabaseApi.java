@@ -1260,8 +1260,8 @@ public class TheMovieDatabaseApi {
                                                    @Query("page") int page);
 
         @GET(SEARCH_MOVIES_URL)
-        Call<MovieSearchResult> searchMoviessByTitle(@Query("query") String query,
-                                                     @Query("page") int page);
+        Call<MovieSearchResult> searchMoviesByTitle(@Query("query") String query,
+                                                    @Query("page") int page);
     }
 
     private class ActorSearchResult {
@@ -1287,11 +1287,7 @@ public class TheMovieDatabaseApi {
         if(query==null || query.isEmpty() || page<=0)
             return result;
 
-        final Retrofit restAdapter = new Retrofit.Builder()
-                                            .addConverterFactory(GsonConverterFactory.create())
-                                            .baseUrl(getBaseURL())
-                                            .build();
-        final RetrofitAPI tmdbAPI = restAdapter.create(RetrofitAPI.class);
+        final RetrofitAPI tmdbAPI = buildRetrofitService();
 
         try {
             Call<ActorSearchResult> call = tmdbAPI.searchActorsByName(query, page);
@@ -1314,14 +1310,10 @@ public class TheMovieDatabaseApi {
         if(query==null || query.isEmpty() || page<=0)
             return result;
 
-        final Retrofit restAdapter = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(getBaseURL())
-                .build();
-        final RetrofitAPI tmdbAPI = restAdapter.create(RetrofitAPI.class);
+        final RetrofitAPI apiService = buildRetrofitService();
 
         try {
-            Call<MovieSearchResult> call = tmdbAPI.searchMoviessByTitle(query, page);
+            Call<MovieSearchResult> call = apiService.searchMoviesByTitle(query, page);
             Response<MovieSearchResult> response = call.execute();
 
             if(response.isSuccessful()) {
@@ -1335,6 +1327,15 @@ public class TheMovieDatabaseApi {
 
         return result;
     }// end getMoviesByTitle()
+
+    private RetrofitAPI buildRetrofitService() {
+        final Retrofit retrofitClient = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(getBaseURL())
+                .build();
+
+        return retrofitClient.create(RetrofitAPI.class);
+    }
 
 
 

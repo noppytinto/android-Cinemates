@@ -26,6 +26,23 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:id="@+id/textView_searchRecordActor_department"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/poppins_semibold"
+                android:maxLines="2"
+                android:textColor="@color/light_blue"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textView_searchRecordActor_name"
+                app:layout_constraintTop_toBottomOf="@+id/textView_searchRecordActor_name"
+                tools:text="(attore)" />
+
+            <TextView
                 android:id="@+id/textView_searchRecordActor_knownFor"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -59,7 +76,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/textView_searchRecordActor_name"
-                app:layout_constraintTop_toBottomOf="@+id/textView_searchRecordActor_name" />
+                app:layout_constraintTop_toBottomOf="@+id/textView_searchRecordActor_department" />
 
             <TextView
                 android:id="@+id/textView_searchRecordActor_name"
@@ -81,9 +98,9 @@
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardview_searchRecordActor"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="80dp"
+                android:layout_height="120dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 app:cardCornerRadius="@dimen/default_corner_radius"

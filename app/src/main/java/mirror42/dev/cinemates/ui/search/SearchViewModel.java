@@ -1,8 +1,6 @@
 package mirror42.dev.cinemates.ui.search;
 
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -14,10 +12,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import io.reactivex.rxjava3.core.Observable;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Cast;
+import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.search.model.CastSearchResult;
 import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
 import mirror42.dev.cinemates.ui.search.model.SearchResult;
@@ -93,17 +91,16 @@ public class SearchViewModel extends ViewModel {
         switch (searchType) {
             case MOVIE: {
                 // ignore loggedUser
-                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
-                Thread t = new Thread(searchMoviesTask);
+                Runnable task = createSearchMoviesTask(givenQuery, PAGE_1);
+                Thread t = new Thread(task);
                 t.start();
             }
                 break;
             case CAST: {
                 // ignore loggedUser
-                //TODO:
-//                Runnable searchActorsTask = createSearchActorsTask(givenQuery);
-//                Thread t = new Thread(searchActorsTask);
-//                t.start();
+                Runnable task = createSearchCastTask(givenQuery, PAGE_1);
+                Thread t = new Thread(task);
+                t.start();
             }
                 break;
             case USER: {
@@ -114,7 +111,7 @@ public class SearchViewModel extends ViewModel {
                 break;
             case UNIVERSAL: {
                 //TODO:
-                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery);
+                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery, PAGE_1);
                 Thread t = new Thread(searchMoviesTask);
                 t.start();
             }
@@ -125,7 +122,6 @@ public class SearchViewModel extends ViewModel {
 
     private Runnable createSearchUsersTask(String givenQuery, User loggedUser) {
         return ()-> {
-
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_search_users";
@@ -169,7 +165,8 @@ public class SearchViewModel extends ViewModel {
                                         userSearchResult.setUsername(jsonDBobj.getString("Username"));
                                         userSearchResult.setFirstName(jsonDBobj.getString("Name"));
                                         userSearchResult.setLastName(jsonDBobj.getString("LastName"));
-                                        userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+                                        userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() +
+                                                                                jsonDBobj.getString("ProfileImage"));
 
                                         result.add(userSearchResult);
                                     }// for
@@ -182,7 +179,7 @@ public class SearchViewModel extends ViewModel {
                                 }
                                 // if response contains no data
                                 else {
-                                    postSearchResultList(null);
+                                    postSearchResultList(result);
                                     postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                                 }
                             } // if response is unsuccessful
@@ -201,68 +198,33 @@ public class SearchViewModel extends ViewModel {
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
-    }
+    }// end createSearchUsersTask()
 
-    private Runnable createSearchMoviesTask(String givenQuery) {
+    private Runnable createSearchMoviesTask(String givenQuery, int page) {
         return ()-> {
             String movieTitle = givenQuery;
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<SearchResult> result = null;
-
-
+            ArrayList<SearchResult> result = new ArrayList<>();
 
             // checking string
             if((movieTitle == null) || (movieTitle.isEmpty())) {
                 postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postSearchResultList(null);
+                postSearchResultList(result);
             }
-
-            movieTitle = movieTitle.trim();
-            result = new ArrayList<>();
 
             try {
                 // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
+                TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+                movieTitle = movieTitle.trim();
+                ArrayList<Movie> movies = tmdb.getMoviesByTitle(movieTitle, page);
 
                 // fetching results
-                for(int i=0; i<resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-                    int id = x.getInt("id");
-                    String title = x.getString("title");
-
-                    // if overview is null
-                    // getString() will fail
-                    // (due to the unvailable defaultLanguage version)
-                    // that's why the try-catch
-                    String overview = null;
-                    try {
-                        overview = x.getString("overview");
-                        if((overview==null) || (overview.isEmpty()))
-                            overview = "(trama non disponibile in italiano)";
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                        overview = "(trama in italiano non disp.)";
+                // for each candidate item, we build a SearchResult object
+                for(Movie x: movies) {
+                    SearchResult searchResult = buildMovieSearchResult(x);
+                    if(searchResult!=null) {
+                        result.add(searchResult);
                     }
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String posterURL = null;
-                    try {
-                        posterURL = x.getString("poster_path");
-                        posterURL = tmdb.buildPosterUrl(posterURL);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                    }
-
-                    //
-                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
-                    result.add(mv);
-                }// for
-
+                }
 
                 // once finished set results
                 postSearchResultList(result);
@@ -271,99 +233,73 @@ public class SearchViewModel extends ViewModel {
                 // if the search returns nothing
                 // moviesList will be null
                 e.printStackTrace();
-                postSearchResultList(null);
+                postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
-    }// end createDownloadTask()
+    }// end createSearchMoviesTask()
 
-
-    //todo: createSearchActorsTask()
-    private Runnable createSearchActorsTask(String givenQuery) {
+    private Runnable createSearchCastTask(String searchTerm, int page) {
         return ()-> {
-            Log.d(TAG, "THREAD: SEARCH PAGE - SEARCH ACTORS");
-            String actorName = givenQuery;
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<Cast> result = null;
-
-
+            ArrayList<SearchResult> result = new ArrayList<>();
+            String personName = searchTerm;
 
             // checking string
-            if((actorName == null) || (actorName.isEmpty())) {
+            if((personName == null) || (personName.isEmpty())) {
                 postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postSearchResultList(null);
+                postSearchResultList(result);
             }
-
-            actorName = actorName.trim();
-            result = new ArrayList<>();
 
             try {
                 // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonActorsListByName(actorName, PAGE_1);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
+                TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+                personName = personName.trim();
+                ArrayList<Cast> cast = api.getCastByName(personName, page);
 
-                // fetching results
-                for(int i=0; i<resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-                    int id = x.getInt("id");
-                    String name = x.getString("name");
-
-                    // if overview is null
-                    // getString() will fail
-                    // (due to the unvailable defaultLanguage version)
-                    // that's why the try-catch
-//                    String overview = null;
-//                    try {
-//                        overview = x.getString("overview");
-//                        if((overview==null) || (overview.isEmpty()))
-//                            overview = "(trama non disponibile in italiano)";
-//                    } catch (Exception e) {
-//                        e.getMessage();
-//                        e.printStackTrace();
-//                        overview = "(trama in italiano non disp.)";
-//                    }
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String profilePictureUrl = null;
-                    try {
-                        profilePictureUrl = x.getString("profile_path");
-                        profilePictureUrl = tmdb.buildPersonImageUrl(profilePictureUrl);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
+                // for each candidate actor, we build a SearchResult object
+                for(Cast x: cast) {
+                    SearchResult searchResult = buildCastSearchResult(x);
+                    if(searchResult!=null) {
+                        result.add(searchResult);
                     }
-
-                    //
-                    Cast cc = new Cast();
-                    cc.setTmdbID(id);
-                    cc.setFullName(name);
-                    cc.setProfilePictureUrl(profilePictureUrl);
-
-                    result.add(cc);
-                }// for
-
+                }
 
                 // once finished set results
-//                postMoviesList(result);
+                postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
-                // if the search returns nothing
-                // moviesList will be null
                 e.printStackTrace();
-                postSearchResultList(null);
+                postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
-    }// end createDownloadTask()
+    }// end createSearchCastTask()
 
-    //todo: createSearchUserTask()
-    private Runnable createSearchUserTask() {
-        //TODO:
+    private CastSearchResult buildCastSearchResult(Cast item) {
+        if(item==null) return null;
 
-        return null;
+        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+        CastSearchResult searchResult = new CastSearchResult.Builder(item.getTmdbID(), item.getFullName())
+                .setKnownFor(item.getKnownFor())
+                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
+                .setDepartment(item.getDepartment())
+                .build();
+
+        return searchResult;
     }
+
+    private MovieSearchResult buildMovieSearchResult(Movie item) {
+        if(item==null) return null;
+
+        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+        MovieSearchResult searchResult = new MovieSearchResult.Builder(item.getTmdbID(), item.getTitle())
+                .setOverview(item.getOverview())
+                .setPosterURL(api.buildPersonImageUrl(item.getPosterURL()))
+                .build();
+
+        return searchResult;
+    }
+
 
 
 
@@ -397,57 +333,32 @@ public class SearchViewModel extends ViewModel {
 
 
 
-    public Observable<ArrayList<SearchResult>> getCastSearchResultObservable(String searchTerm, int page) {
-        return Observable.create(emitter -> {
-            try {
-                // we first search the actor
-                TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-                ArrayList<Cast> casts = api.getCastByName(searchTerm, page);
-
-                // for each candidate actor, we build a SearchResult object
-                ArrayList<SearchResult> searchResults = new ArrayList<>();
-                for(Cast x: casts) {
-                    CastSearchResult searchResult = buildCastSearchResult(x);
-                    if(searchResult!=null) {
-                        searchResults.add(searchResult);
-                    }
-                }
-
-                // then we emit the result
-                emitter.onNext(searchResults);
-                emitter.onComplete();
-            } catch (Exception e) {
-                emitter.onError(e);
-            }
-        });
-    }
-
-
-
-    private CastSearchResult buildCastSearchResult(Cast item) {
-        if(item==null) return null;
-
-        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-        CastSearchResult searchResult = new CastSearchResult.Builder(item.getTmdbID(), item.getFullName())
-                .setKnownFor(item.getKnownFor())
-                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
-                .build();
-
-        return searchResult;
-    }
-
-//    private SearchResult buildMovieSearchResult(Actor item) {
-//        if(item==null) return null;
+//    public Observable<ArrayList<SearchResult>> getCastSearchResultObservable(String searchTerm, int page) {
+//        return Observable.create(emitter -> {
+//            try {
+//                // we first search the actor
+//                TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
+//                ArrayList<Cast> casts = api.getCastByName(searchTerm, page);
 //
-//        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-//        MovieSearchResult searchResult = new MovieSearchResult.Builder(item.getTmdbID(), item.getFullName())
-//                .setBio(item.getBiography())
-//                .setBirthDate(item.getBirthDate())
-//                .setKnownFor(item.getKnownFor())
-//                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
-//                .build();
+//                // for each candidate actor, we build a SearchResult object
+//                ArrayList<SearchResult> searchResults = new ArrayList<>();
+//                for(Cast x: casts) {
+//                    CastSearchResult searchResult = buildCastSearchResult(x);
+//                    if(searchResult!=null) {
+//                        searchResults.add(searchResult);
+//                    }
+//                }
 //
-//        return searchResult;
+//                // then we emit the result
+//                emitter.onNext(searchResults);
+//                emitter.onComplete();
+//            } catch (Exception e) {
+//                emitter.onError(e);
+//            }
+//        });
 //    }
+
+
+
 
 }// end SearchViewModel class

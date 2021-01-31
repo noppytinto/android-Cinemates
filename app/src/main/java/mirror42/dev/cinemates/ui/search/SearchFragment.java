@@ -28,9 +28,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jakewharton.rxbinding4.widget.RxTextView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -38,11 +35,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.disposables.SerialDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.tmdbAPI.model.Cast;
 import mirror42.dev.cinemates.tmdbAPI.model.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -181,7 +176,10 @@ public class SearchFragment extends Fragment implements
                     searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
 
                 }
-                else searchButtonPressed = false;
+                else {
+                    spinner.setVisibility(View.GONE);
+                    searchButtonPressed = false;
+                }
             }
             else {
                 textInputLayout.setError("Campo vuoto");
@@ -202,13 +200,9 @@ public class SearchFragment extends Fragment implements
             searchType = SearchType.MOVIE;
             textInputLayout.setHint("Cerca film");
         }
-        else if(checkedId == R.id.chip_searchFragment_actor) {
+        else if(checkedId == R.id.chip_searchFragment_cast) {
             searchType = SearchType.CAST;
             textInputLayout.setHint("Cerca attore");
-        }
-        else if(checkedId == R.id.chip_searchFragment_director) {
-            searchType = SearchType.DIRECTOR;
-            textInputLayout.setHint("Cerca regista");
         }
         else if(checkedId == R.id.chip_searchFragment_user) {
             searchType = SearchType.USER;
@@ -221,11 +215,7 @@ public class SearchFragment extends Fragment implements
 
     }// end onCheckedChanged()
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        disposeSubscribers();
-    }
+
 
 
 
@@ -242,33 +232,7 @@ public class SearchFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
 
-    private void search(String query, SearchType searchType) {
-        switch (searchType) {
-            case MOVIE:
-                break;
-            case CAST:
-                searchCast(currentSearchTerm);
-                break;
-            case USER:
-                break;
-            default:
-        }
-    }
 
-    private void searchCast(String searchTerm) {
-        Observable<ArrayList<SearchResult>> notificationsObservable =
-                searchViewModel.getCastSearchResultObservable(searchTerm, 1)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        searchSubscription.set(notificationsObservable
-                .subscribe( this::drawCastSearchResult,
-                            this::handleErrors));
-    }
-
-    private void handleErrors(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
 
 
     private void enableSearchOnTyping() {
@@ -294,9 +258,6 @@ public class SearchFragment extends Fragment implements
         }
     }
 
-    private void drawCastSearchResult(ArrayList<SearchResult> searchResults) {
-        recyclerAdapterSearchPage.loadNewData(searchResults);
-    }
 
     @Override
     public void onMovieSearchResultClicked(int position, View v) {
@@ -338,77 +299,110 @@ public class SearchFragment extends Fragment implements
 
 
     //--- on testing
-    private void disposeSubscribers() {
-        if (disposable_2 != null && !disposable_2.isDisposed()) {
-            disposable_2.dispose();
-        }
-    }
-    private void updateResults(ArrayList<SearchResult> searchResults) {
-        recyclerAdapterSearchPage.loadNewData(searchResults);
-    }
-    private Observable<ArrayList<SearchResult>> createMoviesListObservable(String givenQuery) {
-        return Observable.create( emitter -> {
-            final int PAGE_1 = 1;
-            String movieTitle = givenQuery;
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            ArrayList<SearchResult> result = null;
 
-            movieTitle = movieTitle.trim();
-            result = new ArrayList<>();
+//    private void drawCastSearchResult(ArrayList<SearchResult> searchResults) {
+//        recyclerAdapterSearchPage.loadNewData(searchResults);
+//    }
 
 
-            try {
-                // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
-
-                // fetching results
-                for (int i = 0; i < resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-                    int id = x.getInt("id");
-                    String title = x.getString("title");
-
-                    // if overview is null
-                    // getString() will fail
-                    // (due to the unvailable defaultLanguage version)
-                    // that's why the try-catch
-                    String overview = null;
-                    try {
-                        overview = x.getString("overview");
-                        if ((overview == null) || (overview.isEmpty()))
-                            overview = "(trama non disponibile in italiano)";
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                        overview = "(trama in italiano non disp.)";
-                    }
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String posterURL = null;
-                    try {
-                        posterURL = x.getString("poster_path");
-                        posterURL = tmdb.buildPosterUrl(posterURL);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                    }
-
-                    //
-                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
-                    result.add(mv);
-                }// for
-                // once finished set results
-                emitter.onNext(result);
-                emitter.onComplete();
-
-            } catch (Exception e) {
-                // if the search returns nothing
-                // moviesList will be null
-                emitter.onError(e);
-            }
-        });
-    }
+//    private void search(String query, SearchType searchType) {
+//        switch (searchType) {
+//            case MOVIE:
+//                break;
+//            case CAST:
+//                searchCast(currentSearchTerm);
+//                break;
+//            case USER:
+//                break;
+//            default:
+//        }
+//    }
+//
+//    private void searchCast(String searchTerm) {
+////        Observable<ArrayList<SearchResult>> notificationsObservable =
+////                searchViewModel.getCastSearchResultObservable(searchTerm, 1)
+////                .subscribeOn(Schedulers.io())
+////                .observeOn(AndroidSchedulers.mainThread());
+////
+////        searchSubscription.set(notificationsObservable
+////                .subscribe( this::drawCastSearchResult,
+////                            this::handleErrors));
+//    }
+//
+//    private void handleErrors(Throwable e) {
+//        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+//    }
+//    private void disposeSubscribers() {
+//        if (disposable_2 != null && !disposable_2.isDisposed()) {
+//            disposable_2.dispose();
+//        }
+//    }
+//    private void updateResults(ArrayList<SearchResult> searchResults) {
+//        recyclerAdapterSearchPage.loadNewData(searchResults);
+//    }
+//    private Observable<ArrayList<SearchResult>> createMoviesListObservable(String givenQuery) {
+//        return Observable.create( emitter -> {
+//            final int PAGE_1 = 1;
+//            String movieTitle = givenQuery;
+//            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+//            ArrayList<SearchResult> result = null;
+//
+//            movieTitle = movieTitle.trim();
+//            result = new ArrayList<>();
+//
+//
+//            try {
+//                // querying TBDb
+//                JSONObject jsonObj = tmdb.getJsonMoviesListByTitle(movieTitle, PAGE_1);
+//                JSONArray resultsArray = jsonObj.getJSONArray("results");
+//
+//                // fetching results
+//                for (int i = 0; i < resultsArray.length(); i++) {
+//                    JSONObject x = resultsArray.getJSONObject(i);
+//                    int id = x.getInt("id");
+//                    String title = x.getString("title");
+//
+//                    // if overview is null
+//                    // getString() will fail
+//                    // (due to the unvailable defaultLanguage version)
+//                    // that's why the try-catch
+//                    String overview = null;
+//                    try {
+//                        overview = x.getString("overview");
+//                        if ((overview == null) || (overview.isEmpty()))
+//                            overview = "(trama non disponibile in italiano)";
+//                    } catch (Exception e) {
+//                        e.getMessage();
+//                        e.printStackTrace();
+//                        overview = "(trama in italiano non disp.)";
+//                    }
+//
+//                    // if poster_path is null
+//                    // getString() will fail
+//                    // that's why the try-catch
+//                    String posterURL = null;
+//                    try {
+//                        posterURL = x.getString("poster_path");
+//                        posterURL = tmdb.buildPosterUrl(posterURL);
+//                    } catch (Exception e) {
+//                        e.getMessage();
+//                        e.printStackTrace();
+//                    }
+//
+//                    //
+//                    MovieSearchResult mv = new MovieSearchResult(id, title, overview, posterURL);
+//                    result.add(mv);
+//                }// for
+//                // once finished set results
+//                emitter.onNext(result);
+//                emitter.onComplete();
+//
+//            } catch (Exception e) {
+//                // if the search returns nothing
+//                // moviesList will be null
+//                emitter.onError(e);
+//            }
+//        });
+//    }
 
 }// end SearchFragment class

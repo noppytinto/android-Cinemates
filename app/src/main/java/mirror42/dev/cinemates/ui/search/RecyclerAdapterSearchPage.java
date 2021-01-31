@@ -148,6 +148,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
                 .into(holder.imageViewProfilePicture); //8
 
         holder.textViewFullName.setText(searchResult.getFullName());
+        holder.textViewDepartment.setText(translate(searchResult.getDepartment()));
         holder.textViewKnownFor.setText(searchResult.getKnwonForAsString());
     }
 
@@ -175,6 +176,50 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }
 
 
+    public String translate(String original) {
+        String translated = "";
+
+        if(original!=null || !original.isEmpty()) {
+            translated = original.toLowerCase();
+
+            switch (translated) {
+                case "acting":
+                    translated = "(attore)";
+                    break;
+                case "directing":
+                    translated = "(regista)";
+                    break;
+                case "writing":
+                    translated = "(scrittore)";
+                    break;
+                case "sound":
+                    translated = "(compositore)";
+                    break;
+                case "crew":
+                    translated = "(membro crew)";
+                    break;
+                case "production":
+                    translated = "(produttore)";
+                    break;
+                case "art":
+                    translated = "(artista)";
+                    break;
+                case "costume & make-up":
+                    translated = "(costumi & make-up)";
+                    break;
+                case "lighting":
+                    translated = "(luci)";
+                    break;
+                case "visual effects":
+                    translated = "(effetti speciali)";
+                    break;
+                default:
+                    translated = "(" + translated + ")";
+            }
+        }
+
+        return translated;
+    }
 
     //------------------------------------------------------------------ VIEWHOLDERS
 
@@ -230,6 +275,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     public class CastSearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView imageViewProfilePicture;
         public TextView textViewFullName;
+        public TextView textViewDepartment;
         public TextView textViewKnownFor;
         private CardView cardView;
 
@@ -238,6 +284,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
             super(itemView);
             this.imageViewProfilePicture = itemView.findViewById(R.id.imageview_searchRecordActor_profilePicture);
             this.textViewFullName =  itemView.findViewById(R.id.textView_searchRecordActor_name);
+            this.textViewDepartment =  itemView.findViewById(R.id.textView_searchRecordActor_department);
             this.textViewKnownFor =  itemView.findViewById(R.id.textView_searchRecordActor_knownFor);
             this.cardView = itemView.findViewById(R.id.cardview_searchRecordActor);
             cardView.setOnClickListener(this);

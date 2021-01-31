@@ -42,4 +42,9 @@ public class UserSearchResult extends SearchResult{
     public void setUsername(String username) {
         this.username = username;
     }
+
+
+
+
+
 }
