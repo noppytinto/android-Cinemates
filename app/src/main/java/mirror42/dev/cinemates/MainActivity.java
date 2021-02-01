@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import mirror42.dev.cinemates.async.NotificationsRefreshWorker;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -53,13 +55,13 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     private NavController navController;
     private RemoteConfigServer remoteConfigServer;
     public MenuItem loginMenuItem;
-    public MenuItem menuItemNotifications;
+    public MenuItem notificationsMenuItem;
     private static boolean rememberMeExists;
     private LoginViewModel loginViewModel;
     private ImageView toolbarLogo;
     private Toolbar toolbar;
     private ProgressDialog progressDialog;
-
+    private NotificationsViewModel notificationsViewModel;
 
 
     //---------------------------------------------------------------------------------------------- ANDROID METHODS
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         firebaseAnalytics.setUserConsent(true); //TODO: fetch user consensus from DB
         //init okhttp
         OkHttpSingleton.getInstance(getApplicationContext());
+        notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
         // observe login acitivty
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(profilePicturePath, loginMenuItem, this);
                     invalidateOptionsMenu();
+
+                    checkForNewNotifications(user);
                     }
                     break;
                 case LOGGED_OUT:
@@ -98,9 +103,13 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     invalidateOptionsMenu();
                     rememberMeExists = false;
                     break;
-                case REMEMBER_ME_EXISTS:
+                case REMEMBER_ME_EXISTS: {
+                    User user = loginViewModel.getLoggedUser().getValue();
+                    checkForNewNotifications(user);
                     rememberMeExists = true;
                     invalidateOptionsMenu();
+                }
+
                     break;
                 }
         });
@@ -116,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
 
         loginMenuItem = menu.findItem(R.id.menu_item_login);
-        menuItemNotifications = menu.findItem(R.id.menu_item_notifications);
+        notificationsMenuItem = menu.findItem(R.id.menu_item_notifications);
         return true;
     }
 
@@ -145,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     public boolean onPrepareOptionsMenu(Menu menu) {
         // if is logged
         if(rememberMeExists || loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) {
-            menuItemNotifications.setVisible(true);
+            notificationsMenuItem.setVisible(true);
 
             // set profile picture
             User remeberMeUser = loginViewModel.getLoggedUser().getValue();
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             ImageUtilities.loadCircularImageInto(imagePath, loginMenuItem, this);
         }
         else {
-            menuItemNotifications.setVisible(false);
+            notificationsMenuItem.setVisible(false);
             loginMenuItem.setVisible(true);
         }
 
@@ -181,9 +190,11 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         loadRemoteParams();
 
         // on testing
-//        startNotificationRefreshWorker();
+        startNotificationRefreshWorker();
 //        startFCM();
     }
+
+
 
     private void loadRemoteParams() {
         showProgressDialog();
@@ -191,6 +202,32 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         remoteConfigServer.setListener(this);
         remoteConfigServer.loadConfigParams();
     }
+
+    private void checkForNewNotifications(User loggedUser) {
+        if(loggedUser!=null) {
+            notificationsViewModel.getNotificationsStatus().observe(this, status -> {
+                switch (status) {
+                    case NOTIFICATIONS_FETCHED: {
+                        notificationsViewModel.checkForNewNotifications(getApplicationContext());
+                    }
+                        break;
+                    case GOT_NEW_NOTIFICATIONS: {
+                        activateNotificationsIcon();
+                    }
+                        break;
+                    case NO_NOTIFICATIONS:
+//                        deactivateNotificationsIcon();
+                        break;
+                    case ALL_NOTIFICATIONS_READ:
+                        deactivateNotificationsIcon();
+                        break;
+                }
+            });
+            notificationsViewModel.fetchNotifications(loggedUser, getApplicationContext());
+        }
+    }
+
+
 
     @Override
     public void onRemoteParamsLoaded(boolean taskIsSuccessful) {
@@ -274,17 +311,30 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
     private void showProgressDialog() {
         //notes: Declare progressDialog before so you can use .hide() later!
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(getApplicationContext());
         progressDialog.setMessage("Avvio in corso...");
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+        try {
+            progressDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void hideProgressDialog() {
         if(progressDialog!=null)
             progressDialog.hide();
+    }
+
+
+    public void activateNotificationsIcon() {
+        notificationsMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_notifications_active_yellow));
+    }
+
+    public void deactivateNotificationsIcon() {
+        notificationsMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.notification_icon_light_blue));
     }
 
 
@@ -294,11 +344,10 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                 new PeriodicWorkRequest.Builder(NotificationsRefreshWorker.class, 15, TimeUnit.MINUTES)
                         .build();
 
-        WorkManager
-                .getInstance(getApplicationContext())
+        WorkManager.getInstance(getApplicationContext())
                 .enqueue(notificationRefreshRequest);
 
-        createNotificationChannel();
+//        createNotificationChannel();
     }
     private void startFCM() {
 //        FirebaseMessaging.getInstance().getToken()
@@ -349,5 +398,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 
 }// end MainActivity class

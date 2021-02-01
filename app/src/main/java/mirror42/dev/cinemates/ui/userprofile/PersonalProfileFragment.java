@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -40,6 +42,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private LoginViewModel loginViewModel;
     private View includeAccountActivationView;
     private View includeUserProfileContent;
+    private NotificationsViewModel notificationsViewModel;
 
 
 
@@ -74,6 +77,8 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         buttonResendEmail.setOnClickListener(this);
         includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
         includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_content);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+
         hideResendEmail();
 
 
@@ -85,6 +90,17 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         // firebase logging
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.logScreenEvent(this, "User profile page", getContext());
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
+            switch (status) {
+                case GOT_NEW_NOTIFICATIONS:
+                    ((MainActivity) getActivity()).activateNotificationsIcon();
+                    break;
+                case NO_NOTIFICATIONS:
+                    break;
+            }
+        });
+
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -133,6 +149,9 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                     break;
             }// switch
         });
+
+
+
     }
 
     @Override
@@ -171,7 +190,11 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         MenuItem item = menu.findItem(R.id.menu_item_login);
         if(item!=null)
             item.setVisible(false);
+
+        checkForNewNotifications();
     }
+
+
 
     //----------------------------------------------------------------------- METHODS
 
@@ -190,4 +213,17 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
+    private void checkForNewNotifications() {
+        if(notificationsViewModel!=null) {
+            if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
+                ((MainActivity) getActivity()).activateNotificationsIcon();
+            }
+            else {
+                ((MainActivity) getActivity()).deactivateNotificationsIcon();
+            }
+        }
+    }
+
+
 }// end UserProfileFragment class

@@ -18,15 +18,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
 import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener,
@@ -39,6 +41,7 @@ public class HomeFragment extends Fragment implements
     private Button buttonUpdateFeed;
     private RecyclerView recyclerView;
     private ProgressDialog progressDialog;
+    private NotificationsViewModel notificationsViewModel;
 
 
 
@@ -67,6 +70,7 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
@@ -85,14 +89,14 @@ public class HomeFragment extends Fragment implements
             }
         });
 
-
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLoggedUser().getValue();
-                    homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+                    homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+//                    checkForNewNotifications(loggedUser);
                 }
                     break;
                 case LOGGED_OUT:
@@ -107,16 +111,16 @@ public class HomeFragment extends Fragment implements
         });
 
 
-        buttonUpdateFeed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showProgressDialog();
+        buttonUpdateFeed.setOnClickListener(v -> {
+            // ignore v
 
-                recyclerAdapterPost.clearList();
+            showProgressDialog();
 
-                User loggedUser = loginViewModel.getLoggedUser().getValue();
-                homeViewModel.fetchData(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-            }
+            recyclerAdapterPost.clearList();
+
+            User loggedUser = loginViewModel.getLoggedUser().getValue();
+            homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+            checkForNewNotifications(loggedUser);
         });
     }// end onActivityCreated()
 
@@ -293,6 +297,30 @@ public class HomeFragment extends Fragment implements
                 commentId,
                 loginViewModel.getLoggedUser().getValue().getEmail(),
                 loginViewModel.getLoggedUser().getValue().getAccessToken());
+    }
+
+    private void checkForNewNotifications(User loggedUser) {
+        if(loggedUser!=null) {
+            notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
+                switch (status) {
+                    case NOTIFICATIONS_FETCHED: {
+                        notificationsViewModel.checkForNewNotifications(getContext());
+                    }
+                    break;
+                    case GOT_NEW_NOTIFICATIONS: {
+                        ((MainActivity) getActivity()).activateNotificationsIcon();
+                    }
+                    break;
+                    case NO_NOTIFICATIONS:
+//                        deactivateNotificationsIcon();
+                        break;
+                    case ALL_NOTIFICATIONS_READ:
+                        ((MainActivity) getActivity()).deactivateNotificationsIcon();
+                        break;
+                }
+            });
+            notificationsViewModel.fetchNotifications(loggedUser, getContext());
+        }
     }
 
 }// end HomeFragment class

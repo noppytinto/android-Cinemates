@@ -3,27 +3,21 @@ package mirror42.dev.cinemates.model.notification;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import mirror42.dev.cinemates.model.User;
 
+@Entity
 public class Notification implements Parcelable, Comparable<Notification>{
-    private long postId;
-    private User owner;
-    private long dateInMillis;
-    protected NotificationType notificationType;
-    private User sender;
-
-    @Override
-    public int compareTo(Notification another) {
-        if(this.dateInMillis > another.dateInMillis)
-            return -1;
-        else if(this.dateInMillis < another.dateInMillis)
-            return 1;
-
-        return 0;
-
-//        return Long.compare(this.dateInMillis, o.dateInMillis);
-    }
-
+    @PrimaryKey private long id;
+    private boolean isNew;
+    @Ignore private long postId;
+    @Ignore private User owner;
+    @Ignore private long dateInMillis;
+    @Ignore protected NotificationType notificationType;
+    @Ignore private User sender;
 
     public enum NotificationType {
         FOLLOW_REQUEST, POST_COMMENTED, POST_LIKED, NONE
@@ -34,13 +28,21 @@ public class Notification implements Parcelable, Comparable<Notification>{
     //------------------------------------------------------------------------------- CONSTRUCTORS
 
     public Notification() {
-
+        isNew = true;
     }
 
 
 
 
     //------------------------------------------------------------------------------- GETTERS/SETTERS
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public User getSender() {
         return sender;
@@ -49,7 +51,6 @@ public class Notification implements Parcelable, Comparable<Notification>{
     public void setSender(User sender) {
         this.sender = sender;
     }
-
 
     public long getPostId() {
         return postId;
@@ -83,9 +84,29 @@ public class Notification implements Parcelable, Comparable<Notification>{
         this.notificationType = notificationType;
     }
 
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
 
 
     //------------------------------------------------------------------------------- METHODS
+
+    @Override
+    public int compareTo(Notification another) {
+        if(this.dateInMillis > another.dateInMillis)
+            return -1;
+        else if(this.dateInMillis < another.dateInMillis)
+            return 1;
+
+        return 0;
+
+//        return Long.compare(this.dateInMillis, o.dateInMillis);
+    }
 
     public static final Creator<Notification> CREATOR = new Creator<Notification>() {
         @Override

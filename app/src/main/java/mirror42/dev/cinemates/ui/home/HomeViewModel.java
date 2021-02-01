@@ -77,7 +77,7 @@ public class HomeViewModel extends ViewModel {
 
     //-------------------------------------------------------------------------- METHODS
 
-    public void fetchData(String email, String token, String loggedUsername) {
+    public void fetchPosts(String email, String token, String loggedUsername) {
         Runnable watchlistPostTask = createFetchWatchlistPostTask(email, token, loggedUsername);
         Thread t = new Thread(watchlistPostTask);
         t.start();

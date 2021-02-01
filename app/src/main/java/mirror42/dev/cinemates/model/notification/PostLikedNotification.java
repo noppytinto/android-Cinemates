@@ -6,8 +6,8 @@ public class PostLikedNotification extends Notification {
     private Post post;
 
     public PostLikedNotification() {
+        super();
         notificationType = Notification.NotificationType.POST_LIKED;
-
     }
 
     public Post getPost() {

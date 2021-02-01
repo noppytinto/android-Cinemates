@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,9 +22,11 @@ import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 
 import static mirror42.dev.cinemates.MainActivity.CHANNEL_ID;
 
@@ -37,6 +40,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private Button buttonFollow;
     private Button buttonAcceptFollow;
     private User profileOwner;
+    private NotificationsViewModel notificationsViewModel;
 
 
 
@@ -55,6 +59,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
         textViewMessage = view.findViewById(R.id.textView_userProfileFragment_message);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         buttonFollow = view.findViewById(R.id.button_userProfileFragment_follow);
         buttonAcceptFollow = view.findViewById(R.id.button_userProfileFragment_acceptRequest);
@@ -246,9 +251,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-
-
-
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        checkForNewNotifications();
+    }
 
     //-------------------------------------------------------------------------- MY METHODS
 
@@ -261,6 +268,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void checkForNewNotifications() {
+        if(notificationsViewModel!=null) {
+            if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
+                ((MainActivity) getActivity()).activateNotificationsIcon();
+            }
+            else {
+                ((MainActivity) getActivity()).deactivateNotificationsIcon();
+            }
+        }
     }
 
     //TODO: on testing

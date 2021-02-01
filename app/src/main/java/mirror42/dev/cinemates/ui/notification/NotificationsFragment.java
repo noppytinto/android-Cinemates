@@ -21,10 +21,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.SerialDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterNotifications;
@@ -41,7 +37,6 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
-    private SerialDisposable notificationsSubscription;
 
 
 
@@ -71,21 +66,37 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        notificationsSubscription = new SerialDisposable();
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), notificationsStatust -> {
+            ArrayList<Notification> notifications = notificationsViewModel.getNotifications().getValue();
 
-        enableSwipeDownToRefresh();
-    }
+            switch (notificationsStatust) {
+                case NOTIFICATIONS_FETCHED: {
+                    if(notifications!=null) {
+                        updateUI(notifications);
+                        notificationsViewModel.setNotificationsAsOld(notifications, getContext());
+                    }
+                }
+                    break;
+                case GOT_NEW_NOTIFICATIONS: {
 
-    @Override
-    public void onResume() {
-        super.onResume();
+                }
+                    break;
+                case NO_NOTIFICATIONS:
+                    break;
+                case ALL_NOTIFICATIONS_READ:
+                    break;
+            }
+
+        });
+
 
         // load notifications, only if the user is logged
-        if(currentUserIsLogged()) {
-            loadNotifications(loginViewModel.getLoggedUser().getValue());
-        }
+        loadNotifications(loginViewModel.getLoggedUser().getValue());
+
+        enableSwipeDownToRefresh();
+
     }
 
     @Override
@@ -124,33 +135,18 @@ public class NotificationsFragment extends Fragment implements
 
     private void loadNotifications(User loggedUser) {
         if(loggedUser==null) return;
-        Observable<ArrayList<Notification>> notifications = fetchNotifications(loggedUser);
-
-        notificationsSubscription.set(notifications
-                .subscribe(this::updateUI, this::handleFetchErrors));
-    }
-
-    private Observable<ArrayList<Notification>> fetchNotifications(User loggedUser) {
-        if(loggedUser==null) return null;
-
-        Observable<ArrayList<Notification>> fetchedNotifications = notificationsViewModel
-                .getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        return fetchedNotifications;
+        notificationsViewModel.fetchNotifications(loggedUser, getContext());
     }
 
     private void updateUI(ArrayList<Notification> notifications) {
-        if(notifications==null || notifications.size()==0)
+        if(notifications==null || notifications.size()==0) {
             Toast.makeText(getContext(), "Nessuna notifica.", Toast.LENGTH_SHORT).show();
-        else
+        }
+        else {
             recyclerAdapterNotifications.loadNewData(notifications);
+        }
     }
 
-    private void handleFetchErrors(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
 
 
 

@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,9 +22,11 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MainActivity;
@@ -33,6 +36,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
@@ -44,6 +48,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private FloatingActionButton addToListButton;
     private LoginViewModel loginViewModel;
     private int currentMovieId;
+    private NotificationsViewModel notificationsViewModel;
 
 
 
@@ -87,6 +92,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         this.view = view;
         addToListButton = view.findViewById(R.id.button_movieDetailsFragment_addToList);
         addToListButton.setOnClickListener(this);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -280,6 +286,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
         MenuItem menuItem = menu.getItem(1);
         menuItem.setVisible(false);
+
+        checkForNewNotifications();
     }
 
 
@@ -361,7 +369,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         return temp;
     }
 
-
+    private void checkForNewNotifications() {
+        if(notificationsViewModel!=null) {
+            if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
+                ((MainActivity) getActivity()).activateNotificationsIcon();
+            }
+            else {
+                ((MainActivity) getActivity()).deactivateNotificationsIcon();
+            }
+        }
+    }
 
 
 }// end MovieDetailsFragment class
