@@ -55,7 +55,8 @@ public class NotificationsFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.notifications_fragment, container, false);
     }
@@ -84,7 +85,7 @@ public class NotificationsFragment extends Fragment implements
 
         // load notifications, only if the user is logged
         if(currentUserIsLogged()) {
-            loadNotifications();
+            loadNotifications(loginViewModel.getLoggedUser().getValue());
         }
     }
 
@@ -122,15 +123,23 @@ public class NotificationsFragment extends Fragment implements
         //TODO
     }
 
-    private void loadNotifications() {
-        Observable<ArrayList<Notification>> notificationsObservable =
-                notificationsViewModel.getObservableNotifications(loginViewModel.getLoggedUser().getValue().getEmail(),
-                        loginViewModel.getLoggedUser().getValue().getAccessToken())
+    private void loadNotifications(User loggedUser) {
+        if(loggedUser==null) return;
+        Observable<ArrayList<Notification>> notifications = fetchNotifications(loggedUser);
+
+        notificationsSubscription.set(notifications
+                .subscribe(this::updateUI, this::handleFetchErrors));
+    }
+
+    private Observable<ArrayList<Notification>> fetchNotifications(User loggedUser) {
+        if(loggedUser==null) return null;
+
+        Observable<ArrayList<Notification>> fetchedNotifications =
+                notificationsViewModel.getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread());
 
-        notificationsSubscription.set(notificationsObservable
-                .subscribe(this::updateUI, this::handleErrors));
+        return fetchedNotifications;
     }
 
     private void updateUI(ArrayList<Notification> notifications) {
@@ -140,7 +149,7 @@ public class NotificationsFragment extends Fragment implements
             recyclerAdapterNotifications.loadNewData(notifications);
     }
 
-    private void handleErrors(Throwable e) {
+    private void handleFetchErrors(Throwable e) {
         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -174,7 +183,7 @@ public class NotificationsFragment extends Fragment implements
             // The method calls setRefreshing(false) when it's finished.
             recyclerAdapterNotifications.clearList();
             if(currentUserIsLogged()) {
-                loadNotifications();
+                loadNotifications(loginViewModel.getLoggedUser().getValue());
             }
 
             swipeRefreshLayout.setRefreshing(false);
