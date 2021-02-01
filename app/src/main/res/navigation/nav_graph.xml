@@ -28,7 +28,7 @@
         tools:layout="@layout/fragment_movie_details" >
         <argument
             android:name="Movie"
-            app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie" />
+            app:argType="mirror42.dev.cinemates.model.tmdb.Movie" />
     </fragment>
     <fragment
         android:id="@+id/exploreFragment"
@@ -93,7 +93,7 @@
         tools:layout="@layout/fragment_list" >
         <argument
             android:name="movies_list"
-            app:argType="mirror42.dev.cinemates.tmdbAPI.model.Movie[]" />
+            app:argType="mirror42.dev.cinemates.model.tmdb.Movie[]" />
         <argument
             android:name="list_title"
             app:argType="string"
@@ -132,11 +132,7 @@
         android:id="@+id/notificationsFragment"
         android:name="mirror42.dev.cinemates.ui.notification.NotificationsFragment"
         android:label="Notifiche"
-        tools:layout="@layout/notifications_fragment" >
-        <argument
-            android:name="notifications_args"
-            app:argType="mirror42.dev.cinemates.ui.notification.model.Notification[]" />
-    </fragment>
+        tools:layout="@layout/notifications_fragment" />
     <action
         android:id="@+id/action_global_notificationsFragment"
         app:destination="@id/notificationsFragment"
@@ -144,4 +140,9 @@
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+    <fragment
+        android:id="@+id/watchlistThumbnailsFragment"
+        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistThumbnailsFragment"
+        android:label="fragment_watchlist"
+        tools:layout="@layout/fragment_watchlist" />
 </navigation>

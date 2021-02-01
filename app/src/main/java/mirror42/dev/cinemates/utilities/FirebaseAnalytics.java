@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
+import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.model.search.MovieSearchResult;
 
 public class FirebaseAnalytics {
     private static FirebaseAnalytics singletonInstance;

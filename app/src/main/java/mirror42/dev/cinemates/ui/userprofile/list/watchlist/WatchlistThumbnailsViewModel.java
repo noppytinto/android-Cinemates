@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import mirror42.dev.cinemates.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;

@@ -27,16 +27,16 @@ import io.reactivex.rxjava3.disposables.SerialDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterNotifications;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
+import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
-import mirror42.dev.cinemates.ui.notification.model.Notification;
 
 public class NotificationsFragment extends Fragment implements
         RecyclerAdapterNotifications.OnNotificationClickedListener {
     private final String TAG = this.getClass().getSimpleName();
     private NotificationsViewModel notificationsViewModel;
-    private View view;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
@@ -64,9 +64,8 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.view = view;
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_notificationsFragment);
-        initRecyclerView();
+        initRecyclerView(view);
     }
 
     @Override
@@ -108,9 +107,9 @@ public class NotificationsFragment extends Fragment implements
         User user = getUserFromNotification(recyclerAdapterNotifications.getNotification(position));
         if(user==null) return;
 
-        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
                 NavGraphDirections.actionGlobalUserProfileFragment(user);
-        navigateTo(userProfileFragment, true);
+        navigateTo(userProfileDirection, true);
     }
 
     @Override
@@ -134,10 +133,10 @@ public class NotificationsFragment extends Fragment implements
     private Observable<ArrayList<Notification>> fetchNotifications(User loggedUser) {
         if(loggedUser==null) return null;
 
-        Observable<ArrayList<Notification>> fetchedNotifications =
-                notificationsViewModel.getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
+        Observable<ArrayList<Notification>> fetchedNotifications = notificationsViewModel
+                .getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
         return fetchedNotifications;
     }
@@ -158,7 +157,7 @@ public class NotificationsFragment extends Fragment implements
 
     //--------------------------------------------------------------------------------------- SUPPORT METHODS
 
-    private void initRecyclerView() {
+    private void initRecyclerView(@NonNull View view) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_notificationFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

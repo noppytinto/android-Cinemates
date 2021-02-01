@@ -20,7 +20,7 @@ import java.util.Collections;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.userprofile.PersonalProfileFragmentDirections;
 import mirror42.dev.cinemates.utilities.ImageUtilities;

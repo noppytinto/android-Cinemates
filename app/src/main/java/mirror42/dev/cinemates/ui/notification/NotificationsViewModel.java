@@ -12,10 +12,10 @@ import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.notification.model.FollowRequestNotification;
-import mirror42.dev.cinemates.ui.notification.model.Notification;
-import mirror42.dev.cinemates.ui.notification.model.PostCommentedNotification;
-import mirror42.dev.cinemates.ui.notification.model.PostLikedNotification;
+import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
+import mirror42.dev.cinemates.model.notification.Notification;
+import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
+import mirror42.dev.cinemates.model.notification.PostLikedNotification;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;

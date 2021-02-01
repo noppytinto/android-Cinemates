@@ -2,7 +2,7 @@ package mirror42.dev.cinemates.model;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 
 public class WatchlistPost extends Post {
     private String listOwnerEmail;

@@ -25,11 +25,13 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterShowCommentsDialog;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.User;
 
 
-public class ShowCommentsDialogFragment extends DialogFragment implements RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
+public class ShowCommentsDialogFragment extends DialogFragment implements
+        RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
     private ArrayList<Comment> commentsList;
     private View view;
     private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;

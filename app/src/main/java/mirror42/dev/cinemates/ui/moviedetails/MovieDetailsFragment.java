@@ -30,8 +30,8 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
-import mirror42.dev.cinemates.tmdbAPI.model.Person;
+import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 

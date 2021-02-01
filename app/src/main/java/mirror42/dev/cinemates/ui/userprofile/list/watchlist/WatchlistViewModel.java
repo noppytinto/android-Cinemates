@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Random;
 
-import mirror42.dev.cinemates.mailAPI.JavaMailAPI;
+import mirror42.dev.cinemates.api.mailAPI.JavaMailAPI;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;

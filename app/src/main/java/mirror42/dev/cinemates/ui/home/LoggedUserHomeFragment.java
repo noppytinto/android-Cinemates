@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 
 public class LoggedUserHomeFragment extends Fragment {
     private LoggedUserHomeViewModel loggedUserHomeViewModel;

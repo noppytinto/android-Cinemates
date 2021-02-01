@@ -36,13 +36,14 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.SerialDisposable;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.model.search.MovieSearchResult;
+import mirror42.dev.cinemates.model.search.SearchResult;
+import mirror42.dev.cinemates.model.search.SearchResult.SearchType;
+import mirror42.dev.cinemates.model.search.UserSearchResult;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.search.model.MovieSearchResult;
-import mirror42.dev.cinemates.ui.search.model.SearchResult;
-import mirror42.dev.cinemates.ui.search.model.SearchResult.SearchType;
-import mirror42.dev.cinemates.ui.search.model.UserSearchResult;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 

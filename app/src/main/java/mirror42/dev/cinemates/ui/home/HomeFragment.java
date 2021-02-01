@@ -25,7 +25,7 @@ import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
 import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
-import mirror42.dev.cinemates.ui.home.post.RecyclerAdapterPost;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class HomeFragment extends Fragment implements

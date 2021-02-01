@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
 import mirror42.dev.cinemates.model.User;
 
 public class ShowLikesDialogFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {

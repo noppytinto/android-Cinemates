@@ -20,8 +20,9 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterExploreUpcoming;
 import mirror42.dev.cinemates.listener.RecyclerListener;
-import mirror42.dev.cinemates.tmdbAPI.model.Movie;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
