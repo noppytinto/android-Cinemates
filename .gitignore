@@ -117,3 +117,8 @@ lint/tmp/
 
 .idea/misc.xml
 .idea/compiler.xml
+app/.settings/org.eclipse.buildship.core.prefs
+app/.project
+app/.classpath
+.settings/org.eclipse.buildship.core.prefs
+.project

@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,7 +46,7 @@ public class NotificationsFragment extends Fragment implements
 
 
 
-    //-------------------------------------------------------------------------------------------------- ANDROID METHODS
+    //--------------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +75,96 @@ public class NotificationsFragment extends Fragment implements
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
 
+        enableSwipeDownToRefresh();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // load notifications, only if the user is logged
+        if(currentUserIsLogged()) {
+            loadNotifications();
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        hideMenuItem(menu, R.id.menu_item_notifications);
+        hideMenuItem(menu, R.id.menu_item_login);
+    }
+
+
+
+
+
+    //--------------------------------------------------------------------------------------- MY METHODS
+
+    @Override
+    public void onFollowRequestNotificationClicked(int position) {
+        User user = getUserFromNotification(recyclerAdapterNotifications.getNotification(position));
+        if(user==null) return;
+
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                NavGraphDirections.actionGlobalUserProfileFragment(user);
+        navigateTo(userProfileFragment, true);
+    }
+
+    @Override
+    public void onPostLikedNotificationClicked(int position) {
+        //TODO
+    }
+
+    @Override
+    public void onPostCommentedNotificationClicked(int position) {
+        //TODO
+    }
+
+    private void loadNotifications() {
+        Observable<ArrayList<Notification>> notificationsObservable =
+                notificationsViewModel.getObservableNotifications(loginViewModel.getLoggedUser().getValue().getEmail(),
+                        loginViewModel.getLoggedUser().getValue().getAccessToken())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
+
+        notificationsSubscription.set(notificationsObservable
+                .subscribe(this::updateUI, this::handleErrors));
+    }
+
+    private void updateUI(ArrayList<Notification> notifications) {
+        if(notifications==null || notifications.size()==0)
+            Toast.makeText(getContext(), "Nessuna notifica.", Toast.LENGTH_SHORT).show();
+        else
+            recyclerAdapterNotifications.loadNewData(notifications);
+    }
+
+    private void handleErrors(Throwable e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+
+
+
+    //--------------------------------------------------------------------------------------- SUPPORT METHODS
+
+    private void initRecyclerView() {
+        // defining Recycler view
+        recyclerView = view.findViewById(R.id.recyclerView_notificationFragment);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // adding recycle listener for touch detection
+        recyclerAdapterNotifications = new RecyclerAdapterNotifications(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterNotifications);
+    }
+
+    private boolean currentUserIsLogged() {
+        return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                                            loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
+    }
+
+    private void enableSwipeDownToRefresh() {
         /*
          * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
          * performs a swipe-to-refresh gesture.
@@ -91,114 +182,35 @@ public class NotificationsFragment extends Fragment implements
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // fetch notifications, only if the user is logged
-        if(currentUserIsLogged()) {
-            loadNotifications();
-        }
+    private void hideMenuItem(Menu menu, int IDResource) {
+        MenuItem menuItem = menu.findItem(IDResource);
+        if(menuItem!=null)
+            menuItem.setVisible(false);
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem notification_item = menu.findItem(R.id.menu_item_notifications);
-        MenuItem login_item = menu.findItem(R.id.menu_item_login);
+    private User getUserFromNotification(Notification notification) {
+        if(notification==null) return null;
 
-        if(notification_item!=null)
-            notification_item.setVisible(false);
-
-        if(login_item!=null)
-            login_item.setVisible(false);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        disposeSubscribers();
-    }
-
-
-
-
-
-    //-------------------------------------------------------------------------------------------------- METHODS
-
-    private void initRecyclerView() {
-        // defining Recycler view
-        recyclerView = view.findViewById(R.id.recyclerView_notificationFragment);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // adding recycle listener for touch detection
-        recyclerAdapterNotifications = new RecyclerAdapterNotifications(new ArrayList<>(), getContext(), this);
-        recyclerView.setAdapter(recyclerAdapterNotifications);
-    }
-
-    private void loadNotifications() {
-        Observable<ArrayList<Notification>> notificationsObservable = notificationsViewModel.getNotifications(
-                                                                        loginViewModel.getLoggedUser().getValue().getEmail(),
-                                                                        loginViewModel.getLoggedUser().getValue().getAccessToken())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        notificationsSubscription.set(notificationsObservable
-                                        .subscribe( this::updateUI,
-                                                    this::handleErrors));
-    }
-
-    private void updateUI(ArrayList<Notification> notifications) {
-        if(notifications==null || notifications.size()==0)
-            Toast.makeText(getContext(), "Nessuna notifica.", Toast.LENGTH_SHORT).show();
-        else
-            recyclerAdapterNotifications.loadNewData(notifications);
-    }
-
-    private void handleErrors(Throwable e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onFollowRequestNotificationClicked(int position) {
-        FollowRequestNotification itemSelected = (FollowRequestNotification) recyclerAdapterNotifications.getNotification(position);
-
-        String username = (itemSelected.getSender()).getUsername();
-        String firstName = (itemSelected.getSender()).getFirstName();
-        String lastName = (itemSelected.getSender()).getLastName();
-        String profilePictureUrl = (itemSelected.getSender()).getProfilePicturePath();
+        FollowRequestNotification followNotification = (FollowRequestNotification) notification;
+        String username = (followNotification.getSender()).getUsername();
+        String firstName = (followNotification.getSender()).getFirstName();
+        String lastName = (followNotification.getSender()).getLastName();
+        String profilePictureUrl = (followNotification.getSender()).getProfilePicturePath();
         User user = new User();
         user.setUsername(username);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setProfilePicturePath(profilePictureUrl);
 
-        NavGraphDirections.ActionGlobalUserProfileFragment action = NavGraphDirections.actionGlobalUserProfileFragment(user);
-        NavController navController = NavHostFragment.findNavController(NotificationsFragment.this);
-        navController.popBackStack();
-        navController.navigate(action);
-
+        return user;
     }
 
-    @Override
-    public void onPostLikedNotificationClicked(int position) {
+    private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
+        if(direction==null) return;
 
-    }
-
-    @Override
-    public void onPostCommentedNotificationClicked(int position) {
-
-    }
-
-    private boolean currentUserIsLogged() {
-        return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                                            loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
-    }
-
-    private void disposeSubscribers() {
-        if (notificationsSubscription != null && !notificationsSubscription.isDisposed()) {
-            notificationsSubscription.dispose();
-        }
+        NavController navController = NavHostFragment.findNavController(this);
+        if (removeFromBackStack) navController.popBackStack();
+        navController.navigate(direction);
     }
 
 }// end NotificationsFragment class

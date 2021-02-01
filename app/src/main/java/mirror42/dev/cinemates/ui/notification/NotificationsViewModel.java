@@ -47,7 +47,7 @@ public class NotificationsViewModel extends ViewModel {
     //-------------------------------------------------------------------------- GETTERS/SETTERS
 
     // rxjava
-    public Observable<ArrayList<Notification>> getFollowNotifications(String email, String token) {
+    public Observable<ArrayList<Notification>> getObservableFollowNotifications(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -55,7 +55,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                HttpUrl httpUrl = buildDBurl(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -63,7 +63,7 @@ public class NotificationsViewModel extends ViewModel {
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-                // performing request
+                // executing request
                 response = httpClient.newCall(request).execute();
 
                 // check responses
@@ -111,7 +111,7 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    public Observable<ArrayList<Notification>> getLikeNotifications(String email, String token) {
+    public Observable<ArrayList<Notification>> getObservableLikeNotifications(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -119,7 +119,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                HttpUrl httpUrl = buildDBurl(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -176,7 +176,7 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
-    public Observable<ArrayList<Notification>> getCommentNotificaionts(String email, String token) {
+    public Observable<ArrayList<Notification>> getObservableCommentNotificaionts(String email, String token) {
         return Observable.create(emitter->{
             Response response = null;
             ArrayList<Notification> tempResult = new ArrayList<>();
@@ -184,7 +184,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildHttpUrl(dbFunctionName);
+                HttpUrl httpUrl = buildDBurl(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -247,16 +247,16 @@ public class NotificationsViewModel extends ViewModel {
      * @param token
      * @return
      */
-    public Observable<ArrayList<Notification>> getNotifications(String email, String token) {
+    public Observable<ArrayList<Notification>> getObservableNotifications(String email, String token) {
         Observable<ArrayList<Notification>> followNotificationsObservable =
-                getFollowNotifications(email, token);
+                getObservableFollowNotifications(email, token);
 
         Observable<ArrayList<Notification>> likeNotificationsObservable =
-                getLikeNotifications(email, token);
+                getObservableLikeNotifications(email, token);
 
 
         Observable<ArrayList<Notification>> commentNotificationsObservable =
-                getCommentNotificaionts(email, token);
+                getObservableCommentNotificaionts(email, token);
 
 
         Observable<ArrayList<Notification>> combinedNotificationsObservable =
@@ -276,7 +276,7 @@ public class NotificationsViewModel extends ViewModel {
 
         Observable<ArrayList<Notification>> sortedCombinedNotificationsObservable =
                 combinedNotificationsObservable
-                        .map(this::sortNotificationsList);
+                        .map(this::sortNotificationsByDate);
 
         return sortedCombinedNotificationsObservable;
     }
@@ -284,7 +284,7 @@ public class NotificationsViewModel extends ViewModel {
 
     //-------------------------------------------------------------------------- MY METHODS
 
-    private HttpUrl buildHttpUrl(String dbFunctionName) {
+    private HttpUrl buildDBurl(String dbFunctionName) {
         return new HttpUrl.Builder()
                 .scheme("https")
                 .host(remoteConfigServer.getAzureHostName())
@@ -298,7 +298,7 @@ public class NotificationsViewModel extends ViewModel {
      * @param list
      * @return
      */
-    ArrayList<Notification> sortNotificationsList(List<Notification> list) {
+    ArrayList<Notification> sortNotificationsByDate(List<Notification> list) {
         ArrayList<Notification> sortedList = new ArrayList<>(); // create a copy for immutability principle
         sortedList.addAll(list);
         Collections.sort(sortedList);
