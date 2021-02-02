@@ -93,7 +93,7 @@ public class NotificationsFragment extends Fragment implements
 
 
         // load notifications, only if the user is logged
-        loadNotifications(loginViewModel.getLoggedUser().getValue());
+        loadNotifications(loginViewModel.getLiveLoggedUser().getValue());
 
         enableSwipeDownToRefresh();
 
@@ -178,7 +178,7 @@ public class NotificationsFragment extends Fragment implements
             // The method calls setRefreshing(false) when it's finished.
             recyclerAdapterNotifications.clearList();
             if(currentUserIsLogged()) {
-                loadNotifications(loginViewModel.getLoggedUser().getValue());
+                loadNotifications(loginViewModel.getLiveLoggedUser().getValue());
             }
 
             swipeRefreshLayout.setRefreshing(false);

@@ -12,14 +12,17 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.model.tmdb.Cast;
-import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.exception.signup.CurrentTermEqualsPreviousTermException;
+import mirror42.dev.cinemates.exception.signup.EmptyFieldException;
+import mirror42.dev.cinemates.exception.signup.NoResultException;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.search.CastSearchResult;
 import mirror42.dev.cinemates.model.search.MovieSearchResult;
 import mirror42.dev.cinemates.model.search.SearchResult;
 import mirror42.dev.cinemates.model.search.UserSearchResult;
+import mirror42.dev.cinemates.model.tmdb.Cast;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -49,6 +52,8 @@ public class SearchViewModel extends ViewModel {
     private MutableLiveData<ArrayList<SearchResult>> searchResultList;
     private MutableLiveData<DownloadStatus> downloadStatus;
     private RemoteConfigServer remoteConfigServer;
+    private String previousSearchTerm; // if currentSerchTerm equals the previous one, don't start any new search
+    private User loggedUser;
 
 
 
@@ -60,6 +65,7 @@ public class SearchViewModel extends ViewModel {
         searchResultList = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        previousSearchTerm="";
     }
 
 
@@ -70,7 +76,7 @@ public class SearchViewModel extends ViewModel {
         this.searchResultList.postValue(searchResultList);
     }
 
-    public LiveData<ArrayList<SearchResult>> getSearchResultList() {
+    public LiveData<ArrayList<SearchResult>> getObservableSearchResultList() {
         return searchResultList;
     }
 
@@ -78,46 +84,60 @@ public class SearchViewModel extends ViewModel {
         this.downloadStatus.postValue(downloadStatus);
     }
 
-    public LiveData<DownloadStatus> getDownloadStatus() {
+    public LiveData<DownloadStatus> getObservableDownloadStatus() {
         return downloadStatus;
     }
 
+    public void setLoggedUser(User user) {
+        this.loggedUser = user;
+    }
 
+    public void resetPreviousSearchTerm() {
+        previousSearchTerm = "";
+    }
+
+    public ArrayList<SearchResult> getSearchResultList() {
+        return searchResultList.getValue();
+    }
 
     //--------------------------------------------------------- METHODS
 
 
-    public void fetchResults(String givenQuery, SearchResult.SearchType searchType, User loggedUser) {
+    public void search(String searchTerm, SearchResult.SearchType searchType)
+            throws EmptyFieldException, CurrentTermEqualsPreviousTermException {
+        if(searchTerm.isEmpty()) throw new EmptyFieldException("Campo vuoto");
+        if(searchTerm.equals(previousSearchTerm)) throw new CurrentTermEqualsPreviousTermException("CINEMATES EXCEPTIONS: termine ricerca corrente uguale al precedente");
+
+        previousSearchTerm = searchTerm.trim();
         switch (searchType) {
             case MOVIE: {
                 // ignore loggedUser
-                Runnable task = createSearchMoviesTask(givenQuery, PAGE_1);
+                Runnable task = createSearchMoviesTask(searchTerm, PAGE_1);
                 Thread t = new Thread(task);
                 t.start();
             }
                 break;
             case CAST: {
                 // ignore loggedUser
-                Runnable task = createSearchCastTask(givenQuery, PAGE_1);
+                Runnable task = createSearchCastTask(searchTerm, PAGE_1);
                 Thread t = new Thread(task);
                 t.start();
             }
                 break;
             case USER: {
-                Runnable task = createSearchUsersTask(givenQuery, loggedUser);
+                Runnable task = createSearchUsersTask(searchTerm, loggedUser);
                 Thread t = new Thread(task);
                 t.start();
             }
                 break;
             case UNIVERSAL: {
                 //TODO:
-                Runnable searchMoviesTask = createSearchMoviesTask(givenQuery, PAGE_1);
+                Runnable searchMoviesTask = createSearchMoviesTask(searchTerm, PAGE_1);
                 Thread t = new Thread(searchMoviesTask);
                 t.start();
             }
                 break;
         }
-
     }
 
     private Runnable createSearchUsersTask(String givenQuery, User loggedUser) {
@@ -125,12 +145,7 @@ public class SearchViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_search_users";
-                HttpUrl httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
+                HttpUrl httpUrl = buildHttpUrl(dbFunction);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("search_term", givenQuery)
@@ -179,7 +194,6 @@ public class SearchViewModel extends ViewModel {
                                 }
                                 // if response contains no data
                                 else {
-                                    postSearchResultList(result);
                                     postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
                                 }
                             } // if response is unsuccessful
@@ -200,40 +214,48 @@ public class SearchViewModel extends ViewModel {
         };
     }// end createSearchUsersTask()
 
+    @NotNull
+    private HttpUrl buildHttpUrl(String dbFunction) {
+        return new HttpUrl.Builder()
+                .scheme("https")
+                .host(remoteConfigServer.getAzureHostName())
+                .addPathSegments(remoteConfigServer.getPostgrestPath())
+                .addPathSegment(dbFunction)
+                .build();
+    }
+
+    /**
+     * PRECONDITIONS: givenQuery must be not null or not empty
+     * @param givenQuery
+     * @param page
+     * @return
+     */
     private Runnable createSearchMoviesTask(String givenQuery, int page) {
         return ()-> {
             String movieTitle = givenQuery;
             ArrayList<SearchResult> result = new ArrayList<>();
 
-            // checking string
-            if((movieTitle == null) || (movieTitle.isEmpty())) {
-                postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postSearchResultList(result);
-            }
-
             try {
                 // querying TBDb
                 TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-                movieTitle = movieTitle.trim();
                 ArrayList<Movie> movies = tmdb.getMoviesByTitle(movieTitle, page);
+                if(movies==null || movies.size()==0) throw new NoResultException("CINEMATES EXCEPTIONS: Nessun risultato");
 
                 // fetching results
                 // for each candidate item, we build a SearchResult object
                 for(Movie x: movies) {
-                    SearchResult searchResult = buildMovieSearchResult(x);
-                    if(searchResult!=null) {
+                    try {
+                        SearchResult searchResult = buildMovieSearchResult(x);
                         result.add(searchResult);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
                 }
 
                 // once finished set results
                 postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
-            } catch (Exception e) {
-                // if the search returns nothing
-                // moviesList will be null
-                e.printStackTrace();
-                postSearchResultList(result);
+            } catch (NoResultException e) {
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
@@ -244,16 +266,9 @@ public class SearchViewModel extends ViewModel {
             ArrayList<SearchResult> result = new ArrayList<>();
             String personName = searchTerm;
 
-            // checking string
-            if((personName == null) || (personName.isEmpty())) {
-                postDownloadStatus(DownloadStatus.NOT_INITILIZED);
-                postSearchResultList(result);
-            }
-
             try {
                 // querying TBDb
                 TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-                personName = personName.trim();
                 ArrayList<Cast> cast = api.getCastByName(personName, page);
 
                 // for each candidate actor, we build a SearchResult object
@@ -269,7 +284,6 @@ public class SearchViewModel extends ViewModel {
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
                 e.printStackTrace();
-                postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
             }
         };
@@ -288,8 +302,8 @@ public class SearchViewModel extends ViewModel {
         return searchResult;
     }
 
-    private MovieSearchResult buildMovieSearchResult(Movie item) {
-        if(item==null) return null;
+    private MovieSearchResult buildMovieSearchResult(Movie item) throws NullPointerException{
+        if(item==null) throw new NullPointerException("CINEMATES EXCEPTIONS: argomento nullo");
 
         TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
         MovieSearchResult searchResult = new MovieSearchResult.Builder(item.getTmdbID(), item.getTitle())

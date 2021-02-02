@@ -107,7 +107,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getLoggedUser().getValue();
+                    User user = loginViewModel.getLiveLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
 
                     ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
@@ -118,7 +118,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                     break;
                 case REMEMBER_ME_EXISTS:
                     try {
-                        User user = loginViewModel.getLoggedUser().getValue();
+                        User user = loginViewModel.getLiveLoggedUser().getValue();
                         String profilePicturePath = user.getProfilePicturePath();
 
                         ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());

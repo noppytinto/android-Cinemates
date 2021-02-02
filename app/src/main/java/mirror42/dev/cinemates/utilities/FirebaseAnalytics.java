@@ -54,6 +54,8 @@ public class FirebaseAnalytics {
 
     public void logSearchTerm(String term, Object screenClass, Context context) {
         if(haveUserConsensus) {
+            if(term==null || term.isEmpty()) return;
+
             // send to firebase analytics
             @SuppressLint("MissingPermission")
             com.google.firebase.analytics.FirebaseAnalytics mFirebaseAnalytics = com.google.firebase.analytics.FirebaseAnalytics.getInstance(context);

@@ -99,7 +99,7 @@ public class LoginFragment extends Fragment  implements
 
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getLoggedUser().getValue();
+                    User user = loginViewModel.getLiveLoggedUser().getValue();
                     try {
                         showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail());
                     } catch (Exception e) {

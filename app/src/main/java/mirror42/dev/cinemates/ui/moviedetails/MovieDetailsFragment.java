@@ -201,7 +201,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                             if(x==0) {
                                 // add movie to watchlist
-                                User user = loginViewModel.getLoggedUser().getValue();
+                                User user = loginViewModel.getLiveLoggedUser().getValue();
                                 movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
                             }
 

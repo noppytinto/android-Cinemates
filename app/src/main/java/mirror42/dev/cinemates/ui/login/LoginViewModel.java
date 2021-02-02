@@ -82,9 +82,14 @@ public class LoginViewModel extends ViewModel {
 
     //----------------------------------------------------------------------- GETTERS/SETTERS
 
-    public LiveData<User> getLoggedUser() {
+    public LiveData<User> getLiveLoggedUser() {
         return user;
     }
+
+    public User getLoggedUser() {
+        return user.getValue();
+    }
+
 
     public void postUser(User user) {
         this.user.postValue(user);

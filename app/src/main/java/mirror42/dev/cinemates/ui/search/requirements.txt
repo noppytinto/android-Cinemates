@@ -1,0 +1,15 @@
+l'utente puo':
+RICERCA
+- cercare film                                            (a)
+- cercare cast (attori, registi, produttori, ecc..)       (b)
+- cercare utenti nella piattaforma social di Cinemates    (c)
+- ricerca universale (film+cast+utenti)                   (d)
+
+
+
+Cercare x ---------------------------------------------------
+* x e' presente                               --> mostra risultati
+* x non e' presente                           --> lancia eccezione
+* non e' stato inserito nessun carattere      --> lancia eccezione
+* il termine corrente e' uguale al precedente --> lancia eccezione
+* se utente non e' loggato

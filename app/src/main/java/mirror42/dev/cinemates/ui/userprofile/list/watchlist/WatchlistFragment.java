@@ -151,7 +151,7 @@ public class WatchlistFragment extends Fragment implements
     }
 
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
-        User user = loginViewModel.getLoggedUser().getValue();
+        User user = loginViewModel.getLiveLoggedUser().getValue();
         watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
     }
 

@@ -108,9 +108,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
                         //
                         userProfileViewModel.checkMyFollowIsPending(
-                                loginViewModel.getLoggedUser().getValue().getUsername(),
+                                loginViewModel.getLiveLoggedUser().getValue().getUsername(),
                                 profileOwner.getUsername(),
-                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
                     }
                         break;
@@ -154,8 +154,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
                         userProfileViewModel.checkHisFollowIsPending(
                                 profileOwner.getUsername(),
-                                loginViewModel.getLoggedUser().getValue().getUsername(),
-                                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                                loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
                     }
                     break;
                     case HIS_FOLLOW_REQUEST_IS_PENDING: {
@@ -185,14 +185,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         super.onResume();
         if(currentUserIsLogged()) {
             userProfileViewModel.checkIfollowHim(
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
             userProfileViewModel.checkHeFollowsMe(
                     profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
         }
     }
@@ -222,9 +222,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             });
 
             userProfileViewModel.sendFollowRequest(
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
         }
         else if(v.getId() == buttonAcceptFollow.getId()) {
             userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
@@ -246,8 +246,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
             userProfileViewModel.acceptFollowRequest(
                     profileOwner.getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getUsername(),
-                    loginViewModel.getLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
         }
     }
 

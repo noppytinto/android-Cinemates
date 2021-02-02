@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             hideProgressDialog();
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getLoggedUser().getValue();
+                    User user = loginViewModel.getLiveLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(profilePicturePath, loginMenuItem, this);
                     invalidateOptionsMenu();
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     rememberMeExists = false;
                     break;
                 case REMEMBER_ME_EXISTS: {
-                    User user = loginViewModel.getLoggedUser().getValue();
+                    User user = loginViewModel.getLiveLoggedUser().getValue();
                     checkForNewNotifications(user);
                     rememberMeExists = true;
                     invalidateOptionsMenu();
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             notificationsMenuItem.setVisible(true);
 
             // set profile picture
-            User remeberMeUser = loginViewModel.getLoggedUser().getValue();
+            User remeberMeUser = loginViewModel.getLiveLoggedUser().getValue();
             String imagePath = null;
             try {
                 imagePath = remeberMeUser.getProfilePicturePath();
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         loadRemoteParams();
 
         // on testing
-        startNotificationRefreshWorker();
+//        startNotificationRefreshWorker();
 //        startFCM();
     }
 

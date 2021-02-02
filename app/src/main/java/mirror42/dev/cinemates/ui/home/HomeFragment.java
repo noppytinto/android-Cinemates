@@ -94,7 +94,7 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS: case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
-                    User loggedUser = loginViewModel.getLoggedUser().getValue();
+                    User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
 //                    checkForNewNotifications(loggedUser);
                 }
@@ -118,7 +118,7 @@ public class HomeFragment extends Fragment implements
 
             recyclerAdapterPost.clearList();
 
-            User loggedUser = loginViewModel.getLoggedUser().getValue();
+            User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
             homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
             checkForNewNotifications(loggedUser);
         });
@@ -159,7 +159,7 @@ public class HomeFragment extends Fragment implements
 //        recyclerAdapterPost.updateLikeCounter(position);
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
-        String currentLoggedUserEmail = loginViewModel.getLoggedUser().getValue().getEmail();
+        String currentLoggedUserEmail = loginViewModel.getLiveLoggedUser().getValue().getEmail();
         TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_showLikes);
         Button likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
@@ -169,23 +169,23 @@ public class HomeFragment extends Fragment implements
             if(currentLikesCounter>0)
                 currentLikesCounter = currentLikesCounter - 1;
 
-            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLoggedUser().getValue().getAccessToken());
+            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
             // removing like from current cached list
             ArrayList<Like> currentLikes = currentPost.getLikes();
             if(currentLikes!=null && currentLikes.size()>0) {
                 Like placeholderLike = new Like();
-                placeholderLike.setOwner(loginViewModel.getLoggedUser().getValue());
+                placeholderLike.setOwner(loginViewModel.getLiveLoggedUser().getValue());
                 currentLikes.remove(placeholderLike);
             }
         }
         else { //add like
             currentLikesCounter = currentLikesCounter + 1;
-            homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getValue().getAccessToken());
+            homeViewModel.addLike(postId, loginViewModel.getLiveLoggedUser().getValue().getEmail(), loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
             // adding placehoder like to the current cached list
             Like placeholderLike = new Like();
-            User currentUser = loginViewModel.getLoggedUser().getValue();
+            User currentUser = loginViewModel.getLiveLoggedUser().getValue();
             placeholderLike.setOwner(currentUser);
             ArrayList<Like> currentLikes = currentPost.getLikes();
             if(currentLikes==null)
@@ -215,7 +215,7 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         ArrayList<Comment> comments = currentPost.getComments();
         int currentCommentsCount = currentPost.getCommentsCount();
-        User reactionOwner = loginViewModel.getLoggedUser().getValue();
+        User reactionOwner = loginViewModel.getLiveLoggedUser().getValue();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
         ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
@@ -256,8 +256,8 @@ public class HomeFragment extends Fragment implements
         homeViewModel.addComment(
                 postId,
                 commentText,
-                loginViewModel.getLoggedUser().getValue().getEmail(),
-                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
+                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
 
         // updating comments counter
         TextView commentsCounter = recyclerView.getLayoutManager()
@@ -295,8 +295,8 @@ public class HomeFragment extends Fragment implements
 
         homeViewModel.deleteComment(
                 commentId,
-                loginViewModel.getLoggedUser().getValue().getEmail(),
-                loginViewModel.getLoggedUser().getValue().getAccessToken());
+                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
+                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
     }
 
     private void checkForNewNotifications(User loggedUser) {

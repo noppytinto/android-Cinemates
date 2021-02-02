@@ -1305,6 +1305,8 @@ public class TheMovieDatabaseApi {
         return result;
     }// end getActorsByName()
 
+
+    // tested
     public ArrayList<Movie> getMoviesByTitle(String query, int page) {
         ArrayList<Movie> result = new ArrayList<>();
         if(query==null || query.isEmpty() || page<=0)

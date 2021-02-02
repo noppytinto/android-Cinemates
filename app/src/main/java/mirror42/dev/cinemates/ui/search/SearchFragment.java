@@ -37,6 +37,8 @@ import io.reactivex.rxjava3.disposables.SerialDisposable;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
+import mirror42.dev.cinemates.exception.signup.CurrentTermEqualsPreviousTermException;
+import mirror42.dev.cinemates.exception.signup.EmptyFieldException;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.search.MovieSearchResult;
 import mirror42.dev.cinemates.model.search.SearchResult;
@@ -66,8 +68,6 @@ public class SearchFragment extends Fragment implements
     private User loggedUser;
     private TextView textViewTitle;
     private RecyclerView recyclerView;
-    private String previousSearchTerm; //if the new search term equals the previous one, then don't start any search
-    private boolean searchButtonPressed;
     private ProgressBar spinner;
     private SerialDisposable searchSubscription;
 
@@ -102,28 +102,6 @@ public class SearchFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        searchSubscription = new SerialDisposable();
-
-        //
-        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        searchViewModel.getSearchResultList().observe(getViewLifecycleOwner(), searchResults -> {
-            textViewTitle.setVisibility(View.VISIBLE);
-            spinner.setVisibility(View.GONE);
-            searchButtonPressed = false;
-
-            if (searchResults != null && searchResults.size()>0) {
-                textViewTitle.setText("Risultati per: " + currentSearchTerm);
-                recyclerAdapterSearchPage.loadNewData(searchResults);
-            }
-            else {
-                recyclerAdapterSearchPage.loadNewData(null);
-                textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
-                final Toast toast = Toast.makeText(getContext(), "Nessun risultato per: " + currentSearchTerm, Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-        });
-
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
@@ -131,65 +109,88 @@ public class SearchFragment extends Fragment implements
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
                     chipUsersFilter.setVisibility(View.VISIBLE);
-                    loggedUser = loginViewModel.getLoggedUser().getValue();
+                    loggedUser = loginViewModel.getLoggedUser();
+                    searchViewModel.setLoggedUser(loggedUser);
                 }
                 break;
                 default:
                     textInputLayout.setHint("Cerca tutto");
-                    searchType = SearchType.UNIVERSAL;
+                    searchType = SearchType.UNIVERSAL; // reset filters
                     chipUsersFilter.setVisibility(View.GONE);
             }
         });
 
         //
-        enableSearchOnTyping();
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        searchViewModel.getObservableDownloadStatus().observe(getViewLifecycleOwner(), downloadStatus -> {
+            textViewTitle.setVisibility(View.VISIBLE);
+            showLoadingSpinner(false);
+
+            switch (downloadStatus) {
+                case SUCCESS: {
+                    ArrayList<SearchResult> searchResults = searchViewModel.getSearchResultList();
+                    if (searchResults != null && searchResults.size()>0) {
+                        textViewTitle.setText("Risultati per: " + currentSearchTerm);
+                        recyclerAdapterSearchPage.loadNewData(searchResults);
+                    }
+                }
+                    break;
+                case FAILED_OR_EMPTY:
+                    recyclerAdapterSearchPage.loadNewData(null);
+                    textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
+                    showCenteredToast("Nessun risultato per: " + currentSearchTerm);
+                    break;
+            }
+        });
+
+
+
+
+        //
+        enableSearchOnTyping(true);
 
     }// end onActivityCreated()
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == buttonSearch.getId()) {
-            spinner.setVisibility(View.VISIBLE);
-            searchButtonPressed = true;
-            Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
-            buttonSearch.startAnimation(buttonAnim);
+        if(theButtonPressed_is(buttonSearch, v)) {
+            animateButton(buttonSearch);
+            showLoadingSpinner(true);
+            enableSearchOnTyping(false);
+            textInputLayout.setError(null);
+            hideKeyboard();
             currentSearchTerm = editTextSearch.getText().toString();
+            logSearchTerm(currentSearchTerm);
 
-            if( ! currentSearchTerm.isEmpty()) {
-                if( ! currentSearchTerm.equals(previousSearchTerm)) {
-                    previousSearchTerm = currentSearchTerm;
-
-                    // don't log user searches
-                    if(chipGroup.getCheckedChipId() != R.id.chip_searchFragment_user)
-                        firebaseAnalytics.logSearchTerm(currentSearchTerm, this, getContext());
-
-                    //
-                    textInputLayout.setError(null);
-                    editTextSearch.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
-
-                    //
-                    searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
-
-                }
-                else {
-                    spinner.setVisibility(View.GONE);
-                    searchButtonPressed = false;
-                }
-            }
-            else {
-                textInputLayout.setError("Campo vuoto");
-                final Toast toast = Toast.makeText(getContext(),"Campo vuoto", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-                searchButtonPressed = false;
+            //
+            try {
+                searchViewModel.search(currentSearchTerm, searchType);
+            } catch (EmptyFieldException e) {
+                e.printStackTrace();
+                textInputLayout.setError(e.getMessage());
+                showCenteredToast(e.getMessage());
+                showLoadingSpinner(false);
+            } catch (CurrentTermEqualsPreviousTermException e) {
+                e.printStackTrace();
+                showLoadingSpinner(false);
             }
         }
+    }
+
+    private void logSearchTerm(String searchTerm) {
+        // don't log user searches
+        if(chipGroup.getCheckedChipId() != R.id.chip_searchFragment_user)
+            firebaseAnalytics.logSearchTerm(searchTerm, this, getContext());
+    }
+
+    private boolean theButtonPressed_is(FloatingActionButton buttonTarget, View actualButtonPressed) {
+        return actualButtonPressed.getId() == buttonTarget.getId();
     }
 
     @Override
     public void onCheckedChanged(ChipGroup group, int checkedId) {
         //NOTE: checkedId is -1 if no chip is checked
-        previousSearchTerm = "-"; // if the filter has been changed, then reset previous search term
+        searchViewModel.resetPreviousSearchTerm(); // if the filter has been changed, then reset previous search term
 
         if(checkedId == R.id.chip_searchFragment_movie) {
             searchType = SearchType.MOVIE;
@@ -227,28 +228,55 @@ public class SearchFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterSearchPage);
     }
 
-    private void enableSearchOnTyping() {
+    private void enableSearchOnTyping(boolean enable) {
         // AUTOMATIC SEARCH on typing
         // triggered when:
         // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
         // 1 second later after the last typed character (debounce)
-        Observable<CharSequence> searchTermObservable = RxTextView.textChanges(editTextSearch)
-                                                    .filter(text -> text.length()>=3 && !searchButtonPressed)
-                                                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                                                    .observeOn(AndroidSchedulers.mainThread());
 
-        searchSubscription.set(searchTermObservable.subscribe(this::search));
-    }
+        if(enable) {
+            searchSubscription = new SerialDisposable();
+            Observable<String> searchTermObservable = RxTextView.textChanges(editTextSearch)
+                    .filter(text -> text.length()>=3)
+                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                    .map(text -> text.toString())
+                    .observeOn(AndroidSchedulers.mainThread());
 
-    private void search(CharSequence searchQuery) {
-        currentSearchTerm = searchQuery.toString();
+            searchSubscription.set(searchTermObservable
+                    .subscribe(this::autoSearch));
+        }
+        else {
+            if(searchSubscription!=null && !searchSubscription.isDisposed())
+                searchSubscription.dispose();
 
-        if( ! currentSearchTerm.equals(previousSearchTerm)) {
-            spinner.setVisibility(View.VISIBLE);
-            previousSearchTerm = currentSearchTerm;
-            searchViewModel.fetchResults(currentSearchTerm, searchType, loggedUser);
+            // ri-enable
+            searchSubscription = new SerialDisposable();
+            Observable<String> searchTermObservable = RxTextView.textChanges(editTextSearch)
+                    .filter(text -> text.length()>=3)
+                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                    .map(text -> text.toString())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            searchSubscription.set(searchTermObservable
+                    .subscribe(this::autoSearch));
         }
     }
+
+    private void autoSearch(String searchQuery) {
+        currentSearchTerm = searchQuery;
+
+        try {
+            showLoadingSpinner(true);
+            searchViewModel.search(currentSearchTerm, searchType);
+        } catch (EmptyFieldException e) {
+            e.printStackTrace();
+            //do nothing
+        } catch (CurrentTermEqualsPreviousTermException e) {
+            e.printStackTrace();
+            showLoadingSpinner(false);
+        }
+    }
+
 
     @Override
     public void onMovieSearchResultClicked(int position, View v) {
@@ -285,9 +313,25 @@ public class SearchFragment extends Fragment implements
         NavHostFragment.findNavController(SearchFragment.this).navigate(action);
     }
 
+    private void showCenteredToast(String msg) {
+        final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 
+    private void hideKeyboard() {
+        editTextSearch.onEditorAction(EditorInfo.IME_ACTION_DONE);
+    }
 
+    private void showLoadingSpinner(boolean show) {
+        if(show) spinner.setVisibility(View.VISIBLE);
+        else spinner.setVisibility(View.GONE);
+    }
 
+    private void animateButton(FloatingActionButton button) {
+        Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
+        button.startAnimation(buttonAnim);
+    }
 
     //--- on testing
 
