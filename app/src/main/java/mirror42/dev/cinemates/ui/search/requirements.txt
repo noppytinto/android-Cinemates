@@ -8,10 +8,10 @@ RICERCA
 
 
 Cercare x ---------------------------------------------------
-[x] x e' presente                               --> mostra risultati
-[x] x non e' presente                           --> lancia eccezione NoResultException
-[x] non e' stato inserito nessun carattere      --> lancia eccezione EmptyValueException
-[x] il termine corrente e' uguale al precedente --> lancia eccezione CurrentTermEqualsPreviousTermException
-[x] problemi al server (errori http da 400+)    --> lancia eccezione RemoteDatabaseResponseErrorException
+[x] x e' presente                                     --> mostra risultati
+[x] x non e' presente                                 --> lancia eccezione NoResultException
+[x] non e' stato inserito nessun carattere            --> lancia eccezione EmptyValueException
+[x] il termine corrente e' uguale al precedente       --> lancia eccezione CurrentTermEqualsPreviousTermException
+[x] problemi al server postgres (errori http da 400+) --> lancia eccezione RemoteDatabaseResponseErrorException
 
 [ ] se utente non e' loggato //TODO

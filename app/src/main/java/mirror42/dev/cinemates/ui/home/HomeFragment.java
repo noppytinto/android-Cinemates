@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,7 +43,7 @@ public class HomeFragment extends Fragment implements
     private RecyclerView recyclerView;
     private ProgressDialog progressDialog;
     private NotificationsViewModel notificationsViewModel;
-
+    private ProgressBar spinner;
 
 
     //------------------------------------------------------------------------------- ANDROID METHODS
@@ -92,7 +93,9 @@ public class HomeFragment extends Fragment implements
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
-                case SUCCESS: case REMEMBER_ME_EXISTS: {
+                case SUCCESS:
+                case REMEMBER_ME_EXISTS: {
+                    showProgressDialog();
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
