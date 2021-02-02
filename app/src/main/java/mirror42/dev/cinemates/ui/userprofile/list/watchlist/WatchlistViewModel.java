@@ -125,7 +125,7 @@ public class WatchlistViewModel extends ViewModel {
             } catch (Exception e) {
                 e.printStackTrace();
                 postSelectedMovies(null);
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.FAILED);
             }
         };
     }// end createDownloadTask()

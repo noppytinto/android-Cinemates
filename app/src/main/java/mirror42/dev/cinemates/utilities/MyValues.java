@@ -6,8 +6,9 @@ public class MyValues {
         IDLE,
         PROCESSING,
         NOT_INITILIZED,
-        FAILED_OR_EMPTY,
+        FAILED,
         SUCCESS,
+        NO_RESULT,
         NONE
     }
 

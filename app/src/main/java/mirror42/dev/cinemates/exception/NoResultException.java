@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.exception.signup;
+package mirror42.dev.cinemates.exception;
 
 public class NoResultException extends Exception{
     public NoResultException(String message, Throwable err) {

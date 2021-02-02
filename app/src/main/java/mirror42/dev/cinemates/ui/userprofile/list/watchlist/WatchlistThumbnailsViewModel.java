@@ -89,7 +89,7 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                        postDownloadStatus(DownloadStatus.FAILED);
                     }
 
                     @Override
@@ -138,22 +138,22 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
                                 }
                                 else {
                                     postMoviesList(null);
-                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                                    postDownloadStatus(DownloadStatus.FAILED);
                                 }
                             } // if response is unsuccessful
                             else {
                                 postMoviesList(null);
-                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                                postDownloadStatus(DownloadStatus.FAILED);
                             }
                         } catch (Exception e) {
                             postMoviesList(null);
-                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                            postDownloadStatus(DownloadStatus.FAILED);
                         }
                     }
                 });
             } catch (Exception e) {
                 postMoviesList(null);
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.FAILED);
             }
         };
     }// end createDownloadTask()

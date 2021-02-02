@@ -7,15 +7,17 @@ import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
-import mirror42.dev.cinemates.exception.signup.CurrentTermEqualsPreviousTermException;
-import mirror42.dev.cinemates.exception.signup.EmptyFieldException;
-import mirror42.dev.cinemates.exception.signup.NoResultException;
+import mirror42.dev.cinemates.exception.CurrentTermEqualsPreviousTermException;
+import mirror42.dev.cinemates.exception.EmptyValueException;
+import mirror42.dev.cinemates.exception.NoResultException;
+import mirror42.dev.cinemates.exception.RemoteDatabaseResponseErrorException;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.search.CastSearchResult;
 import mirror42.dev.cinemates.model.search.MovieSearchResult;
@@ -100,12 +102,14 @@ public class SearchViewModel extends ViewModel {
         return searchResultList.getValue();
     }
 
+
+
+
     //--------------------------------------------------------- METHODS
 
-
     public void search(String searchTerm, SearchResult.SearchType searchType)
-            throws EmptyFieldException, CurrentTermEqualsPreviousTermException {
-        if(searchTerm.isEmpty()) throw new EmptyFieldException("Campo vuoto");
+            throws EmptyValueException, CurrentTermEqualsPreviousTermException {
+        if(searchTerm.isEmpty()) throw new EmptyValueException("CINEMATES EXCEPTIONS: Campo vuoto");
         if(searchTerm.equals(previousSearchTerm)) throw new CurrentTermEqualsPreviousTermException("CINEMATES EXCEPTIONS: termine ricerca corrente uguale al precedente");
 
         previousSearchTerm = searchTerm.trim();
@@ -140,90 +144,6 @@ public class SearchViewModel extends ViewModel {
         }
     }
 
-    private Runnable createSearchUsersTask(String givenQuery, User loggedUser) {
-        return ()-> {
-            try {
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_search_users";
-                HttpUrl httpUrl = buildHttpUrl(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("search_term", givenQuery)
-                        .add("email", loggedUser.getEmail())
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
-
-                // performing request
-                ArrayList<SearchResult> result = new ArrayList<>();
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
-
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-
-                                        UserSearchResult userSearchResult = new UserSearchResult();
-                                        userSearchResult.setUsername(jsonDBobj.getString("Username"));
-                                        userSearchResult.setFirstName(jsonDBobj.getString("Name"));
-                                        userSearchResult.setLastName(jsonDBobj.getString("LastName"));
-                                        userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() +
-                                                                                jsonDBobj.getString("ProfileImage"));
-
-                                        result.add(userSearchResult);
-                                    }// for
-
-                                    // once finished set result
-//                                    Collections.reverse(postsList);
-                                    postSearchResultList(result);
-                                    postDownloadStatus(DownloadStatus.SUCCESS);
-
-                                }
-                                // if response contains no data
-                                else {
-                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                        }
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-            }
-        };
-    }// end createSearchUsersTask()
-
-    @NotNull
-    private HttpUrl buildHttpUrl(String dbFunction) {
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-    }
-
     /**
      * PRECONDITIONS: givenQuery must be not null or not empty
      * @param givenQuery
@@ -249,6 +169,7 @@ public class SearchViewModel extends ViewModel {
                         result.add(searchResult);
                     } catch (NullPointerException e) {
                         e.printStackTrace();
+                        // just skip
                     }
                 }
 
@@ -256,7 +177,7 @@ public class SearchViewModel extends ViewModel {
                 postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (NoResultException e) {
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.NO_RESULT);
             }
         };
     }// end createSearchMoviesTask()
@@ -270,27 +191,104 @@ public class SearchViewModel extends ViewModel {
                 // querying TBDb
                 TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
                 ArrayList<Cast> cast = api.getCastByName(personName, page);
+                if(cast==null || cast.size()==0) throw new NoResultException("CINEMATES EXCEPTIONS: Nessun risultato");
 
                 // for each candidate actor, we build a SearchResult object
                 for(Cast x: cast) {
-                    SearchResult searchResult = buildCastSearchResult(x);
-                    if(searchResult!=null) {
+                    try {
+                        SearchResult searchResult = buildCastSearchResult(x);
                         result.add(searchResult);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        // just skip
                     }
                 }
 
                 // once finished set results
                 postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
-            } catch (Exception e) {
+            } catch (NoResultException e) {
                 e.printStackTrace();
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.NO_RESULT);
             }
         };
     }// end createSearchCastTask()
 
+    // search by username/firstname/lastname
+    private Runnable createSearchUsersTask(String givenQuery, User loggedUser) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_search_users";
+                HttpUrl httpUrl = buildHttpUrl(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("search_term", givenQuery)
+                        .add("email", loggedUser.getEmail())
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+                // performing request
+                ArrayList<SearchResult> result = new ArrayList<>();
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        postDownloadStatus(DownloadStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if ( ! response.isSuccessful()) throw new RemoteDatabaseResponseErrorException("CINEMATES EXCEPTIONS: errore response Postgres");
+
+                            //
+                            String responseData = response.body().string();
+                            if(responseData.equals("null")) throw new NoResultException("CINEMATES EXCEPTIONS: Nessun risultato");
+
+                            // if response contains valid data
+                            JSONArray jsonArray = new JSONArray(responseData);
+
+                            for(int i=0; i<jsonArray.length(); i++) {
+                                JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+
+                                UserSearchResult userSearchResult = new UserSearchResult();
+                                userSearchResult.setUsername(jsonDBobj.getString("Username"));
+                                userSearchResult.setFirstName(jsonDBobj.getString("Name"));
+                                userSearchResult.setLastName(jsonDBobj.getString("LastName"));
+                                userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() +
+                                        jsonDBobj.getString("ProfileImage"));
+
+                                result.add(userSearchResult);
+                            }// for
+
+                            // once finished set result
+//                            Collections.reverse(postsList);
+                            postSearchResultList(result);
+                            postDownloadStatus(DownloadStatus.SUCCESS);
+                        } catch (NoResultException e) {
+                            e.printStackTrace();
+                            postDownloadStatus(DownloadStatus.NO_RESULT);
+                        }  catch (JSONException e){
+                            e.printStackTrace();
+                            postDownloadStatus(DownloadStatus.FAILED);
+                        }catch (RemoteDatabaseResponseErrorException e) {
+                            e.printStackTrace();
+                            postDownloadStatus(DownloadStatus.FAILED);
+                        }
+                    }// end onResponse()
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                postDownloadStatus(DownloadStatus.FAILED);
+            }
+        };
+    }// end createSearchUsersTask()
+
     private CastSearchResult buildCastSearchResult(Cast item) {
-        if(item==null) return null;
+        if(item==null) throw new NullPointerException("CINEMATES EXCEPTIONS: argomento nullo");
 
         TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
         CastSearchResult searchResult = new CastSearchResult.Builder(item.getTmdbID(), item.getFullName())
@@ -314,12 +312,17 @@ public class SearchViewModel extends ViewModel {
         return searchResult;
     }
 
-
-
-
+    @NotNull
+    private HttpUrl buildHttpUrl(String dbFunction) {
+        return new HttpUrl.Builder()
+                .scheme("https")
+                .host(remoteConfigServer.getAzureHostName())
+                .addPathSegments(remoteConfigServer.getPostgrestPath())
+                .addPathSegment(dbFunction)
+                .build();
+    }
 
     // rxjava
-
 //    public Observable<ArrayList<SearchResult>> getMoviesSearchResultObservable(String searchTerm, int page) {
 //        return Observable.create(emitter -> {
 //            try {
@@ -371,8 +374,5 @@ public class SearchViewModel extends ViewModel {
 //            }
 //        });
 //    }
-
-
-
 
 }// end SearchViewModel class

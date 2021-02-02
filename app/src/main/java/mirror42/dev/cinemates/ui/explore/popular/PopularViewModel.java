@@ -106,7 +106,7 @@ public class PopularViewModel extends ViewModel {
                 // moviesList will be null
                 e.printStackTrace();
                 postMoviesList(null);
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.FAILED);
             }
         };
     }// end createDownloadTask()

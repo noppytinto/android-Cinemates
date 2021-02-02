@@ -37,8 +37,8 @@ import io.reactivex.rxjava3.disposables.SerialDisposable;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterSearchPage;
-import mirror42.dev.cinemates.exception.signup.CurrentTermEqualsPreviousTermException;
-import mirror42.dev.cinemates.exception.signup.EmptyFieldException;
+import mirror42.dev.cinemates.exception.CurrentTermEqualsPreviousTermException;
+import mirror42.dev.cinemates.exception.EmptyValueException;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.search.MovieSearchResult;
 import mirror42.dev.cinemates.model.search.SearchResult;
@@ -135,10 +135,13 @@ public class SearchFragment extends Fragment implements
                     }
                 }
                     break;
-                case FAILED_OR_EMPTY:
+                case NO_RESULT:
                     recyclerAdapterSearchPage.loadNewData(null);
                     textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
                     showCenteredToast("Nessun risultato per: " + currentSearchTerm);
+                    break;
+                case FAILED:
+
                     break;
             }
         });
@@ -165,10 +168,10 @@ public class SearchFragment extends Fragment implements
             //
             try {
                 searchViewModel.search(currentSearchTerm, searchType);
-            } catch (EmptyFieldException e) {
+            } catch (EmptyValueException e) {
                 e.printStackTrace();
-                textInputLayout.setError(e.getMessage());
-                showCenteredToast(e.getMessage());
+                textInputLayout.setError("Campo vuoto");
+                showCenteredToast("Campo vuoto");
                 showLoadingSpinner(false);
             } catch (CurrentTermEqualsPreviousTermException e) {
                 e.printStackTrace();
@@ -268,7 +271,7 @@ public class SearchFragment extends Fragment implements
         try {
             showLoadingSpinner(true);
             searchViewModel.search(currentSearchTerm, searchType);
-        } catch (EmptyFieldException e) {
+        } catch (EmptyValueException e) {
             e.printStackTrace();
             //do nothing
         } catch (CurrentTermEqualsPreviousTermException e) {

@@ -223,7 +223,7 @@ public class MovieDetailsViewModel extends ViewModel {
                 // moviesList will be null
                 e.printStackTrace();
                 postMovie(null);
-                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                postDownloadStatus(DownloadStatus.FAILED);
             }
         };
     }// end createDownloadTask()
@@ -357,7 +357,7 @@ public class MovieDetailsViewModel extends ViewModel {
             // result will be null
             e.getMessage();
             e.printStackTrace();
-            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+            postDownloadStatus(DownloadStatus.FAILED);
         }
 
         return result;

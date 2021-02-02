@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.exception.signup;
+package mirror42.dev.cinemates.exception;
 
 public class CurrentTermEqualsPreviousTermException extends SearchException {
     public CurrentTermEqualsPreviousTermException(String message, Throwable err) {
