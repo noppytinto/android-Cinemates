@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.ui.search;
 
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -168,7 +170,7 @@ public class SearchViewModel extends ViewModel {
                         SearchResult searchResult = buildMovieSearchResult(x);
                         result.add(searchResult);
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "createSearchCastTask: ", e);
                         // just skip
                     }
                 }
@@ -177,6 +179,7 @@ public class SearchViewModel extends ViewModel {
                 postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (NoResultException e) {
+                Log.e(TAG, "createSearchMoviesTask: ", e);
                 postDownloadStatus(DownloadStatus.NO_RESULT);
             }
         };
@@ -199,7 +202,7 @@ public class SearchViewModel extends ViewModel {
                         SearchResult searchResult = buildCastSearchResult(x);
                         result.add(searchResult);
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "createSearchCastTask: ", e);
                         // just skip
                     }
                 }
@@ -208,7 +211,7 @@ public class SearchViewModel extends ViewModel {
                 postSearchResultList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (NoResultException e) {
-                e.printStackTrace();
+                Log.e(TAG, "createSearchCastTask: ", e);
                 postDownloadStatus(DownloadStatus.NO_RESULT);
             }
         };
@@ -268,13 +271,13 @@ public class SearchViewModel extends ViewModel {
                             postSearchResultList(result);
                             postDownloadStatus(DownloadStatus.SUCCESS);
                         } catch (NoResultException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "onResponse: ", e);
                             postDownloadStatus(DownloadStatus.NO_RESULT);
                         }  catch (JSONException e){
-                            e.printStackTrace();
+                            Log.e(TAG, "onResponse: ", e);
                             postDownloadStatus(DownloadStatus.FAILED);
                         }catch (RemoteDatabaseResponseErrorException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "onResponse: ", e);
                             postDownloadStatus(DownloadStatus.FAILED);
                         }
                     }// end onResponse()

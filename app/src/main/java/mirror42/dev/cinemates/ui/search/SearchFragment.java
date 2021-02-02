@@ -170,11 +170,12 @@ public class SearchFragment extends Fragment implements
                 searchViewModel.search(currentSearchTerm, searchType);
             } catch (EmptyValueException e) {
                 e.printStackTrace();
+                Log.e(TAG, "onClick: ", e);
                 textInputLayout.setError("Campo vuoto");
                 showCenteredToast("Campo vuoto");
                 showLoadingSpinner(false);
             } catch (CurrentTermEqualsPreviousTermException e) {
-                e.printStackTrace();
+                Log.e(TAG, "onClick: ", e);
                 showLoadingSpinner(false);
             }
         }
@@ -272,10 +273,10 @@ public class SearchFragment extends Fragment implements
             showLoadingSpinner(true);
             searchViewModel.search(currentSearchTerm, searchType);
         } catch (EmptyValueException e) {
-            e.printStackTrace();
+            Log.e(TAG, "autoSearch: ", e);
             //do nothing
         } catch (CurrentTermEqualsPreviousTermException e) {
-            e.printStackTrace();
+            Log.e(TAG, "autoSearch: ", e);
             showLoadingSpinner(false);
         }
     }
