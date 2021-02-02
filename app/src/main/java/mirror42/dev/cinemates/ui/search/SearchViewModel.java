@@ -163,17 +163,9 @@ public class SearchViewModel extends ViewModel {
                 ArrayList<Movie> movies = tmdb.getMoviesByTitle(movieTitle, page);
                 if(movies==null || movies.size()==0) throw new NoResultException("CINEMATES EXCEPTIONS: Nessun risultato");
 
-                // fetching results
-                // for each candidate item, we build a SearchResult object
-                for(Movie x: movies) {
-                    try {
-                        SearchResult searchResult = buildMovieSearchResult(x);
-                        result.add(searchResult);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "createSearchCastTask: ", e);
-                        // just skip
-                    }
-                }
+                MovieSearchResult movieSearchResult = new MovieSearchResult();
+                result = new ArrayList<>(movieSearchResult.buildResultList(movies)) ;
+
 
                 // once finished set results
                 postSearchResultList(result);
@@ -303,17 +295,6 @@ public class SearchViewModel extends ViewModel {
         return searchResult;
     }
 
-    private MovieSearchResult buildMovieSearchResult(Movie item) throws NullPointerException{
-        if(item==null) throw new NullPointerException("CINEMATES EXCEPTIONS: argomento nullo");
-
-        TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-        MovieSearchResult searchResult = new MovieSearchResult.Builder(item.getTmdbID(), item.getTitle())
-                .setOverview(item.getOverview())
-                .setPosterURL(api.buildPersonImageUrl(item.getPosterURL()))
-                .build();
-
-        return searchResult;
-    }
 
     @NotNull
     private HttpUrl buildHttpUrl(String dbFunction) {

@@ -1,5 +1,7 @@
 package mirror42.dev.cinemates.model.search;
 
+import java.util.List;
+
 public class UserSearchResult extends SearchResult{
     private String profilePictureUrl;
     private String firstName;
@@ -8,7 +10,7 @@ public class UserSearchResult extends SearchResult{
 
 
     public UserSearchResult() {
-        searchType = SearchType.USER;
+        super(SearchType.CAST);
     }
 
     public String getProfilePictureUrl() {
@@ -44,7 +46,13 @@ public class UserSearchResult extends SearchResult{
     }
 
 
+    @Override
+    public Object buildResult(Object arg) {
+        return null;
+    }
 
-
-
+    @Override
+    public List buildResultList(List args) {
+        return null;
+    }
 }

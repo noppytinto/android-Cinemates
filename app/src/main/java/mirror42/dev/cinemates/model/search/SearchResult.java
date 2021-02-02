@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.model.search;
 
-public class SearchResult {
+import java.util.List;
+
+public abstract class SearchResult<T, S> {
     protected SearchType searchType;
 
     public enum SearchType {
@@ -12,17 +14,16 @@ public class SearchResult {
         NONE
     }
 
-
-
-    public SearchResult() {
-
+    public SearchResult(SearchType searchType) {
+        this.searchType = searchType;
     }
 
     public SearchType getResultType() {
         return searchType;
     }
-
     public void setSearchType(SearchType searchType) {
         this.searchType = searchType;
     }
+    public abstract T  buildResult(S arg);
+    public abstract List<T> buildResultList(List<S> args);
 }

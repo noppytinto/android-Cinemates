@@ -8,8 +8,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.model.tmdb.Cast;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -1308,9 +1308,9 @@ public class TheMovieDatabaseApi {
 
     // tested
     public ArrayList<Movie> getMoviesByTitle(String query, int page) {
-        ArrayList<Movie> result = new ArrayList<>();
+        ArrayList<Movie> results = new ArrayList<>();
         if(query==null || query.isEmpty() || page<=0)
-            return result;
+            return results;
 
         final RetrofitAPI apiService = buildRetrofitService();
 
@@ -1320,14 +1320,26 @@ public class TheMovieDatabaseApi {
 
             if(response.isSuccessful()) {
                 MovieSearchResult temp = response.body();
-                result = temp.getMovies();
+                results = temp.getMovies();
+
+                //building full poster url
+                if(results!=null) {
+                    for(Movie mv: results) {
+                        try {
+                            String relativePath = mv.getPosterURL();
+                            mv.setPosterURL(buildPosterUrl(relativePath));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return result;
+        return results;
     }// end getMoviesByTitle()
 
     private RetrofitAPI buildRetrofitService() {
@@ -1338,6 +1350,7 @@ public class TheMovieDatabaseApi {
 
         return retrofitClient.create(RetrofitAPI.class);
     }
+
 
 
 

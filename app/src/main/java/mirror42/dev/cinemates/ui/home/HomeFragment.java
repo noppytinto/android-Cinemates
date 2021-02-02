@@ -95,7 +95,6 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
-                    showProgressDialog();
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());

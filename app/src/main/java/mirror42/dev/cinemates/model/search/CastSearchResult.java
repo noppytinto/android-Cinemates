@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.model.search;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mirror42.dev.cinemates.model.tmdb.Movie;
 
@@ -12,12 +13,22 @@ public class CastSearchResult extends SearchResult {
     private final ArrayList<Movie> knownFor;
 
     private CastSearchResult(Builder builder) {
-        this.searchType        = SearchType.CAST;
+        super(SearchType.CAST);
         this.tmdbID            = builder.tmdbID;
         this.fullName          = builder.fullName;
         this.department        = builder.department;
         this.profilePictureURL = builder.profilePictureURL;
         this.knownFor          = builder.knownFor;
+    }
+
+    @Override
+    public Object buildResult(Object arg) {
+        return null;
+    }
+
+    @Override
+    public List buildResultList(List args) {
+        return null;
     }
 
     public static class Builder {
