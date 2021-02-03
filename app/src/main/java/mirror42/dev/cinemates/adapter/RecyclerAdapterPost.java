@@ -59,9 +59,9 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         PostType postType = postList.get(position).getPostType();
 
         switch (postType) {
-            case ADD_TO_WATCHLIST:
+            case WL:
                 return ADD_TO_WATCHLIST;
-            case ADD_TO_WATCHED_LIST:
+            case WD:
                 return ADD_TO_WATCHED_LIST;
             default:
                 return 0;
@@ -87,8 +87,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == ADD_TO_WATCHLIST) {
             WatchlistPost watchlistPost = (WatchlistPost) postList.get(position);
-
-
 
             //
             buildWatchlistPost((WatchlistPostViewHolder) holder, watchlistPost);

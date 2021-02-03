@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,32 +18,21 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
 import mirror42.dev.cinemates.model.User;
 
-public class LikesFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
+public class LikesFragment extends Fragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
     private ArrayList<User> usersList;
     private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
 
 
-    public LikesFragment() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
-    }
-
-
-
-
-    public static LikesFragment getInstance(ArrayList<User> usersList) {
+    public static LikesFragment getInstance(Bundle arguments) {
         LikesFragment frag = new LikesFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("usersList", usersList);
-        frag.setArguments(args);
+        frag.setArguments(arguments);
         return frag;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_show_likes, container);
+        return inflater.inflate(R.layout.fragment_likes, container);
     }
 
     @Override
@@ -56,15 +45,8 @@ public class LikesFragment extends DialogFragment implements RecyclerAdapterShow
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        usersList = (ArrayList<User>) getArguments().getSerializable("usersList");
+        usersList = ((ArrayList<User>) getArguments().getSerializable("likes"));
         recyclerAdapterShowLikesDialog.loadNewData(usersList);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(getDialog() != null)
-            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
 

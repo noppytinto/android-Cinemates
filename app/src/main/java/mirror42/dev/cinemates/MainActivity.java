@@ -338,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     }
 
 
+
     // on testing
     private void startNotificationRefreshWorker() {
         WorkRequest notificationRefreshRequest =

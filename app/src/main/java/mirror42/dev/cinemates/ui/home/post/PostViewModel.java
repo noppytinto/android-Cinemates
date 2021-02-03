@@ -5,13 +5,21 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
+import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchlistPost;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -30,6 +38,7 @@ public class PostViewModel extends ViewModel {
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
     private MutableLiveData<Post> postFetched;
+    private long postID;
 
 
 
@@ -57,7 +66,7 @@ public class PostViewModel extends ViewModel {
         this.fetchStatus.postValue(fetchStatus);
     }
 
-    public LiveData<Post> getPostFetched() {
+    public LiveData<Post> getObservablePostFetched() {
         return postFetched;
     }
 
@@ -65,12 +74,20 @@ public class PostViewModel extends ViewModel {
         this.postFetched.postValue(post);
     }
 
+    public PostType getFetchedPostType() {
+        PostType postType = this.postFetched.getValue().getPostType();
+        return postType;
+    }
 
+    public Post getPostFetched() {
+        return this.postFetched.getValue();
+    }
 
 
     //------------------------------------------------------ MY METHODS
 
     public void fetchPost(long postId, User loggedUser) {
+        this.postID = postId;
         Runnable task = createFetchPostTask(postId, loggedUser);
         Thread t = new Thread(task);
         t.start();
@@ -78,7 +95,6 @@ public class PostViewModel extends ViewModel {
 
     private Runnable createFetchPostTask(long postId, User loggedUser) {
         return () -> {
-            Post result = null;
 
             try {
                 // build httpurl and request for remote db
@@ -102,22 +118,19 @@ public class PostViewModel extends ViewModel {
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         // check responses
                         if (response.isSuccessful()) {
+                            Post result = null;
                             String responseData = response.body().string();
 
                             if ( ! responseData.equals("null")) {
                                 try {
                                     JSONObject jsonDBobj = new JSONObject(responseData);
+                                    result = buildPost(jsonDBobj, loggedUser);
 
-
-
-
-                                } catch (JSONException e) {
+                                    setPostFetched(result);
+                                    setFetchStatus(FetchStatus.SUCCESS);
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-
-
-                                setPostFetched(result);
-                                setFetchStatus(FetchStatus.SUCCESS);
                             }
                         }
                         else {
@@ -133,47 +146,6 @@ public class PostViewModel extends ViewModel {
         };
     }
 
-//    private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
-//        // getting post owner data
-//        User user = new User();
-//        user.setUsername(jsonDBobj.getString("Username"));
-//        user.setFirstName(jsonDBobj.getString("Name"));
-//        user.setLastName(jsonDBobj.getString("LastName"));
-//
-//        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
-//
-//        // getting movie data
-//        Movie movie = new Movie();
-//        movie.setTmdbID(jsonDBobj.getInt("MovieId"));
-//        try {
-//            // if poster_path is null
-//            // json.getString() will fail
-//            // that's why the try-catch
-//            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-//            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
-//            String posterURL = jsonTmdbObj.getString("poster_path");
-//            posterURL = tmdb.buildPosterUrl(posterURL);
-//            movie.setPosterURL(posterURL);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        // getting post reactions
-//
-//        // assembling post
-//        WatchlistPost watchlistPost = new WatchlistPost();
-//        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
-//        watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
-//        watchlistPost.setOwner(user);
-//        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
-//        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
-//        watchlistPost.setMovie(movie);
-//        fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-//        fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-//        return watchlistPost;
-//    }
-
-
     private HttpUrl buildHttpUrl() throws Exception {
         final String dbFunction = "fn_select_post";
 
@@ -187,6 +159,181 @@ public class PostViewModel extends ViewModel {
 
         return httpUrl;
     }
+
+    private Post buildPost(JSONObject jsonObject, User loggedUser) throws Exception {
+        Post post = null;
+        String postType = jsonObject.getString("Type_Post");
+        switch (postType) {
+            case "WL": {
+                post = buildWatchlistPost(jsonObject, loggedUser);
+            }
+                break;
+            default:
+        }
+
+        return post;
+    }
+
+    private WatchlistPost buildWatchlistPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // getting movie data
+        Movie movie = buildMovie(jsonObject);
+
+        // assembling post
+        WatchlistPost watchlistPost = new WatchlistPost();
+        watchlistPost.setPostId(postID);
+        watchlistPost.setPostType(Post.PostType.WL);
+        watchlistPost.setOwner(user);
+        watchlistPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
+        watchlistPost.setMovie(movie);
+        fetchWatchlistPostLikes(watchlistPost, loggedUser);
+        fetchWatchlistPostComments(watchlistPost, loggedUser);
+        return watchlistPost;
+    }
+
+    private User buildUser(JSONObject jsonObject) throws JSONException {
+        User user = new User();
+        user.setUsername(jsonObject.getString("Username"));
+        user.setFirstName(jsonObject.getString("Name"));
+        user.setLastName(jsonObject.getString("LastName"));
+        user.setProfilePictureURL(
+                remoteConfigServer.getCloudinaryDownloadBaseUrl() +
+                jsonObject.getString("ProfileImage"));
+        return user;
+    }
+
+    private Movie buildMovie(JSONObject jsonObject) throws JSONException {
+        Movie movie = new Movie();
+        movie.setTmdbID(jsonObject.getInt("MovieId"));
+        try {
+            // if poster_path is null
+            // json.getString() will fail
+            // that's why the try-catch
+            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
+            String posterURL = jsonTmdbObj.getString("poster_path");
+            posterURL = tmdb.buildPosterUrl(posterURL);
+            movie.setPosterURL(posterURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ignore poster url fetch
+        }
+        return movie;
+    }
+
+    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, User loggedUser) {
+        try {
+            final String dbFunction = "fn_select_comments";
+            // building db url
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postID))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // calling synchronously
+            String responseData;
+            try (Response response = httpClient.newCall(request).execute()) {
+                if ( response.isSuccessful()) {
+                    responseData = response.body().string();
+
+                    if( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        ArrayList<Comment> comments = new ArrayList<>();
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            Comment cm = new Comment();
+                            User owner = new User();
+                            owner.setFirstName(jsonDBobj.getString("Name"));
+                            owner.setLastName(jsonDBobj.getString("LastName"));
+                            owner.setUsername(jsonDBobj.getString("Username"));
+                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+
+                            cm.setOwner(owner);
+                            cm.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
+                            cm.setText(jsonDBobj.getString("Text"));
+                            cm.setId(jsonDBobj.getLong("Id_Reaction"));
+                            comments.add(cm);
+                        }
+                        watchlistPost.setComments(comments);
+                        watchlistPost.setIsCommentedByMe(loggedUser.getUsername());
+                    }
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return watchlistPost;
+    }
+
+    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, User loggedUser) {
+        try {
+            final String dbFunction = "fn_select_likes";
+            // building db url
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postID))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // calling synchronously
+            String responseData;
+            try (Response response = httpClient.newCall(request).execute()) {
+                if ( response.isSuccessful()) {
+                    responseData = response.body().string();
+
+                    if( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        ArrayList<Like> likes = new ArrayList<>();
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            Like l = new Like();
+                            User owner = new User();
+                            owner.setFirstName(jsonDBobj.getString("Name"));
+                            owner.setLastName(jsonDBobj.getString("LastName"));
+                            owner.setUsername(jsonDBobj.getString("Username"));
+                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+
+                            l.setOwner(owner);
+                            l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
+                            likes.add(l);
+                        }
+                        watchlistPost.setLikes(likes);
+                        watchlistPost.setIsLikedByMe(loggedUser.getUsername());
+                    }
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return watchlistPost;
+    }
+
 
 
 

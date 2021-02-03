@@ -198,7 +198,7 @@ public class HomeViewModel extends ViewModel {
         // assembling post
         WatchlistPost watchlistPost = new WatchlistPost();
         watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
-        watchlistPost.setPostType(Post.PostType.ADD_TO_WATCHLIST);
+        watchlistPost.setPostType(Post.PostType.WL);
         watchlistPost.setOwner(user);
         watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");

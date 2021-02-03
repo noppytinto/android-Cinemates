@@ -148,7 +148,7 @@
     <fragment
         android:id="@+id/postFragment"
         android:name="mirror42.dev.cinemates.ui.home.post.PostFragment"
-        android:label="fragment_post"
+        android:label="Dettagli post"
         tools:layout="@layout/fragment_post" >
         <argument
             android:name="post_id"

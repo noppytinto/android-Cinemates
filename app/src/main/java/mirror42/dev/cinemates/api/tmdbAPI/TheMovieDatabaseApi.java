@@ -1254,6 +1254,9 @@ public class TheMovieDatabaseApi {
                                                     "&language=" + DEFAULT_LANGUAGE +
                                                     "&include_adult=" + INCLUDE_ADULT;
 
+
+
+
     private interface RetrofitAPI {
         @GET(SEARCH_ACTORS_URL)
         Call<ActorSearchResult> searchActorsByName(@Query("query") String query,

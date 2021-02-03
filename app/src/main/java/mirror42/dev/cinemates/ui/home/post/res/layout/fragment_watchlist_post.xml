@@ -27,7 +27,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_postOwnerLayout"
+                android:id="@+id/include_watchlistPost_owner"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_postContentLayout"
+                android:id="@+id/include_watchlistPost_content"
                 layout="@layout/layout_content_watchlist_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_postOwnerLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/include_watchlistPost_owner" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

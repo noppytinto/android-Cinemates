@@ -12,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,12 +23,10 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
-import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.dialog.post.CommentsFragment;
-import mirror42.dev.cinemates.ui.dialog.post.LikesFragment;
 import mirror42.dev.cinemates.ui.home.post.PostFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
@@ -207,10 +204,10 @@ public class HomeFragment extends Fragment implements
         Post currentPost = recyclerAdapterPost.getPost(position);
         int likesCount = currentPost.getLikesCount();
         if(likesCount>0) {
-            ArrayList<User> users = currentPost.getLikesOwnersList();
-            FragmentManager fm = getActivity().getSupportFragmentManager();
-            LikesFragment dialog = LikesFragment.getInstance(users);
-            dialog.show(fm, "ShowLikesDialogFragment");
+            long postId = currentPost.getPostId();
+            NavGraphDirections.ActionGlobalPostFragment postFragmentDirection =
+                    PostFragmentDirections.actionGlobalPostFragment(postId);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
         }
     }
 
@@ -245,19 +242,9 @@ public class HomeFragment extends Fragment implements
 
         if(commentsCount>0) {
             long postId = currentPost.getPostId();
-            ArrayList<Comment> comments = currentPost.getComments();
-            int currentCommentsCount = currentPost.getCommentsCount();
-            User reactionOwner = currentPost.getOwner();
-
-            FragmentManager fm = getActivity().getSupportFragmentManager();
-            CommentsFragment dialog = CommentsFragment.getInstance(
-                    reactionOwner,
-                    comments,
-                    postId,
-                    position,
-                    currentCommentsCount);
-            dialog.setListener(this);
-            dialog.show(fm, "showCommentsDialogFragment");
+            NavGraphDirections.ActionGlobalPostFragment postFragmentDirection =
+                    PostFragmentDirections.actionGlobalPostFragment(postId);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
         }
     }
 

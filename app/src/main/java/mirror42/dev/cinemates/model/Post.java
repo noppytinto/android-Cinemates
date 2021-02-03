@@ -16,13 +16,13 @@ public class Post {
 
 
     public enum PostType {
-        ADD_TO_WATCHLIST,
-        ADD_TO_WATCHED_LIST,
-        ADD_TO_FAVORITES_LIST,
-        ADD_TO_CUSTOM_LIST,
+        WL,
+        WD,
+        FV,
+        CL,
         CREATE_LIST,
         NEW_FRIEND,
-        REVIEW,
+        RW,
         NONE
     }
 

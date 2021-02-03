@@ -14,12 +14,12 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:fontFamily="@font/poppins_medium"
+        android:text="ha aggiunto un film alla Watchlist."
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="ha aggiunto un film alla Watchlist." />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <include
         android:id="@+id/include_conentWatchlistPost_thumbnail_1"

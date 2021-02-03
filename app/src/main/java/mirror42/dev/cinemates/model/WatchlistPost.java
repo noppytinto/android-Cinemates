@@ -1,10 +1,11 @@
 package mirror42.dev.cinemates.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.tmdb.Movie;
 
-public class WatchlistPost extends Post {
+public class WatchlistPost extends Post implements Serializable {
     private String listOwnerEmail;
     private String thumbnail_1_url;
     private String thumbnail_2_url;
