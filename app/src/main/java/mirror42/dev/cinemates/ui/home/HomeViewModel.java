@@ -179,7 +179,7 @@ public class HomeViewModel extends ViewModel {
         user.setFirstName(jsonDBobj.getString("Name"));
         user.setLastName(jsonDBobj.getString("LastName"));
 
-        user.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
         // getting movie data
         Movie movie = new Movie();
@@ -249,7 +249,7 @@ public class HomeViewModel extends ViewModel {
                             owner.setFirstName(jsonDBobj.getString("Name"));
                             owner.setLastName(jsonDBobj.getString("LastName"));
                             owner.setUsername(jsonDBobj.getString("Username"));
-                            owner.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                             l.setOwner(owner);
                             l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
@@ -428,7 +428,7 @@ public class HomeViewModel extends ViewModel {
                             owner.setFirstName(jsonDBobj.getString("Name"));
                             owner.setLastName(jsonDBobj.getString("LastName"));
                             owner.setUsername(jsonDBobj.getString("Username"));
-                            owner.setProfilePicturePath(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                             cm.setOwner(owner);
                             cm.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));

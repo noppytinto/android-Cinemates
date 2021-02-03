@@ -310,7 +310,7 @@ public class SearchFragment extends Fragment implements
         user.setUsername(username);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setProfilePicturePath(profilePictureUrl);
+        user.setProfilePictureURL(profilePictureUrl);
 
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
                 NavGraphDirections.actionGlobalUserProfileFragment(user);

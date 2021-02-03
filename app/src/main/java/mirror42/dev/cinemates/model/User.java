@@ -101,7 +101,7 @@ public class User implements Serializable, Parcelable {
         this.lastName = lastName;
     }
 
-    public void setProfilePicturePath(String profilePicturePath) {
+    public void setProfilePictureURL(String profilePicturePath) {
         this.profilePicturePath = profilePicturePath;
     }
 

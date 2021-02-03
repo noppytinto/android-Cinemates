@@ -204,7 +204,7 @@ public class NotificationsFragment extends Fragment implements
         user.setUsername(username);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setProfilePicturePath(profilePictureUrl);
+        user.setProfilePictureURL(profilePictureUrl);
 
         return user;
     }

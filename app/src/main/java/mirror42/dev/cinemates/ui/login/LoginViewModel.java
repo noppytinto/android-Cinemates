@@ -259,7 +259,7 @@ public class LoginViewModel extends ViewModel {
                                 //
                                 User user = User.parseUserFromJsonObject(jsonObject);
                                 String profilePictureUrl = remoteConfigServer.getCloudinaryDownloadBaseUrl() + user.getProfilePicturePath();
-                                user.setProfilePicturePath(profilePictureUrl);
+                                user.setProfilePictureURL(profilePictureUrl);
 
                                 //
                                 postUser(user);

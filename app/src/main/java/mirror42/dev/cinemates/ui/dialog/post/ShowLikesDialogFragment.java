@@ -20,7 +20,6 @@ import mirror42.dev.cinemates.model.User;
 
 public class ShowLikesDialogFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
     private ArrayList<User> usersList;
-    private View view;
     private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
 
 
@@ -50,8 +49,7 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.view = view;
-        initRecyclerView();
+        initRecyclerView(view);
     }
 
 
@@ -74,9 +72,9 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
 
 
 
-    //------------------------------------------------------- METHODS
+    //------------------------------------------------------- MY METHODS
 
-    private void initRecyclerView() {
+    private void initRecyclerView(View view) {
         // defining Recycler view
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView_showLikesDialogFragment);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -87,9 +85,11 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
         recyclerView.setAdapter(recyclerAdapterShowLikesDialog);
     }
 
-
     @Override
     public void onItemClicked(int position) {
 
     }
+
+
+
 }// end ShowLikesDialogFragment class

@@ -133,7 +133,7 @@ private final String TAG = this.getClass().getSimpleName();
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setBirthDate(birthDate);
-        newUser.setProfilePicturePath(profilePicturePath);
+        newUser.setProfilePictureURL(profilePicturePath);
         newUser.setPromo(promo);
         newUser.setAnalytics(analytics);
 
@@ -231,7 +231,7 @@ private final String TAG = this.getClass().getSimpleName();
                                         e.printStackTrace();
                                     }
 
-                                    newUser.setProfilePicturePath(imageName+".png");
+                                    newUser.setProfilePictureURL(imageName+".png");
                                     setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.NO_PENDING_USER_COLLISION);
                                 }
                             }).start();
