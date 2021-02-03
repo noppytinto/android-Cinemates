@@ -163,8 +163,7 @@ public class SearchViewModel extends ViewModel {
                 ArrayList<Movie> movies = tmdb.getMoviesByTitle(movieTitle, page);
                 if(movies==null || movies.size()==0) throw new NoResultException("CINEMATES EXCEPTIONS: Nessun risultato");
 
-                MovieSearchResult movieSearchResult = new MovieSearchResult();
-                result = new ArrayList<>(movieSearchResult.buildResultList(movies)) ;
+                result = new ArrayList<>(MovieSearchResult.make().buildResultList(movies)) ;
 
 
                 // once finished set results

@@ -159,7 +159,7 @@ public class HomeViewModel extends ViewModel {
     }// end createDownloadTask()
 
     private HttpUrl buildHttpUrl() throws Exception {
-        final String dbFunction = "fn_select_watchlist_post";
+        final String dbFunction = "fn_select_watchlist_posts";
 
         //
         HttpUrl httpUrl = new HttpUrl.Builder()

@@ -84,6 +84,9 @@ public class MovieSearchResult extends SearchResult<MovieSearchResult, Movie> {
 //
 //    }// end Builder class
 
+
+
+
     @Override
     public List<MovieSearchResult> buildResultList(List<Movie> movies) {
         ArrayList<MovieSearchResult> results = new ArrayList<>();
@@ -111,6 +114,10 @@ public class MovieSearchResult extends SearchResult<MovieSearchResult, Movie> {
         searchResult.setPosterURL(mv.getPosterURL());
 
         return searchResult;
+    }
+
+    public static MovieSearchResult make() {
+        return new MovieSearchResult();
     }
 
 }// end MovieSearchResult class

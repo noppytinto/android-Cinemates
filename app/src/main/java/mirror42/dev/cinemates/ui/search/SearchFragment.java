@@ -281,13 +281,12 @@ public class SearchFragment extends Fragment implements
         }
     }
 
-
     @Override
     public void onMovieSearchResultClicked(int position, View v) {
-        SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
-        firebaseAnalytics.logSelectedSearchedMovie((MovieSearchResult) itemSelected, "selected movie in search tab", this, getContext());
+        MovieSearchResult itemSelected = (MovieSearchResult)  recyclerAdapterSearchPage.getSearchResult(position);
+        firebaseAnalytics.logSelectedSearchedMovie(itemSelected, "selected movie in search tab", this, getContext());
         Movie mv = new Movie();
-        mv.setTmdbID(((MovieSearchResult) itemSelected).getTmdbID());
+        mv.setTmdbID(itemSelected.getTmdbID());
         NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
         NavHostFragment.findNavController(SearchFragment.this).navigate(action);
     }
@@ -299,22 +298,23 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onUserSearchResultClicked(int position, View v) {
-        SearchResult itemSelected = recyclerAdapterSearchPage.getSearchResult(position);
+        UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position);
 //        TextView textViewUsername = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textView_userListItem_username);
 //        String username = textViewUsername.getText().toString();
 
-        String username = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getUsername();
-        String firstName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getFirstName();
-        String lastName = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getLastName();
-        String profilePictureUrl = ((UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position)).getProfilePictureUrl();
+        String username = itemSelected.getUsername();
+        String firstName = itemSelected.getFirstName();
+        String lastName = itemSelected.getLastName();
+        String profilePictureUrl = itemSelected.getProfilePictureUrl();
         User user = new User();
         user.setUsername(username);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setProfilePicturePath(profilePictureUrl);
 
-        NavGraphDirections.ActionGlobalUserProfileFragment action = NavGraphDirections.actionGlobalUserProfileFragment(user);
-        NavHostFragment.findNavController(SearchFragment.this).navigate(action);
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                NavGraphDirections.actionGlobalUserProfileFragment(user);
+        NavHostFragment.findNavController(SearchFragment.this).navigate(userProfileFragment);
     }
 
     private void showCenteredToast(String msg) {
