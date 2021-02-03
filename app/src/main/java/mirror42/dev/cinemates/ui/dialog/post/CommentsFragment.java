@@ -30,7 +30,7 @@ import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.User;
 
 
-public class ShowCommentsDialogFragment extends DialogFragment implements
+public class CommentsFragment extends DialogFragment implements
         RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
     private ArrayList<Comment> commentsList;
     private View view;
@@ -54,14 +54,8 @@ public class ShowCommentsDialogFragment extends DialogFragment implements
 
     //------------------------------------------------------------------------------- ANDROID METHODS
 
-    public ShowCommentsDialogFragment() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
-    }
-
-    public static ShowCommentsDialogFragment getInstance(User reactionOwner, ArrayList<Comment> commentsList, long postId, int position, int commentsCount) {
-        ShowCommentsDialogFragment frag = new ShowCommentsDialogFragment();
+    public static CommentsFragment getInstance(User reactionOwner, ArrayList<Comment> commentsList, long postId, int position, int commentsCount) {
+        CommentsFragment frag = new CommentsFragment();
         Bundle args = new Bundle();
         args.putSerializable("commentsList", commentsList);
         args.putSerializable("reactionOwner", reactionOwner);
@@ -80,15 +74,15 @@ public class ShowCommentsDialogFragment extends DialogFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_show_comments, container);
+        return inflater.inflate(R.layout.fragment_comments, container);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(getDialog() != null)
-            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if(getDialog() != null)
+//            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

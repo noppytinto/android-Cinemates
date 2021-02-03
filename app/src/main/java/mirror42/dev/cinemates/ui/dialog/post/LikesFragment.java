@@ -18,12 +18,12 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
 import mirror42.dev.cinemates.model.User;
 
-public class ShowLikesDialogFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
+public class LikesFragment extends DialogFragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
     private ArrayList<User> usersList;
     private RecyclerAdapterShowLikesDialog recyclerAdapterShowLikesDialog;
 
 
-    public ShowLikesDialogFragment() {
+    public LikesFragment() {
         // Empty constructor is required for DialogFragment
         // Make sure not to add arguments to the constructor
         // Use `newInstance` instead as shown below
@@ -32,8 +32,8 @@ public class ShowLikesDialogFragment extends DialogFragment implements RecyclerA
 
 
 
-    public static ShowLikesDialogFragment getInstance(ArrayList<User> usersList) {
-        ShowLikesDialogFragment frag = new ShowLikesDialogFragment();
+    public static LikesFragment getInstance(ArrayList<User> usersList) {
+        LikesFragment frag = new LikesFragment();
         Bundle args = new Bundle();
         args.putSerializable("usersList", usersList);
         frag.setArguments(args);

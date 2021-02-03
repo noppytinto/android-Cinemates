@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/primary_blue"
-    tools:context=".ui.dialog.post.ShowLikesDialogFragment">
+    tools:context=".ui.dialog.post.LikesFragment">
 
     <TextView
         android:id="@+id/textView_showLikesDialogFragment_title"

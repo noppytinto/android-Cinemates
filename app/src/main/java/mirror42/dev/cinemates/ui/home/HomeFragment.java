@@ -14,26 +14,29 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MainActivity;
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.dialog.post.ShowCommentsDialogFragment;
-import mirror42.dev.cinemates.ui.dialog.post.ShowLikesDialogFragment;
+import mirror42.dev.cinemates.ui.dialog.post.CommentsFragment;
+import mirror42.dev.cinemates.ui.dialog.post.LikesFragment;
+import mirror42.dev.cinemates.ui.home.post.PostFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener,
-        ShowCommentsDialogFragment.AddCommentButtonListener {
+        CommentsFragment.AddCommentButtonListener {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
@@ -82,7 +85,7 @@ public class HomeFragment extends Fragment implements
                     recyclerAdapterPost.loadNewData(postsList);
                 }
                     break;
-                case EMPTY:
+                case NOT_EXISTS:
                     recyclerAdapterPost.loadNewData(null);
                     break;
                 case FAILED:
@@ -206,7 +209,7 @@ public class HomeFragment extends Fragment implements
         if(likesCount>0) {
             ArrayList<User> users = currentPost.getLikesOwnersList();
             FragmentManager fm = getActivity().getSupportFragmentManager();
-            ShowLikesDialogFragment dialog = ShowLikesDialogFragment.getInstance(users);
+            LikesFragment dialog = LikesFragment.getInstance(users);
             dialog.show(fm, "ShowLikesDialogFragment");
         }
     }
@@ -215,19 +218,24 @@ public class HomeFragment extends Fragment implements
     public void onCommentButtonClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
-        ArrayList<Comment> comments = currentPost.getComments();
-        int currentCommentsCount = currentPost.getCommentsCount();
-        User reactionOwner = loginViewModel.getLiveLoggedUser().getValue();
+//        ArrayList<Comment> comments = currentPost.getComments();
+//        int currentCommentsCount = currentPost.getCommentsCount();
+//        User reactionOwner = loginViewModel.getLiveLoggedUser().getValue();
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
-                reactionOwner,
-                comments,
-                postId,
-                position,
-                currentCommentsCount);
-        dialog.setListener(this);
-        dialog.show(fm, "showCommentsDialogFragment");
+
+        NavGraphDirections.ActionGlobalPostFragment postFragmentDirection =
+                PostFragmentDirections.actionGlobalPostFragment(postId);
+        NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
+
+//        FragmentManager fm = getActivity().getSupportFragmentManager();
+//        CommentsFragment dialog = CommentsFragment.getInstance(
+//                reactionOwner,
+//                comments,
+//                postId,
+//                position,
+//                currentCommentsCount);
+//        dialog.setListener(this);
+//        dialog.show(fm, "showCommentsDialogFragment");
     }
 
     @Override
@@ -242,7 +250,7 @@ public class HomeFragment extends Fragment implements
             User reactionOwner = currentPost.getOwner();
 
             FragmentManager fm = getActivity().getSupportFragmentManager();
-            ShowCommentsDialogFragment dialog = ShowCommentsDialogFragment.getInstance(
+            CommentsFragment dialog = CommentsFragment.getInstance(
                     reactionOwner,
                     comments,
                     postId,

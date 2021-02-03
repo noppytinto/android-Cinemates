@@ -85,8 +85,6 @@ public class HomeViewModel extends ViewModel {
 
     private Runnable createFetchWatchlistPostTask(String email, String token, String loggedUsername) {
         return ()-> {
-            ArrayList<Post> result = null;
-
             try {
                 // build httpurl and request for remote db
                 HttpUrl httpUrl = buildHttpUrl();
@@ -96,13 +94,11 @@ public class HomeViewModel extends ViewModel {
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-                // performing request
-                result = new ArrayList<>();
+                // executing request
                 Call call = httpClient.newCall(request);
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
                         setFetchStatus(FetchStatus.FAILED);
                     }
 
@@ -135,7 +131,7 @@ public class HomeViewModel extends ViewModel {
                                 // if response contains no data
                                 else {
                                     setPostsList(null);
-                                    setFetchStatus(FetchStatus.EMPTY);
+                                    setFetchStatus(FetchStatus.NOT_EXISTS);
                                 }
                             } // if response is unsuccessful
                             else {

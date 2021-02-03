@@ -10,7 +10,7 @@ public class UserSearchResult extends SearchResult{
 
 
     public UserSearchResult() {
-        super(SearchType.CAST);
+        super(SearchType.USER);
     }
 
     public String getProfilePictureUrl() {

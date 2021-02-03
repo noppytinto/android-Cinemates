@@ -16,7 +16,7 @@ public class MyValues {
         PROCESSING,
         NOT_INITILIZED,
         FAILED,
-        EMPTY,
+        NOT_EXISTS,
         SUCCESS,
         MOVIES_DETAILS_DOWNLOADED,
         REFETCH,
