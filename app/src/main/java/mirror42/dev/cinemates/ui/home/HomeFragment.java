@@ -29,11 +29,9 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.ui.post.PostFragmentDirections;
-import mirror42.dev.cinemates.ui.reaction.CommentsFragment;
 
 public class HomeFragment extends Fragment implements
-        RecyclerAdapterPost.ReactionsClickAdapterListener,
-        CommentsFragment.AddCommentButtonListener {
+        RecyclerAdapterPost.ReactionsClickAdapterListener{
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
@@ -74,21 +72,6 @@ public class HomeFragment extends Fragment implements
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            hideProgressDialog();
-            switch (fetchStatus) {
-                case SUCCESS: {
-                    ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
-                    recyclerAdapterPost.loadNewData(postsList);
-                }
-                    break;
-                case NOT_EXISTS:
-                    recyclerAdapterPost.loadNewData(null);
-                    break;
-                case FAILED:
-                    break;
-            }
-        });
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
@@ -126,7 +109,26 @@ public class HomeFragment extends Fragment implements
         });
     }// end onActivityCreated()
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            hideProgressDialog();
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
+                    recyclerAdapterPost.loadNewData(postsList);
+                }
+                break;
+                case NOT_EXISTS:
+                    recyclerAdapterPost.loadNewData(null);
+                    break;
+                case FAILED:
+                    break;
+            }
+        });
 
+    }
 
 
     //------------------------------------------------------------------------------- METHODS
@@ -248,53 +250,53 @@ public class HomeFragment extends Fragment implements
         }
     }
 
-    @Override
-    public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount) {
-        homeViewModel.addComment(
-                postId,
-                commentText,
-                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
-                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+//    @Override
+//    public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount) {
+//        homeViewModel.addComment(
+//                postId,
+//                commentText,
+//                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
+//                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+//
+//        // updating comments counter
+//        TextView commentsCounter = recyclerView.getLayoutManager()
+//                .findViewByPosition(position)
+//                .findViewById(R.id.button_reactionsLayout_showComments);
+//        commentsCount = commentsCount + 1;
+//
+//        if(commentsCount==1) {
+//            commentsCounter.setText(commentsCount + " commento");
+//        }
+//        else {
+//            commentsCounter.setText(commentsCount + " commenti");
+//        }
+//    }
 
-        // updating comments counter
-        TextView commentsCounter = recyclerView.getLayoutManager()
-                .findViewByPosition(position)
-                .findViewById(R.id.button_reactionsLayout_showComments);
-        commentsCount = commentsCount + 1;
-
-        if(commentsCount==1) {
-            commentsCounter.setText(commentsCount + " commento");
-        }
-        else {
-            commentsCounter.setText(commentsCount + " commenti");
-        }
-    }
-
-    @Override
-    public void onDeleteCommentClicked(long commentId, int commentPosition, int postPosition, int commentsCount) {
-        try {
-            TextView commentsCounter = recyclerView.getLayoutManager()
-                    .findViewByPosition(postPosition)
-                    .findViewById(R.id.button_reactionsLayout_showComments);
-
-            if(commentsCount>0)
-                commentsCount = commentsCount - 1;
-
-            if(commentsCount==1) {
-                commentsCounter.setText(commentsCount + " commento");
-            }
-            else {
-                commentsCounter.setText(commentsCount + " commenti");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        homeViewModel.deleteComment(
-                commentId,
-                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
-                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
-    }
+//    @Override
+//    public void onDeleteCommentClicked(long commentId, int commentPosition, int postPosition, int commentsCount) {
+//        try {
+//            TextView commentsCounter = recyclerView.getLayoutManager()
+//                    .findViewByPosition(postPosition)
+//                    .findViewById(R.id.button_reactionsLayout_showComments);
+//
+//            if(commentsCount>0)
+//                commentsCount = commentsCount - 1;
+//
+//            if(commentsCount==1) {
+//                commentsCounter.setText(commentsCount + " commento");
+//            }
+//            else {
+//                commentsCounter.setText(commentsCount + " commenti");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        homeViewModel.deleteComment(
+//                commentId,
+//                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
+//                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+//    }
 
     private void checkForNewNotifications(User loggedUser) {
         if(loggedUser!=null) {
@@ -320,4 +322,13 @@ public class HomeFragment extends Fragment implements
         }
     }
 
+//    @Override
+//    public void onAddCommentClicked(String commentText, long postId, int position) {
+//
+//    }
+//
+//    @Override
+//    public void onCommentDeleted(CommentsViewModel.TaskStatus taskStatus) {
+//
+//    }
 }// end HomeFragment class

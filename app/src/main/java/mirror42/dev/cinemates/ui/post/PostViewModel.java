@@ -84,6 +84,8 @@ public class PostViewModel extends ViewModel {
     }
 
 
+
+
     //------------------------------------------------------ MY METHODS
 
     public void fetchPost(long postId, User loggedUser) {

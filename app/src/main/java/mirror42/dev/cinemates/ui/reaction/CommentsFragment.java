@@ -1,34 +1,42 @@
 package mirror42.dev.cinemates.ui.reaction;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowCommentsDialog;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 
 public class CommentsFragment extends Fragment implements
         RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
+    private CommentsViewModel commentsViewModel;
     private ArrayList<Comment> commentsList;
     private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;
-    AddCommentButtonListener listener;
+    CommentListener listener;
     private RecyclerView recyclerView;
+    private LoginViewModel loginViewModel;
 
-    public interface AddCommentButtonListener {
-        void onAddCommentClicked(String commentText, long postId, int position, int commentsCount);
-        void onDeleteCommentClicked(long commentId, int commentPosition, int position, int commentsCount);
+    public interface CommentListener {
+        void onAddCommentClicked(String commentText, long postId, int position);
+        void onCommentDeleted();
     }
 
 
@@ -36,13 +44,14 @@ public class CommentsFragment extends Fragment implements
 
     //------------------------------------------------------------------------------- ANDROID METHODS
 
-    public static CommentsFragment getInstance(Bundle arguments) {
+    public static CommentsFragment getInstance(Bundle arguments, CommentListener listener) {
         CommentsFragment frag = new CommentsFragment();
+        frag.setListener(listener);
         frag.setArguments(arguments);
         return frag;
     }
 
-    public void setListener(AddCommentButtonListener listner) {
+    public void setListener(CommentListener listner) {
         this.listener = listner;
     }
 
@@ -52,13 +61,6 @@ public class CommentsFragment extends Fragment implements
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_comments, container);
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if(getDialog() != null)
-//            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -70,6 +72,22 @@ public class CommentsFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         commentsList = (ArrayList<Comment>) getArguments().getSerializable("comments");
+
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
+        commentsViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            switch (taskStatus) {
+                case SUCCESS: {
+                    showCenteredToast("commento eliminato");
+                    listener.onCommentDeleted();
+                }
+                    break;
+                case FAILED: {
+                    showCenteredToast("impossibile eliminare commento");
+                }
+                    break;
+            }
+        });
 
 //        buttonComment.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -106,6 +124,12 @@ public class CommentsFragment extends Fragment implements
         moveRecyclerToBottom();
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
 
 
     //------------------------------------------------------------------------------- METHODS
@@ -136,29 +160,24 @@ public class CommentsFragment extends Fragment implements
 
     @Override
     public void onDeleteButtonPressed(int commentPosition) {
-//        new MaterialAlertDialogBuilder(getContext())
-//                .setTitle("Vuoi eliminare il commento?")
-//                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        final Toast toast = Toast.makeText(getContext(), "Operazione annullata.", Toast.LENGTH_SHORT);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
-//                    }
-//                })
-//                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Comment currentComment = recyclerAdapterShowCommentsDialog.getComment(commentPosition);
-//                        recyclerAdapterShowCommentsDialog.removeItem(currentComment);
-//                        listener.onDeleteCommentClicked(currentComment.getId(), commentPosition, postPosition, commentsCount);
-//                        dismiss();
-//                        final Toast toast = Toast.makeText(getContext(), "Commento eliminato.", Toast.LENGTH_SHORT);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
-//                    }
-//                })
-//        .show();
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Vuoi eliminare il commento?")
+                .setNegativeButton("No", (dialog, which) -> {
+                    showCenteredToast("operazione annullata");
+                })
+                .setPositiveButton("Si", (dialog, which) -> {
+                    Comment currentComment = recyclerAdapterShowCommentsDialog.getComment(commentPosition);
+                    recyclerAdapterShowCommentsDialog.removeItem(currentComment);
+                    commentsViewModel.deleteComment(currentComment.getId(), loginViewModel.getLoggedUser());
+//                    dialog.dismiss();
+                })
+        .show();
+    }
+
+    private void showCenteredToast(String msg) {
+        final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 }// end ShowCommentsDialogFragment class

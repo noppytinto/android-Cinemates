@@ -167,6 +167,16 @@ public class HttpUtilities {
         return request;
     }
 
+    public static HttpUrl buildHttpURL(String dbFunctionName) {
+        HttpUrl httpUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host(RemoteConfigServer.getInstance().getAzureHostName())
+                .addPathSegments(RemoteConfigServer.getInstance().getPostgrestPath())
+                .addPathSegment(dbFunctionName)
+                .build();
+
+        return httpUrl;
+    }
 
 //    public static Request buildRemoteDBrequest(String dbFunctionName, String token) {
 //        RemoteConfigServer remoteConfigServer = RemoteConfigServer.getInstance();

@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.post;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,9 +29,12 @@ import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.reaction.CommentsFragment;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
-public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDialog.ClickAdapterListener {
+public class PostFragment extends Fragment implements
+        RecyclerAdapterShowLikesDialog.ClickAdapterListener,
+        CommentsFragment.CommentListener {
     private RecyclerAdapterShowLikesDialog recyclerView;
     private ViewPager2 viewPager;
     private ViewPagerAdapterPost viewPagerAdapter;
@@ -38,6 +42,8 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
     private LoginViewModel loginViewModel;
     private PostViewModel postViewModel;
     private View includeCommentBox;
+    private int commentsCount;
+    private int likesCount;
 
 
 
@@ -64,7 +70,6 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
         super.onViewCreated(view, savedInstanceState);
         includeCommentBox = view.findViewById(R.id.include_postFragment_commentBox);
 
-
         if(getArguments() != null) {
             PostFragmentArgs args = PostFragmentArgs.fromBundle(getArguments());
             long postId = args.getPostId();
@@ -84,13 +89,12 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
 
             loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
             postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
-            postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), loginResult -> {
-                switch (loginResult) {
+            postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+                switch (fetchStatus) {
                     case SUCCESS: {
-                        Toast.makeText(getContext(), "post" + postId + " esiste", Toast.LENGTH_SHORT).show();
-                        User loggedUser = loginViewModel.getLoggedUser();
-                        PostType postType = postViewModel.getFetchedPostType();
+                        Toast.makeText(getContext(), "post " + postId + " esiste", Toast.LENGTH_SHORT).show();
                         Post post = postViewModel.getObservablePostFetched().getValue();
+                        PostType postType = post.getPostType();
                         Bundle arguments = buildRequiredArguments(post);
                         setupFragment(postType, arguments);
 
@@ -115,7 +119,6 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
             });
             User loggedUser = loginViewModel.getLoggedUser();
             postViewModel.fetchPost(postId, loggedUser);
-
         }
     }// end onViewCreated()
 
@@ -125,8 +128,6 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
         postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
         // TODO: Use the ViewModel
     }
-
-
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
@@ -139,10 +140,9 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
 
 
 
+
+
     //---------------------------------------------------------------------- MY METHODS
-
-
-
 
     @Override
     public void onItemClicked(int position) {
@@ -191,17 +191,25 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
         transaction.commit();
     }
 
-
     private void setupTabs(View view, Bundle arguments, int commentsCount, int likesCount) {
+        setupTabPages(view, arguments);
+        setupTabAppearance(commentsCount, likesCount);
+        setupTabListener();
+    }
+
+    private void setupTabPages(View view, Bundle arguments) {
         tabLayout = view.findViewById(R.id.tablayout_postFragment);
         viewPager = view.findViewById(R.id.viewPager_postFragment);
         FragmentManager fm = getChildFragmentManager();
         Lifecycle lifecycle = getViewLifecycleOwner().getLifecycle();
-        viewPagerAdapter = new ViewPagerAdapterPost(fm, lifecycle, arguments);
+        viewPagerAdapter = new ViewPagerAdapterPost(fm, lifecycle, arguments, this);
         viewPager.setUserInputEnabled(false); // disables horiz. swipe to scroll tabs gestures
         viewPager.setAdapter(viewPagerAdapter);
+    }
 
-
+    private void setupTabAppearance(int commentsCount, int likesCount) {
+        this.commentsCount = commentsCount;
+        this.likesCount = likesCount;
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
@@ -215,8 +223,9 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
             }
         });
         tabLayoutMediator.attach();
+    }
 
-
+    private void setupTabListener() {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -246,5 +255,28 @@ public class PostFragment extends Fragment implements RecyclerAdapterShowLikesDi
 
 
 
+    @Override
+    public void onAddCommentClicked(String commentText, long postId, int position) {
+
+    }
+
+    @Override
+    public void onCommentDeleted() {
+        decreaseCommentsCounter();
+    }
+
+    private void decreaseCommentsCounter() {
+        if(commentsCount>0) {
+            commentsCount -= 1;
+            setupTabAppearance(commentsCount, likesCount);
+        }
+    }
+
+
+    private void showCenteredToast(String msg) {
+        final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 
 }// end WatchlistPostFragment clasd
