@@ -26,10 +26,10 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.dialog.post.CommentsFragment;
-import mirror42.dev.cinemates.ui.home.post.PostFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
+import mirror42.dev.cinemates.ui.post.PostFragmentDirections;
+import mirror42.dev.cinemates.ui.reaction.CommentsFragment;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener,

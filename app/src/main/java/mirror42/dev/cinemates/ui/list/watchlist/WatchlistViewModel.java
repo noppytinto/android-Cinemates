@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.userprofile.list.watchlist;
+package mirror42.dev.cinemates.ui.list.watchlist;
 
 import android.util.Log;
 

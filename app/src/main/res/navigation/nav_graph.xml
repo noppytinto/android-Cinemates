@@ -88,7 +88,7 @@
         app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/listFragment"
-        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistFragment"
+        android:name="mirror42.dev.cinemates.ui.list.watchlist.WatchlistFragment"
         android:label=" "
         tools:layout="@layout/fragment_list" >
         <argument
@@ -142,12 +142,12 @@
         app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/watchlistThumbnailsFragment"
-        android:name="mirror42.dev.cinemates.ui.userprofile.list.watchlist.WatchlistThumbnailsFragment"
+        android:name="mirror42.dev.cinemates.ui.list.watchlist.WatchlistThumbnailsFragment"
         android:label="fragment_watchlist"
         tools:layout="@layout/fragment_watchlist" />
     <fragment
         android:id="@+id/postFragment"
-        android:name="mirror42.dev.cinemates.ui.home.post.PostFragment"
+        android:name="mirror42.dev.cinemates.ui.post.PostFragment"
         android:label="Dettagli post"
         tools:layout="@layout/fragment_post" >
         <argument

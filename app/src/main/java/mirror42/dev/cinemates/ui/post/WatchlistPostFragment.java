@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.home.post;
+package mirror42.dev.cinemates.ui.post;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

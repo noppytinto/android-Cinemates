@@ -25,7 +25,7 @@ import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
 import mirror42.dev.cinemates.model.notification.PostLikedNotification;
 import mirror42.dev.cinemates.model.room.CinematesLocalDatabase;
-import mirror42.dev.cinemates.model.room.NotificationDao;
+import mirror42.dev.cinemates.dao.room.NotificationDao;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;

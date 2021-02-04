@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.dialog.post;
+package mirror42.dev.cinemates.ui.reaction;
 
 import androidx.lifecycle.ViewModel;
 

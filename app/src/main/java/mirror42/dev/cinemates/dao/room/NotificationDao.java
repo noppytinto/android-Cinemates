@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.model.room;
+package mirror42.dev.cinemates.dao.room;
 
 
 import androidx.room.Dao;
