@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
+        spinner = view.findViewById(R.id.progressBar_homeFragment);
 
         initRecyclerView();
 
@@ -72,6 +73,22 @@ public class HomeFragment extends Fragment implements
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            hideProgressDialog();
+            spinner.setVisibility(View.GONE);
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
+                    recyclerAdapterPost.loadNewData(postsList);
+                }
+                break;
+                case NOT_EXISTS:
+                    recyclerAdapterPost.loadNewData(null);
+                    break;
+                case FAILED:
+                    break;
+            }
+        });
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
@@ -80,10 +97,11 @@ public class HomeFragment extends Fragment implements
                 case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
+                    spinner.setVisibility(View.VISIBLE);
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
 //                    checkForNewNotifications(loggedUser);
                 }
-                    break;
+                break;
                 case LOGGED_OUT:
                     buttonUpdateFeed.setVisibility(View.GONE);
                     recyclerAdapterPost.loadNewData(null);
@@ -94,7 +112,6 @@ public class HomeFragment extends Fragment implements
                     buttonUpdateFeed.setVisibility(View.GONE);
             }
         });
-
 
         buttonUpdateFeed.setOnClickListener(v -> {
             // ignore v
@@ -112,21 +129,6 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            hideProgressDialog();
-            switch (fetchStatus) {
-                case SUCCESS: {
-                    ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
-                    recyclerAdapterPost.loadNewData(postsList);
-                }
-                break;
-                case NOT_EXISTS:
-                    recyclerAdapterPost.loadNewData(null);
-                    break;
-                case FAILED:
-                    break;
-            }
-        });
 
     }
 
