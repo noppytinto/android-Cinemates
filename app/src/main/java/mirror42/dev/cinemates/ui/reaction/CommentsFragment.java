@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.ui.reaction;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,36 +24,39 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowCommentsDialog;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.post.ReactionListener;
 
 
 public class CommentsFragment extends Fragment implements
-        RecyclerAdapterShowCommentsDialog.ClickAdapterListener {
+        RecyclerAdapterShowCommentsDialog.ClickAdapterListener,
+        ReactionListener{
+    private final String TAG = this.getClass().getSimpleName();
     private CommentsViewModel commentsViewModel;
     private ArrayList<Comment> commentsList;
     private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;
-    CommentListener listener;
+    ReactionListener listener;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
+    private String commentText;
 
-    public interface CommentListener {
-        void onAddCommentClicked(String commentText, long postId, int position);
-        void onCommentDeleted();
-    }
+
+
 
 
 
 
     //------------------------------------------------------------------------------- ANDROID METHODS
 
-    public static CommentsFragment getInstance(Bundle arguments, CommentListener listener) {
+    public static CommentsFragment getInstance(Bundle arguments, ReactionListener listener) {
         CommentsFragment frag = new CommentsFragment();
-        frag.setListener(listener);
+        frag.setOnDeleteCommentListener(listener);
         frag.setArguments(arguments);
         return frag;
     }
 
-    public void setListener(CommentListener listner) {
+    public void setOnDeleteCommentListener(ReactionListener listner) {
         this.listener = listner;
     }
 
@@ -77,47 +82,33 @@ public class CommentsFragment extends Fragment implements
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
             switch (taskStatus) {
-                case SUCCESS: {
+                case COMMENT_DELETED: {
                     showCenteredToast("commento eliminato");
                     listener.onCommentDeleted();
                 }
-                    break;
-                case FAILED: {
+                break;
+                case COMMENT_NOT_DELETED: {
                     showCenteredToast("impossibile eliminare commento");
                 }
-                    break;
+                break;
+                case COMMENT_POSTED: {
+                    showCenteredToast("commento pubblicato");
+                    Comment newComment = new Comment();
+                    newComment.setText(commentText);
+                    newComment.setOwner(loginViewModel.getLoggedUser());
+                    newComment.setIsNewItem(true);
+//                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
+                    recyclerAdapterShowCommentsDialog.addPlaceholderitem(newComment);
+                    moveRecyclerToBottom();
+                }
+                break;
+                case COMMNET_NOT_POSTED: {
+                    showCenteredToast("impossibile pubblicare commento");
+                }
+                break;
             }
         });
 
-//        buttonComment.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
-//                buttonComment.startAnimation(buttonAnim);
-//                String commentText = editTextComment.getText().toString();
-//                if( ! commentText.isEmpty()) {
-//                    editTextComment.setText("");
-//                    editTextComment.clearFocus();
-//                    Comment newComment = new Comment();
-//                    newComment.setText(commentText);
-//                    newComment.setOwner(reactionOwner);
-//                    newComment.setIsNewItem(true);
-////                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
-//                    recyclerAdapterShowCommentsDialog.addPlaceholderitem(newComment);
-//                    editTextComment.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
-//
-//                    listener.onAddCommentClicked(commentText, postId, postPosition, commentsCount);
-//                    moveRecyclerToBottom();
-//
-//                    //TODO: get new reaction id from db for delete to be allowed
-//
-//                    final Toast toast = Toast.makeText(getContext(), "Commento pubblicato.", Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.CENTER, 0, 0);
-//                    toast.show();
-////                    dismiss();
-//                }
-//            }
-//        });
 
 
         recyclerAdapterShowCommentsDialog.loadNewData(commentsList);
@@ -125,8 +116,20 @@ public class CommentsFragment extends Fragment implements
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d(TAG, "onAttach: ");
+        super.onAttach(context);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
+        Log.d(TAG, "onDetach: ");
         listener = null;
     }
 
@@ -179,5 +182,23 @@ public class CommentsFragment extends Fragment implements
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
+
+    @Override
+    public void onPostCommentButtonClicked(String commentText, long postID, User loggedUser) {
+        this.commentText = commentText;
+        this.commentsViewModel.addComment(postID, commentText, loggedUser);
+    }
+
+    @Override
+    public void onCommentDeleted() {
+        // ignore
+    }
+
+    @Override
+    public void onCommentPosted() {
+        // ignore
+    }
+
 
 }// end ShowCommentsDialogFragment class

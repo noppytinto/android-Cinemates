@@ -109,7 +109,6 @@ public class RecyclerAdapterShowCommentsDialog
         notifyDataSetChanged();
     }
 
-
     public void removeItem(Comment item) {
         comments.remove(item);
         notifyDataSetChanged();

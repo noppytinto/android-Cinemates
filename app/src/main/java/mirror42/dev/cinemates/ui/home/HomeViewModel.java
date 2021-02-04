@@ -446,69 +446,6 @@ public class HomeViewModel extends ViewModel {
         return watchlistPost;
     }
 
-    public void addComment(long postId, String commentText, String email, String token) {
-        Runnable task = creatAddCommentTask(postId, commentText, email, token);
-        Thread t = new Thread(task);
-        t.start();
-    }
-
-    private Runnable creatAddCommentTask(long postId, String commentText, String email, String token) {
-        return ()-> {
-            try {
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_add_reaction_comment";
-                //
-                HttpUrl httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("target_post_id", String.valueOf(postId))
-                        .add("email_reaction_owner", email)
-                        .add("comment_text", commentText)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setFetchStatus(FetchStatus.FAILED);
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response is true
-                                if (responseData.equals("true")) {
-                                    setFetchStatus(FetchStatus.REFETCH);
-                                }
-                                else {
-                                }
-                            } // if response is unsuccessful
-                            else {
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-    }
-
 
 
 }// end HomeViewModel class

@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,8 +21,11 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
@@ -29,12 +35,12 @@ import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.reaction.CommentsFragment;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class PostFragment extends Fragment implements
         RecyclerAdapterShowLikesDialog.ClickAdapterListener,
-        CommentsFragment.CommentListener {
+        View.OnClickListener,
+        ReactionListener {
     private RecyclerAdapterShowLikesDialog recyclerView;
     private ViewPager2 viewPager;
     private ViewPagerAdapterPost viewPagerAdapter;
@@ -44,12 +50,16 @@ public class PostFragment extends Fragment implements
     private View includeCommentBox;
     private int commentsCount;
     private int likesCount;
+    private ReactionListener listener;
+    private FloatingActionButton buttonPostComment;
+    private TextInputEditText editTextCommentText;
+    private TextInputLayout textLayout;
+    private long postID;
 
 
 
 
     //---------------------------------------------------------------------- ANDROID METHODS
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,10 +79,13 @@ public class PostFragment extends Fragment implements
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         includeCommentBox = view.findViewById(R.id.include_postFragment_commentBox);
+        editTextCommentText = view.findViewById(R.id.include_postFragment_commentBox).findViewById(R.id.editText_commentDialog);
+        buttonPostComment = view.findViewById(R.id.include_postFragment_commentBox).findViewById(R.id.button_commentDialog);
+        textLayout = view.findViewById(R.id.include_postFragment_commentBox).findViewById(R.id.editTextLayout_commentDialog);
 
         if(getArguments() != null) {
             PostFragmentArgs args = PostFragmentArgs.fromBundle(getArguments());
-            long postId = args.getPostId();
+            postID = args.getPostId();
 
             // TODO: getting details from db
 
@@ -92,7 +105,7 @@ public class PostFragment extends Fragment implements
             postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
                 switch (fetchStatus) {
                     case SUCCESS: {
-                        Toast.makeText(getContext(), "post " + postId + " esiste", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "post " + postID + " esiste", Toast.LENGTH_SHORT).show();
                         Post post = postViewModel.getObservablePostFetched().getValue();
                         PostType postType = post.getPostType();
                         Bundle arguments = buildRequiredArguments(post);
@@ -106,11 +119,13 @@ public class PostFragment extends Fragment implements
                         int likesCount = post.getLikesCount();
                         setupTabs(view, arg, commentsCount, likesCount);
 
+//                        setupPostCommentButtonListener();
+
                     }
                     break;
                     case FAILED:
                     case NOT_EXISTS: {
-                        Toast.makeText(getContext(), "post " + postId + " NON esiste", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "post " + postID + " NON esiste", Toast.LENGTH_SHORT).show();
                     }
                         break;
                     default: {
@@ -118,7 +133,7 @@ public class PostFragment extends Fragment implements
                 }
             });
             User loggedUser = loginViewModel.getLoggedUser();
-            postViewModel.fetchPost(postId, loggedUser);
+            postViewModel.fetchPost(postID, loggedUser);
         }
     }// end onViewCreated()
 
@@ -139,10 +154,30 @@ public class PostFragment extends Fragment implements
     }
 
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
 
 
 
     //---------------------------------------------------------------------- MY METHODS
+    private void setupPostCommentButtonListener() {
+        buttonPostComment.setOnClickListener(v -> {
+            String commentText = editTextCommentText.getText().toString();
+            Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
+            buttonPostComment.startAnimation(buttonAnim);
+
+            if( ! commentText.isEmpty()) {
+                this.listener.onPostCommentButtonClicked(commentText, postID, loginViewModel.getLoggedUser());
+                editTextCommentText.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
+            }
+            else {
+
+            }
+        });
+    }
 
     @Override
     public void onItemClicked(int position) {
@@ -254,17 +289,6 @@ public class PostFragment extends Fragment implements
     }
 
 
-
-    @Override
-    public void onAddCommentClicked(String commentText, long postId, int position) {
-
-    }
-
-    @Override
-    public void onCommentDeleted() {
-        decreaseCommentsCounter();
-    }
-
     private void decreaseCommentsCounter() {
         if(commentsCount>0) {
             commentsCount -= 1;
@@ -272,11 +296,42 @@ public class PostFragment extends Fragment implements
         }
     }
 
+    private void increaseCommentsCounter() {
+        commentsCount += 1;
+        setupTabAppearance(commentsCount, likesCount);
+    }
 
     private void showCenteredToast(String msg) {
         final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    public void seOnPostCommentListener(ReactionListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    @Override
+    public void onCommentDeleted() {
+        decreaseCommentsCounter();
+    }
+
+    @Override
+    public void onCommentPosted() {
+        editTextCommentText.setText("");
+        editTextCommentText.clearFocus();
+        increaseCommentsCounter();
+    }
+
+    @Override
+    public void onPostCommentButtonClicked(String commentText, long postID, User loggedUser) {
+        // ignore
     }
 
 }// end WatchlistPostFragment clasd

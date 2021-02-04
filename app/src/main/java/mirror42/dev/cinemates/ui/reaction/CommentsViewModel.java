@@ -21,12 +21,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus.COMMENT_NOT_DELETED;
+import static mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus.COMMNET_NOT_POSTED;
+
 public class CommentsViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<TaskStatus> taskStatus;
     private RemoteConfigServer remoteConfigServer;
     private long reactionID;
-    public enum TaskStatus {SUCCESS,FAILED,IDLE}
+    public enum TaskStatus {COMMENT_DELETED, COMMENT_NOT_DELETED, COMMENT_POSTED, COMMNET_NOT_POSTED, IDLE}
 
 
 
@@ -47,7 +50,7 @@ public class CommentsViewModel extends ViewModel {
         return taskStatus;
     }
 
-    public void setFetchStatus(TaskStatus taskStatus) {
+    public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus.postValue(taskStatus);
     }
 
@@ -95,7 +98,7 @@ public class CommentsViewModel extends ViewModel {
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        setFetchStatus(TaskStatus.FAILED);
+                        setTaskStatus(COMMENT_NOT_DELETED);
                     }
 
                     @Override
@@ -107,13 +110,70 @@ public class CommentsViewModel extends ViewModel {
 
                                 // if response is true
                                 if (responseData.equals("true")) {
-                                    setFetchStatus(TaskStatus.SUCCESS);
+                                    setTaskStatus(TaskStatus.COMMENT_DELETED);
                                 }
                                 else {
-                                    setFetchStatus(TaskStatus.FAILED);
+                                    setTaskStatus(COMMENT_NOT_DELETED);
                                 }
                             }
 
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+    }
+
+    public void addComment(long postId, String commentText, User loggedUser) {
+        Runnable task = creatAddCommentTask(postId, commentText, loggedUser);
+        Thread t = new Thread(task);
+        t.start();
+    }
+
+    private Runnable creatAddCommentTask(long postId, String commentText, User loggedUser) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_add_reaction_comment";
+                //
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("target_post_id", String.valueOf(postId))
+                        .add("email_reaction_owner", loggedUser.getEmail())
+                        .add("comment_text", commentText)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+                // performing request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        setTaskStatus(COMMNET_NOT_POSTED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                // if response is true
+                                if (responseData.equals("true")) {
+                                    setTaskStatus(TaskStatus.COMMENT_POSTED);
+                                }
+                                else {
+                                }
+                            } // if response is unsuccessful
+                            else {
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
