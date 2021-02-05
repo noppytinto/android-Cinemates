@@ -29,6 +29,10 @@ public class CommentsViewModel extends ViewModel {
     private MutableLiveData<TaskStatus> taskStatus;
     private RemoteConfigServer remoteConfigServer;
     private long reactionID;
+    private String commentText;
+
+
+
     public enum TaskStatus {COMMENT_DELETED, COMMENT_NOT_DELETED, COMMENT_POSTED, COMMNET_NOT_POSTED, IDLE}
 
 
@@ -58,7 +62,9 @@ public class CommentsViewModel extends ViewModel {
         return taskStatus.getValue();
     };
 
-
+    public String getCommentText() {
+        return commentText;
+    }
 
     //---------------------------------------------------------------------- MY METHODS
 
@@ -129,13 +135,14 @@ public class CommentsViewModel extends ViewModel {
         };
     }
 
-    public void addComment(long postId, String commentText, User loggedUser) {
-        Runnable task = creatAddCommentTask(postId, commentText, loggedUser);
+    public void postComment(long postId, String commentText, User loggedUser) {
+        this.commentText = commentText;
+        Runnable task = creatPostCommentTask(postId, commentText, loggedUser);
         Thread t = new Thread(task);
         t.start();
     }
 
-    private Runnable creatAddCommentTask(long postId, String commentText, User loggedUser) {
+    private Runnable creatPostCommentTask(long postId, String commentText, User loggedUser) {
         return ()-> {
             try {
                 // build httpurl and request for remote db

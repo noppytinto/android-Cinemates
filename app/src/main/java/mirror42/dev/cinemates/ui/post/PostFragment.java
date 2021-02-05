@@ -35,12 +35,12 @@ import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class PostFragment extends Fragment implements
         RecyclerAdapterShowLikesDialog.ClickAdapterListener,
-        View.OnClickListener,
-        ReactionListener {
+        View.OnClickListener{
     private RecyclerAdapterShowLikesDialog recyclerView;
     private ViewPager2 viewPager;
     private ViewPagerAdapterPost viewPagerAdapter;
@@ -50,11 +50,11 @@ public class PostFragment extends Fragment implements
     private View includeCommentBox;
     private int commentsCount;
     private int likesCount;
-    private ReactionListener listener;
     private FloatingActionButton buttonPostComment;
     private TextInputEditText editTextCommentText;
     private TextInputLayout textLayout;
     private long postID;
+    private CommentsViewModel commentsViewModel;
 
 
 
@@ -83,6 +83,12 @@ public class PostFragment extends Fragment implements
         buttonPostComment = view.findViewById(R.id.include_postFragment_commentBox).findViewById(R.id.button_commentDialog);
         textLayout = view.findViewById(R.id.include_postFragment_commentBox).findViewById(R.id.editTextLayout_commentDialog);
 
+        postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
+
+        // TODO: Use the ViewModel
+
         if(getArguments() != null) {
             PostFragmentArgs args = PostFragmentArgs.fromBundle(getArguments());
             postID = args.getPostId();
@@ -99,12 +105,10 @@ public class PostFragment extends Fragment implements
             // else
             // - show error message
 
-
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-            postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
             postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
                 switch (fetchStatus) {
                     case SUCCESS: {
+
                         Toast.makeText(getContext(), "post " + postID + " esiste", Toast.LENGTH_SHORT).show();
                         Post post = postViewModel.getObservablePostFetched().getValue();
                         PostType postType = post.getPostType();
@@ -119,7 +123,23 @@ public class PostFragment extends Fragment implements
                         int likesCount = post.getLikesCount();
                         setupTabs(view, arg, commentsCount, likesCount);
 
-//                        setupPostCommentButtonListener();
+                        setupPostCommentButtonListener();
+
+
+                        commentsViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                            switch (taskStatus) {
+                                case COMMENT_DELETED: {
+                                    decreaseCommentsCounter();
+                                }
+                                break;
+                                case COMMENT_POSTED: {
+                                    editTextCommentText.setText("");
+                                    editTextCommentText.clearFocus();
+                                    increaseCommentsCounter();
+                                }
+                                break;
+                            }
+                        });
 
                     }
                     break;
@@ -127,7 +147,7 @@ public class PostFragment extends Fragment implements
                     case NOT_EXISTS: {
                         Toast.makeText(getContext(), "post " + postID + " NON esiste", Toast.LENGTH_SHORT).show();
                     }
-                        break;
+                    break;
                     default: {
                     }
                 }
@@ -135,13 +155,13 @@ public class PostFragment extends Fragment implements
             User loggedUser = loginViewModel.getLoggedUser();
             postViewModel.fetchPost(postID, loggedUser);
         }
+
     }// end onViewCreated()
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
-        // TODO: Use the ViewModel
+
     }
 
     @Override
@@ -170,7 +190,7 @@ public class PostFragment extends Fragment implements
             buttonPostComment.startAnimation(buttonAnim);
 
             if( ! commentText.isEmpty()) {
-                this.listener.onPostCommentButtonClicked(commentText, postID, loginViewModel.getLoggedUser());
+                this.commentsViewModel.postComment(postID, commentText, loginViewModel.getLoggedUser());
                 editTextCommentText.onEditorAction(EditorInfo.IME_ACTION_DONE); // hide keyboard on search button press
             }
             else {
@@ -237,7 +257,7 @@ public class PostFragment extends Fragment implements
         viewPager = view.findViewById(R.id.viewPager_postFragment);
         FragmentManager fm = getChildFragmentManager();
         Lifecycle lifecycle = getViewLifecycleOwner().getLifecycle();
-        viewPagerAdapter = new ViewPagerAdapterPost(fm, lifecycle, arguments, this);
+        viewPagerAdapter = new ViewPagerAdapterPost(fm, lifecycle, arguments);
         viewPager.setUserInputEnabled(false); // disables horiz. swipe to scroll tabs gestures
         viewPager.setAdapter(viewPagerAdapter);
     }
@@ -307,31 +327,6 @@ public class PostFragment extends Fragment implements
         toast.show();
     }
 
-    public void seOnPostCommentListener(ReactionListener listener) {
-        this.listener = listener;
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    @Override
-    public void onCommentDeleted() {
-        decreaseCommentsCounter();
-    }
-
-    @Override
-    public void onCommentPosted() {
-        editTextCommentText.setText("");
-        editTextCommentText.clearFocus();
-        increaseCommentsCounter();
-    }
-
-    @Override
-    public void onPostCommentButtonClicked(String commentText, long postID, User loggedUser) {
-        // ignore
-    }
 
 }// end WatchlistPostFragment clasd

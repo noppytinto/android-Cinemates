@@ -1,8 +1,6 @@
 package mirror42.dev.cinemates.ui.reaction;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,19 +22,15 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowCommentsDialog;
 import mirror42.dev.cinemates.model.Comment;
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.post.ReactionListener;
 
 
 public class CommentsFragment extends Fragment implements
-        RecyclerAdapterShowCommentsDialog.ClickAdapterListener,
-        ReactionListener{
+        RecyclerAdapterShowCommentsDialog.ClickAdapterListener{
     private final String TAG = this.getClass().getSimpleName();
     private CommentsViewModel commentsViewModel;
     private ArrayList<Comment> commentsList;
     private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;
-    ReactionListener listener;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
     private String commentText;
@@ -49,17 +43,11 @@ public class CommentsFragment extends Fragment implements
 
     //------------------------------------------------------------------------------- ANDROID METHODS
 
-    public static CommentsFragment getInstance(Bundle arguments, ReactionListener listener) {
+    public static CommentsFragment getInstance(Bundle arguments) {
         CommentsFragment frag = new CommentsFragment();
-        frag.setOnDeleteCommentListener(listener);
         frag.setArguments(arguments);
         return frag;
     }
-
-    public void setOnDeleteCommentListener(ReactionListener listner) {
-        this.listener = listner;
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,12 +67,11 @@ public class CommentsFragment extends Fragment implements
         commentsList = (ArrayList<Comment>) getArguments().getSerializable("comments");
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
+        commentsViewModel = new ViewModelProvider(requireParentFragment()).get(CommentsViewModel.class);
         commentsViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
             switch (taskStatus) {
                 case COMMENT_DELETED: {
                     showCenteredToast("commento eliminato");
-                    listener.onCommentDeleted();
                 }
                 break;
                 case COMMENT_NOT_DELETED: {
@@ -94,11 +81,11 @@ public class CommentsFragment extends Fragment implements
                 case COMMENT_POSTED: {
                     showCenteredToast("commento pubblicato");
                     Comment newComment = new Comment();
-                    newComment.setText(commentText);
+                    newComment.setText(commentsViewModel.getCommentText());
                     newComment.setOwner(loginViewModel.getLoggedUser());
                     newComment.setIsNewItem(true);
 //                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
-                    recyclerAdapterShowCommentsDialog.addPlaceholderitem(newComment);
+                    recyclerAdapterShowCommentsDialog.addPlaceholderComment(newComment);
                     moveRecyclerToBottom();
                 }
                 break;
@@ -115,23 +102,7 @@ public class CommentsFragment extends Fragment implements
         moveRecyclerToBottom();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        Log.d(TAG, "onAttach: ");
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(TAG, "onDetach: ");
-        listener = null;
-    }
 
 
 
@@ -183,22 +154,6 @@ public class CommentsFragment extends Fragment implements
         toast.show();
     }
 
-
-    @Override
-    public void onPostCommentButtonClicked(String commentText, long postID, User loggedUser) {
-        this.commentText = commentText;
-        this.commentsViewModel.addComment(postID, commentText, loggedUser);
-    }
-
-    @Override
-    public void onCommentDeleted() {
-        // ignore
-    }
-
-    @Override
-    public void onCommentPosted() {
-        // ignore
-    }
 
 
 }// end ShowCommentsDialogFragment class
