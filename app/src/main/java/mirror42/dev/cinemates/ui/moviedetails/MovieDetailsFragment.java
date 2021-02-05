@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -9,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -62,6 +65,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         ((MainActivity)requireActivity()).hideToolbar();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window window = requireActivity().getWindow();
+//            window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
     }
 
     @Override
@@ -343,7 +352,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                     .load(movie.getBackdropURL()) //3
                     .fallback(R.drawable.backdrop_placeholder)
                     .placeholder(R.drawable.backdrop_placeholder)
-                    .fitCenter() //4
+                    .centerCrop() //4
                     .into(backdrop); //8
         } catch (Exception e) {
             e.printStackTrace();

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -83,6 +85,10 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         //init okhttp
         OkHttpSingleton.getInstance(getApplicationContext());
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
+
+
+
+
 
         // observe login acitivty
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);

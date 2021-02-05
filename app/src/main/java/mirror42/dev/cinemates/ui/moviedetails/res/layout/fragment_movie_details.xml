@@ -4,15 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_blue"
     tools:context=".ui.moviedetails.MovieDetailsFragment"
     >
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_movieDetailsFragment"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="250dp"
+        android:theme="@style/Widget.AppTheme.AppBar"
         app:elevation="@dimen/default_elevation"
+        android:background="#C3000000"
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -23,21 +24,29 @@
             app:contentScrim="@color/primary_blue"
             app:expandedTitleMarginBottom="10dp"
             app:expandedTitleMarginStart="15dp"
+
             app:expandedTitleTextAppearance="@style/Cinemates.Toolbar.Expanded.TextAppearance"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar_movieDetailsFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/dark_blue">
 
                 <ImageView
                     android:id="@+id/appBarImage_movieDetailsFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@color/dark_blue"
                     android:scaleType="centerCrop"
                     android:src="@drawable/backdrop_placeholder"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <View
                     android:id="@+id/view_movieDetailsFragment_titleBackground"
@@ -86,7 +95,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/dark_blue"
+            >
 
 
             <TextView
