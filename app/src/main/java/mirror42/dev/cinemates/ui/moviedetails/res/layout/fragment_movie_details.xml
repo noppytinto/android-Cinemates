@@ -10,7 +10,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_movieDetailsFragment"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="300dp"
         app:elevation="@dimen/default_elevation"
         android:fitsSystemWindows="true"
         >

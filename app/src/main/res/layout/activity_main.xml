@@ -15,10 +15,9 @@
         android:background="@color/primary_blue"
         android:theme="@style/Theme.Cinemates.AppBarOverlay"
         app:elevation="0dp"
+        android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:fitsSystemWindows="true"
-
         app:layout_constraintTop_toTopOf="parent">
 
 
@@ -43,9 +42,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main"
-
-        />
+    <include layout="@layout/content_main" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
