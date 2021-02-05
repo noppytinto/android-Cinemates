@@ -154,10 +154,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 movieDetailsViewModel.getAddToListStatus().observe(getViewLifecycleOwner(), addToListStatus ->  {
                     switch (addToListStatus) {
                         case SUCCESS:
-                            Toast.makeText(getContext(), "film aggiunto a Watchlist", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film aggiunto alla lista selezionata", Toast.LENGTH_LONG).show();
                             break;
                         case FAILED:
-                            Toast.makeText(getContext(), "film NON aggiunto a watchlist", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film NON aggiunto alla lista selezionata", Toast.LENGTH_LONG).show();
                             break;
                     }
                 });
@@ -181,7 +181,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         int buttonId = v.getId();
 
-        final String[] choices = {"Watchlist", "2", "3"};
+        final String[] choices = {"Watchlist", "Lista preferiti", "3"};
         final boolean[] checkedItems = {false, false, false};
         ArrayList<Integer> res = new ArrayList<>();
 
@@ -199,13 +199,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                         for(Integer x: res) {
                             Log.d(TAG, "clicked item index is " + x);
 
-                            if(x==0) {
+                            if(x == 0) {
                                 // add movie to watchlist
                                 User user = loginViewModel.getLiveLoggedUser().getValue();
                                 movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
+                            }else if(x == 1){
+                                User user = loginViewModel.getLiveLoggedUser().getValue();
+                                movieDetailsViewModel.addMovieToFavouriteList(currentMovieId, user.getEmail(), user.getAccessToken());
                             }
 
-    //                        Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
+                             //Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -1,5 +1,7 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,6 +18,7 @@ import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -438,6 +441,63 @@ public class MovieDetailsViewModel extends ViewModel {
     }
 
 
+    public void addMovieToFavouriteList(int movieId, String email, String accessToken) {
 
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+        final String dbFunction = "fn_add_to_list_favorites";
+
+        if(movieId<0) {
+            postAddToListStatus(AddToListStatus.IDLE);
+            return;
+        }
+
+        try{
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movieid", String.valueOf(movieId))
+                    .add("email", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,accessToken);
+
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    postAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) {
+                                postAddToListStatus(AddToListStatus.SUCCESS);
+                            }
+                            else {
+                                postAddToListStatus(AddToListStatus.FAILED);
+                            }
+                        }
+                        else {
+                            postAddToListStatus(AddToListStatus.FAILED);
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        postAddToListStatus(AddToListStatus.FAILED);
+                    }
+                }
+            });
+        }catch(Exception e){
+            e.printStackTrace();
+            postAddToListStatus(AddToListStatus.FAILED);
+        }
+    }
 
 }// end MovieDetailsViewModel class
