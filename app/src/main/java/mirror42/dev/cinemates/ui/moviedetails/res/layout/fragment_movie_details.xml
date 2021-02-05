@@ -12,7 +12,8 @@
         android:id="@+id/appbar_movieDetailsFragment"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        app:elevation="@dimen/default_elevation">
+        app:elevation="@dimen/default_elevation"
+        >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar_movieDetailsFragment"
@@ -24,7 +25,7 @@
             app:expandedTitleMarginStart="15dp"
             app:expandedTitleTextAppearance="@style/Cinemates.Toolbar.Expanded.TextAppearance"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
+            app:toolbarId="@+id/toolbar_movieDetailsFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -58,8 +59,25 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
                 app:layout_collapseMode="pin" />
+
+
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_movieDetailsFragment_addToList"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:backgroundTint="@color/yellow"
+        android:elevation="@dimen/default_elevation"
+        android:shadowColor="@color/black"
+        android:src="@drawable/add_icon_black"
+        app:fabCustomSize="50dp"
+        app:layout_anchor="@id/appbar_movieDetailsFragment"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_marginRight="15dp"
+        app:maxImageSize="30dp" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -256,6 +274,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/darkSemiTransparent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_movieDetailsFragment_castNcrewLabel" />
@@ -286,20 +305,7 @@
             <!--            app:layout_constraintEnd_toEndOf="parent"-->
             <!--            app:layout_constraintTop_toTopOf="parent"-->
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_movieDetailsFragment_addToList"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="195dp"
-                android:layout_marginEnd="20dp"
-                android:backgroundTint="@color/yellow"
-                android:elevation="@dimen/default_elevation"
-                android:shadowColor="@color/black"
-                android:src="@drawable/add_icon_black"
-                app:fabCustomSize="50dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:maxImageSize="30dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
