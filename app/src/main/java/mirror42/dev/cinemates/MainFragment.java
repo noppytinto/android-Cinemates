@@ -147,7 +147,7 @@ public class MainFragment extends Fragment {
 
         // TODO: improve this
         try {
-            Thread.sleep(100);
+            Thread.sleep(150);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
