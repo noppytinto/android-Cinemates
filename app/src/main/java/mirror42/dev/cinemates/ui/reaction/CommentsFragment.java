@@ -20,17 +20,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.adapter.RecyclerAdapterShowCommentsDialog;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterCommentsList;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 
 public class CommentsFragment extends Fragment implements
-        RecyclerAdapterShowCommentsDialog.ClickAdapterListener{
+        RecyclerAdapterCommentsList.ClickAdapterListener{
     private final String TAG = this.getClass().getSimpleName();
     private CommentsViewModel commentsViewModel;
     private ArrayList<Comment> commentsList;
-    private RecyclerAdapterShowCommentsDialog recyclerAdapterShowCommentsDialog;
+    private RecyclerAdapterCommentsList recyclerAdapterCommentsList;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
     private String commentText;
@@ -85,7 +85,7 @@ public class CommentsFragment extends Fragment implements
                     newComment.setOwner(loginViewModel.getLoggedUser());
                     newComment.setIsNewItem(true);
 //                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
-                    recyclerAdapterShowCommentsDialog.addPlaceholderComment(newComment);
+                    recyclerAdapterCommentsList.addPlaceholderComment(newComment);
                     moveRecyclerToBottom();
                 }
                 break;
@@ -98,7 +98,7 @@ public class CommentsFragment extends Fragment implements
 
 
 
-        recyclerAdapterShowCommentsDialog.loadNewData(commentsList);
+        recyclerAdapterCommentsList.loadNewData(commentsList);
         moveRecyclerToBottom();
     }
 
@@ -123,8 +123,8 @@ public class CommentsFragment extends Fragment implements
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // adding recycle listener for touch detection
-        recyclerAdapterShowCommentsDialog = new RecyclerAdapterShowCommentsDialog(new ArrayList<>(), getContext(), this);
-        recyclerView.setAdapter(recyclerAdapterShowCommentsDialog);
+        recyclerAdapterCommentsList = new RecyclerAdapterCommentsList(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterCommentsList);
     }
 
     @Override
@@ -140,8 +140,8 @@ public class CommentsFragment extends Fragment implements
                     showCenteredToast("operazione annullata");
                 })
                 .setPositiveButton("Si", (dialog, which) -> {
-                    Comment currentComment = recyclerAdapterShowCommentsDialog.getComment(commentPosition);
-                    recyclerAdapterShowCommentsDialog.removeItem(currentComment);
+                    Comment currentComment = recyclerAdapterCommentsList.getComment(commentPosition);
+                    recyclerAdapterCommentsList.removeItem(currentComment);
                     commentsViewModel.deleteComment(currentComment.getId(), loginViewModel.getLoggedUser());
 //                    dialog.dismiss();
                 })

@@ -153,6 +153,10 @@
         <argument
             android:name="post_id"
             app:argType="long" />
+        <argument
+            android:name="tab_to_focus"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <action
         android:id="@+id/action_global_postFragment"

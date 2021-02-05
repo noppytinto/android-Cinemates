@@ -209,8 +209,10 @@ public class HomeFragment extends Fragment implements
         int likesCount = currentPost.getLikesCount();
         if(likesCount>0) {
             long postId = currentPost.getPostId();
+            int tabToFocus = 1;
             NavGraphDirections.ActionGlobalPostFragment postFragmentDirection =
                     PostFragmentDirections.actionGlobalPostFragment(postId);
+            postFragmentDirection.setTabToFocus(tabToFocus);
             NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
         }
     }
@@ -219,24 +221,9 @@ public class HomeFragment extends Fragment implements
     public void onCommentButtonClicked(int position) {
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
-//        ArrayList<Comment> comments = currentPost.getComments();
-//        int currentCommentsCount = currentPost.getCommentsCount();
-//        User reactionOwner = loginViewModel.getLiveLoggedUser().getValue();
-
-
         NavGraphDirections.ActionGlobalPostFragment postFragmentDirection =
                 PostFragmentDirections.actionGlobalPostFragment(postId);
         NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
-
-//        FragmentManager fm = getActivity().getSupportFragmentManager();
-//        CommentsFragment dialog = CommentsFragment.getInstance(
-//                reactionOwner,
-//                comments,
-//                postId,
-//                position,
-//                currentCommentsCount);
-//        dialog.setListener(this);
-//        dialog.show(fm, "showCommentsDialogFragment");
     }
 
     @Override

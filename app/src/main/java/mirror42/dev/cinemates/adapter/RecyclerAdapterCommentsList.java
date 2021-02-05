@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 
-public class RecyclerAdapterShowCommentsDialog
-        extends RecyclerView.Adapter<RecyclerAdapterShowCommentsDialog.UserCommentsListItemViewHolder>{
+public class RecyclerAdapterCommentsList
+        extends RecyclerView.Adapter<RecyclerAdapterCommentsList.CommentItemViewHolder>{
     private ArrayList<Comment> comments;
     private Context context;
     private ClickAdapterListener listener;
@@ -34,9 +35,9 @@ public class RecyclerAdapterShowCommentsDialog
 
     //----------------------------------------------------------------------- CONSTRUCTORS
 
-    public RecyclerAdapterShowCommentsDialog(ArrayList<Comment> comments,
-                                          Context context,
-                                          ClickAdapterListener listener) {
+    public RecyclerAdapterCommentsList(ArrayList<Comment> comments,
+                                       Context context,
+                                       ClickAdapterListener listener) {
         this.comments = comments;
         this.context = context;
         this.listener = listener;
@@ -49,13 +50,13 @@ public class RecyclerAdapterShowCommentsDialog
 
     @NonNull
     @Override
-    public UserCommentsListItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CommentItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_users_comment_list_item, parent, false);
-        return new UserCommentsListItemViewHolder(view);
+        return new CommentItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserCommentsListItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CommentItemViewHolder holder, int position) {
         Comment comment = comments.get(position);
         User user = comments.get(position).getOwner();
 
@@ -63,9 +64,11 @@ public class RecyclerAdapterShowCommentsDialog
         String lastName = user.getLastName();
         String commentText = comment.getText();
         String profilePictureUrl = user.getProfilePicturePath();
+        String publishDate = MyUtilities.convertMillisToReadableTimespan(comment.getPublishDateMillis());
 
         holder.textViewFullName.setText(firstName + " " + lastName);
         holder.textViewCommentText.setText(commentText);
+        holder.textViewPublishDate.setText(publishDate);
 
         if(comment.isMine())
             holder.buttonDelete.setVisibility(View.VISIBLE);
@@ -120,26 +123,28 @@ public class RecyclerAdapterShowCommentsDialog
 
     //---------------------------------------------------------------------- VIEWHOLDERS
 
-    class UserCommentsListItemViewHolder extends RecyclerView.ViewHolder
+    class CommentItemViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
         public TextView textViewFullName;
         public TextView textViewCommentText;
         public CardView cardView;
         private ImageButton buttonDelete;
+        public TextView textViewPublishDate;
 
 
 
 
         //--------------------------------------------- CONSTRUCTORS
 
-        UserCommentsListItemViewHolder(@NonNull View itemView) {
+        CommentItemViewHolder(@NonNull View itemView) {
             super(itemView);
             this.imageViewProfilePicture = itemView.findViewById(R.id.imageView_userCommentListItem_profilePicture);
             this.textViewFullName = itemView.findViewById(R.id.textView_userCommentListItem_fullName);
             this.textViewCommentText = itemView.findViewById(R.id.textView_userCommentListItem_commentText);
             this.cardView = itemView.findViewById(R.id.cardView_userCommentListItem);
             this.buttonDelete = itemView.findViewById(R.id.imageButton_userCommentListItem_delete);
+            this.textViewPublishDate = itemView.findViewById(R.id.textView_userCommentListItem_date);
 
             this.imageViewProfilePicture.setOnClickListener(this);
             this.buttonDelete.setOnClickListener(this);

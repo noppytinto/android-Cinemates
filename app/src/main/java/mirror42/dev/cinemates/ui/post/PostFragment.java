@@ -55,8 +55,7 @@ public class PostFragment extends Fragment implements
     private TextInputLayout textLayout;
     private long postID;
     private CommentsViewModel commentsViewModel;
-
-
+    private int tabToFocus;
 
 
     //---------------------------------------------------------------------- ANDROID METHODS
@@ -92,6 +91,7 @@ public class PostFragment extends Fragment implements
         if(getArguments() != null) {
             PostFragmentArgs args = PostFragmentArgs.fromBundle(getArguments());
             postID = args.getPostId();
+            tabToFocus = args.getTabToFocus();
 
             // TODO: getting details from db
 
@@ -122,7 +122,6 @@ public class PostFragment extends Fragment implements
                         int commentsCount = post.getCommentsCount();
                         int likesCount = post.getLikesCount();
                         setupTabs(view, arg, commentsCount, likesCount);
-
                         setupPostCommentButtonListener();
 
 
@@ -179,8 +178,10 @@ public class PostFragment extends Fragment implements
 
     }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     //---------------------------------------------------------------------- MY METHODS
     private void setupPostCommentButtonListener() {
@@ -258,8 +259,8 @@ public class PostFragment extends Fragment implements
         FragmentManager fm = getChildFragmentManager();
         Lifecycle lifecycle = getViewLifecycleOwner().getLifecycle();
         viewPagerAdapter = new ViewPagerAdapterPost(fm, lifecycle, arguments);
-        viewPager.setUserInputEnabled(false); // disables horiz. swipe to scroll tabs gestures
         viewPager.setAdapter(viewPagerAdapter);
+
     }
 
     private void setupTabAppearance(int commentsCount, int likesCount) {
@@ -278,6 +279,7 @@ public class PostFragment extends Fragment implements
             }
         });
         tabLayoutMediator.attach();
+//        if(tabToFocus==1) viewPager.setCurrentItem(1); //TODO: fix items disappearance
     }
 
     private void setupTabListener() {

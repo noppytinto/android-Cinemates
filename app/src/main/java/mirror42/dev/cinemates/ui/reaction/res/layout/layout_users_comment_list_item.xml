@@ -12,11 +12,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:backgroundTint="@color/dark_blue"
         app:cardCornerRadius="7dp"
         app:cardElevation="3dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView_userCommentListItem_profilePicture"
         app:layout_constraintTop_toTopOf="@+id/imageView_userCommentListItem_profilePicture">
@@ -82,5 +80,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_user_primary_blue" />
+
+    <TextView
+        android:id="@+id/textView_userCommentListItem_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="5dp"
+        android:fontFamily="@font/poppins_light"
+        android:text="3 giorni fa"
+        android:textColor="@color/light_blue"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/cardView_userCommentListItem"
+        app:layout_constraintTop_toBottomOf="@+id/cardView_userCommentListItem"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
