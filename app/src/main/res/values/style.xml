@@ -6,6 +6,9 @@
 
 
 
+
+
+
     <!--BOTTOM SHEET STYLE-->
 
     <style name="bottom_sheet_dialog_theme" parent="Theme.Design.BottomSheetDialog">
@@ -222,7 +225,6 @@
 
 
 
-
     <!-- CINEMATES MATERIAL DATE PICKER -->
     <style name="Cinemates.MaterialDatePicker" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar">
         <item name="materialCalendarHeaderLayout">@style/Cinemates.MaterialDatePicker.HeaderLayout</item>
@@ -239,6 +241,32 @@
         <item name="itemTextColor">@color/black</item>
         <item name="itemStrokeWidth">0dp</item>
     </style>
+
+
+
+
+
+
+
+
+
+
+    <style name="Cinemates.Toolbar.Expanded.TextAppearance" parent="@style/TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textSize">22sp</item>
+        <item name="fontFamily">@font/poppins_bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Cinemates.Toolbar.Collapsed.TextAppearance" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">@font/poppins_light</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
+
+
+
 
     <!-- CINEMATES TYPING SYSTEM -->
 

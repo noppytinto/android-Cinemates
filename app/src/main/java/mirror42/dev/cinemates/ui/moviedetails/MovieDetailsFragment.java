@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -49,7 +50,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private LoginViewModel loginViewModel;
     private int currentMovieId;
     private NotificationsViewModel notificationsViewModel;
-
+    private MaterialToolbar toolbar;
 
 
 
@@ -59,30 +60,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        ((MainActivity)requireActivity()).hideToolbar();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-//        // This callback will only be called when MyFragment is at least Started.
-//        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
-//            @Override
-//            public void handleOnBackPressed() {
-//                // Handle the back button event
-//
-//                // getting main activity
-//                // and hding action bar
-//                MainActivity main = (MainActivity) getActivity();
-//                if(main!=null && main.getSupportActionBar()!=null)
-//                    main.getSupportActionBar().show();
-//                NavHostFragment.findNavController(MovieDetails_fragment.this)
-//                        .navigate(R.id.action_movieDetails_fragment_to_mainFragment);
-//            }
-//        };
-//        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
-//        // The callback can be enabled or disabled here or in handleOnBackPressed()
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_movie_details, container, false);
     }
@@ -93,6 +75,9 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         addToListButton = view.findViewById(R.id.button_movieDetailsFragment_addToList);
         addToListButton.setOnClickListener(this);
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        toolbar = view.findViewById(R.id.toolbar_movieDetailsFragment);
+        toolbar.setNavigationIcon(R.drawable.ic_back_arrow_light_blue);
+        toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -293,8 +278,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         checkForNewNotifications();
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
 
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
     //------------------------------------------------------------- METHODS
 
@@ -313,8 +306,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     }
 
     private void updateUI(Movie movie) {
-        ImageView backdrop = view.findViewById(R.id.imageView_movieDetailsFragment_backdrop);
-        TextView title = view.findViewById(R.id.textView_movieDetailsFragment_movieTitle);
+        ImageView backdrop = view.findViewById(R.id.appBarImage_movieDetailsFragment);
         TextView releaseDate = view.findViewById(R.id.textView_movieDetailsFragment_releaseDate);
         TextView overview = view.findViewById(R.id.textView_movieDetailsFragment_overview);
         ImageView poster = view.findViewById(R.id.imageView_movieDetailsFragment_poster);
@@ -322,8 +314,9 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         TextView genres = view.findViewById(R.id.textView_movieDetailsFragment_genres);
         TextView releaseStatus = view.findViewById(R.id.textView_movieDetailsFragment_releaseStatus);
 
+        toolbar.setTitle(movie.getTitle());
 
-        title.setText(movie.getTitle());
+
         releaseDate.setText(movie.getReleaseDate());
         overview.setText(movie.getOverview());
         duration.setText(String.valueOf(movie.getDuration()) + " min");
@@ -346,8 +339,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         try {
             Glide.with(this)  //2
                     .load(movie.getBackdropURL()) //3
-                    .fallback(R.drawable.broken_image)
-                    .placeholder(R.drawable.placeholder_image)
+                    .fallback(R.drawable.backdrop_placeholder)
+                    .placeholder(R.drawable.backdrop_placeholder)
                     .fitCenter() //4
                     .into(backdrop); //8
         } catch (Exception e) {

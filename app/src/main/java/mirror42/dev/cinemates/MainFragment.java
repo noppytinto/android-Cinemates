@@ -145,6 +145,15 @@ public class MainFragment extends Fragment {
         });
 
 
+        // TODO: improve this
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        ((MainActivity)requireActivity()).showToolbar();
+
+
     }// end onViewCreated()
 
 

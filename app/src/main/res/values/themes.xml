@@ -18,13 +18,14 @@
         <item name="colorOnError">@color/white</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/primary_blue</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
         <!-- Customize your theme here. -->
     </style>
 
     <style name="Theme.Cinemates.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
     <style name="Theme.Cinemates.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
