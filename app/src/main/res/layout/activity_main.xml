@@ -17,6 +17,8 @@
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:fitsSystemWindows="true"
+
         app:layout_constraintTop_toTopOf="parent">
 
 
@@ -41,7 +43,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_main"
+
+        />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
