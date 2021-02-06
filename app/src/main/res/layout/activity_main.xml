@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
 
@@ -15,7 +14,6 @@
         android:background="@color/primary_blue"
         android:theme="@style/Theme.Cinemates.AppBarOverlay"
         app:elevation="0dp"
-        android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
