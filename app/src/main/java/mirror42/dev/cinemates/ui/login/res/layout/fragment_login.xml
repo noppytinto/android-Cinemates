@@ -12,7 +12,7 @@
         android:layout_width="211dp"
         android:layout_height="100dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/cinemates_logo_extended_nolights"
+        android:src="@drawable/cinemates_logo_extended_no_lights_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
