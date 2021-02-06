@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,10 +59,15 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     //------------------------------------------------------------------------ ANDROID METHODS
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        ((MainActivity)requireActivity()).hideToolbar();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        ((MainActivity)requireActivity()).hideToolbar();
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            Window window = requireActivity().getWindow();
@@ -345,8 +351,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         try {
             Glide.with(this)  //2
                     .load(movie.getBackdropURL()) //3
-                    .fallback(R.drawable.backdrop_placeholder)
-                    .placeholder(R.drawable.backdrop_placeholder)
+                    .fallback(R.drawable.backdrop_placeholder_small)
+                    .placeholder(R.drawable.backdrop_placeholder_small)
                     .centerCrop() //4
                     .into(backdrop); //8
         } catch (Exception e) {

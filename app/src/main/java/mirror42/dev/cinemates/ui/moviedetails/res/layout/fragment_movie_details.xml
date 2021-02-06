@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.moviedetails.MovieDetailsFragment"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    >
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_movieDetailsFragment"
@@ -40,7 +41,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/dark_blue"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/backdrop_placeholder"
+                    android:src="@drawable/backdrop_placeholder_small"
                     app:layout_collapseMode="parallax"
                     android:fitsSystemWindows="true"
                     app:layout_constraintBottom_toBottomOf="parent"
