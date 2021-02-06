@@ -45,6 +45,7 @@ public class NotificationsViewModel extends ViewModel {
     private long notificationID;
 
 
+
     public enum NotificationsStatus {
         NOTIFICATIONS_FETCHED,
         GOT_NEW_NOTIFICATIONS,
@@ -90,6 +91,10 @@ public class NotificationsViewModel extends ViewModel {
 
     public LiveData<NotificationsStatus> getNotificationsStatus() {
         return notificationsStatus;
+    }
+
+    public long getCurrentNotificationID() {
+        return notificationID;
     }
 
 
@@ -438,15 +443,16 @@ public class NotificationsViewModel extends ViewModel {
 
     // deletion
 
-    public void deleteNotificationFromRemoteDB(long notificationID, User loggedUser) {
+    public void deleteNotificationFromRemoteDB(long id, User loggedUser) {
         // TODO: handle errors
+        this.notificationID = id;
 
-        Runnable task = createDeletionTask(notificationID, loggedUser);
+        Runnable task = createDeletionTask(id, loggedUser);
         Thread thread = new Thread(task);
         thread.start();
     }
 
-    private Runnable createDeletionTask(long notificationID, User loggedUser) {
+    private Runnable createDeletionTask(long id, User loggedUser) {
         return () -> {
             Response response = null;
 
@@ -457,7 +463,7 @@ public class NotificationsViewModel extends ViewModel {
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", loggedUser.getEmail())
-                        .add("notification_id", String.valueOf(notificationID))
+                        .add("notification_id", String.valueOf(id))
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
 
@@ -494,9 +500,9 @@ public class NotificationsViewModel extends ViewModel {
     }
 
 
-    public void deleteNotificationFromLocalDB(long notificationID, Context context) {
+    public void deleteNotificationFromLocalDB(long id, Context context) {
         NotificationDao notificationDao = getNotificationDao(context);
-        new Thread(() -> notificationDao.deleteByID(notificationID)).start();
+        new Thread(() -> notificationDao.deleteByID(id)).start();
     }
 
 

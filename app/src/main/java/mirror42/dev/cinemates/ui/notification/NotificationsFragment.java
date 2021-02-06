@@ -91,8 +91,9 @@ public class NotificationsFragment extends Fragment implements
                 case NOTIFICATION_DELETED: {
                     showCenteredToast("notifica eliminata");
                     // delete from local DB
-                    long notificationID = 0;
+                    long notificationID = notificationsViewModel.getCurrentNotificationID();
                     notificationsViewModel.deleteNotificationFromLocalDB(notificationID, getContext());
+
                 }
                     break;
                 case NOTIFICATION_NOT_DELETED: {
