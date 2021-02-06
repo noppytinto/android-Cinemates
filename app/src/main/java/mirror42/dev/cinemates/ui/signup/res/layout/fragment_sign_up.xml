@@ -9,7 +9,9 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        tools:layout_editor_absoluteX="-192dp"
+        tools:layout_editor_absoluteY="16dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -44,73 +46,72 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_username"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="236dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/username"
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.526"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_signUpFragment_upload"
                 app:startIconDrawable="@drawable/icon_user_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_username"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:textColor="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_email"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/login_page_email"
                 app:endIconMode="clear_text"
                 app:helperText="test@mail.com"
                 app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_username"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_username"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_username"
                 app:startIconDrawable="@drawable/email_icon_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_email"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:inputType="textEmailAddress"
                     android:textColor="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_password"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/password"
                 app:endIconMode="password_toggle"
                 app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_email"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_email"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
                 app:startIconDrawable="@drawable/password_icon_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_password"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:inputType="textPassword"
                     android:textColor="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -119,9 +120,11 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_repeatPassword"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle"
                 app:helperText="la password deve contenere almeno 5 caratteri"
@@ -133,9 +136,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_repeatPassword"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:inputType="textPassword"
                     android:textColor="@color/white" />
 
@@ -145,9 +147,11 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_firstName"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
                 android:hint="Nome"
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_repeatPassword"
@@ -158,9 +162,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_firstName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:inputType="textPersonName"
                     android:textColor="@color/white" />
 
@@ -170,9 +173,11 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_lastName"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="12dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/lastname"
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_firstName"
@@ -183,9 +188,8 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_lastName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="20"
                     android:inputType="textPersonName"
                     android:textColor="@color/white" />
 
@@ -195,23 +199,24 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_birthDate"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
                 android:hint="@string/birthdate"
                 app:endIconMode="clear_text"
                 app:helperText="(gg-mm-aaaa)"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_lastName"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_lastName"
                 app:startIconDrawable="@drawable/icon_calendar_light_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_signUpFragment_birthDate"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="16"
                     android:inputType="date"
                     android:textColor="@color/white" />
 
@@ -274,7 +279,7 @@
                 android:id="@+id/button_signUpPage_datePicker"
                 android:layout_width="58dp"
                 android:layout_height="60dp"
-                android:layout_marginStart="7dp"
+                android:layout_marginStart="16dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/icon_clock_light_blue"
                 app:layout_constraintBottom_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate"
