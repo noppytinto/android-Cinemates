@@ -42,21 +42,23 @@ public class NotificationsViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Notification>> notificationsList;
     private SerialDisposable notificationsSubscription;
     private MutableLiveData<NotificationsStatus> notificationsStatus;
-
-
+    private long notificationID;
 
 
     public enum NotificationsStatus {
         NOTIFICATIONS_FETCHED,
         GOT_NEW_NOTIFICATIONS,
         ALL_NOTIFICATIONS_READ,
-        NO_NOTIFICATIONS
+        NO_NOTIFICATIONS,
+        NOTIFICATION_DELETED,
+        NOTIFICATION_NOT_DELETED,
+        IDLE
     }
-
 
     private final String FOLLOW_REQUEST_NOTIFICATION_TYPE = "FR";   //(Friend Request)
     private final String POST_LIKED_NOTIFICATION_TYPE = "PL";       //(Post Liked)
     private final String POST_COMMENTED_NOTIFICATION_TYPE = "PC";   //(Post Commented)
+
 
 
 
@@ -100,7 +102,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildDBurl(dbFunctionName);
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -166,7 +168,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildDBurl(dbFunctionName);
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -233,7 +235,7 @@ public class NotificationsViewModel extends ViewModel {
             try {
                 // build httpurl and request for remote db
                 final String dbFunctionName = "fn_select_notifications";
-                HttpUrl httpUrl = buildDBurl(dbFunctionName);
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("owner_email", email)
@@ -335,6 +337,9 @@ public class NotificationsViewModel extends ViewModel {
     }
 
 
+
+
+
     //-------------------------------------------------------------------------- MY METHODS
 
     public void fetchNotifications(User loggedUser, Context context) {
@@ -364,15 +369,6 @@ public class NotificationsViewModel extends ViewModel {
 //        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    private HttpUrl buildDBurl(String dbFunctionName) {
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunctionName)
-                .build();
-    }
-
     /**
      * sorting in DESC order
      * @param list
@@ -385,12 +381,6 @@ public class NotificationsViewModel extends ViewModel {
         return sortedList;
     }
 
-
-
-
-
-
-
     /**
      * PRECONDITIONS:
      *  - notifications must be != null
@@ -400,15 +390,8 @@ public class NotificationsViewModel extends ViewModel {
     public void saveOnLocalDatabase(@NotNull ArrayList<Notification> notifications, Context context) {
         NotificationDao notificationDao = getNotificationDao(context);
 
-
-        new Thread(() -> {
-            notificationDao.insertAll(notifications);
-
-        })
-                .start();
+        new Thread(() -> notificationDao.insertAll(notifications)).start();
     }
-
-
 
     public void setNotificationsAsOld(ArrayList<Notification> notifications, Context context) {
         if(notifications==null) return;
@@ -450,5 +433,78 @@ public class NotificationsViewModel extends ViewModel {
 
         return notificationDao;
     }
+
+
+
+    // deletion
+
+    public void deleteNotificationFromRemoteDB(long notificationID, User loggedUser) {
+        // TODO: handle errors
+
+        Runnable task = createDeletionTask(notificationID, loggedUser);
+        Thread thread = new Thread(task);
+        thread.start();
+    }
+
+    private Runnable createDeletionTask(long notificationID, User loggedUser) {
+        return () -> {
+            Response response = null;
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_delete_notification";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", loggedUser.getEmail())
+                        .add("notification_id", String.valueOf(notificationID))
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if (responseData.equals("true")) {
+                        setNotificationsStatus(NotificationsStatus.NOTIFICATION_DELETED);
+                    }
+                    // if the response is null (no notifications)
+                    else setNotificationsStatus(NotificationsStatus.NOTIFICATION_NOT_DELETED);
+
+                }
+                // if the response is unsuccesfull
+                else setNotificationsStatus(NotificationsStatus.NOTIFICATION_NOT_DELETED);
+            }
+            catch (ConnectException ce) {
+                setNotificationsStatus(NotificationsStatus.NOTIFICATION_NOT_DELETED);
+            }
+            catch (Exception e) {
+                setNotificationsStatus(NotificationsStatus.NOTIFICATION_NOT_DELETED);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+        };
+    }
+
+
+    public void deleteNotificationFromLocalDB(long notificationID, Context context) {
+        NotificationDao notificationDao = getNotificationDao(context);
+        new Thread(() -> notificationDao.deleteByID(notificationID)).start();
+    }
+
+
+
+
+
+
+
+
 
 }// end NotificationsViewModel class

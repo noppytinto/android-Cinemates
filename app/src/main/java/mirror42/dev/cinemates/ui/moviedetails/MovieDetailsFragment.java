@@ -292,6 +292,9 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     }
 
 
+
+
+
     //------------------------------------------------------------- METHODS
 
     private void initRecyclerView() {

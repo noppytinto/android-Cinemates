@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.notification;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -87,6 +88,18 @@ public class NotificationsFragment extends Fragment implements
                     break;
                 case ALL_NOTIFICATIONS_READ:
                     break;
+                case NOTIFICATION_DELETED: {
+                    showCenteredToast("notifica eliminata");
+                    // delete from local DB
+                    long notificationID = 0;
+                    notificationsViewModel.deleteNotificationFromLocalDB(notificationID, getContext());
+                }
+                    break;
+                case NOTIFICATION_NOT_DELETED: {
+                    showCenteredToast("notifica NON eliminata :(");
+
+                }
+                    break;
             }
 
         });
@@ -97,6 +110,12 @@ public class NotificationsFragment extends Fragment implements
 
         enableSwipeDownToRefresh();
 
+    }
+
+    private void showCenteredToast(String msg) {
+        final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.show();
     }
 
     @Override
@@ -126,11 +145,33 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onPostLikedNotificationClicked(int position) {
         //TODO
+        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        long postID = currentNotification.getPostID();
+        long notificationID = currentNotification.getId();
+
+        // delete from remote DB
+        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+        // then go to the relative post
+        NavGraphDirections.ActionGlobalPostFragment postFragment =
+                NavGraphDirections.actionGlobalPostFragment(postID);
+        navigateTo(postFragment, false);
     }
 
     @Override
     public void onPostCommentedNotificationClicked(int position) {
         //TODO
+        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        long postID = currentNotification.getPostID();
+        long notificationID = currentNotification.getId();
+
+        // delete from remote DB
+        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+        // then go to the relative post
+        NavGraphDirections.ActionGlobalPostFragment postFragment =
+                NavGraphDirections.actionGlobalPostFragment(postID);
+        navigateTo(postFragment, false);
     }
 
     private void loadNotifications(User loggedUser) {
@@ -216,5 +257,7 @@ public class NotificationsFragment extends Fragment implements
         if (removeFromBackStack) navController.popBackStack();
         navController.navigate(direction);
     }
+
+
 
 }// end NotificationsFragment class

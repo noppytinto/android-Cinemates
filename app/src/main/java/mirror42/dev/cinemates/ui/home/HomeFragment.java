@@ -133,6 +133,8 @@ public class HomeFragment extends Fragment implements
     }
 
 
+
+
     //------------------------------------------------------------------------------- METHODS
 
     private void showProgressDialog() {
@@ -320,4 +322,6 @@ public class HomeFragment extends Fragment implements
 //    public void onCommentDeleted(CommentsViewModel.TaskStatus taskStatus) {
 //
 //    }
+
+
 }// end HomeFragment class

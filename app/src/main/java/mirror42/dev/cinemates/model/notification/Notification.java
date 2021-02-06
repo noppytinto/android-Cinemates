@@ -52,7 +52,7 @@ public class Notification implements Parcelable, Comparable<Notification>{
         this.sender = sender;
     }
 
-    public long getPostId() {
+    public long getPostID() {
         return postId;
     }
 

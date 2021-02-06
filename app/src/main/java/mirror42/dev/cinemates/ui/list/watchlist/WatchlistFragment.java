@@ -50,11 +50,6 @@ public class WatchlistFragment extends Fragment implements
     //--------------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -82,6 +77,7 @@ public class WatchlistFragment extends Fragment implements
 
         //
         if(getArguments() != null) {
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
             WatchlistFragmentArgs args = WatchlistFragmentArgs.fromBundle(getArguments());
             Movie[] ml = args.getMoviesList();
             moviesList = new ArrayList<>(Arrays.asList(ml));
@@ -121,18 +117,6 @@ public class WatchlistFragment extends Fragment implements
                 textView.setText(null);
             }
 
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-            loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
-//                switch (loginResult) {
-//                    case SUCCESS: case REMEMBER_ME_EXISTS:
-//                        addToListButton.setVisibility(View.VISIBLE);
-//                        break;
-//                    default:
-//                        addToListButton.setVisibility(View.GONE);
-//                }
-
-            });
-
 
         }//if
 
@@ -150,10 +134,7 @@ public class WatchlistFragment extends Fragment implements
         hideMainToolbar();
     }
 
-    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
-        User user = loginViewModel.getLiveLoggedUser().getValue();
-        watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
-    }
+
 
 
 
@@ -177,11 +158,14 @@ public class WatchlistFragment extends Fragment implements
 //        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
 
         // assigning adapter to recycle
-        recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<Movie>(), getContext(), this);
+        recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterMoviesList);
     }
 
-
+    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
+        User user = loginViewModel.getLiveLoggedUser().getValue();
+        watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
+    }
 
 
 
@@ -206,10 +190,9 @@ public class WatchlistFragment extends Fragment implements
                 //
                 showMainToolbar();
                 NavGraphDirections.AnywhereToMovieDetailsFragment
-                        action = ExploreFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
-                NavHostFragment.findNavController(this).navigate(action);
+                        movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
+                NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
             } catch (Exception e) {
-                e.getMessage();
                 e.printStackTrace();
             }
         } //otw select item during actionmode enabled

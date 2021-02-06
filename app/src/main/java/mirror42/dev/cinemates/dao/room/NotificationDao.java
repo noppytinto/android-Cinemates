@@ -32,6 +32,9 @@ public interface NotificationDao {
     @Delete
     void delete(Notification notification);
 
+    @Query("DELETE FROM notification WHERE id = :id")
+    void deleteByID(long id);
+
     @Update
     void update(Notification notification);
 
