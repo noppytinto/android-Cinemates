@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -80,7 +79,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         addToListButton = view.findViewById(R.id.button_movieDetailsFragment_addToList);
         addToListButton.setOnClickListener(this);
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-        CollapsingToolbarLayout collapsingToolbarLayout = view.findViewById(R.id.collapsingToolbar_movieDetailsFragment);
         toolbar = view.findViewById(R.id.toolbar_movieDetailsFragment);
         toolbar.setNavigationIcon(R.drawable.ic_back_arrow_light_blue);
         toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
@@ -172,7 +170,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         int buttonId = v.getId();
 
-        final String[] choices = {"Watchlist", "Lista preferiti", "3"};
+        final String[] choices = {"Watchlist", "Preferiti", "<TODO>"};
         final boolean[] checkedItems = {false, false, false};
         ArrayList<Integer> res = new ArrayList<>();
 
