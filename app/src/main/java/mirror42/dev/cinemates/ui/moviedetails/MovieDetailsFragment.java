@@ -1,6 +1,5 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,17 +56,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
     //------------------------------------------------------------------------ ANDROID METHODS
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        ((MainActivity)requireActivity()).hideToolbar();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        ((MainActivity)requireActivity()).hideToolbar();
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            Window window = requireActivity().getWindow();
