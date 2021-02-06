@@ -46,7 +46,9 @@
                 style="@style/Cinemates.TextField.TextInputLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="236dp"
+                android:layout_marginEnd="4dp"
                 android:hint="@string/username"
                 app:endIconMode="clear_text"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -73,8 +75,9 @@
                 android:hint="@string/login_page_email"
                 app:endIconMode="clear_text"
                 app:helperText="test@mail.com"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_username"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_username"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_username"
                 app:startIconDrawable="@drawable/email_icon_light_blue">
 
@@ -97,8 +100,9 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/password"
                 app:endIconMode="password_toggle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_email"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_email"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_email"
                 app:startIconDrawable="@drawable/password_icon_light_blue">
 
@@ -121,8 +125,9 @@
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle"
                 app:helperText="la password deve contenere almeno 5 caratteri"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_password"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_password"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_password"
                 app:startIconDrawable="@drawable/password_icon_light_blue">
 
@@ -145,8 +150,9 @@
                 android:layout_marginTop="16dp"
                 android:hint="Nome"
                 app:endIconMode="clear_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_repeatPassword"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_repeatPassword"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_repeatPassword"
                 app:startIconDrawable="@drawable/icon_user_filled_light_blue">
 
@@ -169,8 +175,9 @@
                 android:layout_marginTop="12dp"
                 android:hint="@string/lastname"
                 app:endIconMode="clear_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_firstName"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_firstName"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_firstName"
                 app:startIconDrawable="@drawable/icon_user_filled_light_blue">
 
@@ -195,8 +202,8 @@
                 app:endIconMode="clear_text"
                 app:helperText="(gg-mm-aaaa)"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.175"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_lastName"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_lastName"
                 app:startIconDrawable="@drawable/icon_calendar_light_blue">
 
@@ -233,8 +240,8 @@
                 android:layout_marginTop="32dp"
                 android:text="@string/sign_up_promo_consensus_message"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.186"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_birthDate"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate" />
 
             <CheckBox
@@ -245,8 +252,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/sign_up_page_analytics_consensus_message"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.161"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/checkBox_loginFragment_promo"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_promo" />
 
 
@@ -259,8 +266,8 @@
                 android:fontFamily="@font/poppins_bold"
                 android:text="@string/sign_up_page_terms_and_conditions"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.1"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/checkBox_loginFragment_analytics"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
 
             <ImageButton

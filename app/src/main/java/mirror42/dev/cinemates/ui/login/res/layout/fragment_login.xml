@@ -32,9 +32,11 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_loginFragment_email"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:hint="@string/login_page_email"
         app:endIconMode="clear_text"
         app:errorEnabled="true"
@@ -47,9 +49,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editText_loginFragment_email"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="20"
             android:inputType="textEmailAddress"
             android:textColor="@color/white" />
 
@@ -57,9 +58,11 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_loginFragment_password"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:hint="@string/password"
         app:endIconMode="password_toggle"
         app:errorEnabled="true"
@@ -70,9 +73,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editText_loginFragment_password"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="20"
             android:inputType="textPassword"
             android:textColor="@color/white" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -83,11 +85,13 @@
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="159dp"
         android:layout_height="60dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="16dp"
         android:text="@string/login_page_login"
+        app:layout_constraintBottom_toTopOf="@+id/button_loginFragment_signUp"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe"
+        app:layout_constraintVertical_bias="0.0" />
 
     <CheckBox
         android:id="@+id/checkBox_loginFragment_rememberMe"
