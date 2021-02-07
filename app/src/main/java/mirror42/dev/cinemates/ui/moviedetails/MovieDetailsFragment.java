@@ -1,6 +1,5 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -167,7 +166,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         int buttonId = v.getId();
 
         final String[] choices = {"Watchlist", "Preferiti", "Visti", "<TODO>"};
-        final boolean[] checkedItems = {false, false, false};
+        final boolean[] checkedItems = {false, false, false, false};
         ArrayList<Integer> res = new ArrayList<>();
 
         if(buttonId == R.id.button_movieDetailsFragment_addToList) {
@@ -175,32 +174,29 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             addToListButton.startAnimation(buttonAnim);
 
             // create a dialog with AlertDialog builder
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext()); //TODO: pass style here, once defined
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext()); //TODO: pass style here, once defined
             builder.setTitle("Scegli liste").setNeutralButton("Annulla", null);
-            builder.setPositiveButton("Fatto", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    try {
-                        for(Integer x: res) {
-                            Log.d(TAG, "clicked item index is " + x);
+            builder.setPositiveButton("Fatto", (dialog, which) -> {
+                try {
+                    for(Integer x: res) {
+                        Log.d(TAG, "clicked item index is " + x);
 
-                            if(x == 0) {
-                                // add movie to watchlist
-                                User user = loginViewModel.getObservableLoggedUser().getValue();
-                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WL ,user);
-                            }else if(x == 1){
-                                User user = loginViewModel.getObservableLoggedUser().getValue();
-                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.FV, user);
-                            } else if(x == 2){
-                                User user = loginViewModel.getObservableLoggedUser().getValue();
-                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WD, user);
-                            }
-
-                             //Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
+                        if(x == 0) {
+                            // add movie to watchlist
+                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                            movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WL ,user);
+                        } else if(x == 1){
+                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                            movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.FV, user);
+                        } else if(x == 2){
+                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                            movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WD, user);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+
+                         //Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
             builder.setMultiChoiceItems(choices, checkedItems, (dialog, which, isChecked) -> {
