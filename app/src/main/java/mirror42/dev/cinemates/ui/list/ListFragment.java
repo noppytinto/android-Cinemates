@@ -73,7 +73,7 @@ public class ListFragment extends Fragment implements
 
         //na
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
-        firebaseAnalytics.logScreenEvent(this, "Watchlist page", getContext());
+        firebaseAnalytics.logScreenEvent(this, "List page", getContext());
 
         //
         if(getArguments() != null) {
@@ -85,6 +85,7 @@ public class ListFragment extends Fragment implements
             switch (listType) {
                 case WL:
                     populateEssentialList("Watchlist", list.getMovies());
+                    break;
                 case FV:
                     //TODO
                     break;
@@ -133,7 +134,7 @@ public class ListFragment extends Fragment implements
     }
 
     private void populateEssentialList(String listName, ArrayList<Movie> movies) {
-        // setn list name
+        // set list name
         TextView textView = view.findViewById(R.id.textView_listFragment_title);
         textView.setText(listName);
 
@@ -144,6 +145,7 @@ public class ListFragment extends Fragment implements
 
             // observing selected movies list
             listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         }//if
     }
 

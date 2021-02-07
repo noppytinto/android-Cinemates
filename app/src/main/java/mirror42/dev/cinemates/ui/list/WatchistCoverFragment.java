@@ -62,6 +62,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
             spinner.setVisibility(View.GONE);
             if(watchlist!=null) {
                 // set cover
+                list = watchlist;
                 setCover(watchlist.getMovies());
             }
             else {
@@ -116,9 +117,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
         int viewId = v.getId();
 
         if(viewId == R.id.cardView_listCover) {
-            if(movies!=null) {
-                Movie[] ml = movies.toArray(new Movie[0]);
-
+            if(list!=null && list.getMovies() != null && list.getMovies().size()>0) {
                 NavGraphDirections.ActionGlobalListFragment listFragment =
                         NavGraphDirections.actionGlobalListFragment(list);
                 NavHostFragment.findNavController(WatchistCoverFragment.this).navigate(listFragment);
