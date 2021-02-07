@@ -88,7 +88,7 @@
         app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/listFragment"
-        android:name="mirror42.dev.cinemates.ui.list.watchlist.WatchlistFragment"
+        android:name="mirror42.dev.cinemates.ui.list.ListFragment"
         android:label=" "
         tools:layout="@layout/fragment_list" >
         <argument
@@ -106,6 +106,12 @@
             android:id="@+id/action_listFragment_to_personalProfileFragment"
             app:destination="@id/personalProfileFragment"
             app:popUpTo="@id/personalProfileFragment" />
+        <argument
+            android:name="list_id"
+            app:argType="long" />
+        <argument
+            android:name="list_type"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/resetPasswordFragment"
@@ -142,7 +148,7 @@
         app:popExitAnim="@anim/fragment_close_exit" />
     <fragment
         android:id="@+id/watchlistThumbnailsFragment"
-        android:name="mirror42.dev.cinemates.ui.list.watchlist.WatchlistThumbnailsFragment"
+        android:name="mirror42.dev.cinemates.ui.list.WatchistCoverFragment"
         android:label="fragment_watchlist"
         tools:layout="@layout/fragment_watchlist" />
     <fragment

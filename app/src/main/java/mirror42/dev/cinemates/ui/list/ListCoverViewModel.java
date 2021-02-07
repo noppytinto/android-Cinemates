@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.list.watchlist;
+package mirror42.dev.cinemates.ui.list;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -27,46 +27,46 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class WatchlistThumbnailsViewModel extends ViewModel {
+public class ListCoverViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> moviesList;
-    private MutableLiveData<DownloadStatus> downloadStatus;
-    private RemoteConfigServer remoteConfigServer;
+    private MutableLiveData<FetchStatus> fetchStatus;
     private TheMovieDatabaseApi tmdb;
 
 
     //----------------------------------------------- CONSTRUCTORS
-    public WatchlistThumbnailsViewModel() {
+    public ListCoverViewModel() {
         moviesList = new MutableLiveData<>();
-        downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
-        remoteConfigServer = RemoteConfigServer.getInstance();
+        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         tmdb = TheMovieDatabaseApi.getInstance();
     }
 
 
     //----------------------------------------------- GETTERS/SETTERS
 
-    public void postMoviesList(ArrayList<Movie> moviesList) {
+    public void setMoviesList(ArrayList<Movie> moviesList) {
         this.moviesList.postValue(moviesList);
     }
 
-    public LiveData<ArrayList<Movie>> getMoviesList() {
+    public LiveData<ArrayList<Movie>> getObservableMoviesList() {
         return moviesList;
     }
 
-    public void postDownloadStatus(DownloadStatus downloadStatus) {
-        this.downloadStatus.postValue(downloadStatus);
+    public void setFetchStatus(FetchStatus fetchStatus) {
+        this.fetchStatus.postValue(fetchStatus);
     }
 
-    public LiveData<DownloadStatus> getDownloadStatus() {
-        return downloadStatus;
+    public LiveData<FetchStatus> getObservableFetchStatus() {
+        return fetchStatus;
     }
+
+
 
 
 
     //----------------------------------------------- METHODS
 
-    public void fetchData(String email, String token) {
+    public void fetchWatchlist(String email, String token) {
         Runnable downloadTask = createFetchTask(email, token);
         Thread t = new Thread(downloadTask);
         t.start();
@@ -78,7 +78,8 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
 
             try {
                 // generating url request
-                HttpUrl httpUrl = buildHttpUrl();
+                final String dbFunction = "fn_get_movies_watchlist";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
                         .add("email", email)
                         .build();
@@ -89,7 +90,7 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        postDownloadStatus(DownloadStatus.FAILED);
+                        setFetchStatus(FetchStatus.FAILED);
                     }
 
                     @Override
@@ -132,45 +133,31 @@ public class WatchlistThumbnailsViewModel extends ViewModel {
 
                                     // once finished set results
                                     Collections.reverse(result);
-                                    postMoviesList(result);
-                                    postDownloadStatus(DownloadStatus.SUCCESS);
+                                    setMoviesList(result);
+                                    setFetchStatus(FetchStatus.SUCCESS);
 
                                 }
                                 else {
-                                    postMoviesList(null);
-                                    postDownloadStatus(DownloadStatus.FAILED);
+                                    setMoviesList(null);
+                                    setFetchStatus(FetchStatus.FAILED);
                                 }
                             } // if response is unsuccessful
                             else {
-                                postMoviesList(null);
-                                postDownloadStatus(DownloadStatus.FAILED);
+                                setMoviesList(null);
+                                setFetchStatus(FetchStatus.FAILED);
                             }
                         } catch (Exception e) {
-                            postMoviesList(null);
-                            postDownloadStatus(DownloadStatus.FAILED);
+                            setMoviesList(null);
+                            setFetchStatus(FetchStatus.FAILED);
                         }
                     }
                 });
             } catch (Exception e) {
-                postMoviesList(null);
-                postDownloadStatus(DownloadStatus.FAILED);
+                setMoviesList(null);
+                setFetchStatus(FetchStatus.FAILED);
             }
         };
     }// end createDownloadTask()
-
-    private HttpUrl buildHttpUrl() throws Exception {
-        final String dbFunction = "fn_get_movies_watchlist";
-
-        //
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-
-        return httpUrl;
-    }
 
 
 }// end WatchlistViewModel class

@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.list.watchlist;
+package mirror42.dev.cinemates.ui.list;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,14 +32,14 @@ import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
-public class WatchlistFragment extends Fragment implements
+public class ListFragment extends Fragment implements
         RecyclerAdapterMoviesList.ClickAdapterListener{
     private final String TAG = getClass().getSimpleName();
     private RecyclerAdapterMoviesList recyclerAdapterMoviesList;
     private View view;
     private ArrayList<Movie> selectedMovies;
     private ArrayList<Movie> moviesList;
-    private WatchlistViewModel watchlistViewModel;
+    private ListViewModel listViewModel;
     private LoginViewModel loginViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
@@ -71,54 +71,54 @@ public class WatchlistFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         selectedMovies = new ArrayList<>();
 
-        //
+        //na
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.logScreenEvent(this, "Watchlist page", getContext());
 
         //
-        if(getArguments() != null) {
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-            WatchlistFragmentArgs args = WatchlistFragmentArgs.fromBundle(getArguments());
-            Movie[] ml = args.getMoviesList();
-            moviesList = new ArrayList<>(Arrays.asList(ml));
-
-            if(moviesList != null && moviesList.size()!=0) {
-                // loading data into recycler
-                recyclerAdapterMoviesList.loadNewData(moviesList);
-
-                // observing selected movies list
-                watchlistViewModel = new ViewModelProvider(requireActivity()).get(WatchlistViewModel.class);
-                watchlistViewModel.getSelectedMovies().observe(getViewLifecycleOwner(), selectedMovies-> {
-                    //ignore
-                });
-            }//if
-
-            // setting list name
-            String listTitle = args.getListTitle();
-            if(listTitle != null) {
-                TextView textView = view.findViewById(R.id.textView_listFragment_title);
-                textView.setText(listTitle);
-            }
-
-            // setting list description
-            String listDescription = args.getListDescription();
-            if(listDescription != null ) {
-                if(!listDescription.isEmpty() || !listDescription.equals("")) {
-                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
-                    textView.setText(listDescription);
-                }
-                else {
-                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
-                    textView.setText(null);
-                }
-            }
-            else {
-                TextView textView = view.findViewById(R.id.textView_listFragment_description);
-                textView.setText(null);
-            }
-
-
-        }//if
+//        if(getArguments() != null) {
+//            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+////            WatchlistFragmentArgs args = WatchlistFragmentArgs.fromBundle(getArguments());
+////            Movie[] ml = args.getMoviesList();
+////            moviesList = new ArrayList<>(Arrays.asList(ml));
+//
+//            if(moviesList != null && moviesList.size()!=0) {
+//                // loading data into recycler
+//                recyclerAdapterMoviesList.loadNewData(moviesList);
+//
+//                // observing selected movies list
+//                listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+//                listViewModel.getSelectedMovies().observe(getViewLifecycleOwner(), selectedMovies-> {
+//                    //ignore
+//                });
+//            }//if
+//
+//            // setting list name
+//            String listTitle = args.getListTitle();
+//            if(listTitle != null) {
+//                TextView textView = view.findViewById(R.id.textView_listFragment_title);
+//                textView.setText(listTitle);
+//            }
+//
+//            // setting list description
+//            String listDescription = args.getListDescription();
+//            if(listDescription != null ) {
+//                if(!listDescription.isEmpty() || !listDescription.equals("")) {
+//                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
+//                    textView.setText(listDescription);
+//                }
+//                else {
+//                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
+//                    textView.setText(null);
+//                }
+//            }
+//            else {
+//                TextView textView = view.findViewById(R.id.textView_listFragment_description);
+//                textView.setText(null);
+//            }
+//
+//
+//        }//if
 
     }
 
@@ -164,7 +164,7 @@ public class WatchlistFragment extends Fragment implements
 
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
         User user = loginViewModel.getLiveLoggedUser().getValue();
-        watchlistViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
+        listViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
     }
 
 

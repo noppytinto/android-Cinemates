@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates.ui.list.watchlist;
+package mirror42.dev.cinemates.ui.list;
 
 import android.util.Log;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.utilities.MyValues.*;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -25,38 +25,44 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class WatchlistViewModel extends ViewModel {
+public class ListViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> selectedMovies;
-    private MutableLiveData<DownloadStatus> downloadStatus;
-    private RemoteConfigServer remoteConfigServer;
+    private MutableLiveData<FetchStatus> fetchStatus;
+
+    /**
+     * WL - watchlist
+     * FV - favorites list
+     * WD - watched list
+     * CM - custom list
+     */
+    public enum ListType {WL, FV, WD, CM}
 
 
 
     //----------------------------------------------------------------------------------------- CONSTRUCTORS
-    public WatchlistViewModel() {
+    public ListViewModel() {
         selectedMovies = new MutableLiveData<>();
-        downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
-        remoteConfigServer = RemoteConfigServer.getInstance();
+        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
 
 
     //----------------------------------------------------------------------------------------- GETTERS/SETTERS
 
-    public void postSelectedMovies(ArrayList<Movie> moviesList) {
+    public void setSelectedMovies(ArrayList<Movie> moviesList) {
         this.selectedMovies.postValue(moviesList);
     }
 
-    public LiveData<ArrayList<Movie>> getSelectedMovies() {
+    public LiveData<ArrayList<Movie>> getObservableSelectedMovies() {
         return selectedMovies;
     }
 
-    public void postDownloadStatus(DownloadStatus downloadStatus) {
-        this.downloadStatus.postValue(downloadStatus);
+    public void setFetchStatus(FetchStatus fetchStatus) {
+        this.fetchStatus.postValue(fetchStatus);
     }
 
-    public LiveData<DownloadStatus> getDownloadStatus() {
-        return downloadStatus;
+    public LiveData<FetchStatus> getFetchStatus() {
+        return fetchStatus;
     }
 
 
@@ -75,7 +81,8 @@ public class WatchlistViewModel extends ViewModel {
 
             try {
                 // generating url request
-                HttpUrl httpUrl = buildHttpUrl();
+                final String dbFunction = "fn_remove_from_list_watchlist";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
                         .add("movieid", String.valueOf(movieId))
                         .add("email", email)
@@ -124,25 +131,11 @@ public class WatchlistViewModel extends ViewModel {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-                postSelectedMovies(null);
-                postDownloadStatus(DownloadStatus.FAILED);
+                setSelectedMovies(null);
+                setFetchStatus(FetchStatus.FAILED);
             }
         };
     }// end createDownloadTask()
-
-    private HttpUrl buildHttpUrl() throws Exception {
-        final String dbFunction = "fn_remove_from_list_watchlist";
-
-        //
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-
-        return httpUrl;
-    }
 
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, String email, String token) {
         if(moviesToRemove!=null) {
