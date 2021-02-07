@@ -1255,8 +1255,6 @@ public class TheMovieDatabaseApi {
                                                     "&include_adult=" + INCLUDE_ADULT;
 
 
-
-
     private interface RetrofitAPI {
         @GET(SEARCH_ACTORS_URL)
         Call<ActorSearchResult> searchActorsByName(@Query("query") String query,
@@ -1265,6 +1263,7 @@ public class TheMovieDatabaseApi {
         @GET(SEARCH_MOVIES_URL)
         Call<MovieSearchResult> searchMoviesByTitle(@Query("query") String query,
                                                     @Query("page") int page);
+
     }
 
     private class ActorSearchResult {

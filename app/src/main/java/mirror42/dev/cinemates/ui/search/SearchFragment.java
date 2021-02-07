@@ -104,7 +104,7 @@ public class SearchFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {

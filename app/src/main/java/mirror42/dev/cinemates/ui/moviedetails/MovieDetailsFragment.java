@@ -16,9 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +32,7 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -105,7 +104,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 //                }
 
                 loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-                loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+                loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
                     switch (loginResult) {
                         case SUCCESS: case REMEMBER_ME_EXISTS:
                             addToListButton.setVisibility(View.VISIBLE);
@@ -122,17 +121,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                 //2
                 movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
-                movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), new Observer<Movie>() {
-                    @Override
-                    public void onChanged(@Nullable Movie movie) {
-                        if(movie!=null) {
-                            updateUI(movie);
-                        }
-                        else {
-                            Toast toast = Toast.makeText(getContext(), "errore caricamento dettagli Film", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
+                movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), movie1 -> {
+                    if(movie1 !=null) {
+                        updateUI(movie1);
+                    }
+                    else {
+                        Toast toast = Toast.makeText(getContext(), "errore caricamento dettagli Film", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
                     }
                 });
 
@@ -143,10 +139,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 movieDetailsViewModel.getAddToListStatus().observe(getViewLifecycleOwner(), addToListStatus ->  {
                     switch (addToListStatus) {
                         case SUCCESS:
-                            Toast.makeText(getContext(), "film aggiunto alla lista selezionata", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film aggiunto alla lista", Toast.LENGTH_LONG).show();
                             break;
                         case FAILED:
-                            Toast.makeText(getContext(), "film NON aggiunto alla lista selezionata", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film NON aggiunto alla lista", Toast.LENGTH_LONG).show();
                             break;
                     }
                 });
@@ -170,7 +166,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         int buttonId = v.getId();
 
-        final String[] choices = {"Watchlist", "Preferiti", "<TODO>"};
+        final String[] choices = {"Watchlist", "Preferiti", "Visti", "<TODO>"};
         final boolean[] checkedItems = {false, false, false};
         ArrayList<Integer> res = new ArrayList<>();
 
@@ -190,11 +186,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                             if(x == 0) {
                                 // add movie to watchlist
-                                User user = loginViewModel.getLiveLoggedUser().getValue();
-                                movieDetailsViewModel.addMovieToWatchList(currentMovieId, user.getEmail(), user.getAccessToken());
+                                User user = loginViewModel.getObservableLoggedUser().getValue();
+                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WL ,user);
                             }else if(x == 1){
-                                User user = loginViewModel.getLiveLoggedUser().getValue();
-                                movieDetailsViewModel.addMovieToFavouriteList(currentMovieId, user.getEmail(), user.getAccessToken());
+                                User user = loginViewModel.getObservableLoggedUser().getValue();
+                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.FV, user);
+                            } else if(x == 2){
+                                User user = loginViewModel.getObservableLoggedUser().getValue();
+                                movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WD, user);
                             }
 
                              //Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
@@ -204,22 +203,19 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                     }
                 }
             });
-            builder.setMultiChoiceItems(choices, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                    if(isChecked) {
-                        try {
-                            res.add(which);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+            builder.setMultiChoiceItems(choices, checkedItems, (dialog, which, isChecked) -> {
+                if(isChecked) {
+                    try {
+                        res.add(which);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    else {
-                        try {
-                            res.remove(which);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                }
+                else {
+                    try {
+                        res.remove(which);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });

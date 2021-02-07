@@ -90,11 +90,11 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
         // observe login acitivty
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(this, loginResult -> {
+        loginViewModel.getObservableLoginResult().observe(this, loginResult -> {
             hideProgressDialog();
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getLiveLoggedUser().getValue();
+                    User user = loginViewModel.getObservableLoggedUser().getValue();
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(profilePicturePath, loginMenuItem, this);
                     invalidateOptionsMenu();
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     rememberMeExists = false;
                     break;
                 case REMEMBER_ME_EXISTS: {
-                    User user = loginViewModel.getLiveLoggedUser().getValue();
+                    User user = loginViewModel.getObservableLoggedUser().getValue();
                     checkForNewNotifications(user);
                     rememberMeExists = true;
                     invalidateOptionsMenu();
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             navController.navigate(R.id.action_global_notificationsFragment);
         }
         else if(item.getItemId() == R.id.menu_item_login) {
-            if(rememberMeExists || (loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
+            if(rememberMeExists || (loginViewModel.getObservableLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS)) {
                 navController.navigate(R.id.action_global_personalProfileFragment);
             }
             else {
@@ -157,11 +157,11 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // if is logged
-        if(rememberMeExists || loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) {
+        if(rememberMeExists || loginViewModel.getObservableLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) {
             notificationsMenuItem.setVisible(true);
 
             // set profile picture
-            User remeberMeUser = loginViewModel.getLiveLoggedUser().getValue();
+            User remeberMeUser = loginViewModel.getObservableLoggedUser().getValue();
             String imagePath = null;
             try {
                 imagePath = remeberMeUser.getProfilePicturePath();

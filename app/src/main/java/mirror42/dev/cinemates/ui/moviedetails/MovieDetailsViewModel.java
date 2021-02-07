@@ -1,7 +1,5 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -15,10 +13,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -366,103 +365,89 @@ public class MovieDetailsViewModel extends ViewModel {
         return result;
     }
 
-    public void addMovieToWatchList(int movieId, String email, String accessToken) {
-        Runnable task = createAddToWatchListTask(movieId, email, accessToken);
-        Thread t = new Thread(task);
-        t.start();
+    public void addMovieToEssentialList(int movieId, MoviesList.ListType listType, User loggedUser) {
+        switch (listType) {
+            case WL:
+                addToWatchlist(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
+                break;
+            case FV:
+                addMovieToFavouriteList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
+                break;
+            case WD:
+                addToWatchedList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
+        }
     }
 
-    private Runnable createAddToWatchListTask(int movieId, String email, String accessToken) {
-        return ()-> {
-            // checking input
-            if(movieId<0) {
-                postAddToListStatus(AddToListStatus.IDLE);
-                return;
-            }
+    private void addToWatchlist(int movieId, String email, String accessToken) {
+        // checking input
+        if(movieId<0) {
+            postAddToListStatus(AddToListStatus.IDLE);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_insert_into_essential_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movieid", String.valueOf(movieId))
+                    .add("email", email)
+                    .add("list_type", "WL")
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
 
             //
-            HttpUrl httpUrl = null;
-            final OkHttpClient httpClient = OkHttpSingleton.getClient();
-            // generating url request
-            try {
-                final String dbFunction = "fn_add_to_list_watchlist";
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    postAddToListStatus(AddToListStatus.FAILED);
+                }
 
-                //
-                httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
 
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("movieid", String.valueOf(movieId))
-                        .add("email", email)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
-
-                //
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                            if(responseData.equals("true")) postAddToListStatus(AddToListStatus.SUCCESS);
+                            else postAddToListStatus(AddToListStatus.FAILED);
+                        }
+                        else postAddToListStatus(AddToListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
                         postAddToListStatus(AddToListStatus.FAILED);
                     }
+                }
+            });
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                if(responseData.equals("true")) {
-                                    postAddToListStatus(AddToListStatus.SUCCESS);
-                                }
-                                else {
-                                    postAddToListStatus(AddToListStatus.FAILED);
-                                }
-                            }
-                            else {
-                                postAddToListStatus(AddToListStatus.FAILED);
-                            }
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                            postAddToListStatus(AddToListStatus.FAILED);
-                        }
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                postAddToListStatus(AddToListStatus.FAILED);
-            }
-        };
+        } catch (Exception e) {
+            e.printStackTrace();
+            postAddToListStatus(AddToListStatus.FAILED);
+        }
     }
 
 
     public void addMovieToFavouriteList(int movieId, String email, String accessToken) {
-
-        final OkHttpClient httpClient = OkHttpSingleton.getClient();
-        final String dbFunction = "fn_add_to_list_favorites";
-
         if(movieId<0) {
             postAddToListStatus(AddToListStatus.IDLE);
             return;
         }
 
         try{
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            final String dbFunction = "fn_insert_into_essential_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
             RequestBody requestBody = new FormBody.Builder()
                     .add("movieid", String.valueOf(movieId))
                     .add("email", email)
+                    .add("list_type", "FV")
                     .build();
-            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,accessToken);
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
 
             Call call = httpClient.newCall(request);
             call.enqueue(new Callback() {
@@ -495,6 +480,58 @@ public class MovieDetailsViewModel extends ViewModel {
                 }
             });
         }catch(Exception e){
+            e.printStackTrace();
+            postAddToListStatus(AddToListStatus.FAILED);
+        }
+    }
+
+    private void addToWatchedList(int movieId, String email, String accessToken) {
+        // checking input
+        if(movieId<0) {
+            postAddToListStatus(AddToListStatus.IDLE);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_insert_into_essential_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movieid", String.valueOf(movieId))
+                    .add("email", email)
+                    .add("list_type", "WD")
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, accessToken);
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    postAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) postAddToListStatus(AddToListStatus.SUCCESS);
+                            else postAddToListStatus(AddToListStatus.FAILED);
+                        }
+                        else postAddToListStatus(AddToListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        postAddToListStatus(AddToListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
             e.printStackTrace();
             postAddToListStatus(AddToListStatus.FAILED);
         }

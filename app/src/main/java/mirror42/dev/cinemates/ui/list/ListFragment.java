@@ -20,13 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterMoviesList;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -38,11 +38,11 @@ public class ListFragment extends Fragment implements
     private RecyclerAdapterMoviesList recyclerAdapterMoviesList;
     private View view;
     private ArrayList<Movie> selectedMovies;
-    private ArrayList<Movie> moviesList;
     private ListViewModel listViewModel;
     private LoginViewModel loginViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
+    private MoviesList.ListType listType;
 
 
 
@@ -76,22 +76,32 @@ public class ListFragment extends Fragment implements
         firebaseAnalytics.logScreenEvent(this, "Watchlist page", getContext());
 
         //
-//        if(getArguments() != null) {
+        if(getArguments() != null) {
+            ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
+            MoviesList list = args.getList();
+            listType = list.getListType();
+
+            //
+            switch (listType) {
+                case WL:
+                    populateEssentialList("Watchlist", list.getMovies());
+                case FV:
+                    //TODO
+                    break;
+                case WD:
+                    //TODO
+                    break;
+                case CM:
+                    //TODO
+                    break;
+            }
+        }
 //            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 ////            WatchlistFragmentArgs args = WatchlistFragmentArgs.fromBundle(getArguments());
 ////            Movie[] ml = args.getMoviesList();
 ////            moviesList = new ArrayList<>(Arrays.asList(ml));
 //
-//            if(moviesList != null && moviesList.size()!=0) {
-//                // loading data into recycler
-//                recyclerAdapterMoviesList.loadNewData(moviesList);
-//
-//                // observing selected movies list
-//                listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
-//                listViewModel.getSelectedMovies().observe(getViewLifecycleOwner(), selectedMovies-> {
-//                    //ignore
-//                });
-//            }//if
+
 //
 //            // setting list name
 //            String listTitle = args.getListTitle();
@@ -120,6 +130,21 @@ public class ListFragment extends Fragment implements
 //
 //        }//if
 
+    }
+
+    private void populateEssentialList(String listName, ArrayList<Movie> movies) {
+        // setn list name
+        TextView textView = view.findViewById(R.id.textView_listFragment_title);
+        textView.setText(listName);
+
+        // set movies list
+        if(movies != null && movies.size()!=0) {
+            // loading data into recycler
+            recyclerAdapterMoviesList.loadNewData(movies);
+
+            // observing selected movies list
+            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        }//if
     }
 
     @Override
@@ -160,11 +185,6 @@ public class ListFragment extends Fragment implements
         // assigning adapter to recycle
         recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterMoviesList);
-    }
-
-    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove) {
-        User user = loginViewModel.getLiveLoggedUser().getValue();
-        listViewModel.removeMoviesFromList(moviesToRemove, user.getEmail(), user.getAccessToken());
     }
 
 
@@ -316,7 +336,8 @@ public class ListFragment extends Fragment implements
         }
         //
         selectedMovies = recyclerAdapterMoviesList.getcurrentSelectedMovies();
-        removeMoviesFromList(selectedMovies);
+        User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
+        listViewModel.removeMoviesFromList(selectedMovies, listType, loggedUser);
 
         // and notify recycler
         recyclerAdapterMoviesList.notifyDataSetChanged();

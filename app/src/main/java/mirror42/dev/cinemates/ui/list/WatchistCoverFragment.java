@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.list;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
@@ -30,6 +33,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
     private LoginViewModel loginViewModel;
     private View view;
     private ArrayList<Movie> movies;
+    private MoviesList list;
     private CardView cardView;
     private ProgressBar spinner;
 
@@ -41,7 +45,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.layout_list_cover, container, false);
+        return inflater.inflate(R.layout.layout_essential_list_cover, container, false);
     }
 
     @Override
@@ -54,30 +58,25 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
 
         //2
         listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);
-        listCoverViewModel.getObservableMoviesList().observe(getViewLifecycleOwner(), moviesList -> {
-            if(moviesList!=null) {
-                // reverse list
-                Collections.reverse(moviesList);
-                movies = moviesList;
-
-                // set thumbnails
-                setThumbnails(moviesList);
+        listCoverViewModel.getObservableWatchlist().observe(getViewLifecycleOwner(), watchlist -> {
+            spinner.setVisibility(View.GONE);
+            if(watchlist!=null) {
+                // set cover
+                setCover(watchlist.getMovies());
             }
             else {
-                Toast toast = Toast.makeText(getContext(), "errore caricamento Watchlist", Toast.LENGTH_SHORT);
-                toast.show();
+                //                showCenteredToast("errore caricamento Watchlist");
             }
         });
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS: case REMEMBER_ME_EXISTS: {
-                    User user = loginViewModel.getLiveLoggedUser().getValue();
-                    if(user!=null) {
-                        String email = user.getEmail();
-                        listCoverViewModel.fetchWatchlist(email, user.getAccessToken());
+                    User loggedUser = loginViewModel.getLoggedUser();
+                    if(loggedUser!=null) {
+                        listCoverViewModel.fetchList(loggedUser, MoviesList.ListType.WL);
                     }
                 }
                 break;
@@ -88,11 +87,9 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
 
 
 
-
-
     //--------------------------------------------------------------------------------------- METHODS
 
-    private void setThumbnails(ArrayList<Movie> moviesList) {
+    private void setCover(ArrayList<Movie> moviesList) {
         ImageView thumbnail_1 = view.findViewById(R.id.imageView_listCover_1);
         ImageView thumbnail_2 = view.findViewById(R.id.imageView_listCover_2);
         ImageView thumbnail_3 = view.findViewById(R.id.imageView_listCover_3);
@@ -116,24 +113,24 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        int id = v.getId();
+        int viewId = v.getId();
 
-        if(id == R.id.cardView_listCover) {
+        if(viewId == R.id.cardView_listCover) {
             if(movies!=null) {
-                Movie[] m = movies.toArray(new Movie[0]);
-n
-//                PersonalProfileFragmentDirections.ActionPersonalProfileFragmentToListFragment listFragment =
-//                        PersonalProfileFragmentDirections.actionPersonalProfileFragmentToListFragment(ml, 0, )
-//                PersonalProfileFragmentDirections.ActionPersonalProfileFragmentToListFragment action =
-//                        PersonalProfileFragmentDirections.actionPersonalProfileFragmentToListFragment(m);
-//                action.setListTitle("Watchlist");
-//                action.setListDescription("");
-//                NavHostFragment.findNavController(BaseListThumbnailsFragment.this).navigate(action);
+                Movie[] ml = movies.toArray(new Movie[0]);
+
+                NavGraphDirections.ActionGlobalListFragment listFragment =
+                        NavGraphDirections.actionGlobalListFragment(list);
+                NavHostFragment.findNavController(WatchistCoverFragment.this).navigate(listFragment);
             }
-            else {
-                Toast toast = Toast.makeText(getContext(), "caricamento lista in corso...", Toast.LENGTH_SHORT);
-                toast.show();
-            }
+            else showCenteredToast("caricamento lista in corso...");
         }
     }
+
+    private void showCenteredToast(String s) {
+        final Toast toast = Toast.makeText(getContext(), s, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0,0);
+        toast.show();
+    }
+
 }// end WatchlistFragment class

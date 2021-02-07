@@ -82,7 +82,7 @@ public class LoginViewModel extends ViewModel {
 
     //----------------------------------------------------------------------- GETTERS/SETTERS
 
-    public LiveData<User> getLiveLoggedUser() {
+    public LiveData<User> getObservableLoggedUser() {
         return user;
     }
 
@@ -99,8 +99,12 @@ public class LoginViewModel extends ViewModel {
         this.user.setValue(user);
     }
 
-    public MutableLiveData<LoginResult> getLoginResult() {
+    public MutableLiveData<LoginResult> getObservableLoginResult() {
         return loginResult;
+    }
+
+    public LoginResult getLoginResult() {
+        return loginResult.getValue();
     }
 
     public void setPostLoginResult(LoginResult loginResult) {

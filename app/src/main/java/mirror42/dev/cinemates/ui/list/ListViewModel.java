@@ -11,11 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.*;
+import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
-import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -30,13 +31,7 @@ public class ListViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Movie>> selectedMovies;
     private MutableLiveData<FetchStatus> fetchStatus;
 
-    /**
-     * WL - watchlist
-     * FV - favorites list
-     * WD - watched list
-     * CM - custom list
-     */
-    public enum ListType {WL, FV, WD, CM}
+
 
 
 
@@ -69,79 +64,92 @@ public class ListViewModel extends ViewModel {
 
     //----------------------------------------------------------------------------------------- METHODS
 
-    public void removeMovie(int movieId, String email, String token) {
-        Runnable downloadTask = createTask(movieId, email, token);
-        Thread t = new Thread(downloadTask);
-        t.start();
+    public void removeSingleMovieFromEssentialList(int movieId, MoviesList.ListType listType, User loggedUser) {
+        switch (listType) {
+            case WL:
+                removeSingleMovieFromWatchlist(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
+                break;
+            case FV: {
+                //TODO
+            }
+                break;
+            case WD: {
+                //TODO
+            }
+                break;
+            case CM: {
+                //TODO
+            }
+                break;
+        }
     }
 
-    private Runnable createTask(int movieId, String email, String token) {
-        return ()-> {
-            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+    private void removeSingleMovieFromWatchlist(int movieId, String email, String token) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
-            try {
-                // generating url request
-                final String dbFunction = "fn_remove_from_list_watchlist";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("movieid", String.valueOf(movieId))
-                        .add("email", email)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+        try {
+            // generating url request
+            final String dbFunction = "fn_delete_movie_from_essential_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movieid", String.valueOf(movieId))
+                    .add("list_type", "WL")
+                    .add("email", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-                // performing http request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
 //                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                        Log.d(TAG, "onFailure: ");
-                    }
+                    Log.d(TAG, "onFailure: ");
+                }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
 //                                ArrayList<Movie> result = null;
 //                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
-                                if (!responseData.equals("null")) {
+                            if (!responseData.equals("null")) {
 
-                                    // once finished set results
+                                // once finished set results
 //                                    postSelectedMovies(result);
 //                                    postDownloadStatus(DownloadStatus.SUCCESS);
 
-                                }
-                                else {
+                            }
+                            else {
 //                                    postSelectedMovies(null);
 //                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                                }
-                            } // if response is unsuccessful
-                            else {
+                            }
+                        } // if response is unsuccessful
+                        else {
 //                                postSelectedMovies(null);
 //                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
 //                            postSelectedMovies(null);
 //                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
-                        }
                     }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                setSelectedMovies(null);
-                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setSelectedMovies(null);
+            setFetchStatus(FetchStatus.FAILED);
+        }
     }// end createDownloadTask()
 
-    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, String email, String token) {
+    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, MoviesList.ListType listType,  User loggedUser) {
         if(moviesToRemove!=null) {
             for(Movie m: moviesToRemove) {
                 try {
-                    removeMovie(m.getTmdbID(), email, token);
+                    removeSingleMovieFromEssentialList(m.getTmdbID(), listType,  loggedUser);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

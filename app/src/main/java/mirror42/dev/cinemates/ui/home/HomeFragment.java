@@ -91,12 +91,12 @@ public class HomeFragment extends Fragment implements
         });
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
-                    User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
+                    User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
                     spinner.setVisibility(View.VISIBLE);
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
 //                    checkForNewNotifications(loggedUser);
@@ -120,7 +120,7 @@ public class HomeFragment extends Fragment implements
 
             recyclerAdapterPost.clearList();
 
-            User loggedUser = loginViewModel.getLiveLoggedUser().getValue();
+            User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
             homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
             checkForNewNotifications(loggedUser);
         });
@@ -167,7 +167,7 @@ public class HomeFragment extends Fragment implements
 //        recyclerAdapterPost.updateLikeCounter(position);
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
-        String currentLoggedUserEmail = loginViewModel.getLiveLoggedUser().getValue().getEmail();
+        String currentLoggedUserEmail = loginViewModel.getObservableLoggedUser().getValue().getEmail();
         TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_showLikes);
         Button likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
@@ -177,23 +177,23 @@ public class HomeFragment extends Fragment implements
             if(currentLikesCounter>0)
                 currentLikesCounter = currentLikesCounter - 1;
 
-            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
             // removing like from current cached list
             ArrayList<Like> currentLikes = currentPost.getLikes();
             if(currentLikes!=null && currentLikes.size()>0) {
                 Like placeholderLike = new Like();
-                placeholderLike.setOwner(loginViewModel.getLiveLoggedUser().getValue());
+                placeholderLike.setOwner(loginViewModel.getObservableLoggedUser().getValue());
                 currentLikes.remove(placeholderLike);
             }
         }
         else { //add like
             currentLikesCounter = currentLikesCounter + 1;
-            homeViewModel.addLike(postId, loginViewModel.getLiveLoggedUser().getValue().getEmail(), loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+            homeViewModel.addLike(postId, loginViewModel.getObservableLoggedUser().getValue().getEmail(), loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
             // adding placehoder like to the current cached list
             Like placeholderLike = new Like();
-            User currentUser = loginViewModel.getLiveLoggedUser().getValue();
+            User currentUser = loginViewModel.getObservableLoggedUser().getValue();
             placeholderLike.setOwner(currentUser);
             ArrayList<Like> currentLikes = currentPost.getLikes();
             if(currentLikes==null)

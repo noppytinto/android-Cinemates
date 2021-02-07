@@ -82,5 +82,6 @@
     <string name="channel_name">cinemates_channel</string>
     <string name="channel_description">cinemates_notification_channel</string>
     <string name="msg_token_fmt">FCM token: </string>
+    <string name="custom_list">lista custom</string>
 
 </resources>

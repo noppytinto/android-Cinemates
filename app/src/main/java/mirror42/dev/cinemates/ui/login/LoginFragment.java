@@ -94,12 +94,12 @@ public class LoginFragment extends Fragment  implements
 
         //
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             hideProgressDialog();
 
             switch (loginResult) {
                 case SUCCESS: {
-                    User user = loginViewModel.getLiveLoggedUser().getValue();
+                    User user = loginViewModel.getObservableLoggedUser().getValue();
                     try {
                         showCenteredToast( "Authentication server:\nlogin successful\nwelcome: " + user.getEmail());
                     } catch (Exception e) {

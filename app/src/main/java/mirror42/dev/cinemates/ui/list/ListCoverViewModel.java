@@ -10,14 +10,17 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
+import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.FavoritesList;
+import mirror42.dev.cinemates.model.list.MoviesList;
+import mirror42.dev.cinemates.model.list.WatchedList;
+import mirror42.dev.cinemates.model.list.Watchlist;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
-import mirror42.dev.cinemates.utilities.MyValues.*;
+import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
-import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -29,27 +32,47 @@ import okhttp3.Response;
 
 public class ListCoverViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
-    private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<FetchStatus> fetchStatus;
     private TheMovieDatabaseApi tmdb;
+    private MutableLiveData<Watchlist> watchlist;
+    private MutableLiveData<FavoritesList> favoritesList; //TODO
+    private MutableLiveData<WatchedList> watchedList;     //TODO
 
 
-    //----------------------------------------------- CONSTRUCTORS
+    //----------------------------------------------------------------------------- CONSTRUCTORS
     public ListCoverViewModel() {
-        moviesList = new MutableLiveData<>();
+        watchlist = new MutableLiveData<>();
+        favoritesList = new MutableLiveData<>();
+        watchedList = new MutableLiveData<>();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         tmdb = TheMovieDatabaseApi.getInstance();
     }
 
 
-    //----------------------------------------------- GETTERS/SETTERS
+    //----------------------------------------------------------------------------- GETTERS/SETTERS
 
-    public void setMoviesList(ArrayList<Movie> moviesList) {
-        this.moviesList.postValue(moviesList);
+    public void setWatchlist(Watchlist watchlist) {
+        this.watchlist.postValue(watchlist);
     }
 
-    public LiveData<ArrayList<Movie>> getObservableMoviesList() {
-        return moviesList;
+    public LiveData<Watchlist> getObservableWatchlist() {
+        return watchlist;
+    }
+
+    public void setFavoritesList(FavoritesList favoritesList) {
+        this.favoritesList.postValue(favoritesList);
+    }
+
+    public LiveData<FavoritesList> getObservableFavoritesList() {
+        return favoritesList;
+    }
+
+    public void setWatchedList(WatchedList watchedList) {
+        this.watchedList.postValue(watchedList);
+    }
+
+    public LiveData<WatchedList> getObservableWatchedsList() {
+        return watchedList;
     }
 
     public void setFetchStatus(FetchStatus fetchStatus) {
@@ -62,26 +85,38 @@ public class ListCoverViewModel extends ViewModel {
 
 
 
+    //----------------------------------------------------------------------------- METHODS
 
-
-    //----------------------------------------------- METHODS
-
-    public void fetchWatchlist(String email, String token) {
-        Runnable downloadTask = createFetchTask(email, token);
-        Thread t = new Thread(downloadTask);
-        t.start();
+    public void fetchList(User loggedUser, MoviesList.ListType listType) {
+        switch (listType) {
+            case WL: {
+                Runnable task = createFetchWatchlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Thread t = new Thread(task);
+                t.start();
+            }
+                break;
+            case FV: {
+                //TODO
+            }
+                break;
+            case WD: {
+                //TODO
+            }
+                break;
+        }
     }
 
-    private Runnable createFetchTask(String email, String token) {
+    private Runnable createFetchWatchlistTask(String email, String token) {
         return ()-> {
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
             try {
                 // generating url request
-                final String dbFunction = "fn_get_movies_watchlist";
+                final String dbFunction = "fn_select_essential_list";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
                         .add("email", email)
+                        .add("list_type", "WL")
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
@@ -119,41 +154,41 @@ public class ListCoverViewModel extends ViewModel {
                                                 e.printStackTrace();
                                             }
 
+
+                                            Movie movie = new Movie();
+                                            movie.setTmdbID(movieId);
+                                            movie.setPosterURL(posterURL);
+
+                                            result.add(movie);
+
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
-
-
-                                        Movie movie = new Movie();
-                                        movie.setTmdbID(movieId);
-                                        movie.setPosterURL(posterURL);
-
-                                        result.add(movie);
                                     }
 
                                     // once finished set results
-                                    Collections.reverse(result);
-                                    setMoviesList(result);
+                                    Watchlist watchlist = new Watchlist();
+                                    watchlist.setMovies(result);
+                                    setWatchlist(watchlist);
                                     setFetchStatus(FetchStatus.SUCCESS);
-
                                 }
                                 else {
-                                    setMoviesList(null);
+                                    setWatchlist(null);
                                     setFetchStatus(FetchStatus.FAILED);
                                 }
                             } // if response is unsuccessful
                             else {
-                                setMoviesList(null);
+                                setWatchlist(null);
                                 setFetchStatus(FetchStatus.FAILED);
                             }
                         } catch (Exception e) {
-                            setMoviesList(null);
+                            setWatchlist(null);
                             setFetchStatus(FetchStatus.FAILED);
                         }
                     }
                 });
             } catch (Exception e) {
-                setMoviesList(null);
+                setWatchlist(null);
                 setFetchStatus(FetchStatus.FAILED);
             }
         };

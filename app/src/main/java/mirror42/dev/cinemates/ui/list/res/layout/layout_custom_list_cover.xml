@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_listStub_watchlist"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/black"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView_listStub_5"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_3"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_6"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_4"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_7"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_5"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_8"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_6"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_listStub_7"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_3"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_1"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_4"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_2"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ImageView
+                android:id="@+id/imageView_listStub_1"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+
+            <ImageView
+                android:id="@+id/imageView_listStub_2"
+                android:layout_width="85dp"
+                android:layout_height="125dp"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:srcCompat="@drawable/poster_avengers" />
+
+            <ProgressBar
+                android:id="@+id/progressBar_listStub"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="44dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.827"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/view_listStub_gradient"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/gradient_horizontal_black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView_listStub_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/custom_list"
+                android:textColor="@color/light_blue"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/textView_listStub_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textView_listStub_description"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/poppins_medium"
+                android:text="Scetur ridiculus mus. Nam fermentum, nulla luctus pharetra "
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

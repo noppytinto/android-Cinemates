@@ -108,9 +108,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
                         //
                         userProfileViewModel.checkMyFollowIsPending(
-                                loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                                 profileOwner.getUsername(),
-                                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
                     }
                         break;
@@ -154,8 +154,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
                         userProfileViewModel.checkHisFollowIsPending(
                                 profileOwner.getUsername(),
-                                loginViewModel.getLiveLoggedUser().getValue().getUsername(),
-                                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
                     }
                     break;
                     case HIS_FOLLOW_REQUEST_IS_PENDING: {
@@ -185,14 +185,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         super.onResume();
         if(currentUserIsLogged()) {
             userProfileViewModel.checkIfollowHim(
-                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
             userProfileViewModel.checkHeFollowsMe(
                     profileOwner.getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
         }
     }
@@ -222,9 +222,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             });
 
             userProfileViewModel.sendFollowRequest(
-                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
         }
         else if(v.getId() == buttonAcceptFollow.getId()) {
             userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
@@ -246,8 +246,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
             userProfileViewModel.acceptFollowRequest(
                     profileOwner.getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getUsername(),
-                    loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
         }
     }
 
@@ -260,8 +260,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     //-------------------------------------------------------------------------- MY METHODS
 
     private boolean currentUserIsLogged() {
-        return loginViewModel != null && (( loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
-                loginViewModel.getLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
+        return loginViewModel != null && (( loginViewModel.getObservableLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
+                loginViewModel.getObservableLoginResult().getValue() == LoginViewModel.LoginResult.REMEMBER_ME_EXISTS);
     }
 
     public void showCenteredToast(String message) {
