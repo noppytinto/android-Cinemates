@@ -90,7 +90,7 @@ public class ListFragment extends Fragment implements
                     populateEssentialList("Preferiti", list.getMovies());
                     break;
                 case WD:
-                    //TODO
+                    populateEssentialList("Visti", list.getMovies());
                     break;
                 case CM:
                     //TODO

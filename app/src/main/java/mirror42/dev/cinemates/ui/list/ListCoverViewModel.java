@@ -36,7 +36,7 @@ public class ListCoverViewModel extends ViewModel {
     private TheMovieDatabaseApi tmdb;
     private MutableLiveData<Watchlist> watchlist;
     private MutableLiveData<FavoritesList> favoritesList;
-    private MutableLiveData<WatchedList> watchedList;     //TODO
+    private MutableLiveData<WatchedList> watchedList;
 
 
     //----------------------------------------------------------------------------- CONSTRUCTORS
@@ -102,7 +102,9 @@ public class ListCoverViewModel extends ViewModel {
             }
                 break;
             case WD: {
-                //TODO
+                Runnable task = createFetchWatchedlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Thread t = new Thread(task);
+                t.start();
             }
                 break;
         }
@@ -283,5 +285,94 @@ public class ListCoverViewModel extends ViewModel {
             }
         };
     } // end createFetchFavourites()
+
+    private Runnable createFetchWatchedlistTask(String email, String token) {
+        return ()-> {
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+            try {
+                // generating url request
+                final String dbFunction = "fn_select_essential_list";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("email", email)
+                        .add("list_type", "WD")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing http request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+                                ArrayList<Movie> result = null;
+
+                                if ( ! responseData.equals("null")) {
+                                    result = new ArrayList<>();
+                                    JSONArray jsonArray = new JSONArray(responseData);
+                                    String posterURL = null;
+
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject x = jsonArray.getJSONObject(i);
+                                        int movieId = x.getInt("fk_movie");
+
+                                        try{
+                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
+
+                                            try {
+                                                posterURL = jsonMovieDetails.getString("poster_path");
+                                                posterURL = tmdb.buildPosterUrl(posterURL);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+
+                                            Movie movie = new Movie();
+                                            movie.setTmdbID(movieId);
+                                            movie.setPosterURL(posterURL);
+
+                                            result.add(movie);
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    // once finished set results
+                                    WatchedList watchedList = new WatchedList();
+                                    watchedList.setMovies(result);
+                                    setWatchedList(watchedList);
+                                    setFetchStatus(FetchStatus.SUCCESS);
+                                }
+                                else {
+                                    setWatchedList(null);
+                                    setFetchStatus(FetchStatus.FAILED);
+                                }
+                            } // if response is unsuccessful
+                            else {
+                                setWatchedList(null);
+                                setFetchStatus(FetchStatus.FAILED);
+                            }
+                        } catch (Exception e) {
+                            setWatchedList(null);
+                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                setWatchedList(null);
+                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    } // end createFetchWatchedlistTask()
+
 
 }// end WatchlistViewModel class

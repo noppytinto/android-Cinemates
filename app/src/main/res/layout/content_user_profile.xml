@@ -32,6 +32,19 @@
         app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_watchlist"
         app:layout_constraintTop_toBottomOf="@+id/fragment_personalProfileFragment_watchlist" />
 
+    <fragment
+        android:id="@+id/fragment_personalProfileFragment_watchedlist"
+        android:name="mirror42.dev.cinemates.ui.list.WatchedCoverFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_watchlist"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_personalProfileFragment_watchlist" />
+
     <TextView
         android:id="@+id/textView_userProfileFragment_watchlist"
         android:layout_width="0dp"
