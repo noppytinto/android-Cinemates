@@ -70,7 +70,7 @@ public class ListViewModel extends ViewModel {
                 removeSingleMovieFromWatchlist(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
                 break;
             case FV: {
-                //TODO
+                removeSingleMovieFromFavouritesList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
             }
                 break;
             case WD: {
@@ -143,7 +143,68 @@ public class ListViewModel extends ViewModel {
             setSelectedMovies(null);
             setFetchStatus(FetchStatus.FAILED);
         }
-    }// end createDownloadTask()
+    }// end removeSingleMovieFromWatchlist()
+
+    private void removeSingleMovieFromFavouritesList(int movieId, String email, String token) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "fn_delete_movie_from_essential_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movieid", String.valueOf(movieId))
+                    .add("list_type", "FV")
+                    .add("email", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                    Log.d(TAG, "onFailure: ");
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+//                                ArrayList<Movie> result = null;
+//                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+
+                            if (!responseData.equals("null")) {
+
+                                // once finished set results
+//                                    postSelectedMovies(result);
+//                                    postDownloadStatus(DownloadStatus.SUCCESS);
+
+                            }
+                            else {
+//                                    postSelectedMovies(null);
+//                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                            }
+                        } // if response is unsuccessful
+                        else {
+//                                postSelectedMovies(null);
+//                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+//                            postSelectedMovies(null);
+//                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setSelectedMovies(null);
+            setFetchStatus(FetchStatus.FAILED);
+        }
+    }// end removeSingleMovieFromFavouritesList()
 
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, MoviesList.ListType listType,  User loggedUser) {
         if(moviesToRemove!=null) {

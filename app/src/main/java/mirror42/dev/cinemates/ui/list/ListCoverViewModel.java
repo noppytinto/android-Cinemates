@@ -35,7 +35,7 @@ public class ListCoverViewModel extends ViewModel {
     private MutableLiveData<FetchStatus> fetchStatus;
     private TheMovieDatabaseApi tmdb;
     private MutableLiveData<Watchlist> watchlist;
-    private MutableLiveData<FavoritesList> favoritesList; //TODO
+    private MutableLiveData<FavoritesList> favoritesList;
     private MutableLiveData<WatchedList> watchedList;     //TODO
 
 
@@ -96,7 +96,9 @@ public class ListCoverViewModel extends ViewModel {
             }
                 break;
             case FV: {
-                //TODO
+                Runnable task = createFetchFavourites(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Thread t = new Thread(task);
+                t.start();
             }
                 break;
             case WD: {
@@ -192,7 +194,94 @@ public class ListCoverViewModel extends ViewModel {
                 setFetchStatus(FetchStatus.FAILED);
             }
         };
-    }// end createDownloadTask()
+    }// end createFetchWatchlistTask()
 
+    private Runnable createFetchFavourites(String email, String token) {
+        return ()-> {
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+            try {
+                // generating url request
+                final String dbFunction = "fn_select_essential_list";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("email", email)
+                        .add("list_type", "FV")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing http request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+                                ArrayList<Movie> result = null;
+
+                                if ( ! responseData.equals("null")) {
+                                    result = new ArrayList<>();
+                                    JSONArray jsonArray = new JSONArray(responseData);
+                                    String posterURL = null;
+
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject x = jsonArray.getJSONObject(i);
+                                        int movieId = x.getInt("fk_Movie");
+
+                                        try{
+                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
+
+                                            try {
+                                                posterURL = jsonMovieDetails.getString("poster_path");
+                                                posterURL = tmdb.buildPosterUrl(posterURL);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+
+                                            Movie movie = new Movie();
+                                            movie.setTmdbID(movieId);
+                                            movie.setPosterURL(posterURL);
+
+                                            result.add(movie);
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    // once finished set results
+                                    FavoritesList favoritesList = new FavoritesList();
+                                    favoritesList.setMovies(result);
+                                    setFavoritesList(favoritesList);
+                                    setFetchStatus(FetchStatus.SUCCESS);
+                                }
+                                else {
+                                    setFavoritesList(null);
+                                    setFetchStatus(FetchStatus.FAILED);
+                                }
+                            } // if response is unsuccessful
+                            else {
+                                setFavoritesList(null);
+                                setFetchStatus(FetchStatus.FAILED);
+                            }
+                        } catch (Exception e) {
+                            setFavoritesList(null);
+                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                setFavoritesList(null);
+                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    } // end createFetchFavourites()
 
 }// end WatchlistViewModel class
