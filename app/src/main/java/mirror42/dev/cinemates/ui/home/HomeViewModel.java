@@ -87,10 +87,12 @@ public class HomeViewModel extends ViewModel {
         return ()-> {
             try {
                 // build httpurl and request for remote db
-                HttpUrl httpUrl = buildHttpUrl();
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("email", email)
+                        .add("given_email", email)
+                        .add("post_type", "WL")
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
@@ -152,21 +154,7 @@ public class HomeViewModel extends ViewModel {
                 setFetchStatus(FetchStatus.FAILED);
             }
         };
-    }// end createDownloadTask()
-
-    private HttpUrl buildHttpUrl() throws Exception {
-        final String dbFunction = "fn_select_watchlist_posts";
-
-        //
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-
-        return httpUrl;
-    }
+    }// end createFetchWatchlistPostTask()
 
     private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
         // getting post owner data
