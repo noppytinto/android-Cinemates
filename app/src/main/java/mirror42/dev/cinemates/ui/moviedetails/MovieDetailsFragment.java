@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -49,6 +51,13 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private int currentMovieId;
     private NotificationsViewModel notificationsViewModel;
     private MaterialToolbar toolbar;
+    private ChipGroup chipGroupLists;
+    private Chip chipWatched;
+    private Chip chipWatchlist;
+    private Chip chipFavorites;
+    private boolean isInWatchlist;
+    private boolean isInWatchedList;
+    private boolean isInFavoritesList;
 
 
 
@@ -80,6 +89,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         toolbar = view.findViewById(R.id.toolbar_movieDetailsFragment);
         toolbar.setNavigationIcon(R.drawable.ic_back_arrow_light_blue);
         toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
+        chipGroupLists = view.findViewById(R.id.chipGroup_movieDetailsFragment_lists);
+        chipWatched = view.findViewById(R.id.chip_movieDetailsfragment_watched);
+        chipWatchlist = view.findViewById(R.id.chip_movieDetailsfragment_watchlist);
+        chipFavorites = view.findViewById(R.id.chip_movieDetailsfragment_favorites);
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -93,6 +106,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             if(movie != null) {
                 int movieId = movie.getTmdbID();
                 currentMovieId = movieId;
+                movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
+                loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
                 // getting main activity
                 // and hiding action bar
@@ -102,16 +117,17 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 //                }
 
-                loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
                 loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
                     switch (loginResult) {
-                        case SUCCESS: case REMEMBER_ME_EXISTS:
+                        case SUCCESS: case REMEMBER_ME_EXISTS: {
                             addToListButton.setVisibility(View.VISIBLE);
+                            //
+                            setListChips(movieId, loginViewModel.getLoggedUser());
+                        }
                             break;
                         default:
                             addToListButton.setVisibility(View.GONE);
                     }
-
                 });
 
 
@@ -119,7 +135,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 initRecyclerView();
 
                 //2
-                movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
                 movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), movie1 -> {
                     if(movie1 !=null) {
                         updateUI(movie1);
@@ -138,13 +153,16 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 movieDetailsViewModel.getAddToListStatus().observe(getViewLifecycleOwner(), addToListStatus ->  {
                     switch (addToListStatus) {
                         case SUCCESS:
-                            Toast.makeText(getContext(), "film aggiunto alla lista", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film aggiunto alla lista", Toast.LENGTH_SHORT).show();
                             break;
                         case FAILED:
-                            Toast.makeText(getContext(), "film NON aggiunto alla lista", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "film NON aggiunto alla lista", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 });
+
+
+
             }// inner if
         }// outer if
 
@@ -166,8 +184,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         int buttonId = v.getId();
 
         final String[] choices = {"Watchlist", "Preferiti", "Visti", "<TODO>"};
-        final boolean[] checkedItems = {false, false, false, false};
-        ArrayList<Integer> res = new ArrayList<>();
+        final boolean[] checkedItems = {isInWatchlist, isInFavoritesList, isInWatchedList, false};
+        ArrayList<Integer> checkedLists = new ArrayList<>();
 
         if(buttonId == R.id.button_movieDetailsFragment_addToList) {
             Animation buttonAnim = AnimationUtils.loadAnimation(getContext(), R.anim.push_button_animation);
@@ -178,22 +196,20 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             builder.setTitle("Scegli liste").setNeutralButton("Annulla", null);
             builder.setPositiveButton("Fatto", (dialog, which) -> {
                 try {
-                    for(Integer x: res) {
-                        Log.d(TAG, "clicked item index is " + x);
-
+                    for(Integer x: checkedLists) {
                         if(x == 0) {
                             // add movie to watchlist
-                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                            User user = loginViewModel.getLoggedUser();
                             movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WL ,user);
-                        } else if(x == 1){
-                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                        }
+                        else if(x == 1){
+                            User user = loginViewModel.getLoggedUser();
                             movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.FV, user);
-                        } else if(x == 2){
-                            User user = loginViewModel.getObservableLoggedUser().getValue();
+                        }
+                        else if(x == 2){
+                            User user = loginViewModel.getLoggedUser();
                             movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WD, user);
                         }
-
-                         //Toast.makeText(getContext(), "lista selezionata: " + choices[x], Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -202,14 +218,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             builder.setMultiChoiceItems(choices, checkedItems, (dialog, which, isChecked) -> {
                 if(isChecked) {
                     try {
-                        res.add(which);
+                        checkedLists.add(which);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 else {
                     try {
-                        res.remove(which);
+                        checkedLists.remove(which);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -288,6 +304,51 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
     //------------------------------------------------------------- METHODS
+
+    private void setListChips(int movieId, User loggedUser) {
+        movieDetailsViewModel.checkIsInWatchedList(movieId, loggedUser);
+        movieDetailsViewModel.checkIsInWatchlist(movieId, loggedUser);
+        movieDetailsViewModel.checkIsInFavoritesList(movieId, loggedUser);
+
+        movieDetailsViewModel.getWatchlistStatus().observe(getViewLifecycleOwner(), checkListStatus -> {
+            switch (checkListStatus) {
+                case IS_IN_WATCHLIST:
+                    chipWatchlist.setVisibility(View.VISIBLE);
+                    isInWatchlist = true;
+                    break;
+                case FAILED:
+                    chipWatchlist.setVisibility(View.GONE);
+                    isInWatchlist = false;
+                    break;
+            }
+        });
+
+        movieDetailsViewModel.getWatchedListStatus().observe(getViewLifecycleOwner(), checkListStatus -> {
+            switch (checkListStatus) {
+                case IS_IN_WATCHED_LIST:
+                    chipWatched.setVisibility(View.VISIBLE);
+                    isInWatchedList = true;
+                    break;
+                case FAILED:
+                    chipWatched.setVisibility(View.GONE);
+                    isInWatchedList = false;
+                    break;
+            }
+        });
+
+        movieDetailsViewModel.getFavoritesListStatus().observe(getViewLifecycleOwner(), checkListStatus -> {
+            switch (checkListStatus) {
+                case IS_IN_FAVORITES_LIST:
+                    chipFavorites.setVisibility(View.VISIBLE);
+                    isInFavoritesList = true;
+                    break;
+                case FAILED:
+                    chipFavorites.setVisibility(View.GONE);
+                    isInFavoritesList = false;
+                    break;
+            }
+        });
+    }// end setListChips()
 
     private void initRecyclerView() {
         // defining HORIZONTAL layout manager for recycler

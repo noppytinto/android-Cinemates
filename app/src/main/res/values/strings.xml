@@ -83,5 +83,7 @@
     <string name="channel_description">cinemates_notification_channel</string>
     <string name="msg_token_fmt">FCM token: </string>
     <string name="custom_list">lista custom</string>
+    <string name="watched">visto</string>
+    <string name="to_watch">da vedere</string>
 
 </resources>

@@ -37,6 +37,9 @@ public class MovieDetailsViewModel extends ViewModel {
     private final int MAX_NUM_CREDITS = 10;
     private MutableLiveData<AddToListStatus> addToListStatus;
     private RemoteConfigServer remoteConfigServer;
+    private MutableLiveData<CheckListStatus> isInWatchlistStatus;
+    private MutableLiveData<CheckListStatus> isInWatchedListStatus;
+    private MutableLiveData<CheckListStatus> isInFavoritesStatus;
 
     public enum AddToListStatus {
         SUCCESS,
@@ -44,13 +47,23 @@ public class MovieDetailsViewModel extends ViewModel {
         IDLE
     }
 
-
+    public enum CheckListStatus {
+        IS_IN_WATCHED_LIST,
+        IS_IN_WATCHLIST,
+        IS_IN_FAVORITES_LIST,
+        FAILED,
+        IDLE
+    }
 
     //----------------------------------------------- CONSTRUCTORS
     public MovieDetailsViewModel() {
         movie = new MutableLiveData<>();
         downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
         addToListStatus = new MutableLiveData<>(AddToListStatus.IDLE);
+        isInWatchlistStatus = new MutableLiveData<>(CheckListStatus.IDLE);
+        isInWatchedListStatus = new MutableLiveData<>(CheckListStatus.IDLE);
+        isInFavoritesStatus = new MutableLiveData<>(CheckListStatus.IDLE);
+
         tmdb = TheMovieDatabaseApi.getInstance();
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
@@ -76,7 +89,7 @@ public class MovieDetailsViewModel extends ViewModel {
         return downloadStatus;
     }
 
-    public void postAddToListStatus(AddToListStatus addToListStatus) {
+    public void setAddToListStatus(AddToListStatus addToListStatus) {
         this.addToListStatus.postValue(addToListStatus);
     }
 
@@ -84,6 +97,29 @@ public class MovieDetailsViewModel extends ViewModel {
         return addToListStatus;
     }
 
+    public void setIsInWatchlistStatus(CheckListStatus isInWatchlistStatus) {
+        this.isInWatchlistStatus.postValue(isInWatchlistStatus);
+    }
+
+    public LiveData<CheckListStatus> getWatchlistStatus() {
+        return isInWatchlistStatus;
+    }
+
+    public void setIsInWatchedListStatus(CheckListStatus isInWatchedListStatus) {
+        this.isInWatchedListStatus.postValue(isInWatchedListStatus);
+    }
+
+    public LiveData<CheckListStatus> getWatchedListStatus() {
+        return isInWatchedListStatus;
+    }
+
+    public void setIsInFavoritesListStatus(CheckListStatus isInFavoritesListStatus) {
+        this.isInFavoritesStatus.postValue(isInFavoritesListStatus);
+    }
+
+    public LiveData<CheckListStatus> getFavoritesListStatus() {
+        return isInFavoritesStatus;
+    }
 
 
     //----------------------------------------------- METHODS
@@ -365,6 +401,9 @@ public class MovieDetailsViewModel extends ViewModel {
         return result;
     }
 
+
+    //--- lists
+
     public void addMovieToEssentialList(int movieId, MoviesList.ListType listType, User loggedUser) {
         switch (listType) {
             case WL:
@@ -381,7 +420,7 @@ public class MovieDetailsViewModel extends ViewModel {
     private void addToWatchlist(int movieId, String email, String accessToken) {
         // checking input
         if(movieId<0) {
-            postAddToListStatus(AddToListStatus.IDLE);
+            setAddToListStatus(AddToListStatus.IDLE);
             return;
         }
 
@@ -403,7 +442,7 @@ public class MovieDetailsViewModel extends ViewModel {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    postAddToListStatus(AddToListStatus.FAILED);
+                    setAddToListStatus(AddToListStatus.FAILED);
                 }
 
                 @Override
@@ -412,28 +451,27 @@ public class MovieDetailsViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             String responseData = response.body().string();
 
-                            if(responseData.equals("true")) postAddToListStatus(AddToListStatus.SUCCESS);
-                            else postAddToListStatus(AddToListStatus.FAILED);
+                            if(responseData.equals("true")) setAddToListStatus(AddToListStatus.SUCCESS);
+                            else setAddToListStatus(AddToListStatus.FAILED);
                         }
-                        else postAddToListStatus(AddToListStatus.FAILED);
+                        else setAddToListStatus(AddToListStatus.FAILED);
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        postAddToListStatus(AddToListStatus.FAILED);
+                        setAddToListStatus(AddToListStatus.FAILED);
                     }
                 }
             });
 
         } catch (Exception e) {
             e.printStackTrace();
-            postAddToListStatus(AddToListStatus.FAILED);
+            setAddToListStatus(AddToListStatus.FAILED);
         }
     }
 
-
     public void addMovieToFavouriteList(int movieId, String email, String accessToken) {
         if(movieId<0) {
-            postAddToListStatus(AddToListStatus.IDLE);
+            setAddToListStatus(AddToListStatus.IDLE);
             return;
         }
 
@@ -453,7 +491,7 @@ public class MovieDetailsViewModel extends ViewModel {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    postAddToListStatus(AddToListStatus.FAILED);
+                    setAddToListStatus(AddToListStatus.FAILED);
                 }
 
                 @Override
@@ -463,32 +501,32 @@ public class MovieDetailsViewModel extends ViewModel {
                             String responseData = response.body().string();
 
                             if(responseData.equals("true")) {
-                                postAddToListStatus(AddToListStatus.SUCCESS);
+                                setAddToListStatus(AddToListStatus.SUCCESS);
                             }
                             else {
-                                postAddToListStatus(AddToListStatus.FAILED);
+                                setAddToListStatus(AddToListStatus.FAILED);
                             }
                         }
                         else {
-                            postAddToListStatus(AddToListStatus.FAILED);
+                            setAddToListStatus(AddToListStatus.FAILED);
                         }
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        postAddToListStatus(AddToListStatus.FAILED);
+                        setAddToListStatus(AddToListStatus.FAILED);
                     }
                 }
             });
         }catch(Exception e){
             e.printStackTrace();
-            postAddToListStatus(AddToListStatus.FAILED);
+            setAddToListStatus(AddToListStatus.FAILED);
         }
     }
 
     private void addToWatchedList(int movieId, String email, String accessToken) {
         // checking input
         if(movieId<0) {
-            postAddToListStatus(AddToListStatus.IDLE);
+            setAddToListStatus(AddToListStatus.IDLE);
             return;
         }
 
@@ -510,7 +548,7 @@ public class MovieDetailsViewModel extends ViewModel {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    postAddToListStatus(AddToListStatus.FAILED);
+                    setAddToListStatus(AddToListStatus.FAILED);
                 }
 
                 @Override
@@ -519,21 +557,176 @@ public class MovieDetailsViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             String responseData = response.body().string();
 
-                            if(responseData.equals("true")) postAddToListStatus(AddToListStatus.SUCCESS);
-                            else postAddToListStatus(AddToListStatus.FAILED);
+                            if(responseData.equals("true")) setAddToListStatus(AddToListStatus.SUCCESS);
+                            else setAddToListStatus(AddToListStatus.FAILED);
                         }
-                        else postAddToListStatus(AddToListStatus.FAILED);
+                        else setAddToListStatus(AddToListStatus.FAILED);
                     }
                     catch (Exception e) {
                         e.printStackTrace();
-                        postAddToListStatus(AddToListStatus.FAILED);
+                        setAddToListStatus(AddToListStatus.FAILED);
                     }
                 }
             });
 
         } catch (Exception e) {
             e.printStackTrace();
-            postAddToListStatus(AddToListStatus.FAILED);
+            setAddToListStatus(AddToListStatus.FAILED);
+        }
+    }
+
+    //--- checks
+
+    public void checkIsInWatchedList(int movieId, User loggedUser) {
+        // checking input
+        if(movieId<0) {
+            setIsInWatchedListStatus(CheckListStatus.FAILED);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_is_in_watched_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) setIsInWatchedListStatus(CheckListStatus.IS_IN_WATCHED_LIST);
+                            else setIsInWatchedListStatus(CheckListStatus.FAILED);
+                        }
+                        else setIsInWatchedListStatus(CheckListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setIsInWatchedListStatus(CheckListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setIsInWatchedListStatus(CheckListStatus.FAILED);
+        }
+    }
+
+    public void checkIsInWatchlist(int movieId, User loggedUser) {
+        // checking input
+        if(movieId<0) {
+            setIsInWatchlistStatus(CheckListStatus.FAILED);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_is_in_watchlist";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) setIsInWatchlistStatus(CheckListStatus.IS_IN_WATCHLIST);
+                            else setIsInWatchlistStatus(CheckListStatus.FAILED);
+                        }
+                        else setIsInWatchlistStatus(CheckListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setIsInWatchlistStatus(CheckListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setIsInWatchlistStatus(CheckListStatus.FAILED);
+        }
+    }
+
+    public void checkIsInFavoritesList(int movieId, User loggedUser) {
+        // checking input
+        if(movieId<0) {
+            setIsInFavoritesListStatus(CheckListStatus.FAILED);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_is_in_favorites_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) setIsInFavoritesListStatus(CheckListStatus.IS_IN_FAVORITES_LIST);
+                            else setIsInFavoritesListStatus(CheckListStatus.FAILED);
+                        }
+                        else setIsInFavoritesListStatus(CheckListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setIsInFavoritesListStatus(CheckListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setIsInFavoritesListStatus(CheckListStatus.FAILED);
         }
     }
 
