@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.User;
@@ -172,6 +173,7 @@ public class ListCoverViewModel extends ViewModel {
 
                                     // once finished set results
                                     Watchlist watchlist = new Watchlist();
+                                    Collections.reverse(result);
                                     watchlist.setMovies(result);
                                     setWatchlist(watchlist);
                                     setFetchStatus(FetchStatus.SUCCESS);
@@ -260,6 +262,7 @@ public class ListCoverViewModel extends ViewModel {
 
                                     // once finished set results
                                     FavoritesList favoritesList = new FavoritesList();
+                                    Collections.reverse(result);
                                     favoritesList.setMovies(result);
                                     setFavoritesList(favoritesList);
                                     setFetchStatus(FetchStatus.SUCCESS);
@@ -348,6 +351,7 @@ public class ListCoverViewModel extends ViewModel {
 
                                     // once finished set results
                                     WatchedList watchedList = new WatchedList();
+                                    Collections.reverse(result);
                                     watchedList.setMovies(result);
                                     setWatchedList(watchedList);
                                     setFetchStatus(FetchStatus.SUCCESS);

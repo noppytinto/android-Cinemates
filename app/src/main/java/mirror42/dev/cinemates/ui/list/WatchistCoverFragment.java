@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,8 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.ArrayList;
 
@@ -35,7 +36,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
     private ArrayList<Movie> movies;
     private MoviesList list;
     private CardView cardView;
-    private ProgressBar spinner;
+    private LinearProgressIndicator progressIndicator;
 
 
 
@@ -54,12 +55,12 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
         this.view = view;
         cardView = view.findViewById(R.id.cardView_listCover);
         cardView.setOnClickListener(this);
-        spinner = view.findViewById(R.id.progressBar_listCover);
+        progressIndicator = view.findViewById(R.id.progressIndicator_listCover);
 
         //2
         listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);
         listCoverViewModel.getObservableWatchlist().observe(getViewLifecycleOwner(), watchlist -> {
-            spinner.setVisibility(View.GONE);
+            progressIndicator.setVisibility(View.GONE);
             if(watchlist!=null) {
                 // set cover
                 list = watchlist;
@@ -107,7 +108,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
             String posterUrl = moviesList.get(i).getPosterURL();
             ImageUtilities.loadRectangularImageInto(posterUrl, t, getContext());
         }
-        spinner.setVisibility(View.GONE);
+        progressIndicator.setVisibility(View.GONE);
     }// end setThumbnails()
 
 
@@ -122,7 +123,7 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
                         NavGraphDirections.actionGlobalListFragment(list);
                 NavHostFragment.findNavController(WatchistCoverFragment.this).navigate(listFragment);
             }
-            else showCenteredToast("caricamento lista in corso...");
+            else showCenteredToast("lista vuota");
         }
     }
 

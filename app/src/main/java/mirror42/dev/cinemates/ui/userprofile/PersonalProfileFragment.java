@@ -226,4 +226,4 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     }
 
 
-}// end UserProfileFragment class
+}// end PersonalProfileFragment class

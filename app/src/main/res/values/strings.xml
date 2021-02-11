@@ -85,5 +85,7 @@
     <string name="custom_list">lista custom</string>
     <string name="watched">visto</string>
     <string name="to_watch">da vedere</string>
+    <string name="update">aggiorna</string>
+    <string name="my_lists">Mie Liste</string>
 
 </resources>

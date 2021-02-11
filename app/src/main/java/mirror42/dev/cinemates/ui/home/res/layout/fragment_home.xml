@@ -7,10 +7,11 @@
     tools:context=".ui.home.HomeFragment">
 
     <include
-        android:id="@+id/include"
+        android:id="@+id/include_homeFragment_recycler"
         layout="@layout/logged_user_home_fragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,22 +22,22 @@
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:text="aggiorna"
+        android:text="@string/update"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
-    <ProgressBar
-        android:id="@+id/progressBar_homeFragment"
-        style="?android:attr/progressBarStyle"
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressIndicator_homeFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/include"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toBottomOf="@+id/button_homeFragment_updateFeed" />
 </androidx.constraintlayout.widget.ConstraintLayout>

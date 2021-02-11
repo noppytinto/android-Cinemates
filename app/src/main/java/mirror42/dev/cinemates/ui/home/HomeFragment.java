@@ -1,12 +1,10 @@
 package mirror42.dev.cinemates.ui.home;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 
@@ -39,9 +39,8 @@ public class HomeFragment extends Fragment implements
     private LoginViewModel loginViewModel;
     private Button buttonUpdateFeed;
     private RecyclerView recyclerView;
-    private ProgressDialog progressDialog;
     private NotificationsViewModel notificationsViewModel;
-    private ProgressBar spinner;
+    private CircularProgressIndicator progressIndicator;
 
 
     //------------------------------------------------------------------------------- ANDROID METHODS
@@ -61,7 +60,7 @@ public class HomeFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
         buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
-        spinner = view.findViewById(R.id.progressBar_homeFragment);
+        progressIndicator = view.findViewById(R.id.progressIndicator_homeFragment);
 
         initRecyclerView();
 
@@ -74,8 +73,8 @@ public class HomeFragment extends Fragment implements
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            hideProgressDialog();
-            spinner.setVisibility(View.GONE);
+            hideProgressIndicator();
+            progressIndicator.setVisibility(View.GONE);
             switch (fetchStatus) {
                 case SUCCESS: {
                     ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
@@ -97,7 +96,7 @@ public class HomeFragment extends Fragment implements
                 case REMEMBER_ME_EXISTS: {
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-                    spinner.setVisibility(View.VISIBLE);
+                    progressIndicator.setVisibility(View.VISIBLE);
                     homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
 //                    checkForNewNotifications(loggedUser);
                 }
@@ -116,7 +115,7 @@ public class HomeFragment extends Fragment implements
         buttonUpdateFeed.setOnClickListener(v -> {
             // ignore v
 
-            showProgressDialog();
+            showProgressIndicator();
 
             recyclerAdapterPost.clearList();
 
@@ -137,19 +136,13 @@ public class HomeFragment extends Fragment implements
 
     //------------------------------------------------------------------------------- METHODS
 
-    private void showProgressDialog() {
+    private void showProgressIndicator() {
         //notes: Declare progressDialog before so you can use .hide() later!
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Refresh in corso...");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+        progressIndicator.setVisibility(View.VISIBLE);
     }
 
-    private void hideProgressDialog() {
-        if(progressDialog!=null)
-            progressDialog.hide();
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
     }
 
     private void initRecyclerView() {
