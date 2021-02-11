@@ -52,7 +52,7 @@
                 android:layout_width="200dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="105dp"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="200dp"
                 android:layout_marginEnd="106dp"
                 android:text="@string/logout"
                 android:textSize="16sp"
@@ -78,7 +78,7 @@
 
             <include
                 android:id="@+id/include_personalProfileFragment_content"
-                layout="@layout/content_user_profile"
+                layout="@layout/personal_profile_lists"
                 android:layout_width="358dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -88,6 +88,20 @@
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
+
+            <Button
+                android:id="@+id/button_personalProfileFragment_customList"
+                style="@style/Cinemates.Button.Rectangular.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="125dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/custom_lists"
+                app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_content"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_content"
+                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_content" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -87,5 +87,6 @@
     <string name="to_watch">da vedere</string>
     <string name="update">aggiorna</string>
     <string name="my_lists">Mie Liste</string>
+    <string name="custom_lists">Liste Personalizzate</string>
 
 </resources>
