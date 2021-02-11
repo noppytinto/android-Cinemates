@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -56,6 +57,11 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
         cardView = view.findViewById(R.id.cardView_listCover);
         cardView.setOnClickListener(this);
         progressIndicator = view.findViewById(R.id.progressIndicator_listCover);
+
+        // setup list appearance
+        TextView listTitle = view.findViewById(R.id.textView_listCover_title);
+        listTitle.setText("Watchlist");
+        listTitle.setTextColor(getResources().getColor(R.color.netflix_red));
 
         //2
         listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);

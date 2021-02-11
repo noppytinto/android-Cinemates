@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -154,11 +153,6 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume: ");
-    }
 
     @Override
     public void onClick(View v) {

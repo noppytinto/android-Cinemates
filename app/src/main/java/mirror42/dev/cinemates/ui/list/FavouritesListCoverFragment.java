@@ -28,6 +28,8 @@ import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 
+import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
+
 public class FavouritesListCoverFragment extends Fragment implements View.OnClickListener {
     private final String TAG = getClass().getSimpleName();
     private ListCoverViewModel listCoverViewModel;
@@ -56,8 +58,12 @@ public class FavouritesListCoverFragment extends Fragment implements View.OnClic
         cardView = view.findViewById(R.id.cardView_listCover);
         cardView.setOnClickListener(this);
         progressIndicator = view.findViewById(R.id.progressIndicator_listCover);
-        TextView listTitle = view.findViewById(R.id.textView_watchlist_title);
+        TextView listTitle = view.findViewById(R.id.textView_listCover_title);
         listTitle.setText("Preferiti");
+        listTitle.setTextColor(getResources().getColor(R.color.yellow));
+        ImageView imageViewListICon = view.findViewById(R.id.imageView_listCover_icon);
+        imageViewListICon.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_star_yellow));
+
         //2
         listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);
         listCoverViewModel.getObservableFavoritesList().observe(getViewLifecycleOwner(), favoritesList -> {
