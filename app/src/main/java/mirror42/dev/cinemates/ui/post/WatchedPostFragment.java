@@ -61,7 +61,7 @@ public class WatchedPostFragment extends Fragment {
             textPostDescription.setText(postDescription);
 //            String movieTitle = post.getMovieTitle();
             String movieOverview = post.getMovieOverview();
-//            textViewMovieTitle.setText(movieTitle);
+            textViewMovieTitle.setVisibility(View.GONE);
             textViewMovieOverview.setText(movieOverview);
             textViewMovieOverview.setMaxLines(8);
 
