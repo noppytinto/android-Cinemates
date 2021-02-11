@@ -125,6 +125,8 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(watchlistPost.getPublishDateMillis()));
         holder.textViewPostDescription.setText(watchlistPost.getDescription());
         holder.buttonShowLikes.setText(String.valueOf(watchlistPost.getLikesCount()));
+        holder.textViewMovieTitle.setText(watchlistPost.getMovieTitle());
+        holder.textViewMovieOverview.setText(watchlistPost.getMovieOverview());
 
         int commentsCount = watchlistPost.getCommentsCount();
         if(commentsCount==1)
@@ -148,7 +150,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                     .fallback(R.drawable.broken_image)
                     .placeholder(R.drawable.placeholder_image)
                     .fitCenter() //4
-                    .into(holder.imageViewThumbnail_1); //8
+                    .into(holder.imageViewMoviePoster); //8
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,9 +178,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageButton buttonMore;
 
         public TextView textViewPostDescription;
-        public ImageView imageViewThumbnail_1;
-        public ImageView imageViewThumbnail_2;
-        public ImageView imageViewThumbnail_3;
+        public ImageView imageViewMoviePoster;
+        public TextView textViewMovieTitle;
+        public TextView textViewMovieOverview;
+
 
         public Button buttonComment;
         public Button buttonLike;
@@ -193,11 +196,11 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
             buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
+            textViewMovieTitle = itemView.findViewById(R.id.textView_contentWatchlistPost_movieTitle);
+            textViewMovieOverview = itemView.findViewById(R.id.textView_contentWatchlistPost_movieOverview);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentWatchlistPost_description);
-            imageViewThumbnail_1 = (itemView.findViewById(R.id.include_conentWatchlistPost_thumbnail_1)).findViewById(R.id.imageview_movieThumbnail);
-            imageViewThumbnail_2 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_2)).findViewById(R.id.imageview_movieThumbnail);
-            imageViewThumbnail_3 = (itemView.findViewById(R.id.include_contentWatchlistPost_thumbnail_3)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewMoviePoster = (itemView.findViewById(R.id.include_conentWatchlistPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
 
 
             buttonComment = itemView.findViewById(R.id.button_reactionsLayout_comment);

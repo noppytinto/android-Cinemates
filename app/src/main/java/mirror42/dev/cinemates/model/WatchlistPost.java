@@ -62,4 +62,11 @@ public class WatchlistPost extends Post implements Serializable {
         this.movie = movie;
     }
 
+    public String getMovieTitle() {
+        return movie.getTitle();
+    }
+
+    public String getMovieOverview() {
+        return movie.getOverview();
+    }
 }// end WatchlistPost class

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -168,18 +169,31 @@ public class HomeViewModel extends ViewModel {
         // getting movie data
         Movie movie = new Movie();
         movie.setTmdbID(jsonDBobj.getInt("MovieId"));
+
+
+        TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+        JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
         try {
             // if poster_path is null
             // json.getString() will fail
             // that's why the try-catch
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
+
             String posterURL = jsonTmdbObj.getString("poster_path");
             posterURL = tmdb.buildPosterUrl(posterURL);
             movie.setPosterURL(posterURL);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        movie.setTitle(jsonTmdbObj.getString("title"));
+
+        String overview = "";
+        try {
+            overview = jsonTmdbObj.getString("overview");
+            if(overview==null || overview.isEmpty()) movie.setOverview("(trama non disponibile in italiano)");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        movie.setOverview(overview);
 
         // getting post reactions
 

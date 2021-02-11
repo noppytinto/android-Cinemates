@@ -7,6 +7,38 @@
     android:background="@color/dark_blue">
 
     <TextView
+        android:id="@+id/textView_contentWatchlistPost_movieOverview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/poppins_medium"
+        android:maxLines="6"
+        android:text="trama"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/include_conentWatchlistPost_moviePoster"
+        app:layout_constraintEnd_toEndOf="@+id/textView_contentWatchlistPost_movieTitle"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView_contentWatchlistPost_movieTitle"
+        app:layout_constraintTop_toBottomOf="@+id/textView_contentWatchlistPost_movieTitle" />
+
+    <TextView
+        android:id="@+id/textView_contentWatchlistPost_movieTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Titolo film"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView_contentWatchlistPost_description"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/include_conentWatchlistPost_moviePoster"
+        app:layout_constraintTop_toTopOf="@+id/include_conentWatchlistPost_moviePoster" />
+
+    <TextView
         android:id="@+id/textView_contentWatchlistPost_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -22,35 +54,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/include_conentWatchlistPost_thumbnail_1"
+        android:id="@+id/include_conentWatchlistPost_moviePoster"
         layout="@layout/movie_thumbnail"
         android:layout_width="100dp"
         android:layout_height="160dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/textView_contentWatchlistPost_description"
         app:layout_constraintStart_toStartOf="@+id/textView_contentWatchlistPost_description"
         app:layout_constraintTop_toBottomOf="@+id/textView_contentWatchlistPost_description" />
 
-    <include
-        android:id="@+id/include_contentWatchlistPost_thumbnail_2"
-        layout="@layout/movie_thumbnail"
-        android:layout_width="100dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/include_contentWatchlistPost_thumbnail_3"
-        app:layout_constraintHorizontal_bias="0.473"
-        app:layout_constraintStart_toEndOf="@+id/include_conentWatchlistPost_thumbnail_1"
-        app:layout_constraintTop_toBottomOf="@+id/textView_contentWatchlistPost_description" />
-
-    <include
-        android:id="@+id/include_contentWatchlistPost_thumbnail_3"
-        layout="@layout/movie_thumbnail"
-        android:layout_width="100dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/textView_contentWatchlistPost_description"
-        app:layout_constraintTop_toBottomOf="@+id/textView_contentWatchlistPost_description" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
