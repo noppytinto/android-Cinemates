@@ -3,7 +3,7 @@ package mirror42.dev.cinemates.model;
 
 import java.util.ArrayList;
 
-public class Post {
+public class Post implements Comparable<Post> {
     private long postId;
     private User owner;
     private long publishDateMillis;
@@ -13,6 +13,16 @@ public class Post {
     protected PostType postType;
     private boolean isLikedByMe;
     private boolean isCommentedByMe;
+
+    @Override
+    public int compareTo(Post another) {
+        if(this.publishDateMillis > another.publishDateMillis)
+            return -1;
+        else if(this.publishDateMillis < another.publishDateMillis)
+            return 1;
+
+        return 0;
+    }
 
 
     public enum PostType {

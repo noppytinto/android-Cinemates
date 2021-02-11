@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
@@ -310,6 +311,8 @@ public class HomeViewModel extends ViewModel {
                                     finalList.addAll(watchlistPosts);
                                     finalList.addAll(favoritesPosts);
                                     finalList.addAll(watchedPosts);
+
+                                    finalList = sortPostsByDate(finalList);
 
                                     setPostsList(finalList);
                                     setFetchStatus(FetchStatus.SUCCESS);
@@ -682,6 +685,11 @@ public class HomeViewModel extends ViewModel {
         return watchlistPost;
     }
 
-
+    ArrayList<Post> sortPostsByDate(List<Post> list) {
+        ArrayList<Post> sortedList = new ArrayList<>(); // create a copy for immutability principle
+        sortedList.addAll(list);
+        Collections.sort(sortedList);
+        return sortedList;
+    }
 
 }// end HomeViewModel class
