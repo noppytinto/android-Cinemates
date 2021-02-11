@@ -15,12 +15,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.model.WatchlistPost;
-import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
@@ -40,6 +42,9 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Post>> postsList;
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
+    private ArrayList<Post> watchlistPosts;
+    private ArrayList<Post> favoritesPosts;
+    private ArrayList<Post> watchedPosts;
 
 
     //-------------------------------------------------------------------------- CONSTRUCTORS
@@ -78,13 +83,33 @@ public class HomeViewModel extends ViewModel {
 
     //-------------------------------------------------------------------------- METHODS
 
-    public void fetchPosts(String email, String token, String loggedUsername) {
-        Runnable watchlistPostTask = createFetchWatchlistPostTask(email, token, loggedUsername);
-        Thread t = new Thread(watchlistPostTask);
-        t.start();
+    public void fetchPosts(User loggedUser) {
+        Runnable watchlistPostsTask = createFetchWatchlistPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_1 = new Thread(watchlistPostsTask);
+        t_1.start();
+
+        try {
+            t_1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Runnable favoritesPostsTask = createFetchFavoritesPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_2 = new Thread(favoritesPostsTask);
+        t_2.start();
+
+        try {
+            t_2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Runnable watchedPostsTask = createFetchWatchedPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_3 = new Thread(watchedPostsTask);
+        t_3.start();
     }
 
-    private Runnable createFetchWatchlistPostTask(String email, String token, String loggedUsername) {
+    private Runnable createFetchWatchlistPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
                 // build httpurl and request for remote db
@@ -102,7 +127,7 @@ public class HomeViewModel extends ViewModel {
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        setFetchStatus(FetchStatus.FAILED);
+//                        setFetchStatus(FetchStatus.FAILED);
                     }
 
                     @Override
@@ -126,25 +151,26 @@ public class HomeViewModel extends ViewModel {
                                     }// for
 
                                     // once finished set result
-                                    Collections.reverse(postsList);
-                                    setPostsList(postsList);
-                                    setFetchStatus(FetchStatus.SUCCESS);
+//                                    Collections.reverse(postsList);
+                                    watchlistPosts = new ArrayList<>();
+                                    watchlistPosts.addAll(postsList);
+//                                    setFetchStatus(FetchStatus.SUCCESS);
 
                                 }
                                 // if response contains no data
                                 else {
-                                    setPostsList(null);
-                                    setFetchStatus(FetchStatus.NOT_EXISTS);
+//                                    setPostsList(null);
+//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
                                 }
                             } // if response is unsuccessful
                             else {
-                                setPostsList(null);
-                                setFetchStatus(FetchStatus.FAILED);
+//                                setPostsList(null);
+//                                setFetchStatus(FetchStatus.FAILED);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            setPostsList(null);
-                            setFetchStatus(FetchStatus.FAILED);
+//                            setPostsList(null);
+//                            setFetchStatus(FetchStatus.FAILED);
                         }
                     }
                 });
@@ -157,21 +183,238 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchWatchlistPostTask()
 
+    private Runnable createFetchFavoritesPostsTask(String email, String token, String loggedUsername) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", "FV")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                // if response contains valid data
+                                if ( ! responseData.equals("null")) {
+                                    JSONArray jsonArray = new JSONArray(responseData);
+                                    FavoritesPost favoritesPost;
+                                    ArrayList<Post> postsList = new ArrayList<>();
+
+                                    for(int i=0; i<jsonArray.length(); i++) {
+                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                                        favoritesPost = buildFavoritesPost(jsonDBobj, email, token, loggedUsername);
+
+                                        postsList.add(favoritesPost);
+                                    }// for
+
+                                    // once finished set result
+                                    favoritesPosts = new ArrayList<>();
+                                    favoritesPosts.addAll(postsList);
+
+//                                    Collections.reverse(postsList);
+//                                    setPostsList(postsList);
+//                                    setFetchStatus(FetchStatus.SUCCESS);
+
+                                }
+                                // if response contains no data
+                                else {
+//                                    setPostsList(null);
+//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
+                                }
+                            } // if response is unsuccessful
+                            else {
+//                                setPostsList(null);
+//                                setFetchStatus(FetchStatus.FAILED);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+//                            setPostsList(null);
+//                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+//                setPostsList(null);
+//                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchFavoritesPostTask()
+
+    private Runnable createFetchWatchedPostsTask(String email, String token, String loggedUsername) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", "WD")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                // if response contains valid data
+                                if ( ! responseData.equals("null")) {
+                                    JSONArray jsonArray = new JSONArray(responseData);
+                                    WatchedPost watchedPost;
+                                    ArrayList<Post> postsList = new ArrayList<>();
+
+                                    for(int i=0; i<jsonArray.length(); i++) {
+                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                                        watchedPost = buildWatchedPost(jsonDBobj, email, token, loggedUsername);
+
+                                        postsList.add(watchedPost);
+                                    }// for
+
+                                    // once finished set result
+//                                    Collections.reverse(postsList);
+                                    watchedPosts = new ArrayList<>();
+
+                                    watchedPosts.addAll(postsList);
+
+                                    ArrayList<Post> finalList = new ArrayList<>();
+                                    finalList.addAll(watchlistPosts);
+                                    finalList.addAll(favoritesPosts);
+                                    finalList.addAll(watchedPosts);
+
+                                    setPostsList(finalList);
+                                    setFetchStatus(FetchStatus.SUCCESS);
+
+                                }
+                                // if response contains no data
+                                else {
+//                                    setPostsList(null);
+//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
+                                }
+                            } // if response is unsuccessful
+                            else {
+//                                setPostsList(null);
+//                                setFetchStatus(FetchStatus.FAILED);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+//                            setPostsList(null);
+//                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+//                setPostsList(null);
+//                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchWatchedPostTask()
+
+
+
     private WatchlistPost buildWatchlistPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
         // getting post owner data
-        User user = new User();
-        user.setUsername(jsonDBobj.getString("Username"));
-        user.setFirstName(jsonDBobj.getString("Name"));
-        user.setLastName(jsonDBobj.getString("LastName"));
-
-        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
-
+        User user = buildOwner(jsonDBobj);
         // getting movie data
-        Movie movie = new Movie();
-        movie.setTmdbID(jsonDBobj.getInt("MovieId"));
+        Movie movie = buildMovie(jsonDBobj);
 
+        // assembling post
+        WatchlistPost watchlistPost = new WatchlistPost();
+        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        watchlistPost.setOwner(user);
+        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
+        watchlistPost.setMovie(movie);
+        // getting reactions
+        fetchLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return watchlistPost;
+    }
 
+    private FavoritesPost buildFavoritesPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        // getting post owner data
+        User user = buildOwner(jsonDBobj);
+        // getting movie data
+        Movie movie = buildMovie(jsonDBobj);
+
+        // assembling post
+        FavoritesPost favoritesPost = new FavoritesPost();
+        favoritesPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        favoritesPost.setOwner(user);
+        favoritesPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        favoritesPost.setDescription("ha aggiunto un film nei Preferiti.");
+        favoritesPost.setMovie(movie);
+        // getting reactions
+        fetchLikes(favoritesPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(favoritesPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return favoritesPost;
+    }
+
+    private WatchedPost buildWatchedPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        // getting post owner data
+        User user = buildOwner(jsonDBobj);
+        // getting movie data
+        Movie movie = buildMovie(jsonDBobj);
+
+        // assembling post
+        WatchedPost watchedPost = new WatchedPost();
+        watchedPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        watchedPost.setOwner(user);
+        watchedPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        watchedPost.setDescription("ha visto: " + movie.getTitle());
+        watchedPost.setMovie(movie);
+        // getting reactions
+        fetchLikes(watchedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(watchedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return watchedPost;
+    }
+
+    private User buildOwner(JSONObject jsonObject) throws JSONException {
+        User user = new User();
+        user.setUsername(jsonObject.getString("Username"));
+        user.setFirstName(jsonObject.getString("Name"));
+        user.setLastName(jsonObject.getString("LastName"));
+        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        return user;
+    }
+
+    public Movie buildMovie(JSONObject jsonObject) throws JSONException {
         TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+
+        Movie movie = new Movie();
+        movie.setTmdbID(jsonObject.getInt("MovieId"));
+
         JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
         try {
             // if poster_path is null
@@ -195,25 +438,14 @@ public class HomeViewModel extends ViewModel {
         }
         movie.setOverview(overview);
 
-        // getting post reactions
-
-        // assembling post
-        WatchlistPost watchlistPost = new WatchlistPost();
-        watchlistPost.setPostId(jsonDBobj.getLong("Id_Post"));
-        watchlistPost.setPostType(Post.PostType.WL);
-        watchlistPost.setOwner(user);
-        watchlistPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
-        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
-        watchlistPost.setMovie(movie);
-        fetchWatchlistPostLikes(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-        fetchWatchlistPostComments(watchlistPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-        return watchlistPost;
+        return movie;
     }
+
 
 
     //----------------- likes
 
-    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, long postId, String email, String token, String loggedUsername) {
+    private Post fetchLikes(Post watchlistPost, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_likes";
             // building db url
@@ -390,9 +622,10 @@ public class HomeViewModel extends ViewModel {
     }
 
 
+
     //----------------- comments
 
-    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, long postId, String email, String token, String loggedUsername) {
+    private Post fetchComments(Post watchlistPost, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_comments";
             // building db url
@@ -434,6 +667,7 @@ public class HomeViewModel extends ViewModel {
                             cm.setId(jsonDBobj.getLong("Id_Reaction"));
                             comments.add(cm);
                         }
+                        Collections.reverse(comments);
                         watchlistPost.setComments(comments);
                         watchlistPost.setIsCommentedByMe(loggedUsername);
                     }

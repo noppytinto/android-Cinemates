@@ -30,9 +30,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
 import mirror42.dev.cinemates.adapter.ViewPagerAdapterPost;
+import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.reaction.CommentsViewModel;
@@ -86,7 +88,6 @@ public class PostFragment extends Fragment implements
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
 
-        // TODO: Use the ViewModel
 
         if(getArguments() != null) {
             PostFragmentArgs args = PostFragmentArgs.fromBundle(getArguments());
@@ -108,7 +109,6 @@ public class PostFragment extends Fragment implements
             postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
                 switch (fetchStatus) {
                     case SUCCESS: {
-
                         Toast.makeText(getContext(), "post " + postID + " esiste", Toast.LENGTH_SHORT).show();
                         Post post = postViewModel.getObservablePostFetched().getValue();
                         PostType postType = post.getPostType();
@@ -124,7 +124,6 @@ public class PostFragment extends Fragment implements
                         setupTabs(view, arg, commentsCount, likesCount);
                         setupPostCommentButtonListener();
 
-
                         commentsViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                             switch (taskStatus) {
                                 case COMMENT_DELETED: {
@@ -139,7 +138,6 @@ public class PostFragment extends Fragment implements
                                 break;
                             }
                         });
-
                     }
                     break;
                     case FAILED:
@@ -157,11 +155,6 @@ public class PostFragment extends Fragment implements
 
     }// end onViewCreated()
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
@@ -172,16 +165,14 @@ public class PostFragment extends Fragment implements
         notificationMenu.setVisible(false);
     }
 
-
     @Override
     public void onClick(View v) {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+
+
+
 
     //---------------------------------------------------------------------- MY METHODS
     private void setupPostCommentButtonListener() {
@@ -216,6 +207,18 @@ public class PostFragment extends Fragment implements
                 arguments.putSerializable("watchlist_post_data", watchlistPost);
             }
             break;
+            case FV: {
+                // Create new fragment and transaction
+                FavoritesPost favoritesPost = (FavoritesPost) post;
+                arguments.putSerializable("favorites_post_data", favoritesPost);
+            }
+            break;
+            case WD: {
+                // Create new fragment and transaction
+                WatchedPost watchedPost = (WatchedPost) post;
+                arguments.putSerializable("watched_post_data", watchedPost);
+            }
+            break;
             default:
         }
 
@@ -231,6 +234,20 @@ public class PostFragment extends Fragment implements
                 display(watchlistPostFragment);
             }
                 break;
+            case FV: {
+                // Create new fragment and transaction
+                Fragment favoritesPostFragment = FavoritesPostFragment.newInstance();
+                favoritesPostFragment.setArguments(arguments);
+                display(favoritesPostFragment);
+            }
+            break;
+            case WD: {
+                // Create new fragment and transaction
+                Fragment watchedPostFragment = WatchedPostFragment.newInstance();
+                watchedPostFragment.setArguments(arguments);
+                display(watchedPostFragment);
+            }
+            break;
             default:
         }
     }
@@ -310,7 +327,6 @@ public class PostFragment extends Fragment implements
         });
     }
 
-
     private void decreaseCommentsCounter() {
         if(commentsCount>0) {
             commentsCount -= 1;
@@ -328,7 +344,5 @@ public class PostFragment extends Fragment implements
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
-
-
 
 }// end WatchlistPostFragment clasd

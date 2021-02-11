@@ -150,20 +150,16 @@ public class ListFragment extends Fragment implements
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        showMainToolbar();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         hideMainToolbar();
     }
 
-
-
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        showMainToolbar();
+    }
 
 
 
@@ -298,7 +294,7 @@ public class ListFragment extends Fragment implements
             actionMode.finish();
             actionMode = null;
         } else {
-            actionMode.setTitle("selezionati: " + String.valueOf(count));
+            actionMode.setTitle("selezionati: " + count);
             actionMode.invalidate();
         }
     }

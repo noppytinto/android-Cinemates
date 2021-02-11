@@ -11,13 +11,16 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
@@ -97,7 +100,6 @@ public class PostViewModel extends ViewModel {
 
     private Runnable createFetchPostTask(long postId, User loggedUser) {
         return () -> {
-
             try {
                 // build httpurl and request for remote db
                 HttpUrl httpUrl = buildHttpUrl();
@@ -170,6 +172,14 @@ public class PostViewModel extends ViewModel {
                 post = buildWatchlistPost(jsonObject, loggedUser);
             }
                 break;
+            case "FV": {
+                post = buildFavoritesPost(jsonObject, loggedUser);
+            }
+            break;
+            case "WD": {
+                post = buildWatchedPost(jsonObject, loggedUser);
+            }
+            break;
             default:
         }
 
@@ -186,14 +196,51 @@ public class PostViewModel extends ViewModel {
         // assembling post
         WatchlistPost watchlistPost = new WatchlistPost();
         watchlistPost.setPostId(postID);
-        watchlistPost.setPostType(Post.PostType.WL);
         watchlistPost.setOwner(user);
         watchlistPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
         watchlistPost.setMovie(movie);
-        fetchWatchlistPostLikes(watchlistPost, loggedUser);
-        fetchWatchlistPostComments(watchlistPost, loggedUser);
+        fetchPostLikes(watchlistPost, loggedUser);
+        fetchPostComments(watchlistPost, loggedUser);
         return watchlistPost;
+    }
+
+    private FavoritesPost buildFavoritesPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // getting movie data
+        Movie movie = buildMovie(jsonObject);
+
+        // assembling post
+        FavoritesPost favoritesPost = new FavoritesPost();
+        favoritesPost.setPostId(postID);
+        favoritesPost.setOwner(user);
+        favoritesPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        favoritesPost.setDescription("ha aggiunto un film nei Preferiti.");
+        favoritesPost.setMovie(movie);
+        fetchPostLikes(favoritesPost, loggedUser);
+        fetchPostComments(favoritesPost, loggedUser);
+        return favoritesPost;
+    }
+
+    private WatchedPost buildWatchedPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // getting movie data
+        Movie movie = buildMovie(jsonObject);
+
+        // assembling post
+        WatchedPost watchedPost = new WatchedPost();
+        watchedPost.setPostId(postID);
+        watchedPost.setOwner(user);
+        watchedPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        watchedPost.setDescription("ha visto: " + movie.getTitle());
+        watchedPost.setMovie(movie);
+        fetchPostLikes(watchedPost, loggedUser);
+        fetchPostComments(watchedPost, loggedUser);
+        return watchedPost;
     }
 
     private User buildUser(JSONObject jsonObject) throws JSONException {
@@ -201,32 +248,43 @@ public class PostViewModel extends ViewModel {
         user.setUsername(jsonObject.getString("Username"));
         user.setFirstName(jsonObject.getString("Name"));
         user.setLastName(jsonObject.getString("LastName"));
-        user.setProfilePictureURL(
-                remoteConfigServer.getCloudinaryDownloadBaseUrl() +
-                jsonObject.getString("ProfileImage"));
+        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
         return user;
     }
 
     private Movie buildMovie(JSONObject jsonObject) throws JSONException {
+        TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
+
         Movie movie = new Movie();
         movie.setTmdbID(jsonObject.getInt("MovieId"));
+
+        JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
         try {
             // if poster_path is null
             // json.getString() will fail
             // that's why the try-catch
-            TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-            JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
+
             String posterURL = jsonTmdbObj.getString("poster_path");
             posterURL = tmdb.buildPosterUrl(posterURL);
             movie.setPosterURL(posterURL);
         } catch (Exception e) {
             e.printStackTrace();
-            // ignore poster url fetch
         }
+        movie.setTitle(jsonTmdbObj.getString("title"));
+
+        String overview = "";
+        try {
+            overview = jsonTmdbObj.getString("overview");
+            if(overview==null || overview.isEmpty()) movie.setOverview("(trama non disponibile in italiano)");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        movie.setOverview(overview);
+
         return movie;
     }
 
-    private WatchlistPost fetchWatchlistPostComments(WatchlistPost watchlistPost, User loggedUser) {
+    private Post fetchPostComments(Post watchlistPost, User loggedUser) {
         try {
             final String dbFunction = "fn_select_comments";
             // building db url
@@ -268,6 +326,7 @@ public class PostViewModel extends ViewModel {
                             cm.setId(jsonDBobj.getLong("Id_Reaction"));
                             comments.add(cm);
                         }
+                        Collections.reverse(comments);
                         watchlistPost.setComments(comments);
                         watchlistPost.setIsCommentedByMe(loggedUser.getUsername());
                     }
@@ -282,7 +341,7 @@ public class PostViewModel extends ViewModel {
         return watchlistPost;
     }
 
-    private WatchlistPost fetchWatchlistPostLikes(WatchlistPost watchlistPost, User loggedUser) {
+    private Post fetchPostLikes(Post watchlistPost, User loggedUser) {
         try {
             final String dbFunction = "fn_select_likes";
             // building db url

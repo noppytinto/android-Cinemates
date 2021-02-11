@@ -149,9 +149,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
             }// switch
         });
 
-
-
-    }
+    }// end onActivityCreated()
 
 
     @Override
@@ -172,7 +170,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                 // and show new user profile page
                 loginViewModel.resendVerificationEmail();
                 showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
-                buttonResendEmail.setText("Email attivazione reinviata!");
+                buttonResendEmail.setText("Email attivazione rinviata!");
                 buttonResendEmail.setEnabled(false);
             }
         }

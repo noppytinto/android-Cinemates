@@ -10,7 +10,7 @@ public class Post {
     private ArrayList<Like> likes;
     private ArrayList<Comment> comments;
     private String description;
-    private PostType postType;
+    protected PostType postType;
     private boolean isLikedByMe;
     private boolean isCommentedByMe;
 
@@ -20,8 +20,8 @@ public class Post {
         WD,
         FV,
         CL,
-        CREATE_LIST,
-        NEW_FRIEND,
+        CC,
+        FW,
         RW,
         NONE
     }
@@ -31,7 +31,8 @@ public class Post {
 
     //---------------------------------------------------------------------- CONSTRUCTORS
 
-    public Post() {
+    public Post(PostType postType) {
+        this.postType = postType;
     }
 
 

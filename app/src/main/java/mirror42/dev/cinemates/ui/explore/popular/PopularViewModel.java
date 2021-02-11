@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.tmdb.Movie;
@@ -98,7 +97,7 @@ public class PopularViewModel extends ViewModel {
 
 
                 // once finished set results
-                Collections.shuffle(result);
+//                Collections.shuffle(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {

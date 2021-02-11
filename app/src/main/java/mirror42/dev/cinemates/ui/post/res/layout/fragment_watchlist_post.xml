@@ -37,7 +37,7 @@
 
             <include
                 android:id="@+id/include_watchlistPost_content"
-                layout="@layout/layout_content_watchlist_post"
+                layout="@layout/layout_content_essential_list_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

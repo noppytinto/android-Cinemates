@@ -26,9 +26,12 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchlistPost;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.ui.post.PostFragmentDirections;
+import mirror42.dev.cinemates.ui.search.SearchFragmentDirections;
 
 public class HomeFragment extends Fragment implements
         RecyclerAdapterPost.ReactionsClickAdapterListener{
@@ -97,7 +100,7 @@ public class HomeFragment extends Fragment implements
                     buttonUpdateFeed.setVisibility(View.VISIBLE);
                     User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
                     progressIndicator.setVisibility(View.VISIBLE);
-                    homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+                    homeViewModel.fetchPosts(loggedUser);
 //                    checkForNewNotifications(loggedUser);
                 }
                 break;
@@ -120,7 +123,7 @@ public class HomeFragment extends Fragment implements
             recyclerAdapterPost.clearList();
 
             User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-            homeViewModel.fetchPosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+            homeViewModel.fetchPosts(loggedUser);
             checkForNewNotifications(loggedUser);
         });
     }// end onActivityCreated()
@@ -232,6 +235,14 @@ public class HomeFragment extends Fragment implements
                     PostFragmentDirections.actionGlobalPostFragment(postId);
             NavHostFragment.findNavController(HomeFragment.this).navigate(postFragmentDirection);
         }
+    }
+
+    @Override
+    public void onPostContentClicked(int position) {
+        WatchlistPost currentPost = (WatchlistPost) recyclerAdapterPost.getPost(position);
+        Movie movie = currentPost.getMovie();
+        NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
+        NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
     }
 
 //    @Override

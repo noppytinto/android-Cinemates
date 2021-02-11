@@ -14,54 +14,56 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.WatchlistPost;
+import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
-public class WatchlistPostFragment extends Fragment {
+public class WatchedPostFragment extends Fragment {
     private ImageView imageViewProfile;
     private TextView textViewFullname;
     private TextView textViewPublishDate;
     private ImageView imageViewPoster;
+    private TextView textPostDescription;
     private TextView textViewMovieTitle;
     private TextView textViewMovieOverview;
-    private TextView textPostDescription;
 
-    public static WatchlistPostFragment newInstance() {
-        return new WatchlistPostFragment();
+    public static WatchedPostFragment newInstance() {
+        return new WatchedPostFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_watchlist_post, container, false);
+        return inflater.inflate(R.layout.fragment_watched_post, container, false);
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        imageViewProfile = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
-        textViewFullname = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.textView_postOwnerLayout_username);
-        textViewPublishDate = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
-        imageViewPoster = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.imageview_movieThumbnail);
-        textViewMovieTitle = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_movieTitle);
-        textViewMovieOverview = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_movieOverview);
-        textPostDescription = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_description);
+        imageViewProfile = view.findViewById(R.id.include_watchedPost_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+        textViewFullname = view.findViewById(R.id.include_watchedPost_owner).findViewById(R.id.textView_postOwnerLayout_username);
+        textViewPublishDate = view.findViewById(R.id.include_watchedPost_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
+        imageViewPoster = view.findViewById(R.id.include_watchedPost_content).findViewById(R.id.imageview_movieThumbnail);
+        textPostDescription = view.findViewById(R.id.include_watchedPost_content).findViewById(R.id.textView_contentEssentialListPost_description);
+        textViewMovieTitle = view.findViewById(R.id.include_watchedPost_content).findViewById(R.id.textView_contentEssentialListPost_movieTitle);
+        textViewMovieOverview = view.findViewById(R.id.include_watchedPost_content).findViewById(R.id.textView_contentEssentialListPost_movieOverview);
 
         if(getArguments()!=null) {
-            WatchlistPost post = (WatchlistPost) getArguments().getSerializable("watchlist_post_data");
+            WatchedPost post = (WatchedPost) getArguments().getSerializable("watched_post_data");
             String posterURL = post.getMovie().getPosterURL();
             String profilePictureURL = post.getOwner().getProfilePicturePath();
             String fullname = post.getOwner().getFullName();
-            long publishDate = post.getPublishDateMillis();
             String postDescription = post.getDescription();
+            long publishDate = post.getPublishDateMillis();
 
-            textPostDescription.setText(postDescription);
             textViewFullname.setText(fullname);
             textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(publishDate));
-            String movieTitle = post.getMovieTitle();
+            textPostDescription.setText(postDescription);
+//            String movieTitle = post.getMovieTitle();
             String movieOverview = post.getMovieOverview();
-            textViewMovieTitle.setText(movieTitle);
+//            textViewMovieTitle.setText(movieTitle);
             textViewMovieOverview.setText(movieOverview);
+            textViewMovieOverview.setMaxLines(8);
 
             try {
                 Glide.with(getContext())  //2
@@ -91,5 +93,4 @@ public class WatchlistPostFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-
-}// end WatchlistPostFragment class
+}

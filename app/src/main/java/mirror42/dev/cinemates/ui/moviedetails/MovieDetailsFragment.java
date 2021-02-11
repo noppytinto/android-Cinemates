@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.moviedetails;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,11 +66,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         ((MainActivity)requireActivity()).hideToolbar();
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            Window window = requireActivity().getWindow();
-//            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//        }
     }
 
     @Override
@@ -169,15 +163,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 
     }// end onViewCreated()
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume: ");
-        MainActivity mainActivity = (MainActivity) getActivity();
-        mainActivity.hideLogo();
-        mainActivity = null;
-    }
 
     @Override
     public void onClick(View v) {
@@ -290,14 +275,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         checkForNewNotifications();
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            Window window = requireActivity().getWindow();
-//            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//        }
-    }
+
 
 
 

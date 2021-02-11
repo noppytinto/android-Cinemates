@@ -5,15 +5,14 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.tmdb.Movie;
 
-public class WatchlistPost extends Post implements Serializable {
+public class FavoritesPost extends Post implements Serializable {
     private String listOwnerEmail;
     private ArrayList<Movie> addedMovies;
     private Movie movie;
 
-    public WatchlistPost() {
-        super(PostType.WL);
+    public FavoritesPost() {
+        super(PostType.FV);
     }
-
 
 
     public String getListOwnerEmail() {
@@ -47,5 +46,4 @@ public class WatchlistPost extends Post implements Serializable {
     public String getMovieOverview() {
         return movie.getOverview();
     }
-
-}// end WatchlistPost class
+}

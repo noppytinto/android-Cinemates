@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:context=".ui.post.FavoritesPostFragment">
+
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -11,8 +14,8 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:cardCornerRadius="@dimen/default_corner_radius"
         android:elevation="@dimen/default_elevation"
+        app:cardCornerRadius="@dimen/default_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -25,7 +28,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_watchListPost_postOwnerLayout"
+                android:id="@+id/include_favoritesPostLayout_postOwner"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -34,25 +37,25 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_watchListPost_postContentLayout"
+                android:id="@+id/include_favoritesPostLayout_postContent"
                 layout="@layout/layout_content_essential_list_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchListPost_postOwnerLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/include_favoritesPostLayout_postOwner" />
 
             <View
-                android:id="@+id/divider_watchlistPost_1"
+                android:id="@+id/divider_favoritesPostLayout_1"
                 android:layout_width="wrap_content"
                 android:layout_height="1dp"
                 android:background="@color/divider_blue"
-                app:layout_constraintBottom_toTopOf="@+id/include_watchListPost_postReactionsLayout"
+                app:layout_constraintBottom_toTopOf="@+id/include_favoritesPostLayout_postReactions"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <include
-                android:id="@+id/include_watchListPost_postReactionsLayout"
+                android:id="@+id/include_favoritesPostLayout_postReactions"
                 layout="@layout/layout_post_reactions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -60,10 +63,11 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchListPost_postContentLayout" />
-
+                app:layout_constraintTop_toBottomOf="@+id/include_favoritesPostLayout_postContent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

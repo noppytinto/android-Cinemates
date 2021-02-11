@@ -12,8 +12,8 @@
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:backgroundTint="@color/dark_blue"
         app:icon="@drawable/icon_like_light_blue"
         app:iconGravity="textStart"
@@ -30,8 +30,8 @@
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:backgroundTint="@color/dark_blue"
         app:icon="@drawable/icon_comment_light_blue"
         app:iconGravity="textStart"
@@ -94,4 +94,12 @@
         app:rippleColor="@color/yellow"
         tools:text="10 commenti" />
 
+    <View
+        android:id="@+id/view_reactionsLayout_1"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="#004B81"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_reactionsLayout_showComments" />
 </androidx.constraintlayout.widget.ConstraintLayout>

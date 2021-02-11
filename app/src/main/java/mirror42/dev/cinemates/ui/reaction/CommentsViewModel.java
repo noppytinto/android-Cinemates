@@ -66,6 +66,8 @@ public class CommentsViewModel extends ViewModel {
         return commentText;
     }
 
+
+
     //---------------------------------------------------------------------- MY METHODS
 
     public void deleteComment(long commentID, User loggedUser) {
@@ -75,7 +77,6 @@ public class CommentsViewModel extends ViewModel {
         Thread t = new Thread(task);
         t.start();
     }
-
 
     /**
      * PRECONDITIONS:

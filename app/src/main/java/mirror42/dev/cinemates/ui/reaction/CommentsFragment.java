@@ -84,6 +84,8 @@ public class CommentsFragment extends Fragment implements
                     newComment.setText(commentsViewModel.getCommentText());
                     newComment.setOwner(loginViewModel.getLoggedUser());
                     newComment.setIsNewItem(true);
+                    long currentTimeMillis = System.currentTimeMillis();
+                    newComment.setPublishDateMillis(currentTimeMillis);
 //                    newComment.setIsMine(true); //TODO: get new reaction id from db for delete to be allawed
                     recyclerAdapterCommentsList.addPlaceholderComment(newComment);
                     moveRecyclerToBottom();
