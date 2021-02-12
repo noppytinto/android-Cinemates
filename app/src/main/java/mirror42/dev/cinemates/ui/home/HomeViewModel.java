@@ -113,6 +113,8 @@ public class HomeViewModel extends ViewModel {
     private Runnable createFetchWatchlistPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
+                watchlistPosts = new ArrayList<>();
+
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_select_all_posts";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
@@ -153,7 +155,6 @@ public class HomeViewModel extends ViewModel {
 
                                     // once finished set result
 //                                    Collections.reverse(postsList);
-                                    watchlistPosts = new ArrayList<>();
                                     watchlistPosts.addAll(postsList);
 //                                    setFetchStatus(FetchStatus.SUCCESS);
 
@@ -187,6 +188,8 @@ public class HomeViewModel extends ViewModel {
     private Runnable createFetchFavoritesPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
+                favoritesPosts = new ArrayList<>();
+
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_select_all_posts";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
@@ -226,7 +229,6 @@ public class HomeViewModel extends ViewModel {
                                     }// for
 
                                     // once finished set result
-                                    favoritesPosts = new ArrayList<>();
                                     favoritesPosts.addAll(postsList);
 
 //                                    Collections.reverse(postsList);
@@ -263,6 +265,8 @@ public class HomeViewModel extends ViewModel {
     private Runnable createFetchWatchedPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
+                watchedPosts = new ArrayList<>();
+
                 // build httpurl and request for remote db
                 final String dbFunction = "fn_select_all_posts";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
@@ -303,17 +307,14 @@ public class HomeViewModel extends ViewModel {
 
                                     // once finished set result
 //                                    Collections.reverse(postsList);
-                                    watchedPosts = new ArrayList<>();
-
                                     watchedPosts.addAll(postsList);
 
+                                    // combining and sort all posts
                                     ArrayList<Post> finalList = new ArrayList<>();
-                                    finalList.addAll(watchlistPosts);
-                                    finalList.addAll(favoritesPosts);
-                                    finalList.addAll(watchedPosts);
-
+                                    finalList = combineAllPosts();
                                     finalList = sortPostsByDate(finalList);
 
+                                    // publish result
                                     setPostsList(finalList);
                                     setFetchStatus(FetchStatus.SUCCESS);
 
@@ -343,6 +344,15 @@ public class HomeViewModel extends ViewModel {
             }
         };
     }// end createFetchWatchedPostTask()
+
+    public ArrayList<Post> combineAllPosts() {
+        ArrayList<Post> finalList = new ArrayList<>();
+        finalList.addAll(watchlistPosts);
+        finalList.addAll(favoritesPosts);
+        finalList.addAll(watchedPosts);
+
+        return finalList;
+    }
 
 
 
@@ -412,7 +422,7 @@ public class HomeViewModel extends ViewModel {
         return user;
     }
 
-    public Movie buildMovie(JSONObject jsonObject) throws JSONException {
+    private Movie buildMovie(JSONObject jsonObject) throws JSONException {
         TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
 
         Movie movie = new Movie();
@@ -686,8 +696,8 @@ public class HomeViewModel extends ViewModel {
     }
 
     ArrayList<Post> sortPostsByDate(List<Post> list) {
-        ArrayList<Post> sortedList = new ArrayList<>(); // create a copy for immutability principle
-        sortedList.addAll(list);
+        // create a copy for immutability principle
+        ArrayList<Post> sortedList = new ArrayList<>(list);
         Collections.sort(sortedList);
         return sortedList;
     }

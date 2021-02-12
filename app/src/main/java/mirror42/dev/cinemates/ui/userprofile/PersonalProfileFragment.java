@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import mirror42.dev.cinemates.MainActivity;
@@ -42,6 +43,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private View includeAccountActivationView;
     private View includeUserProfileContent;
     private NotificationsViewModel notificationsViewModel;
+    private Button buttonCustomList;
 
 
 
@@ -68,6 +70,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         textViewEmail = view.findViewById(R.id.textView_personalProfileFragment_email);
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
+        buttonCustomList = view.findViewById(R.id.button_personalProfileFragment_customList);
         remoteConfigServer = RemoteConfigServer.getInstance();
         // setting listeners
         buttonLogout.setOnClickListener(this);
@@ -77,6 +80,15 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
         includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_content);
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+
+        buttonCustomList.setOnClickListener(v -> {
+            // ignore v
+
+            NavDirections personalProfileFragmentDirections = PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment();
+            Navigation.findNavController(v).navigate(personalProfileFragmentDirections);
+
+
+        });
 
         hideResendEmail();
 

@@ -46,7 +46,11 @@
         android:id="@+id/personalProfileFragment"
         android:name="mirror42.dev.cinemates.ui.userprofile.PersonalProfileFragment"
         android:label="@string/user_profile"
-        tools:layout="@layout/fragment_personal_profile" />
+        tools:layout="@layout/fragment_personal_profile" >
+        <action
+            android:id="@+id/action_personalProfileFragment_to_customListBrowserFragment"
+            app:destination="@id/customListBrowserFragment" />
+    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="mirror42.dev.cinemates.ui.login.LoginFragment"
@@ -151,4 +155,9 @@
         app:exitAnim="@anim/fragment_close_exit"
         app:popEnterAnim="@anim/fragment_open_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+    <fragment
+        android:id="@+id/customListBrowserFragment"
+        android:name="mirror42.dev.cinemates.ui.list.CustomListBrowserFragment"
+        android:label="custom_list_browser_fragment"
+        tools:layout="@layout/custom_list_browser_fragment" />
 </navigation>

@@ -55,6 +55,7 @@ android {
                 'src/main/java/mirror42/dev/cinemates/ui/post/res',
                 'src/main/java/mirror42/dev/cinemates/ui/reaction/res',
                 'src/main/java/mirror42/dev/cinemates/ui/list/res',
+                'src/main/java/mirror42/dev/cinemates/ui/dialog/res',
                 'src/main/java/mirror42/dev/cinemates/res'
 
         ]
