@@ -13,23 +13,34 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterCustomLists;
+import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 
-public class CustomListBrowserFragment extends Fragment implements CustomListDialogFragment.CustomListDialogListener {
+public class CustomListBrowserFragment extends Fragment
+        implements CustomListDialogFragment.CustomListDialogListener,
+        RecyclerAdapterCustomLists.CustomListCoverListener {
     private CustomListBrowserViewModel mViewModel;
-    FloatingActionButton buttonAdd;
+    private FloatingActionButton buttonAdd;
+    private RecyclerView recyclerView;
+    private LinearProgressIndicator progressIndicator;
+    private RecyclerAdapterCustomLists recyclerAdapterCustomLists;
 
-    public static CustomListBrowserFragment newInstance() {
-        return new CustomListBrowserFragment();
-    }
+
+
 
 
     //------------------------------------------------------------- ANDROID METHODS
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,6 +64,9 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
             showCreateListDialog();
 
         });
+
+        initRecycleView(view);
+
     }
 
     @Override
@@ -70,7 +84,19 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
         menu.getItem(1).setVisible(false);
     }
 
+
+
     //------------------------------------------------------------- MY METHODS
+
+    private void initRecycleView(View view) {
+        // defining Recycler view
+        recyclerView = view.findViewById(R.id.recyclerView_customListBrowser);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerAdapterCustomLists = new RecyclerAdapterCustomLists(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterCustomLists);
+    }
+
 
     public void showCreateListDialog() {
         DialogFragment newFragment = new CustomListDialogFragment(this);
@@ -88,8 +114,25 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
         // PRECONDITIONS:
         // listName and listDescription will alwaysbe  non-empty
         // checks are made up front
-
-        showCenteredToast("nome: " + listName + "\ndescrizione: " + listDescription);
+        createCustomListPlaceholder(listName, listDescription);
+        showCenteredToast("Creata list:\nnome: " + listName + "\ndescrizione: " + listDescription);
     }
 
+    private void createCustomListPlaceholder(String name, String description) {
+        CustomList placeholder = new CustomList();
+        placeholder.setName(name);
+        placeholder.setDescription(description);
+
+        //
+        recyclerAdapterCustomLists.addPlaceholderItem(placeholder);
+    }
+
+
+    @Override
+    public void onCoverClicked(int position) {
+        // TODO
+        CustomList clickedList = recyclerAdapterCustomLists.getList(position);
+        if(clickedList.getMovies()==null || clickedList.getMovies().size() == 0)
+            showCenteredToast("lista vuota");
+    }
 }// end CustomListBrowserFragment class
