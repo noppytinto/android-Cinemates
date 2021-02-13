@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_listCover"
+        android:id="@+id/cardView_essentialListCover"
         android:layout_width="match_parent"
         android:layout_height="125dp"
         android:layout_marginStart="8dp"
@@ -27,29 +27,29 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageView_listCover_3"
+                android:id="@+id/imageView_essentialListCover_3"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:layout_marginEnd="141dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listCover_2"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_essentialListCover_2"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listCover_4"
+                android:id="@+id/imageView_essentiallistCover_4"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:layout_marginEnd="56dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listCover_3"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_essentialListCover_3"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listCover_1"
+                android:id="@+id/imageView_essentialListCover_1"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
@@ -60,17 +60,17 @@
 
 
             <ImageView
-                android:id="@+id/imageView_listCover_2"
+                android:id="@+id/imageView_essentialListCover_2"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listCover_1"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_essentialListCover_1"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <View
-                android:id="@+id/view_watchlist_gradient"
+                android:id="@+id/view_essentialListCover_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:background="@drawable/gradient_horizontal_black"
@@ -81,18 +81,18 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/imageView_listCover_icon"
+                android:id="@+id/imageView_essentialListCover_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="4dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView_listCover_title"
+                app:layout_constraintBottom_toBottomOf="@+id/textView_essentialListCover_title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView_listCover_title"
+                app:layout_constraintTop_toTopOf="@+id/textView_essentialListCover_title"
                 app:srcCompat="@drawable/icon_watchlist_red" />
 
             <TextView
-                android:id="@+id/textView_listCover_title"
+                android:id="@+id/textView_essentialListCover_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -104,11 +104,11 @@
                 android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/imageView_listCover_icon"
+                app:layout_constraintStart_toEndOf="@+id/imageView_essentialListCover_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progressIndicator_listCover"
+                android:id="@+id/progressIndicator_essentialListCover"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

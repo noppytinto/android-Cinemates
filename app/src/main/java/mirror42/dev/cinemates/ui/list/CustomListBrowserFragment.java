@@ -3,6 +3,7 @@ package mirror42.dev.cinemates.ui.list;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,6 +30,13 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
 
     //------------------------------------------------------------- ANDROID METHODS
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -54,8 +62,13 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
         // TODO: Use the ViewModel
     }
 
-
-
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // hide notification(0) and user(1) icon
+        menu.getItem(0).setVisible(false);
+        menu.getItem(1).setVisible(false);
+    }
 
     //------------------------------------------------------------- MY METHODS
 

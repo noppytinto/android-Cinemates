@@ -27,67 +27,67 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageView_listStub_5"
+                android:id="@+id/imageView_custmListCover_5"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_3"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_3"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_6"
+                android:id="@+id/imageView_custmListCover_6"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_4"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_4"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_7"
+                android:id="@+id/imageView_custmListCover_7"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_5"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_8"
+                android:id="@+id/imageView_custmListCover_8"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_6"
-                app:layout_constraintTop_toBottomOf="@+id/imageView_listStub_7"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_6"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_custmListCover_7"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_3"
+                android:id="@+id/imageView_custmListCover_3"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_1"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_1"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_4"
+                android:id="@+id/imageView_custmListCover_4"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
                 android:padding="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageView_listStub_2"
+                app:layout_constraintEnd_toStartOf="@+id/imageView_custmListCover_2"
                 tools:srcCompat="@drawable/poster_avengers" />
 
             <ImageView
-                android:id="@+id/imageView_listStub_1"
+                android:id="@+id/imageView_custmListCover_1"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
@@ -98,7 +98,7 @@
 
 
             <ImageView
-                android:id="@+id/imageView_listStub_2"
+                android:id="@+id/imageView_custmListCover_2"
                 android:layout_width="85dp"
                 android:layout_height="125dp"
                 android:layout_margin="0dp"
@@ -106,20 +106,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:srcCompat="@drawable/poster_avengers" />
-
-            <ProgressBar
-                android:id="@+id/progressBar_listStub"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="44dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.827"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <View
-                android:id="@+id/view_listStub_gradient"
+                android:id="@+id/view_custmListCover_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:background="@drawable/gradient_horizontal_black"
@@ -130,7 +119,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView_listStub_title"
+                android:id="@+id/textView_custmListCover_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -140,13 +129,13 @@
                 android:text="@string/custom_list"
                 android:textColor="@color/light_blue"
                 android:textSize="24sp"
-                app:layout_constraintBottom_toTopOf="@+id/textView_listStub_description"
+                app:layout_constraintBottom_toTopOf="@+id/textView_custmListCover_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/textView_listStub_description"
+                android:id="@+id/textView_custmListCover_description"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -159,6 +148,18 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressIndicator_customListCover"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="2dp"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

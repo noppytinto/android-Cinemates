@@ -55,13 +55,13 @@ public class WatchedListCoverFragment extends Fragment implements View.OnClickLi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        cardView = view.findViewById(R.id.cardView_listCover);
+        cardView = view.findViewById(R.id.cardView_essentialListCover);
         cardView.setOnClickListener(this);
-        progressIndicator = view.findViewById(R.id.progressIndicator_listCover);
-        TextView listTitle = view.findViewById(R.id.textView_listCover_title);
+        progressIndicator = view.findViewById(R.id.progressIndicator_essentialListCover);
+        TextView listTitle = view.findViewById(R.id.textView_essentialListCover_title);
         listTitle.setText("Visti");
         listTitle.setTextColor(getResources().getColor(R.color.green));
-        ImageView imageViewListICon = view.findViewById(R.id.imageView_listCover_icon);
+        ImageView imageViewListICon = view.findViewById(R.id.imageView_essentialListCover_icon);
         imageViewListICon.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_eye_green));
 
         //2
@@ -99,10 +99,10 @@ public class WatchedListCoverFragment extends Fragment implements View.OnClickLi
     //--------------------------------------------------------------------------------------- METHODS
 
     private void setCover(ArrayList<Movie> moviesList) {
-        ImageView thumbnail_1 = view.findViewById(R.id.imageView_listCover_1);
-        ImageView thumbnail_2 = view.findViewById(R.id.imageView_listCover_2);
-        ImageView thumbnail_3 = view.findViewById(R.id.imageView_listCover_3);
-        ImageView thumbnail_4 = view.findViewById(R.id.imageView_listCover_4);
+        ImageView thumbnail_1 = view.findViewById(R.id.imageView_essentialListCover_1);
+        ImageView thumbnail_2 = view.findViewById(R.id.imageView_essentialListCover_2);
+        ImageView thumbnail_3 = view.findViewById(R.id.imageView_essentialListCover_3);
+        ImageView thumbnail_4 = view.findViewById(R.id.imageView_essentiallistCover_4);
 
         ArrayList<ImageView> thumbnailsList = new ArrayList<>();
         thumbnailsList.add(thumbnail_1);
@@ -124,7 +124,7 @@ public class WatchedListCoverFragment extends Fragment implements View.OnClickLi
     public void onClick(View v) {
         int viewId = v.getId();
 
-        if(viewId == R.id.cardView_listCover) {
+        if(viewId == R.id.cardView_essentialListCover) {
             if(list!=null && list.getMovies() != null && list.getMovies().size()>0) {
                 NavGraphDirections.ActionGlobalListFragment listFragment =
                         NavGraphDirections.actionGlobalListFragment(list);

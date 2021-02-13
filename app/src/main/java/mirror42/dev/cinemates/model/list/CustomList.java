@@ -2,11 +2,11 @@ package mirror42.dev.cinemates.model.list;
 
 import java.io.Serializable;
 
-public class CustomMoviesList extends MoviesList implements Serializable {
+public class CustomList extends MoviesList implements Serializable {
     private String name;
     private String description;
 
-    public CustomMoviesList() {
+    public CustomList() {
         super(ListType.CM);
     }
 

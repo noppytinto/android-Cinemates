@@ -158,6 +158,6 @@
     <fragment
         android:id="@+id/customListBrowserFragment"
         android:name="mirror42.dev.cinemates.ui.list.CustomListBrowserFragment"
-        android:label="custom_list_browser_fragment"
+        android:label="Liste Personalizzate"
         tools:layout="@layout/custom_list_browser_fragment" />
 </navigation>
