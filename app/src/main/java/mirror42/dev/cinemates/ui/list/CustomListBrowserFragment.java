@@ -1,9 +1,11 @@
 package mirror42.dev.cinemates.ui.list;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +18,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 
-public class CustomListBrowserFragment extends Fragment {
+public class CustomListBrowserFragment extends Fragment implements CustomListDialogFragment.CustomListDialogListener {
     private CustomListBrowserViewModel mViewModel;
     FloatingActionButton buttonAdd;
 
     public static CustomListBrowserFragment newInstance() {
         return new CustomListBrowserFragment();
     }
+
+
+    //------------------------------------------------------------- ANDROID MY METHODS
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -37,7 +42,7 @@ public class CustomListBrowserFragment extends Fragment {
         buttonAdd.setOnClickListener(v -> {
             // ignore v
 
-            confirmFireMissiles();
+            showCreateListDialog();
 
         });
     }
@@ -49,10 +54,29 @@ public class CustomListBrowserFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    public void confirmFireMissiles() {
-        DialogFragment newFragment = new CustomListDialogFragment();
-        newFragment.show(requireActivity().getSupportFragmentManager(), "custom list dialog");
+
+
+
+    //------------------------------------------------------------- MY METHODS
+
+    public void showCreateListDialog() {
+        DialogFragment newFragment = new CustomListDialogFragment(this);
+        newFragment.show(requireActivity().getSupportFragmentManager(), "CustomListDialogFragment");
     }
 
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 
-}
+    @Override
+    public void onPositiveButtonClicked(String listName, String listDescription) {
+        // PRECONDITIONS:
+        // listName and listDescription will alwaysbe  non-empty
+        // checks are made up front
+
+        showCenteredToast("nome: " + listName + "\ndescrizione: " + listDescription);
+    }
+
+}// end CustomListBrowserFragment class

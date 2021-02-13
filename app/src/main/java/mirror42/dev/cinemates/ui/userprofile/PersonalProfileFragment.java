@@ -221,13 +221,15 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private void checkForNewNotifications() {
         if(notificationsViewModel!=null) {
             if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
-                ((MainActivity) getActivity()).activateNotificationsIcon();
+                ((MainActivity) requireActivity()).activateNotificationsIcon();
             }
             else {
-                ((MainActivity) getActivity()).deactivateNotificationsIcon();
+                ((MainActivity) requireActivity()).deactivateNotificationsIcon();
             }
         }
     }
+
+
 
 
 }// end PersonalProfileFragment class
