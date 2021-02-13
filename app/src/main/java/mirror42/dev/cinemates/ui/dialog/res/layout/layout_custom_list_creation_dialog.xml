@@ -76,24 +76,23 @@
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="annulla"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_customListDialog_description" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_customListDialog" />
 
     <Button
         android:id="@+id/button_customListDialog_positive"
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="8dp"
         android:text="crea"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_customListDialog_description" />
+        app:layout_constraintTop_toTopOf="@+id/button_customListDialog_negative" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
@@ -103,12 +102,23 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <View
-        android:id="@+id/divider_watchlistPost_1"
+        android:id="@+id/divider_customListDialog_1"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
         android:background="@color/divider_blue"
         app:layout_constraintBottom_toTopOf="@+id/button_customListDialog_negative"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <CheckBox
+        android:id="@+id/checkBox_customListDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Privata"
+        android:textColor="@color/light_blue"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout_customListDialog_description"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_customListDialog_description" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

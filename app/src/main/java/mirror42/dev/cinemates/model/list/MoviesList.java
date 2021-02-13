@@ -3,20 +3,22 @@ package mirror42.dev.cinemates.model.list;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 
 public class MoviesList implements Serializable {
     private long id;
     private ArrayList<Movie> movies;
     private ListType listType;
+    private User owner;
 
     /**
      * WL - watchlist
      * FV - favorites list
      * WD - watched list
-     * CM - custom list
+     * CL - custom list
      */
-    public enum ListType {WL, FV, WD, CM}
+    public enum ListType {WL, FV, WD, CL}
 
     public MoviesList(ListType listType) {
         this.listType = listType;
@@ -50,4 +52,11 @@ public class MoviesList implements Serializable {
         this.listType = listType;
     }
 
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 }// end List class

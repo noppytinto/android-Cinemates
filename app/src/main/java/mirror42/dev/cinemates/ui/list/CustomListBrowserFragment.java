@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.ArrayList;
 
@@ -26,15 +25,18 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterCustomLists;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
         RecyclerAdapterCustomLists.CustomListCoverListener {
-    private CustomListBrowserViewModel mViewModel;
+    private CustomListBrowserViewModel customListBrowserViewModel;
+    private LoginViewModel loginViewModel;
     private FloatingActionButton buttonAdd;
     private RecyclerView recyclerView;
-    private LinearProgressIndicator progressIndicator;
     private RecyclerAdapterCustomLists recyclerAdapterCustomLists;
+    private String newListName;
+    private String newListDescription;
 
 
 
@@ -57,6 +59,7 @@ public class CustomListBrowserFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
         buttonAdd.setOnClickListener(v -> {
             // ignore v
@@ -66,14 +69,44 @@ public class CustomListBrowserFragment extends Fragment
         });
 
         initRecycleView(view);
-
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        // TODO: Use the ViewModel
+        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
+        customListBrowserViewModel.getObservableCustomList().observe(getViewLifecycleOwner(), customLists -> {
+
+        });
+
+        customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+                switch (fetchStatus) {
+                    case SUCCESS: {
+                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                        if(lists!=null) {
+                            recyclerAdapterCustomLists.loadNewData(lists);
+                        }
+                    }
+                        break;
+                    case FAILED:
+                        break;
+                }
+        });
+
+        customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            switch (taskStatus) {
+                case SUCCESS: {
+                    createCustomListPlaceholder(newListName, newListDescription);
+                    showCenteredToast("lista creata");
+                    break;
+                }
+                case FAILED: {
+                    showCenteredToast("errore creazione lista");
+                }
+            }
+        });
+
+        customListBrowserViewModel.fetchLists(loginViewModel.getLoggedUser());
     }
 
     @Override
@@ -110,12 +143,16 @@ public class CustomListBrowserFragment extends Fragment
     }
 
     @Override
-    public void onPositiveButtonClicked(String listName, String listDescription) {
+    public void onPositiveButtonClicked(String listName, String listDescription, boolean isChecked) {
         // PRECONDITIONS:
         // listName and listDescription will alwaysbe  non-empty
         // checks are made up front
-        createCustomListPlaceholder(listName, listDescription);
-        showCenteredToast("Creata list:\nnome: " + listName + "\ndescrizione: " + listDescription);
+
+        customListBrowserViewModel.addNewList(listName , listDescription, isChecked, loginViewModel.getLoggedUser());
+        newListName = listName;
+        newListDescription = listDescription;
+
+
     }
 
     private void createCustomListPlaceholder(String name, String description) {
@@ -132,7 +169,8 @@ public class CustomListBrowserFragment extends Fragment
     public void onCoverClicked(int position) {
         // TODO
         CustomList clickedList = recyclerAdapterCustomLists.getList(position);
-        if(clickedList.getMovies()==null || clickedList.getMovies().size() == 0)
+        if(clickedList.getMovies()==null || clickedList.getMovies().size() == 0) {
             showCenteredToast("lista vuota");
+        }
     }
 }// end CustomListBrowserFragment class

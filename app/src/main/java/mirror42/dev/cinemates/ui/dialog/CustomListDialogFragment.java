@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -24,9 +25,10 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
     private TextInputEditText nameTextInput;
     private TextInputEditText descriptionTextInput;
     private CustomListDialogListener listener;
+    private CheckBox isPrivateCheckBox;
 
     public interface CustomListDialogListener {
-        void onPositiveButtonClicked(String listName, String listDescription);
+        void onPositiveButtonClicked(String listName, String listDescription, boolean isChecked);
     }
 
 
@@ -55,6 +57,7 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
         descriptionTextInputLayout = view.findViewById(R.id.textInputLayout_customListDialog_description);
         nameTextInput = view.findViewById(R.id.editText_customListDialog_name);
         descriptionTextInput = view.findViewById(R.id.editText_customListDialog_description);
+        isPrivateCheckBox = view.findViewById(R.id.checkBox_customListDialog);
         positiveButton.setOnClickListener(this);
         negativeButton.setOnClickListener(this);
 
@@ -69,8 +72,9 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
         if(v.getId() == positiveButton.getId()) {
             String name = nameTextInput.getText().toString();
             String description =  descriptionTextInput.getText().toString();
+            boolean isChecked =  isPrivateCheckBox.isChecked();
             if(fieldsAreValid(name, description)) {
-                listener.onPositiveButtonClicked(name, description);
+                listener.onPositiveButtonClicked(name, description, isChecked);
                 dismiss();
             }
         }

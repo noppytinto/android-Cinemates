@@ -7,7 +7,7 @@ public class CustomList extends MoviesList implements Serializable {
     private String description;
 
     public CustomList() {
-        super(ListType.CM);
+        super(ListType.CL);
     }
 
 

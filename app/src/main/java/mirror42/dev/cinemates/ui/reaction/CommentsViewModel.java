@@ -33,7 +33,7 @@ public class CommentsViewModel extends ViewModel {
 
 
 
-    public enum TaskStatus {COMMENT_DELETED, COMMENT_NOT_DELETED, COMMENT_POSTED, COMMNET_NOT_POSTED, IDLE}
+    public enum TaskStatus {COMMENT_DELETED, COMMENT_NOT_DELETED, COMMENT_POSTED, COMMNET_NOT_POSTED, SUCCESS, FAILED, IDLE}
 
 
 

@@ -77,7 +77,7 @@ public class ListViewModel extends ViewModel {
                 removeSingleMovieFromWatchedList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
             }
                 break;
-            case CM: {
+            case CL: {
                 //TODO
             }
                 break;

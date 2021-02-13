@@ -92,7 +92,7 @@ public class ListFragment extends Fragment implements
                 case WD:
                     populateEssentialList("Visti", list.getMovies());
                     break;
-                case CM:
+                case CL:
                     //TODO
                     break;
             }

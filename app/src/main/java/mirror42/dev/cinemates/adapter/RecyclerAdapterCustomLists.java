@@ -143,6 +143,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
             listDescription = itemView.findViewById(R.id.textView_custmListCover_description);
             containter = itemView.findViewById(R.id.cardView_customListcover);
             progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
+            progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
 
             containter.setOnClickListener(v -> listener.onCoverClicked(getAdapterPosition()));
         }
