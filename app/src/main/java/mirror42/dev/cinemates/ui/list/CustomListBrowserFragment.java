@@ -27,7 +27,7 @@ public class CustomListBrowserFragment extends Fragment implements CustomListDia
     }
 
 
-    //------------------------------------------------------------- ANDROID MY METHODS
+    //------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

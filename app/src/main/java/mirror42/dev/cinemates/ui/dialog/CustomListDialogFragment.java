@@ -29,10 +29,18 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
         void onPositiveButtonClicked(String listName, String listDescription);
     }
 
+
+
+    //------------------------------------------------------------- CONSTRUCTORS
+
     public CustomListDialogFragment(CustomListDialogListener listener) {
         this.listener = listener;
     }
 
+
+
+
+    //------------------------------------------------------------- ANDROID METHODS
 
     @NotNull
     @Override
@@ -76,6 +84,11 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
         super.onDetach();
         listener = null;
     }
+
+
+
+
+    //------------------------------------------------------------- MY METHODS
 
     private boolean fieldsAreValid(String name, String description) {
         boolean result = true;
