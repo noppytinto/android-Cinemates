@@ -35,6 +35,7 @@
     <color name="orange_800">#ff8800</color>
     <color name="orange_900">#ff6600</color>
     <color name="divider_blue">#004B81</color>
+    <color name="divider_toolbar">#0067B1</color>
 
 
 </resources>

@@ -6,7 +6,7 @@
     android:background="@color/dark_blue">
 
     <TextView
-        android:id="@+id/textView_contentEssentialListPost_movieOverview"
+        android:id="@+id/textView_contentListPost_movieOverview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -17,14 +17,14 @@
         android:text="@string/overview"
         android:textColor="@color/white"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/include_conentEssentialListPost_moviePoster"
-        app:layout_constraintEnd_toEndOf="@+id/textView_contentEssentialListPost_movieTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/include_conentListPost_moviePoster"
+        app:layout_constraintEnd_toEndOf="@+id/textView_contentListPost_movieTitle"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/include_conentEssentialListPost_moviePoster"
-        app:layout_constraintTop_toBottomOf="@+id/textView_contentEssentialListPost_movieTitle" />
+        app:layout_constraintStart_toEndOf="@+id/include_conentListPost_moviePoster"
+        app:layout_constraintTop_toBottomOf="@+id/textView_contentListPost_movieTitle" />
 
     <TextView
-        android:id="@+id/textView_contentEssentialListPost_movieTitle"
+        android:id="@+id/textView_contentListPost_movieTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -34,13 +34,13 @@
         android:textColor="@color/white"
         android:textSize="12sp"
         android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="@+id/textView_contentEssentialListPost_description"
+        app:layout_constraintEnd_toEndOf="@+id/textView_contentListPost_description"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/include_conentEssentialListPost_moviePoster"
-        app:layout_constraintTop_toTopOf="@+id/include_conentEssentialListPost_moviePoster" />
+        app:layout_constraintStart_toEndOf="@+id/include_conentListPost_moviePoster"
+        app:layout_constraintTop_toTopOf="@+id/include_conentListPost_moviePoster" />
 
     <TextView
-        android:id="@+id/textView_contentEssentialListPost_description"
+        android:id="@+id/textView_contentListPost_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -55,13 +55,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/include_conentEssentialListPost_moviePoster"
+        android:id="@+id/include_conentListPost_moviePoster"
         layout="@layout/movie_thumbnail"
         android:layout_width="100dp"
         android:layout_height="160dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@+id/textView_contentEssentialListPost_description"
-        app:layout_constraintTop_toBottomOf="@+id/textView_contentEssentialListPost_description" />
+        app:layout_constraintStart_toStartOf="@+id/textView_contentListPost_description"
+        app:layout_constraintTop_toBottomOf="@+id/textView_contentListPost_description" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -110,12 +110,6 @@ public class CommentsFragment extends Fragment implements
 
     //------------------------------------------------------------------------------- METHODS
 
-    private void moveRecyclerToBottom() {
-        if(commentsList != null && commentsList.size()>0) {
-            recyclerView.smoothScrollToPosition(commentsList.size()-1);
-        }
-    }
-
     private void initRecyclerView(View view) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_showCommentsDialog);
@@ -156,6 +150,12 @@ public class CommentsFragment extends Fragment implements
         toast.show();
     }
 
+
+    private void moveRecyclerToBottom() {
+        if(commentsList != null && commentsList.size()>0) {
+            recyclerView.smoothScrollToPosition(commentsList.size()-1);
+        }
+    }
 
 
 }// end ShowCommentsDialogFragment class

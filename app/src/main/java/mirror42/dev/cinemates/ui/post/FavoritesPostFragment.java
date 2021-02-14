@@ -40,13 +40,13 @@ public class FavoritesPostFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        imageViewProfile = view.findViewById(R.id.include_favoritesPost_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
-        textViewFullname = view.findViewById(R.id.include_favoritesPost_owner).findViewById(R.id.textView_postOwnerLayout_username);
-        textViewPublishDate = view.findViewById(R.id.include_favoritesPost_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
-        imageViewPoster = view.findViewById(R.id.include_favoritesPost_content).findViewById(R.id.imageview_movieThumbnail);
-        textPostDescription = view.findViewById(R.id.include_favoritesPost_content).findViewById(R.id.textView_contentEssentialListPost_description);
-        textViewMovieTitle = view.findViewById(R.id.include_favoritesPost_content).findViewById(R.id.textView_contentEssentialListPost_movieTitle);
-        textViewMovieOverview = view.findViewById(R.id.include_favoritesPost_content).findViewById(R.id.textView_contentEssentialListPost_movieOverview);
+        imageViewProfile = view.findViewById(R.id.include_favoritesPostFragment_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+        textViewFullname = view.findViewById(R.id.include_favoritesPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_username);
+        textViewPublishDate = view.findViewById(R.id.include_favoritesPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
+        imageViewPoster = view.findViewById(R.id.include_favoritesPostFragment_content).findViewById(R.id.imageview_movieThumbnail);
+        textPostDescription = view.findViewById(R.id.include_favoritesPostFragment_content).findViewById(R.id.textView_contentListPost_description);
+        textViewMovieTitle = view.findViewById(R.id.include_favoritesPostFragment_content).findViewById(R.id.textView_contentListPost_movieTitle);
+        textViewMovieOverview = view.findViewById(R.id.include_favoritesPostFragment_content).findViewById(R.id.textView_contentListPost_movieOverview);
 
         if(getArguments()!=null) {
             FavoritesPost post = (FavoritesPost) getArguments().getSerializable("favorites_post_data");

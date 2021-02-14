@@ -252,7 +252,7 @@ public class CustomListBrowserViewModel extends ViewModel {
         return movie;
     }
 
-    public void addNewList(String name, String description, boolean isPrivate, User loggedUser) {
+    public void createNewList(String name, String description, boolean isPrivate, User loggedUser) {
         try {
             // build httpurl and request for remote db
             final String dbFunction = "fn_create_custom_list";

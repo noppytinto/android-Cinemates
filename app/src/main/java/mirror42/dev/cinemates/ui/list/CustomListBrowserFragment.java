@@ -97,6 +97,7 @@ public class CustomListBrowserFragment extends Fragment
             switch (taskStatus) {
                 case SUCCESS: {
                     createCustomListPlaceholder(newListName, newListDescription);
+                    moveRecyclerToBottom();
                     showCenteredToast("lista creata");
                     break;
                 }
@@ -148,11 +149,9 @@ public class CustomListBrowserFragment extends Fragment
         // listName and listDescription will alwaysbe  non-empty
         // checks are made up front
 
-        customListBrowserViewModel.addNewList(listName , listDescription, isChecked, loginViewModel.getLoggedUser());
+        customListBrowserViewModel.createNewList(listName , listDescription, isChecked, loginViewModel.getLoggedUser());
         newListName = listName;
         newListDescription = listDescription;
-
-
     }
 
     private void createCustomListPlaceholder(String name, String description) {
@@ -173,4 +172,13 @@ public class CustomListBrowserFragment extends Fragment
             showCenteredToast("lista vuota");
         }
     }
+
+    private void moveRecyclerToBottom() {
+        if(recyclerAdapterCustomLists.getItemCount()>0) {
+            recyclerView.smoothScrollToPosition(recyclerAdapterCustomLists.getItemCount()-1);
+        }
+    }
+
+
+
 }// end CustomListBrowserFragment class

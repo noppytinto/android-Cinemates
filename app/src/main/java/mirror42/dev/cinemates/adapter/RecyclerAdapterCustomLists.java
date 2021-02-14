@@ -113,6 +113,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
 
 
+
     //------------------------------------------------------------------- VIEWHOLDERS
 
     class CustomListViewHolder extends RecyclerView.ViewHolder {

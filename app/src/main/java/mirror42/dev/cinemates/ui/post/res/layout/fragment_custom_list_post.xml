@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.post.CustomListPostFragment">
 
 
-    <androidx.cardview.widget.CardView
+
+<androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:elevation="@dimen/default_elevation"
         app:cardCornerRadius="@dimen/default_corner_radius"
+        android:elevation="@dimen/default_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,7 +28,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_watchedPostFragment_owner"
+                android:id="@+id/include_customListPostFragment_postOwner"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -35,15 +37,16 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_watchedPostFragment_content"
+                android:id="@+id/include_customListPostFragment_postContent"
                 layout="@layout/layout_content_list_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchedPostFragment_owner" />
+                app:layout_constraintTop_toBottomOf="@+id/include_customListPostFragment_postOwner" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

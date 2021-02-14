@@ -15,7 +15,6 @@
         android:elevation="@dimen/default_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -25,7 +24,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_watchListPost_postOwnerLayout"
+                android:id="@+id/include_watchListPostLayout_postOwnerLayout"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -34,25 +33,25 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_watchListPost_postContentLayout"
-                layout="@layout/layout_content_essential_list_post"
+                android:id="@+id/include_watchListPostLayout_postContentLayout"
+                layout="@layout/layout_content_list_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchListPost_postOwnerLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/include_watchListPostLayout_postOwnerLayout" />
 
             <View
-                android:id="@+id/divider_watchlistPost_1"
+                android:id="@+id/divider_watchlistPostLayout_1"
                 android:layout_width="wrap_content"
                 android:layout_height="1dp"
                 android:background="@color/divider_blue"
-                app:layout_constraintBottom_toTopOf="@+id/include_watchListPost_postReactionsLayout"
+                app:layout_constraintBottom_toTopOf="@+id/include_watchListPostLayout_postReactionsLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <include
-                android:id="@+id/include_watchListPost_postReactionsLayout"
+                android:id="@+id/include_watchListPostLayout_postReactionsLayout"
                 layout="@layout/layout_post_reactions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -60,7 +59,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchListPost_postContentLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/include_watchListPostLayout_postContentLayout" />
 
 
 

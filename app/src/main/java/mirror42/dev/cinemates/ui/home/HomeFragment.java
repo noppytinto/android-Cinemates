@@ -46,6 +46,7 @@ public class HomeFragment extends Fragment implements
     private CircularProgressIndicator progressIndicator;
 
 
+
     //------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
@@ -131,7 +132,6 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
 
@@ -243,6 +243,16 @@ public class HomeFragment extends Fragment implements
         Movie movie = currentPost.getMovie();
         NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
         NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+    }
+
+    @Override
+    public void onCustomListCreatedPostClicked(int position) {
+
+    }
+
+    @Override
+    public void onFollowPostClicked(int position) {
+
     }
 
 //    @Override

@@ -49,7 +49,11 @@
         tools:layout="@layout/fragment_personal_profile" >
         <action
             android:id="@+id/action_personalProfileFragment_to_customListBrowserFragment"
-            app:destination="@id/customListBrowserFragment" />
+            app:destination="@id/customListBrowserFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"

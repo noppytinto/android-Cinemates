@@ -26,7 +26,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_watchedPostFragment_owner"
+                android:id="@+id/include_customListCreatedPostLayout_postOwnerLayout"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -35,17 +35,38 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_watchedPostFragment_content"
-                layout="@layout/layout_content_list_post"
+                android:id="@+id/include_customListCreatedPostLayout_postContent"
+                layout="@layout/layout_content_custom_list_created_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/include_customListCreatedPostLayout_postOwnerLayout" />
+
+            <View
+                android:id="@+id/divider_customListCreatedPostLayout_1"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="@color/divider_blue"
+                app:layout_constraintBottom_toTopOf="@+id/include_customListCreatedPostLayout_postReactionsLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <include
+                android:id="@+id/include_customListCreatedPostLayout_postReactionsLayout"
+                layout="@layout/layout_post_reactions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_watchedPostFragment_owner" />
+                app:layout_constraintTop_toBottomOf="@+id/include_customListCreatedPostLayout_postContent" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

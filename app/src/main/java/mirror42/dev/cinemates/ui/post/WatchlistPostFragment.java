@@ -39,13 +39,13 @@ public class WatchlistPostFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        imageViewProfile = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
-        textViewFullname = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.textView_postOwnerLayout_username);
-        textViewPublishDate = view.findViewById(R.id.include_watchlistPost_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
-        imageViewPoster = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.imageview_movieThumbnail);
-        textViewMovieTitle = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_movieTitle);
-        textViewMovieOverview = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_movieOverview);
-        textPostDescription = view.findViewById(R.id.include_watchlistPost_content).findViewById(R.id.textView_contentEssentialListPost_description);
+        imageViewProfile = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+        textViewFullname = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_username);
+        textViewPublishDate = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
+        imageViewPoster = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.imageview_movieThumbnail);
+        textViewMovieTitle = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieTitle);
+        textViewMovieOverview = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieOverview);
+        textPostDescription = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_description);
 
         if(getArguments()!=null) {
             WatchlistPost post = (WatchlistPost) getArguments().getSerializable("watchlist_post_data");

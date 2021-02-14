@@ -18,6 +18,7 @@ import java.util.List;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.CustomListCreatedPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
@@ -46,6 +47,9 @@ public class HomeViewModel extends ViewModel {
     private ArrayList<Post> watchlistPosts;
     private ArrayList<Post> favoritesPosts;
     private ArrayList<Post> watchedPosts;
+    private ArrayList<Post> customListCreatedPosts;
+    private ArrayList<Post> customListPosts;
+    private ArrayList<Post> followPosts;
 
 
     //-------------------------------------------------------------------------- CONSTRUCTORS
@@ -105,9 +109,19 @@ public class HomeViewModel extends ViewModel {
             e.printStackTrace();
         }
 
-        Runnable watchedPostsTask = createFetchWatchedPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_3 = new Thread(watchedPostsTask);
+        Runnable customListCreatedPostsTask = createFetchCustomListCreatedPostTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_3 = new Thread(customListCreatedPostsTask);
         t_3.start();
+
+        try {
+            t_3.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Runnable watchedPostsTask = createFetchWatchedPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_end = new Thread(watchedPostsTask);
+        t_end.start();
     }
 
     private Runnable createFetchWatchlistPostsTask(String email, String token, String loggedUsername) {
@@ -345,14 +359,92 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchWatchedPostTask()
 
-    public ArrayList<Post> combineAllPosts() {
-        ArrayList<Post> finalList = new ArrayList<>();
-        finalList.addAll(watchlistPosts);
-        finalList.addAll(favoritesPosts);
-        finalList.addAll(watchedPosts);
+    // todo: custom list created post
+    private Runnable createFetchCustomListCreatedPostTask(String email, String token, String loggedUsername) {
+        return ()-> {
+            try {
+                customListCreatedPosts = new ArrayList<>();
 
-        return finalList;
-    }
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", "CC")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                Call call = httpClient.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            // check responses
+                            if (response.isSuccessful()) {
+                                String responseData = response.body().string();
+
+                                // if response contains valid data
+                                if ( ! responseData.equals("null")) {
+                                    JSONArray jsonArray = new JSONArray(responseData);
+                                    ArrayList<Post> postsList = new ArrayList<>();
+
+                                    for(int i=0; i<jsonArray.length(); i++) {
+                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                                        CustomListCreatedPost customListCreatedPost = buildCustomListCreatedPost(jsonDBobj, email, token, loggedUsername);
+
+                                        postsList.add(customListCreatedPost);
+                                    }// for
+
+                                    // once finished set result
+//                                    Collections.reverse(postsList);
+                                    customListCreatedPosts.addAll(postsList);
+
+                                }
+                                // if response contains no data
+                                else {
+//                                    setPostsList(null);
+//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
+                                }
+                            } // if response is unsuccessful
+                            else {
+//                                setPostsList(null);
+//                                setFetchStatus(FetchStatus.FAILED);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+//                            setPostsList(null);
+//                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+//                setPostsList(null);
+//                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchCustomListCreatedPostTask()
+
+    // todo: follow post
+
+    // todo: added movie to custom list post
+
+
+
+
+
+
+
+
+
 
 
 
@@ -412,6 +504,77 @@ public class HomeViewModel extends ViewModel {
         fetchComments(watchedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
         return watchedPost;
     }
+
+    private CustomListCreatedPost buildCustomListCreatedPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        // getting post owner data
+        User user = buildOwner(jsonDBobj);
+
+        // assembling post
+        CustomListCreatedPost customListCreatedPost = new CustomListCreatedPost();
+        customListCreatedPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        customListCreatedPost.setOwner(user);
+        customListCreatedPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        String listName = jsonDBobj.getString("list_name");
+        customListCreatedPost.setName(listName);
+        customListCreatedPost.setDescription("ha creato la lista: " + listName);
+        // getting reactions
+        fetchLikes(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return customListCreatedPost;
+    }
+
+    //TODO
+    private CustomListCreatedPost buildCustomListPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        // getting post owner data
+        User user = buildOwner(jsonDBobj);
+
+        // assembling post
+        CustomListCreatedPost customListCreatedPost = new CustomListCreatedPost();
+        customListCreatedPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        customListCreatedPost.setOwner(user);
+        customListCreatedPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        customListCreatedPost.setName(jsonDBobj.getString("list_name"));
+        customListCreatedPost.setDescription("ha creato la lista: " + jsonDBobj.getString("list_name"));
+        // getting reactions
+        fetchLikes(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return customListCreatedPost;
+    }
+
+    //TODO
+    private CustomListCreatedPost buildFollowPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        // getting post owner data
+        User user = buildOwner(jsonDBobj);
+
+        // assembling post
+        CustomListCreatedPost customListCreatedPost = new CustomListCreatedPost();
+        customListCreatedPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        customListCreatedPost.setOwner(user);
+        customListCreatedPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        customListCreatedPost.setName(jsonDBobj.getString("list_name"));
+        customListCreatedPost.setDescription("ha creato la lista: " + jsonDBobj.getString("list_name"));
+        // getting reactions
+        fetchLikes(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return customListCreatedPost;
+    }
+
+
+    public ArrayList<Post> combineAllPosts() {
+        ArrayList<Post> finalList = new ArrayList<>();
+        finalList.addAll(watchlistPosts);
+        finalList.addAll(favoritesPosts);
+        finalList.addAll(customListCreatedPosts);
+        finalList.addAll(watchedPosts);
+
+        return finalList;
+    }
+
+
+
+
+
+
 
     private User buildOwner(JSONObject jsonObject) throws JSONException {
         User user = new User();
