@@ -30,7 +30,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterShowLikesDialog;
 import mirror42.dev.cinemates.adapter.ViewPagerAdapterPost;
+import mirror42.dev.cinemates.model.CustomListCreatedPost;
+import mirror42.dev.cinemates.model.CustomListPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
+import mirror42.dev.cinemates.model.FollowPost;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
 import mirror42.dev.cinemates.model.User;
@@ -219,6 +222,24 @@ public class PostFragment extends Fragment implements
                 arguments.putSerializable("watched_post_data", watchedPost);
             }
             break;
+            case CL: {
+                // Create new fragment and transaction
+                CustomListPost customListPost = (CustomListPost) post;
+                arguments.putSerializable("custom_list_post_data", customListPost);
+            }
+            break;
+            case CC: {
+                // Create new fragment and transaction
+                CustomListCreatedPost customListCreatedPost = (CustomListCreatedPost) post;
+                arguments.putSerializable("custom_list_created_post_data", customListCreatedPost);
+            }
+            break;
+            case FW: {
+                // Create new fragment and transaction
+                FollowPost followPost = (FollowPost) post;
+                arguments.putSerializable("follow_post_data", followPost);
+            }
+            break;
             default:
         }
 
@@ -229,23 +250,44 @@ public class PostFragment extends Fragment implements
         switch (postType) {
             case WL: {
                 // Create new fragment and transaction
-                Fragment watchlistPostFragment = WatchlistPostFragment.newInstance();
-                watchlistPostFragment.setArguments(arguments);
-                display(watchlistPostFragment);
+                Fragment postFragment = WatchlistPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
             }
                 break;
             case FV: {
                 // Create new fragment and transaction
-                Fragment favoritesPostFragment = FavoritesPostFragment.newInstance();
-                favoritesPostFragment.setArguments(arguments);
-                display(favoritesPostFragment);
+                Fragment postFragment = FavoritesPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
             }
             break;
             case WD: {
                 // Create new fragment and transaction
-                Fragment watchedPostFragment = WatchedPostFragment.newInstance();
-                watchedPostFragment.setArguments(arguments);
-                display(watchedPostFragment);
+                Fragment postFragment = WatchedPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
+            }
+            break;
+            case CL: {
+                // Create new fragment and transaction
+                Fragment postFragment = CustomListPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
+            }
+            break;
+            case CC: {
+                // Create new fragment and transaction
+                Fragment postFragment = CustomListCreatedPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
+            }
+            break;
+            case FW: {
+                // Create new fragment and transaction
+                Fragment postFragment = FollowPostFragment.newInstance();
+                postFragment.setArguments(arguments);
+                display(postFragment);
             }
             break;
             default:

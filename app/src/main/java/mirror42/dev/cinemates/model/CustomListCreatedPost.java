@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.model;
 
-public class CustomListCreatedPost extends Post {
+import java.io.Serializable;
+
+public class CustomListCreatedPost extends Post implements Serializable {
     private String name;
     private String listDescription;
 

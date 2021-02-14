@@ -15,7 +15,10 @@ import java.util.Collections;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
+import mirror42.dev.cinemates.model.CustomListCreatedPost;
+import mirror42.dev.cinemates.model.CustomListPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
+import mirror42.dev.cinemates.model.FollowPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.Post.PostType;
@@ -180,6 +183,20 @@ public class PostViewModel extends ViewModel {
                 post = buildWatchedPost(jsonObject, loggedUser);
             }
             break;
+            // TODO
+//            case "CL": {
+//                post = buildWatchedPost(jsonObject, loggedUser);
+//            }
+//            break;
+            case "CC": {
+                post = buildCustomListCreatedPost(jsonObject, loggedUser);
+            }
+            break;
+            // TODO
+//            case "FW": {
+//                post = buildWatchedPost(jsonObject, loggedUser);
+//            }
+//            break;
             default:
         }
 
@@ -194,15 +211,15 @@ public class PostViewModel extends ViewModel {
         Movie movie = buildMovie(jsonObject);
 
         // assembling post
-        WatchlistPost watchlistPost = new WatchlistPost();
-        watchlistPost.setPostId(postID);
-        watchlistPost.setOwner(user);
-        watchlistPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-        watchlistPost.setDescription("ha aggiunto un film alla Watchlist.");
-        watchlistPost.setMovie(movie);
-        fetchPostLikes(watchlistPost, loggedUser);
-        fetchPostComments(watchlistPost, loggedUser);
-        return watchlistPost;
+        WatchlistPost post = new WatchlistPost();
+        post.setPostId(postID);
+        post.setOwner(user);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        post.setDescription("ha aggiunto un film alla Watchlist.");
+        post.setMovie(movie);
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
+        return post;
     }
 
     private FavoritesPost buildFavoritesPost(JSONObject jsonObject, User loggedUser) throws Exception{
@@ -213,15 +230,15 @@ public class PostViewModel extends ViewModel {
         Movie movie = buildMovie(jsonObject);
 
         // assembling post
-        FavoritesPost favoritesPost = new FavoritesPost();
-        favoritesPost.setPostId(postID);
-        favoritesPost.setOwner(user);
-        favoritesPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-        favoritesPost.setDescription("ha aggiunto un film nei Preferiti.");
-        favoritesPost.setMovie(movie);
-        fetchPostLikes(favoritesPost, loggedUser);
-        fetchPostComments(favoritesPost, loggedUser);
-        return favoritesPost;
+        FavoritesPost post = new FavoritesPost();
+        post.setPostId(postID);
+        post.setOwner(user);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        post.setDescription("ha aggiunto un film nei Preferiti.");
+        post.setMovie(movie);
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
+        return post;
     }
 
     private WatchedPost buildWatchedPost(JSONObject jsonObject, User loggedUser) throws Exception{
@@ -232,16 +249,80 @@ public class PostViewModel extends ViewModel {
         Movie movie = buildMovie(jsonObject);
 
         // assembling post
-        WatchedPost watchedPost = new WatchedPost();
-        watchedPost.setPostId(postID);
-        watchedPost.setOwner(user);
-        watchedPost.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-        watchedPost.setDescription("ha visto: " + movie.getTitle());
-        watchedPost.setMovie(movie);
-        fetchPostLikes(watchedPost, loggedUser);
-        fetchPostComments(watchedPost, loggedUser);
-        return watchedPost;
+        WatchedPost post = new WatchedPost();
+        post.setPostId(postID);
+        post.setOwner(user);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        post.setDescription("ha visto: " + movie.getTitle());
+        post.setMovie(movie);
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
+        return post;
     }
+
+    private CustomListCreatedPost buildCustomListCreatedPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // assembling post
+        CustomListCreatedPost post = new CustomListCreatedPost();
+        post.setPostId(postID);
+        post.setOwner(user);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        String listName = jsonObject.getString("list_name");
+        post.setName(listName);
+        post.setDescription("ha creato la lista: " + listName);
+        // getting reactions
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
+        return post;
+    }
+
+    // TODO
+    private CustomListPost buildCustomListPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // assembling post
+        CustomListPost post = new CustomListPost();
+//        post.setPostId(postID);
+//        post.setOwner(user);
+//        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+//        String listName = jsonObject.getString("list_name");
+//        post.setName(listName);
+//        post.setDescription("ha creato la lista: " + listName);
+//        // getting reactions
+//        fetchPostLikes(post, loggedUser);
+//        fetchPostComments(post, loggedUser);
+        return post;
+    }
+
+    // TODO
+    private FollowPost buildFollowPost(JSONObject jsonObject, User loggedUser) throws Exception{
+        // getting post owner data
+        User user = buildUser(jsonObject);
+
+        // assembling post
+        FollowPost post = new FollowPost();
+//        post.setPostId(postID);
+//        post.setOwner(user);
+//        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+//        String listName = jsonObject.getString("list_name");
+//        post.setName(listName);
+//        post.setDescription("ha creato la lista: " + listName);
+//        // getting reactions
+//        fetchPostLikes(post, loggedUser);
+//        fetchPostComments(post, loggedUser);
+        return post;
+    }
+
+
+
+
+
+
+
+
 
     private User buildUser(JSONObject jsonObject) throws JSONException {
         User user = new User();
@@ -283,6 +364,15 @@ public class PostViewModel extends ViewModel {
 
         return movie;
     }
+
+
+
+
+
+
+
+
+    //----------------------------------------------------------------------------- REACTIONS
 
     private Post fetchPostComments(Post watchlistPost, User loggedUser) {
         try {

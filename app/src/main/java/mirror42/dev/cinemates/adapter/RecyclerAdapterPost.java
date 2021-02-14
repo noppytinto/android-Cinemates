@@ -173,6 +173,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void loadNewData(ArrayList<Post> newList) {
+        clearList();
         postList = newList;
         notifyDataSetChanged();
     }

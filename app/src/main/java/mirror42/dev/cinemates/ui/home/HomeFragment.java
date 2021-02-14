@@ -255,54 +255,6 @@ public class HomeFragment extends Fragment implements
 
     }
 
-//    @Override
-//    public void onAddCommentClicked(String commentText, long postId, int position, int commentsCount) {
-//        homeViewModel.addComment(
-//                postId,
-//                commentText,
-//                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
-//                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
-//
-//        // updating comments counter
-//        TextView commentsCounter = recyclerView.getLayoutManager()
-//                .findViewByPosition(position)
-//                .findViewById(R.id.button_reactionsLayout_showComments);
-//        commentsCount = commentsCount + 1;
-//
-//        if(commentsCount==1) {
-//            commentsCounter.setText(commentsCount + " commento");
-//        }
-//        else {
-//            commentsCounter.setText(commentsCount + " commenti");
-//        }
-//    }
-
-//    @Override
-//    public void onDeleteCommentClicked(long commentId, int commentPosition, int postPosition, int commentsCount) {
-//        try {
-//            TextView commentsCounter = recyclerView.getLayoutManager()
-//                    .findViewByPosition(postPosition)
-//                    .findViewById(R.id.button_reactionsLayout_showComments);
-//
-//            if(commentsCount>0)
-//                commentsCount = commentsCount - 1;
-//
-//            if(commentsCount==1) {
-//                commentsCounter.setText(commentsCount + " commento");
-//            }
-//            else {
-//                commentsCounter.setText(commentsCount + " commenti");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        homeViewModel.deleteComment(
-//                commentId,
-//                loginViewModel.getLiveLoggedUser().getValue().getEmail(),
-//                loginViewModel.getLiveLoggedUser().getValue().getAccessToken());
-//    }
-
     private void checkForNewNotifications(User loggedUser) {
         if(loggedUser!=null) {
             notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
@@ -326,16 +278,6 @@ public class HomeFragment extends Fragment implements
             notificationsViewModel.fetchNotifications(loggedUser, getContext());
         }
     }
-
-//    @Override
-//    public void onAddCommentClicked(String commentText, long postId, int position) {
-//
-//    }
-//
-//    @Override
-//    public void onCommentDeleted(CommentsViewModel.TaskStatus taskStatus) {
-//
-//    }
 
 
 }// end HomeFragment class

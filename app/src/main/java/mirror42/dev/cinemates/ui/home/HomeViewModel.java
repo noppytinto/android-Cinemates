@@ -276,6 +276,78 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchFavoritesPostTask()
 
+
+
+    // todo: custom list created post
+    private Runnable createFetchCustomListCreatedPostTask(String email, String token, String loggedUsername) {
+        return ()-> {
+            try {
+                customListCreatedPosts = new ArrayList<>();
+
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", "CC")
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+
+
+                // calling
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (response.isSuccessful()) {
+                        String responseData = response.body().string();
+
+                        // if response contains valid data
+                        if ( ! responseData.equals("null")) {
+                            JSONArray jsonArray = new JSONArray(responseData);
+                            ArrayList<Post> postsList = new ArrayList<>();
+
+                            for(int i=0; i<jsonArray.length(); i++) {
+                                JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                                CustomListCreatedPost customListCreatedPost = buildCustomListCreatedPost(jsonDBobj, email, token, loggedUsername);
+
+                                postsList.add(customListCreatedPost);
+                            }// for
+
+                            // once finished set result
+//                                    Collections.reverse(postsList);
+                            customListCreatedPosts.addAll(postsList);
+
+                        }
+                        // if response contains no data
+                        else {
+//                                    setPostsList(null);
+//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
+                        }
+                    } // if response is unsuccessful
+                    else {
+//                                setPostsList(null);
+//                                setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+//                setPostsList(null);
+//                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchCustomListCreatedPostTask()
+
+    // todo: follow post
+
+    // todo: added movie to custom list post
+
+
+
     private Runnable createFetchWatchedPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
@@ -358,88 +430,6 @@ public class HomeViewModel extends ViewModel {
             }
         };
     }// end createFetchWatchedPostTask()
-
-    // todo: custom list created post
-    private Runnable createFetchCustomListCreatedPostTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                customListCreatedPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "CC")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // executing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                        setFetchStatus(FetchStatus.FAILED);
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    ArrayList<Post> postsList = new ArrayList<>();
-
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        CustomListCreatedPost customListCreatedPost = buildCustomListCreatedPost(jsonDBobj, email, token, loggedUsername);
-
-                                        postsList.add(customListCreatedPost);
-                                    }// for
-
-                                    // once finished set result
-//                                    Collections.reverse(postsList);
-                                    customListCreatedPosts.addAll(postsList);
-
-                                }
-                                // if response contains no data
-                                else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setPostsList(null);
-//                            setFetchStatus(FetchStatus.FAILED);
-                        }
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchCustomListCreatedPostTask()
-
-    // todo: follow post
-
-    // todo: added movie to custom list post
-
-
-
-
 
 
 

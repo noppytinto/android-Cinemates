@@ -1,4 +1,10 @@
 package mirror42.dev.cinemates.ui.post;
 
-public class FollowPostFragment {
+import androidx.fragment.app.Fragment;
+
+public class FollowPostFragment extends Fragment {
+
+    public static FollowPostFragment newInstance() {
+        return new FollowPostFragment();
+    }
 }
