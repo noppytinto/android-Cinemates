@@ -270,7 +270,7 @@ public class PostViewModel extends ViewModel {
         post.setOwner(user);
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         String listName = jsonObject.getString("list_name");
-        post.setName(listName);
+        post.setListName(listName);
         post.setDescription("ha creato la lista: " + listName);
         // getting reactions
         fetchPostLikes(post, loggedUser);

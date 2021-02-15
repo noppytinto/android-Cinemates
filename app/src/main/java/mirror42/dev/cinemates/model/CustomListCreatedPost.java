@@ -14,7 +14,7 @@ public class CustomListCreatedPost extends Post implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setListName(String name) {
         this.name = name;
     }
 

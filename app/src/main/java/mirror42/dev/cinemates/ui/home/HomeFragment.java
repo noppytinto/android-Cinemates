@@ -98,11 +98,7 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
-                    buttonUpdateFeed.setVisibility(View.VISIBLE);
-                    User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-                    progressIndicator.setVisibility(View.VISIBLE);
-                    homeViewModel.fetchPosts(loggedUser);
-//                    checkForNewNotifications(loggedUser);
+                    fetchPosts();
                 }
                 break;
                 case LOGGED_OUT:
@@ -138,6 +134,14 @@ public class HomeFragment extends Fragment implements
 
 
     //------------------------------------------------------------------------------- METHODS
+
+    private void fetchPosts() {
+        buttonUpdateFeed.setVisibility(View.VISIBLE);
+        User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
+        progressIndicator.setVisibility(View.VISIBLE);
+        homeViewModel.fetchPosts(loggedUser);
+//                    checkForNewNotifications(loggedUser);
+    }
 
     private void showProgressIndicator() {
         //notes: Declare progressDialog before so you can use .hide() later!
