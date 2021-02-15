@@ -98,6 +98,12 @@
         <argument
             android:name="list"
             app:argType="mirror42.dev.cinemates.model.list.MoviesList" />
+        <argument
+            android:name="listName"
+            app:argType="string" />
+        <argument
+            android:name="listDescription"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/resetPasswordFragment"

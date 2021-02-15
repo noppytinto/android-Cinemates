@@ -127,7 +127,7 @@ public class FavouritesListCoverFragment extends Fragment implements View.OnClic
         if(viewId == R.id.cardView_essentialListCover) {
             if(list!=null && list.getMovies() != null && list.getMovies().size()>0) {
                 NavGraphDirections.ActionGlobalListFragment listFragment =
-                        NavGraphDirections.actionGlobalListFragment(list);
+                        NavGraphDirections.actionGlobalListFragment(list, "", "");
                 NavHostFragment.findNavController(FavouritesListCoverFragment.this).navigate(listFragment);
             }
             else showCenteredToast("lista vuota");

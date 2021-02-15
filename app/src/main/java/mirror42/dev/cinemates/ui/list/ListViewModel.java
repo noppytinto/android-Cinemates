@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
@@ -237,7 +238,7 @@ public class ListViewModel extends ViewModel {
 //                                ArrayList<Movie> result = null;
 //                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
 
-                            if (!responseData.equals("null")) {
+                            if (responseData.equals("true")) {
 
                                 // once finished set results
 //                                    postSelectedMovies(result);
@@ -269,15 +270,93 @@ public class ListViewModel extends ViewModel {
 
 
 
-    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, MoviesList.ListType listType,  User loggedUser) {
+    public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, MoviesList moviesList, User loggedUser) {
         if(moviesToRemove!=null) {
-            for(Movie m: moviesToRemove) {
-                try {
-                    removeSingleMovieFromEssentialList(m.getTmdbID(), listType,  loggedUser);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            MoviesList.ListType listType = moviesList.getListType();
+            switch (listType) {
+                case CL: {
+                    CustomList customList = (CustomList) moviesList;
+                    for(Movie m: moviesToRemove) {
+                        try {
+                            removeSingleMovieFromCustomList(m.getTmdbID(), customList.getName(),  loggedUser);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+                default: {
+                    for(Movie m: moviesToRemove) {
+                        try {
+                            removeSingleMovieFromEssentialList(m.getTmdbID(), listType,  loggedUser);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
+
+        }
+    }
+
+    private void removeSingleMovieFromCustomList(int movieId, String listName, User loggedUser) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "fn_delete_movie_from_custom_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("list_name", listName)
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                        postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                    Log.d(TAG, "onFailure: ");
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+//                                ArrayList<Movie> result = null;
+//                                TheMovieDatabaseApi tmdb = new TheMovieDatabaseApi();
+
+                            if (responseData.equals("true")) {
+
+                                // once finished set results
+//                                    postSelectedMovies(result);
+//                                    postDownloadStatus(DownloadStatus.SUCCESS);
+
+                            }
+                            else {
+//                                    postSelectedMovies(null);
+//                                    postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                            }
+                        } // if response is unsuccessful
+                        else {
+//                                postSelectedMovies(null);
+//                                postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+//                            postSelectedMovies(null);
+//                            postDownloadStatus(DownloadStatus.FAILED_OR_EMPTY);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setSelectedMovies(null);
+            setFetchStatus(FetchStatus.FAILED);
         }
     }
 

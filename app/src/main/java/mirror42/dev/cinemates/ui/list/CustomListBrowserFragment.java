@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterCustomLists;
 import mirror42.dev.cinemates.model.list.CustomList;
@@ -166,11 +168,14 @@ public class CustomListBrowserFragment extends Fragment
 
     @Override
     public void onCoverClicked(int position) {
-        // TODO
         CustomList clickedList = recyclerAdapterCustomLists.getList(position);
-        if(clickedList.getMovies()==null || clickedList.getMovies().size() == 0) {
-            showCenteredToast("lista vuota");
+
+        if(clickedList!=null && clickedList.getMovies() != null && clickedList.getMovies().size()>0) {
+            NavGraphDirections.ActionGlobalListFragment listFragment =
+                    NavGraphDirections.actionGlobalListFragment(clickedList, clickedList.getName(), clickedList.getDescription());
+            NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(listFragment);
         }
+        else showCenteredToast("lista vuota");
     }
 
     private void moveRecyclerToBottom() {

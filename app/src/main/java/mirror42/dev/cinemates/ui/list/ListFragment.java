@@ -26,6 +26,7 @@ import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterMoviesList;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
@@ -43,6 +44,7 @@ public class ListFragment extends Fragment implements
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
     private MoviesList.ListType listType;
+    private MoviesList currentMoviesList;
 
 
 
@@ -78,59 +80,50 @@ public class ListFragment extends Fragment implements
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
-            MoviesList list = args.getList();
-            listType = list.getListType();
+            currentMoviesList = args.getList();
+            listType = currentMoviesList.getListType();
 
             //
             switch (listType) {
                 case WL:
-                    populateEssentialList("Watchlist", list.getMovies());
+                    populateEssentialList("Watchlist", currentMoviesList.getMovies());
                     break;
                 case FV:
-                    populateEssentialList("Preferiti", list.getMovies());
+                    populateEssentialList("Preferiti", currentMoviesList.getMovies());
                     break;
                 case WD:
-                    populateEssentialList("Visti", list.getMovies());
+                    populateEssentialList("Visti", currentMoviesList.getMovies());
                     break;
-                case CL:
-                    //TODO
+                case CL: {
+                    populateCustomList(currentMoviesList);
+                }
                     break;
             }
         }
-//            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-////            WatchlistFragmentArgs args = WatchlistFragmentArgs.fromBundle(getArguments());
-////            Movie[] ml = args.getMoviesList();
-////            moviesList = new ArrayList<>(Arrays.asList(ml));
-//
+    }
 
-//
-//            // setting list name
-//            String listTitle = args.getListTitle();
-//            if(listTitle != null) {
-//                TextView textView = view.findViewById(R.id.textView_listFragment_title);
-//                textView.setText(listTitle);
-//            }
-//
-//            // setting list description
-//            String listDescription = args.getListDescription();
-//            if(listDescription != null ) {
-//                if(!listDescription.isEmpty() || !listDescription.equals("")) {
-//                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
-//                    textView.setText(listDescription);
-//                }
-//                else {
-//                    TextView textView = view.findViewById(R.id.textView_listFragment_description);
-//                    textView.setText(null);
-//                }
-//            }
-//            else {
-//                TextView textView = view.findViewById(R.id.textView_listFragment_description);
-//                textView.setText(null);
-//            }
-//
-//
-//        }//if
+    private void populateCustomList(MoviesList list) {
+        CustomList customList = (CustomList) list;
+        String listName = customList.getName();
+        String listDescription = customList.getDescription();
+        ArrayList<Movie> movies = customList.getMovies();
 
+        // set list name
+        TextView textViewListName = view.findViewById(R.id.textView_listFragment_title);
+        textViewListName.setText(listName);
+        TextView textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
+        textViewListDescription.setVisibility(View.VISIBLE);
+        textViewListDescription.setText(listDescription);
+
+        // set movies list
+        if(movies != null && movies.size()!=0) {
+            // loading data into recycler
+            recyclerAdapterMoviesList.loadNewData(movies);
+
+            // observing selected movies list
+            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        }//
     }
 
     private void populateEssentialList(String listName, ArrayList<Movie> movies) {
@@ -335,7 +328,7 @@ public class ListFragment extends Fragment implements
         //
         selectedMovies = recyclerAdapterMoviesList.getcurrentSelectedMovies();
         User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-        listViewModel.removeMoviesFromList(selectedMovies, listType, loggedUser);
+        listViewModel.removeMoviesFromList(selectedMovies, currentMoviesList, loggedUser);
 
         // and notify recycler
         recyclerAdapterMoviesList.notifyDataSetChanged();

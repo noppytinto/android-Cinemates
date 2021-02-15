@@ -127,7 +127,7 @@ public class WatchedListCoverFragment extends Fragment implements View.OnClickLi
         if(viewId == R.id.cardView_essentialListCover) {
             if(list!=null && list.getMovies() != null && list.getMovies().size()>0) {
                 NavGraphDirections.ActionGlobalListFragment listFragment =
-                        NavGraphDirections.actionGlobalListFragment(list);
+                        NavGraphDirections.actionGlobalListFragment(list, "", "");
                 NavHostFragment.findNavController(WatchedListCoverFragment.this).navigate(listFragment);
             }
             else showCenteredToast("lista vuota");
