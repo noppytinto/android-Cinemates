@@ -437,6 +437,7 @@ public class MovieDetailsViewModel extends ViewModel {
                 break;
             case WD:
                 addToWatchedList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
+                break;
         }
     }
 
