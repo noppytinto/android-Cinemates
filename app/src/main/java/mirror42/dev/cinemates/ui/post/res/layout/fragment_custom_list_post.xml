@@ -28,7 +28,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_customListPostFragment_postOwner"
+                android:id="@+id/include_customListPostFragment_owner"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/include_customListPostFragment_postContent"
+                android:id="@+id/include_customListPostFragment_content"
                 layout="@layout/layout_content_list_post"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_customListPostFragment_postOwner" />
+                app:layout_constraintTop_toBottomOf="@+id/include_customListPostFragment_owner" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

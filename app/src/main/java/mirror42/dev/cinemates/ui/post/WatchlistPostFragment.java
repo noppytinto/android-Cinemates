@@ -87,9 +87,5 @@ public class WatchlistPostFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
 
 }// end WatchlistPostFragment class
