@@ -4,12 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -30,8 +28,6 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -105,7 +101,8 @@ public class PostViewModel extends ViewModel {
         return () -> {
             try {
                 // build httpurl and request for remote db
-                HttpUrl httpUrl = buildHttpUrl();
+                final String dbFunction = "fn_select_post";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("post_id", String.valueOf(postId))
@@ -114,57 +111,36 @@ public class PostViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
 
                 // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        setFetchStatus(FetchStatus.FAILED);
-                    }
+                try (Response response = httpClient.newCall(request).execute()) {
+                    // check responses
+                    if (response.isSuccessful()) {
+                        Post result = null;
+                        String responseData = response.body().string();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        // check responses
-                        if (response.isSuccessful()) {
-                            Post result = null;
-                            String responseData = response.body().string();
+                        if ( ! responseData.equals("null")) {
+                            try {
+                                JSONObject jsonDBobj = new JSONObject(responseData);
+                                result = buildPost(jsonDBobj, loggedUser);
 
-                            if ( ! responseData.equals("null")) {
-                                try {
-                                    JSONObject jsonDBobj = new JSONObject(responseData);
-                                    result = buildPost(jsonDBobj, loggedUser);
-
-                                    setPostFetched(result);
-                                    setFetchStatus(FetchStatus.SUCCESS);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                                setPostFetched(result);
+                                setFetchStatus(FetchStatus.SUCCESS);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
-                        else {
-                            setFetchStatus(FetchStatus.NOT_EXISTS);
-                        }
                     }
-                });
+                    else {
+                        setFetchStatus(FetchStatus.NOT_EXISTS);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setFetchStatus(FetchStatus.FAILED);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                setFetchStatus(FetchStatus.FAILED);
             }
-
-
         };
-    }
-
-    private HttpUrl buildHttpUrl() throws Exception {
-        final String dbFunction = "fn_select_post";
-
-        //
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-
-        return httpUrl;
     }
 
     private Post buildPost(JSONObject jsonObject, User loggedUser) throws Exception {
@@ -184,10 +160,10 @@ public class PostViewModel extends ViewModel {
             }
             break;
             // TODO
-//            case "CL": {
-//                post = buildWatchedPost(jsonObject, loggedUser);
-//            }
-//            break;
+            case "CL": {
+                post = buildCustomListPost(jsonObject, loggedUser);
+            }
+            break;
             case "CC": {
                 post = buildCustomListCreatedPost(jsonObject, loggedUser);
             }
@@ -283,17 +259,18 @@ public class PostViewModel extends ViewModel {
         // getting post owner data
         User user = buildUser(jsonObject);
 
+        // getting movie data
+        Movie movie = buildMovie(jsonObject);
+
         // assembling post
         CustomListPost post = new CustomListPost();
-//        post.setPostId(postID);
-//        post.setOwner(user);
-//        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-//        String listName = jsonObject.getString("list_name");
-//        post.setName(listName);
-//        post.setDescription("ha creato la lista: " + listName);
-//        // getting reactions
-//        fetchPostLikes(post, loggedUser);
-//        fetchPostComments(post, loggedUser);
+        post.setPostId(postID);
+        post.setOwner(user);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        post.setDescription("aggiunto un film alla lista: " + jsonObject.getString("list_name"));
+        post.setMovie(movie);
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
         return post;
     }
 
