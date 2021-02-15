@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.User;
@@ -40,6 +41,8 @@ public class MovieDetailsViewModel extends ViewModel {
     private MutableLiveData<CheckListStatus> isInWatchlistStatus;
     private MutableLiveData<CheckListStatus> isInWatchedListStatus;
     private MutableLiveData<CheckListStatus> isInFavoritesStatus;
+    private MutableLiveData<CheckListStatus> custmListsCheckStatus;
+    private MutableLiveData<LinkedHashMap<String, Boolean>> custmListsCheckResult;
 
     public enum AddToListStatus {
         SUCCESS,
@@ -51,6 +54,7 @@ public class MovieDetailsViewModel extends ViewModel {
         IS_IN_WATCHED_LIST,
         IS_IN_WATCHLIST,
         IS_IN_FAVORITES_LIST,
+        CUSTOM_LISTS_CHECKED,
         FAILED,
         IDLE
     }
@@ -63,6 +67,8 @@ public class MovieDetailsViewModel extends ViewModel {
         isInWatchlistStatus = new MutableLiveData<>(CheckListStatus.IDLE);
         isInWatchedListStatus = new MutableLiveData<>(CheckListStatus.IDLE);
         isInFavoritesStatus = new MutableLiveData<>(CheckListStatus.IDLE);
+        custmListsCheckStatus = new MutableLiveData<>(CheckListStatus.IDLE);
+        custmListsCheckResult = new MutableLiveData<>();
 
         tmdb = TheMovieDatabaseApi.getInstance();
         remoteConfigServer = RemoteConfigServer.getInstance();
@@ -119,6 +125,23 @@ public class MovieDetailsViewModel extends ViewModel {
 
     public LiveData<CheckListStatus> getFavoritesListStatus() {
         return isInFavoritesStatus;
+    }
+
+
+    public void setCustomListsCheckStatus(CheckListStatus customListsCheckStatus) {
+        this.custmListsCheckStatus.postValue(customListsCheckStatus);
+    }
+
+    public LiveData<CheckListStatus> getCustomListsCheckStatus() {
+        return custmListsCheckStatus;
+    }
+
+    public void setCustomListsCheckResult(LinkedHashMap<String, Boolean> customListsCheckResult) {
+        this.custmListsCheckResult.postValue(customListsCheckResult);
+    }
+
+    public LiveData<LinkedHashMap<String, Boolean>> getCustomListsCheckResult() {
+        return custmListsCheckResult;
     }
 
 
@@ -575,6 +598,59 @@ public class MovieDetailsViewModel extends ViewModel {
         }
     }
 
+    public void addMovieToCustomList(int movieId, String listName, User loggedUser) {
+        // checking input
+        if(movieId<0) {
+            setAddToListStatus(AddToListStatus.IDLE);
+            return;
+        }
+
+        // generating url request
+        try {
+            final String dbFunction = "fn_insert_movie_into_custom_list";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("list_name", listName)
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) setAddToListStatus(AddToListStatus.SUCCESS);
+                            else setAddToListStatus(AddToListStatus.FAILED);
+                        }
+                        else setAddToListStatus(AddToListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setAddToListStatus(AddToListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setAddToListStatus(AddToListStatus.FAILED);
+        }
+    }
+
+
     //--- checks
 
     public void checkIsInWatchedList(int movieId, User loggedUser) {
@@ -727,6 +803,71 @@ public class MovieDetailsViewModel extends ViewModel {
         } catch (Exception e) {
             e.printStackTrace();
             setIsInFavoritesListStatus(CheckListStatus.FAILED);
+        }
+    }
+
+    public void checkIsInCustomLists(int movieId, User loggedUser) {
+        // checking input
+        if(movieId<0) {
+            setCustomListsCheckStatus(CheckListStatus.FAILED);
+            return;
+        }
+        // generating url request
+        try {
+            final String dbFunction = "fn_check_movie_in_my_custom_lists";
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("movie_id", String.valueOf(movieId))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            //
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setAddToListStatus(AddToListStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            LinkedHashMap<String, Boolean> mapping = new LinkedHashMap<>();
+                            String responseData = response.body().string();
+
+                            if( ! responseData.equals("null")) {
+                                JSONArray jsonArray = new JSONArray(responseData);
+
+                                for(int i=0; i<jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    try {
+                                        mapping.put(jsonObject.getString("list_name"), jsonObject.getBoolean("movie_exists"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }// for
+
+                                setCustomListsCheckResult(mapping);
+                                setCustomListsCheckStatus(CheckListStatus.CUSTOM_LISTS_CHECKED);
+                            }
+                            else setCustomListsCheckStatus(CheckListStatus.FAILED);
+                        }
+                        else setCustomListsCheckStatus(CheckListStatus.FAILED);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        setCustomListsCheckStatus(CheckListStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setCustomListsCheckStatus(CheckListStatus.FAILED);
         }
     }
 

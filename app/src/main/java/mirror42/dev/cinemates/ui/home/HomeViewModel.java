@@ -563,9 +563,6 @@ public class HomeViewModel extends ViewModel {
 
 
 
-
-
-
     private User buildOwner(JSONObject jsonObject) throws JSONException {
         User user = new User();
         user.setUsername(jsonObject.getString("Username"));

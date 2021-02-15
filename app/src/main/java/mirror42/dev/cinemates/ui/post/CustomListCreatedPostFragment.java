@@ -18,6 +18,7 @@ import mirror42.dev.cinemates.model.CustomListCreatedPost;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
 public class CustomListCreatedPostFragment extends Fragment {
+    private final String TAG = this.getClass().getSimpleName();
     private ImageView imageViewProfile;
     private TextView textViewFullname;
     private TextView textViewPublishDate;

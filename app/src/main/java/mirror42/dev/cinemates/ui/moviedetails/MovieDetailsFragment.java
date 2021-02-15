@@ -27,6 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
@@ -57,6 +58,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private boolean isInWatchlist;
     private boolean isInWatchedList;
     private boolean isInFavoritesList;
+    private LinkedHashMap<String, Boolean> customListsCheckMapping;
 
 
 
@@ -102,21 +104,13 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 currentMovieId = movieId;
                 movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
                 loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-
-                // getting main activity
-                // and hiding action bar
-//                MainActivity main = (MainActivity) getActivity();
-//                if(main!=null && main.getSupportActionBar()!=null) {
-//                    main.getSupportActionBar().hide();
-
-//                }
-
                 loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
                     switch (loginResult) {
                         case SUCCESS: case REMEMBER_ME_EXISTS: {
                             addToListButton.setVisibility(View.VISIBLE);
                             //
                             setListChips(movieId, loginViewModel.getLoggedUser());
+                            setCustomList(movieId, loginViewModel.getLoggedUser());
                         }
                             break;
                         default:
@@ -130,14 +124,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
                 //2
                 movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), movie1 -> {
-                    if(movie1 !=null) {
-                        updateUI(movie1);
-                    }
-                    else {
-                        Toast toast = Toast.makeText(getContext(), "errore caricamento dettagli Film", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
+                    if(movie1 !=null) updateUI(movie1);
+                    else showCenteredToast("errore caricamento dettagli Film");
                 });
 
                 // downloading data
@@ -164,12 +152,43 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     }// end onViewCreated()
 
+    private void showCenteredToast(String msg) {
+        Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
     @Override
     public void onClick(View v) {
         int buttonId = v.getId();
 
-        final String[] choices = {"Watchlist", "Preferiti", "Visti", "<TODO>"};
-        final boolean[] checkedItems = {isInWatchlist, isInFavoritesList, isInWatchedList, false};
+        ArrayList<String> availableLists = new ArrayList<>();
+        ArrayList<Boolean> movieExists = new ArrayList<>();
+
+        //build essential lists
+        availableLists.add("Watchlist");
+        movieExists.add(isInWatchlist);
+        availableLists.add("Preferiti");
+        movieExists.add(isInFavoritesList);
+        availableLists.add("Visti");
+        movieExists.add(isInWatchedList);
+
+        // build custom lists list
+        if(customListsCheckMapping!=null) {
+            for (String s: customListsCheckMapping.keySet()) {
+                availableLists.add(s);
+                movieExists.add(customListsCheckMapping.get(s));
+            }
+        }
+
+
+        // build checkbox dialog
+        String[] choices = availableLists.toArray(new String[0]);
+        boolean[] checkedItems = new boolean[movieExists.size()];
+        for(int i=0; i<movieExists.size(); i++) {
+            checkedItems[i] = movieExists.get(i);
+        }
+
         ArrayList<Integer> checkedLists = new ArrayList<>();
 
         if(buttonId == R.id.button_movieDetailsFragment_addToList) {
@@ -195,6 +214,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                             User user = loginViewModel.getLoggedUser();
                             movieDetailsViewModel.addMovieToEssentialList(currentMovieId, MoviesList.ListType.WD, user);
                         }
+                        else if(x>2) {
+                            String listName = choices[x];
+                            User user = loginViewModel.getLoggedUser();
+                            movieDetailsViewModel.addMovieToCustomList(currentMovieId, listName, user);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -218,46 +242,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             });
             builder.show();
 
-
-
-
-//            MaterialAlertDialogBuilder(getContext())
-//                    .setTitle("Tue liste")
-//                    .setNeutralButton(" ")){ dialog, which ->
-//                // Respond to neutral button press
-//            }
-//        .setPositiveButton(resources.getString(R.string.ok)) { dialog, which ->
-//                // Respond to positive button press
-//            }
-//            // Single-choice items (initialized with checked item)
-//        .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
-//                // Respond to item chosen
-//            }
-//        .show()
-
-
-
-
-//            try {
-//                //
-//                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.bottom_sheet_dialog_theme);
-//                bottomSheetDialog.setCanceledOnTouchOutside(false);
-//                bottomSheetDialog.setDismissWithAnimation(true);
-//                bottomSheetDialog.setTitle("test");
-//                View bottomSheetView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.bottom_sheet_addtolist, (ConstraintLayout)view.findViewById(R.id.bottom_sheet_container));
-//                bottomSheetView.findViewById(R.id.button_addToList).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        bottomSheetDialog.dismiss();
-//                    }
-//                });
-//                bottomSheetDialog.setContentView(bottomSheetView);
-//                bottomSheetDialog.show();
-//            } catch (Exception e) {
-//                e.getMessage();
-//                e.printStackTrace();
-//            }
-
         }
         else if(buttonId == R.id.button_movieDetailsFragment_seeAllCast) {
 
@@ -274,7 +258,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
         checkForNewNotifications();
     }
-
 
 
 
@@ -327,6 +310,23 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             }
         });
     }// end setListChips()
+
+    private void setCustomList(int movieId, User loggedUser) {
+        movieDetailsViewModel.checkIsInCustomLists(movieId, loggedUser);
+        movieDetailsViewModel.getCustomListsCheckStatus().observe(getViewLifecycleOwner(), checkListStatus -> {
+            switch (checkListStatus) {
+                case CUSTOM_LISTS_CHECKED:
+                    customListsCheckMapping = movieDetailsViewModel.getCustomListsCheckResult().getValue();
+                    break;
+                case FAILED:
+                    break;
+            }
+        });
+    }
+
+    private void buildCheckBox() {
+
+    }
 
     private void initRecyclerView() {
         // defining HORIZONTAL layout manager for recycler
