@@ -23,9 +23,12 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
+import mirror42.dev.cinemates.model.CustomListPost;
+import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -243,10 +246,39 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onPostContentClicked(int position) {
-        WatchlistPost currentPost = (WatchlistPost) recyclerAdapterPost.getPost(position);
-        Movie movie = currentPost.getMovie();
-        NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
-        NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+        Post currentPost = (Post) recyclerAdapterPost.getPost(position);
+
+        switch (currentPost.getPostType()) {
+            case WL: {
+                WatchlistPost post = (WatchlistPost) currentPost;
+                Movie movie = post.getMovie();
+                NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
+                NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+            }
+            break;
+            case FV: {
+                FavoritesPost post = (FavoritesPost) currentPost;
+                Movie movie = post.getMovie();
+                NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
+                NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+            }
+            break;
+            case WD: {
+                WatchedPost post = (WatchedPost) currentPost;
+                Movie movie = post.getMovie();
+                NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
+                NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+            }
+            break;
+            case CL: {
+                CustomListPost post = (CustomListPost) currentPost;
+                Movie movie = post.getMovie();
+                NavGraphDirections.AnywhereToMovieDetailsFragment movieDetailsFragment = SearchFragmentDirections.anywhereToMovieDetailsFragment(movie);
+                NavHostFragment.findNavController(HomeFragment.this).navigate(movieDetailsFragment);
+            }
+            break;
+        }
+
     }
 
     @Override
