@@ -3,4 +3,9 @@
     <string name="change_password">Cambia password</string>
     <string name="change_password_newPassword">Nuova password</string>
     <string name="change_password_text">Salve, in questa pagina viene data l\'opportunità di cambiare la propria password</string>
+
+    <!-- firebase -->
+    <string name="changePassword_page_firebase_changePassword">Change password page</string>
+
+
 </resources>
