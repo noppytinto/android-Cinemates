@@ -309,6 +309,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                     break;
             }
         });
+
     }// end setListChips()
 
     private void setCustomList(int movieId, User loggedUser) {

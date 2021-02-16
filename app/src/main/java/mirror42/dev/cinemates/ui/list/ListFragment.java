@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
 
@@ -37,14 +41,18 @@ public class ListFragment extends Fragment implements
         RecyclerAdapterMoviesList.ClickAdapterListener{
     private final String TAG = getClass().getSimpleName();
     private RecyclerAdapterMoviesList recyclerAdapterMoviesList;
-    private View view;
     private ArrayList<Movie> selectedMovies;
     private ListViewModel listViewModel;
     private LoginViewModel loginViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
-    private MoviesList.ListType listType;
     private MoviesList currentMoviesList;
+    private FloatingActionButton recommendButton;
+    private Button subscribeButton;
+    private SwitchMaterial isPrivateSwitch;
+    private TextView textViewListName;
+    private TextView textViewListDescription;
+    private boolean navigatedToMovieDetailsFragment;
 
 
 
@@ -61,45 +69,108 @@ public class ListFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.view = view;
-
         //
-        initRecyclerView();
+        init(view);
 
     }// end onViewCreated()
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        selectedMovies = new ArrayList<>();
-
-        //na
-        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
-        firebaseAnalytics.logScreenEvent(this, "List page", getContext());
 
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentMoviesList = args.getList();
-            listType = currentMoviesList.getListType();
 
             //
-            switch (listType) {
-                case WL:
-                    populateEssentialList("Watchlist", currentMoviesList.getMovies());
-                    break;
-                case FV:
-                    populateEssentialList("Preferiti", currentMoviesList.getMovies());
-                    break;
-                case WD:
-                    populateEssentialList("Visti", currentMoviesList.getMovies());
-                    break;
-                case CL: {
-                    populateCustomList(currentMoviesList);
-                }
-                    break;
-            }
+            populateMoviesList(currentMoviesList);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        hideMainToolbar();
+        navigatedToMovieDetailsFragment = false;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if( ! navigatedToMovieDetailsFragment)
+            showMainToolbar();
+    }
+
+
+
+
+    //--------------------------------------------------------------------------------------- METHODS
+
+    private void init(View view) {
+        selectedMovies = new ArrayList<>();
+        recommendButton = view.findViewById(R.id.floatingActionButton_listFragment_recommend);
+        subscribeButton = view.findViewById(R.id.button_listFragment_subscribe);
+        isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
+        textViewListName = view.findViewById(R.id.textView_listFragment_listName);
+        textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
+
+        //
+        initRecyclerView(view);
+
+        //
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
+        firebaseAnalytics.logScreenEvent(this, "List page", getContext());
+    }
+
+    void initRecyclerView(View view) {
+        // defining HORIZONTAL layout manager for recycler
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        // defining Recycler view
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_listFragment);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        actionModeCallback = new ActionModeCallback();
+
+        // assigning adapter to recycle
+        recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<>(), getContext(), this);
+        recyclerView.setAdapter(recyclerAdapterMoviesList);
+    }
+
+    private void populateMoviesList(MoviesList list) {
+        MoviesList.ListType listType = list.getListType();
+        switch (listType) {
+            case WL:
+                populateEssentialList("Watchlist", list.getMovies());
+                break;
+            case FV:
+                populateEssentialList("Preferiti", list.getMovies());
+                break;
+            case WD:
+                populateEssentialList("Visti", list.getMovies());
+                break;
+            case CL:
+                populateCustomList(list);
+            break;
+        }
+    }
+
+
+    private void populateEssentialList(String listName, ArrayList<Movie> movies) {
+        // set list name
+        textViewListName.setText(listName);
+
+        // set movies list
+        if(movies != null && movies.size()!=0) {
+            // loading data into recycler
+            recyclerAdapterMoviesList.loadNewData(movies);
+
+            // observing selected movies list
+            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        }//if
     }
 
     private void populateCustomList(MoviesList list) {
@@ -109,9 +180,7 @@ public class ListFragment extends Fragment implements
         ArrayList<Movie> movies = customList.getMovies();
 
         // set list name
-        TextView textViewListName = view.findViewById(R.id.textView_listFragment_title);
         textViewListName.setText(listName);
-        TextView textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
         textViewListDescription.setVisibility(View.VISIBLE);
         textViewListDescription.setText(listDescription);
 
@@ -125,65 +194,6 @@ public class ListFragment extends Fragment implements
             loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         }//
     }
-
-    private void populateEssentialList(String listName, ArrayList<Movie> movies) {
-        // set list name
-        TextView textView = view.findViewById(R.id.textView_listFragment_title);
-        textView.setText(listName);
-
-        // set movies list
-        if(movies != null && movies.size()!=0) {
-            // loading data into recycler
-            recyclerAdapterMoviesList.loadNewData(movies);
-
-            // observing selected movies list
-            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        }//if
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        hideMainToolbar();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        showMainToolbar();
-    }
-
-
-
-
-    //--------------------------------------------------------------------------------------- METHODS
-
-    void initRecyclerView() {
-        // defining HORIZONTAL layout manager for recycler
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
-        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-        // defining Recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView_listFragment);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        actionModeCallback = new ActionModeCallback();
-
-        // adding recycle listener for touch detection
-//        recyclerView.addOnItemTouchListener(new RecyclerListener(getContext(), recyclerView, this));
-
-        // assigning adapter to recycle
-        recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<>(), getContext(), this);
-        recyclerView.setAdapter(recyclerAdapterMoviesList);
-    }
-
-
-
-
-
-
-    //---------------------- listeners methods
 
     @Override
     public void onItemClicked(int position) {
@@ -200,9 +210,7 @@ public class ListFragment extends Fragment implements
 
                 //
                 showMainToolbar();
-                NavGraphDirections.AnywhereToMovieDetailsFragment
-                        movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(movieSelected);
-                NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
+                navigateToMovieDetailsFragment(movieSelected);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -217,11 +225,15 @@ public class ListFragment extends Fragment implements
         enableActionMode(position);
     }
 
+    private void navigateToMovieDetailsFragment(Movie targetMovie) {
+        navigatedToMovieDetailsFragment = true;
+        NavGraphDirections.AnywhereToMovieDetailsFragment
+                movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(targetMovie);
+        NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
+    }
 
 
-
-
-    //---------------------- action mode
+    //---------------------------------------------------- action mode
 
     public class ActionModeCallback implements ActionMode.Callback {
         @Override
@@ -339,6 +351,15 @@ public class ListFragment extends Fragment implements
 
         actionMode = null;
     }
+
+
+    //----------------------------------------------------
+    private void showRecommendButton() {recommendButton.setVisibility(View.VISIBLE);}
+    private void hideRecommendButton() {recommendButton.setVisibility(View.GONE);}
+    private void showIsPrivateSwitchButton() {isPrivateSwitch.setVisibility(View.VISIBLE);}
+    private void hideIsPrivateSwitchButton() {isPrivateSwitch.setVisibility(View.GONE);}
+    private void showSubscribeButton() {subscribeButton.setVisibility(View.VISIBLE);}
+    private void hideSubscribeButton() {subscribeButton.setVisibility(View.GONE);}
 
     public void hideMainToolbar() {
         try {
