@@ -54,6 +54,9 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_personalProfileFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -170,4 +173,9 @@
         android:name="mirror42.dev.cinemates.ui.list.CustomListBrowserFragment"
         android:label="Liste Personalizzate"
         tools:layout="@layout/custom_list_browser_fragment" />
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="mirror42.dev.cinemates.ui.changePassword.changePasswordFragment"
+        android:label="Cambia password"
+        tools:layout="@layout/fragment_change_password" />
 </navigation>

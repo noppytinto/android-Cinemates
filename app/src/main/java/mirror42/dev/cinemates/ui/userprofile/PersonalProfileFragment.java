@@ -38,12 +38,14 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private TextView textViewResendEmailMessage;
     private Button buttonLogout;
     private Button buttonResendEmail;
+    private Button buttonChangePassword;
     private RemoteConfigServer remoteConfigServer;
     private LoginViewModel loginViewModel;
     private View includeAccountActivationView;
     private View includeUserProfileContent;
     private NotificationsViewModel notificationsViewModel;
     private Button buttonCustomList;
+
 
 
 
@@ -70,10 +72,12 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         textViewEmail = view.findViewById(R.id.textView_personalProfileFragment_email);
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
+        buttonChangePassword = view.findViewById(R.id.button_personalProfileFragment_changePassword);
         buttonCustomList = view.findViewById(R.id.button_personalProfileFragment_customList);
         remoteConfigServer = RemoteConfigServer.getInstance();
         // setting listeners
         buttonLogout.setOnClickListener(this);
+        buttonChangePassword.setOnClickListener(this);
         //
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);
@@ -185,6 +189,10 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                 buttonResendEmail.setText("Email attivazione rinviata!");
                 buttonResendEmail.setEnabled(false);
             }
+        }else if(v.getId() == buttonChangePassword.getId()){
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.changePasswordFragment);
+
         }
     }
 
