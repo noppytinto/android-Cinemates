@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +39,8 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class ListFragment extends Fragment implements
-        RecyclerAdapterMoviesList.ClickAdapterListener{
+        RecyclerAdapterMoviesList.ClickAdapterListener,
+        CompoundButton.OnCheckedChangeListener {
     private final String TAG = getClass().getSimpleName();
     private RecyclerAdapterMoviesList recyclerAdapterMoviesList;
     private ArrayList<Movie> selectedMovies;
@@ -77,15 +79,12 @@ public class ListFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentList = args.getList();
-
             //
             setupListAppearance(currentList);
-
             //
             populateList(currentList);
         }
@@ -111,7 +110,6 @@ public class ListFragment extends Fragment implements
     //--------------------------------------------------------------------------------------- METHODS
 
     private void init(View view) {
-        selectedMovies = new ArrayList<>();
         recommendButton = view.findViewById(R.id.floatingActionButton_listFragment_recommend);
         subscribeButton = view.findViewById(R.id.button_listFragment_subscribe);
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
@@ -119,6 +117,8 @@ public class ListFragment extends Fragment implements
         textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        selectedMovies = new ArrayList<>();
+        isPrivateSwitch.setOnCheckedChangeListener(this);
 
         //
         initRecyclerView(view);
@@ -150,14 +150,16 @@ public class ListFragment extends Fragment implements
         //
         setListNameAndDescription(list);
 
-
-        //
+        // setup buttons
         if(listType == MoviesList.ListType.CL) {
             // check list ownership
             User loggerUser = loginViewModel.getLoggedUser();
             User listOwner = list.getOwner();
             if(loggerUser.getUsername().equals(listOwner.getUsername())) {
                 showIsPrivateSwitchButton();
+                if(((CustomList)currentList).isPrivate()) {
+                    isPrivateSwitch.setChecked(true);
+                }
                 showRecommendButton();
             }
             else {
@@ -227,6 +229,23 @@ public class ListFragment extends Fragment implements
         NavGraphDirections.AnywhereToMovieDetailsFragment
                 movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(targetMovie);
         NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
+    }
+
+    private void setPrivate(boolean value) {
+        CustomList newList = new CustomList((CustomList) currentList);
+        newList.setPrivate(value);
+
+        listViewModel.updateCustomListDetails((CustomList) currentList, newList, loginViewModel.getLoggedUser());
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked) {
+            setPrivate(true);
+        }
+        else {
+            setPrivate(false);
+        }
     }
 
 

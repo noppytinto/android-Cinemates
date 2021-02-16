@@ -358,4 +358,55 @@ public class ListViewModel extends ViewModel {
         }
     }
 
+    public void updateCustomListDetails(CustomList oldList, CustomList newList, User loggedUser) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "fn_update_custom_list_details";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_list_name", oldList.getName())
+                    .add("new_name", newList.getName())
+                    .add("new_description", newList.getDescription())
+                    .add("new_is_private", String.valueOf(newList.isPrivate()))
+                    .add("email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getEmail());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if(responseData.equals("true")) {
+
+                            }
+                            else {
+                                // response equals false
+
+                            }
+                        }
+                        else {
+                            // response unsuccessful
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }// end WatchlistViewModel class

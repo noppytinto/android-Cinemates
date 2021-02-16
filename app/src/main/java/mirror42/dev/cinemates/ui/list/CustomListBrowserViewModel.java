@@ -162,6 +162,7 @@ public class CustomListBrowserViewModel extends ViewModel {
         customList.setOwner(user);
         customList.setName(jsonDBobj.getString("list_name"));
         customList.setDescription(jsonDBobj.getString("Description"));
+        customList.setPrivate(jsonDBobj.getBoolean("Private"));
         ArrayList<Movie> moviesList = new ArrayList<>();
         moviesList = fetchMovies(jsonDBobj.getString("list_name"), email, token);
         customList.setMovies(moviesList);
