@@ -63,10 +63,8 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
     public void onClick(View v) {
         if(v.getId() == resetPassword.getId()){
             String email = editTextEmail.getText().toString();
-            if(isVaildMail( email))
+            if(checkAllFieldsAreFilled() && isVaildMail( email))
                 resetPasswordViewModel.resetPassword(email);
-            else
-                showCenteredToast( "Formato mail non valido ");
         }
     }
 
@@ -80,6 +78,21 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
         resetPassword.setOnClickListener(this);
     }
 
+    private boolean checkAllFieldsAreFilled() {
+        boolean res = true;
+
+        if(editTextEmail.getText().toString().isEmpty()) {
+            textInputLayoutEmail.setError("*");
+            showCenteredToast("campo e-mail vuoto");
+            res = false;
+        }
+        else {
+            textInputLayoutEmail.setError(null);
+        }
+
+        return res;
+    }
+
     private boolean isVaildMail(String email) {
         boolean isValid = false;
         String regex = "^(.+)@(.+)$";
@@ -88,6 +101,10 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
         Matcher matcher = pattern.matcher(email);
         if (matcher.matches())
             isValid = true;
+        else{
+            textInputLayoutEmail.setError("*");
+            showCenteredToast( "Formato mail non valido ");
+        }
         return isValid;
     }
 

@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,8 +72,14 @@ public class changePasswordFragment extends Fragment implements
 
         changePasswordViewModel =  new ViewModelProvider(this).get(ChangePasswordViewModel.class);
         changePasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), resetResult -> {
-            if(resetResult == ChangePasswordViewModel.ResetResult.SUCCESS)
+            if(resetResult == ChangePasswordViewModel.ResetResult.SUCCESS){
                 showCenteredToast( "Cambio password completo ");
+                NavController navController = Navigation.findNavController(view);
+                navController.popBackStack();
+                navController.navigate(R.id.personalProfileFragment);
+
+            }
+
             else if(resetResult == ChangePasswordViewModel.ResetResult.FAILED)
                 showCenteredToast( "Cambio password fallito ");
         });
