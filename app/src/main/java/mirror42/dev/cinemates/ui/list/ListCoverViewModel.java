@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -22,8 +20,6 @@ import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -126,73 +122,63 @@ public class ListCoverViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing http request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
                         setFetchStatus(FetchStatus.FAILED);
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-                                ArrayList<Movie> result = null;
+                    String responseData = response.body().string();
+                    ArrayList<Movie> result = null;
 
-                                if ( ! responseData.equals("null")) {
-                                    result = new ArrayList<>();
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    String posterURL = null;
+                    if ( ! responseData.equals("null")) {
+                        result = new ArrayList<>();
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        String posterURL = null;
 
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject x = jsonArray.getJSONObject(i);
-                                        int movieId = x.getInt("fk_movie");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject x = jsonArray.getJSONObject(i);
+                            int movieId = x.getInt("fk_movie");
 
-                                        try{
-                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
+                            try{
+                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
 
-                                            try {
-                                                posterURL = jsonMovieDetails.getString("poster_path");
-                                                posterURL = tmdb.buildPosterUrl(posterURL);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-
-
-                                            Movie movie = new Movie();
-                                            movie.setTmdbID(movieId);
-                                            movie.setPosterURL(posterURL);
-
-                                            result.add(movie);
-
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    // once finished set results
-                                    Watchlist watchlist = new Watchlist();
-                                    Collections.reverse(result);
-                                    watchlist.setMovies(result);
-                                    setWatchlist(watchlist);
-                                    setFetchStatus(FetchStatus.SUCCESS);
+                                try {
+                                    posterURL = jsonMovieDetails.getString("poster_path");
+                                    posterURL = tmdb.buildPosterUrl(posterURL);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                                else {
-                                    setWatchlist(null);
-                                    setFetchStatus(FetchStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setWatchlist(null);
-                                setFetchStatus(FetchStatus.FAILED);
+
+
+                                Movie movie = new Movie();
+                                movie.setTmdbID(movieId);
+                                movie.setPosterURL(posterURL);
+
+                                result.add(movie);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            setWatchlist(null);
-                            setFetchStatus(FetchStatus.FAILED);
                         }
+
+                        // once finished set results
+                        Watchlist watchlist = new Watchlist();
+                        Collections.reverse(result);
+                        watchlist.setMovies(result);
+                        setWatchlist(watchlist);
+                        setFetchStatus(FetchStatus.SUCCESS);
                     }
-                });
+                    else {
+                        setWatchlist(null);
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+
+                } catch (Exception e) {
+                    setWatchlist(null);
+                    setFetchStatus(FetchStatus.FAILED);
+                }
+
             } catch (Exception e) {
                 setWatchlist(null);
                 setFetchStatus(FetchStatus.FAILED);
@@ -215,73 +201,61 @@ public class ListCoverViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing http request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
                         setFetchStatus(FetchStatus.FAILED);
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-                                ArrayList<Movie> result = null;
+                    String responseData = response.body().string();
+                    ArrayList<Movie> result = null;
 
-                                if ( ! responseData.equals("null")) {
-                                    result = new ArrayList<>();
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    String posterURL = null;
+                    if ( ! responseData.equals("null")) {
+                        result = new ArrayList<>();
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        String posterURL = null;
 
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject x = jsonArray.getJSONObject(i);
-                                        int movieId = x.getInt("fk_Movie");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject x = jsonArray.getJSONObject(i);
+                            int movieId = x.getInt("fk_Movie");
 
-                                        try{
-                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
+                            try{
+                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
 
-                                            try {
-                                                posterURL = jsonMovieDetails.getString("poster_path");
-                                                posterURL = tmdb.buildPosterUrl(posterURL);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-
-
-                                            Movie movie = new Movie();
-                                            movie.setTmdbID(movieId);
-                                            movie.setPosterURL(posterURL);
-
-                                            result.add(movie);
-
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    // once finished set results
-                                    FavoritesList favoritesList = new FavoritesList();
-                                    Collections.reverse(result);
-                                    favoritesList.setMovies(result);
-                                    setFavoritesList(favoritesList);
-                                    setFetchStatus(FetchStatus.SUCCESS);
+                                try {
+                                    posterURL = jsonMovieDetails.getString("poster_path");
+                                    posterURL = tmdb.buildPosterUrl(posterURL);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                                else {
-                                    setFavoritesList(null);
-                                    setFetchStatus(FetchStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setFavoritesList(null);
-                                setFetchStatus(FetchStatus.FAILED);
+
+
+                                Movie movie = new Movie();
+                                movie.setTmdbID(movieId);
+                                movie.setPosterURL(posterURL);
+
+                                result.add(movie);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            setFavoritesList(null);
-                            setFetchStatus(FetchStatus.FAILED);
                         }
+
+                        // once finished set results
+                        FavoritesList favoritesList = new FavoritesList();
+                        Collections.reverse(result);
+                        favoritesList.setMovies(result);
+                        setFavoritesList(favoritesList);
+                        setFetchStatus(FetchStatus.SUCCESS);
                     }
-                });
+                    else {
+                        setFavoritesList(null);
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                } catch (Exception e) {
+                    setFavoritesList(null);
+                    setFetchStatus(FetchStatus.FAILED);
+                }
             } catch (Exception e) {
                 setFavoritesList(null);
                 setFetchStatus(FetchStatus.FAILED);
@@ -304,78 +278,64 @@ public class ListCoverViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // performing http request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+                    String responseData = response.body().string();
+                    ArrayList<Movie> result = null;
+
+                    if (!responseData.equals("null")) {
+                        result = new ArrayList<>();
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        String posterURL = null;
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject x = jsonArray.getJSONObject(i);
+                            int movieId = x.getInt("fk_movie");
+
+                            try {
+                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
+
+                                try {
+                                    posterURL = jsonMovieDetails.getString("poster_path");
+                                    posterURL = tmdb.buildPosterUrl(posterURL);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                Movie movie = new Movie();
+                                movie.setTmdbID(movieId);
+                                movie.setPosterURL(posterURL);
+
+                                result.add(movie);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        // once finished set results
+                        WatchedList watchedList = new WatchedList();
+                        Collections.reverse(result);
+                        watchedList.setMovies(result);
+                        setWatchedList(watchedList);
+                        setFetchStatus(FetchStatus.SUCCESS);
+                    } else {
+                        setWatchedList(null);
                         setFetchStatus(FetchStatus.FAILED);
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-                                ArrayList<Movie> result = null;
-
-                                if ( ! responseData.equals("null")) {
-                                    result = new ArrayList<>();
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    String posterURL = null;
-
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject x = jsonArray.getJSONObject(i);
-                                        int movieId = x.getInt("fk_movie");
-
-                                        try{
-                                            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-
-                                            try {
-                                                posterURL = jsonMovieDetails.getString("poster_path");
-                                                posterURL = tmdb.buildPosterUrl(posterURL);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-
-
-                                            Movie movie = new Movie();
-                                            movie.setTmdbID(movieId);
-                                            movie.setPosterURL(posterURL);
-
-                                            result.add(movie);
-
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    // once finished set results
-                                    WatchedList watchedList = new WatchedList();
-                                    Collections.reverse(result);
-                                    watchedList.setMovies(result);
-                                    setWatchedList(watchedList);
-                                    setFetchStatus(FetchStatus.SUCCESS);
-                                }
-                                else {
-                                    setWatchedList(null);
-                                    setFetchStatus(FetchStatus.FAILED);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setWatchedList(null);
-                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            setWatchedList(null);
-                            setFetchStatus(FetchStatus.FAILED);
-                        }
-                    }
-                });
+                } catch (Exception e) {
+                    setWatchedList(null);
+                    setFetchStatus(FetchStatus.FAILED);
+                }
             } catch (Exception e) {
                 setWatchedList(null);
                 setFetchStatus(FetchStatus.FAILED);
             }
-        };
+        };// run
     } // end createFetchWatchedlistTask()
 
 

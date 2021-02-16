@@ -46,7 +46,7 @@ public class ListFragment extends Fragment implements
     private LoginViewModel loginViewModel;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
-    private MoviesList currentMoviesList;
+    private MoviesList currentList;
     private FloatingActionButton recommendButton;
     private Button subscribeButton;
     private SwitchMaterial isPrivateSwitch;
@@ -81,10 +81,13 @@ public class ListFragment extends Fragment implements
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
-            currentMoviesList = args.getList();
+            currentList = args.getList();
 
             //
-            populateMoviesList(currentMoviesList);
+            setupListAppearance(currentList);
+
+            //
+            populateList(currentList);
         }
     }
 
@@ -114,6 +117,8 @@ public class ListFragment extends Fragment implements
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
         textViewListName = view.findViewById(R.id.textView_listFragment_listName);
         textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
 
         //
         initRecyclerView(view);
@@ -139,60 +144,52 @@ public class ListFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterMoviesList);
     }
 
-    private void populateMoviesList(MoviesList list) {
+    private void setupListAppearance(MoviesList list) {
         MoviesList.ListType listType = list.getListType();
-        switch (listType) {
-            case WL:
-                populateEssentialList("Watchlist", list.getMovies());
-                break;
-            case FV:
-                populateEssentialList("Preferiti", list.getMovies());
-                break;
-            case WD:
-                populateEssentialList("Visti", list.getMovies());
-                break;
-            case CL:
-                populateCustomList(list);
-            break;
+
+        //
+        setListNameAndDescription(list);
+
+
+        //
+        if(listType == MoviesList.ListType.CL) {
+            // check list ownership
+            User loggerUser = loginViewModel.getLoggedUser();
+            User listOwner = list.getOwner();
+            if(loggerUser.getUsername().equals(listOwner.getUsername())) {
+                showIsPrivateSwitchButton();
+                showRecommendButton();
+            }
+            else {
+                showSubscribeButton();
+            }
         }
     }
 
+    private void setListNameAndDescription(MoviesList list) {
+        MoviesList.ListType listType = list.getListType();
 
-    private void populateEssentialList(String listName, ArrayList<Movie> movies) {
-        // set list name
-        textViewListName.setText(listName);
-
-        // set movies list
-        if(movies != null && movies.size()!=0) {
-            // loading data into recycler
-            recyclerAdapterMoviesList.loadNewData(movies);
-
-            // observing selected movies list
-            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        }//if
+        switch (listType) {
+            case WL:
+                textViewListName.setText("Watchlist");
+                break;
+            case FV:
+                textViewListName.setText("Preferiti");
+                break;
+            case WD:
+                textViewListName.setText("Visti");
+                break;
+            case CL:
+                textViewListName.setText(((CustomList)list).getName());
+                textViewListDescription.setVisibility(View.VISIBLE);
+                textViewListDescription.setText(((CustomList)list).getDescription());
+                break;
+        }
     }
 
-    private void populateCustomList(MoviesList list) {
-        CustomList customList = (CustomList) list;
-        String listName = customList.getName();
-        String listDescription = customList.getDescription();
-        ArrayList<Movie> movies = customList.getMovies();
-
-        // set list name
-        textViewListName.setText(listName);
-        textViewListDescription.setVisibility(View.VISIBLE);
-        textViewListDescription.setText(listDescription);
-
-        // set movies list
-        if(movies != null && movies.size()!=0) {
-            // loading data into recycler
-            recyclerAdapterMoviesList.loadNewData(movies);
-
-            // observing selected movies list
-            listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        }//
+    private void populateList(MoviesList list) {
+        ArrayList<Movie> movies = list.getMovies();
+        recyclerAdapterMoviesList.loadNewData(movies);
     }
 
     @Override
@@ -340,7 +337,7 @@ public class ListFragment extends Fragment implements
         //
         selectedMovies = recyclerAdapterMoviesList.getcurrentSelectedMovies();
         User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-        listViewModel.removeMoviesFromList(selectedMovies, currentMoviesList, loggedUser);
+        listViewModel.removeMoviesFromList(selectedMovies, currentList, loggedUser);
 
         // and notify recycler
         recyclerAdapterMoviesList.notifyDataSetChanged();

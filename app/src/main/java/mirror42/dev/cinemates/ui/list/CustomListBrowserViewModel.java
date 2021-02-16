@@ -106,55 +106,44 @@ public class CustomListBrowserViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // executing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
                         setCustomLists(null);
                         setFetchStatus(FetchStatus.FAILED);
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-                                ArrayList<CustomList> customLists = new ArrayList<>();
+                    //
+                    String responseData = response.body().string();
+                    ArrayList<CustomList> customLists = new ArrayList<>();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
 
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        CustomList customList = buildCustomList(jsonDBobj, email, token, loggedUsername);
-                                        customLists.add(customList);
-                                    }// for
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            CustomList customList = buildCustomList(jsonDBobj, email, token, loggedUsername);
+                            customLists.add(customList);
+                        }// for
 
-                                    // once finished set result
+                        // once finished set result
 //                                    Collections.reverse(postsList);
-                                    setCustomLists(customLists);
-                                    setFetchStatus(FetchStatus.SUCCESS);
+                        setCustomLists(customLists);
+                        setFetchStatus(FetchStatus.SUCCESS);
 
-                                }
-                                // if response contains no data
-                                else {
-                                    setCustomLists(null);
-                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                                }
-                            } // if response is unsuccessful
-                            else {
-                                setCustomLists(null);
-                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            setCustomLists(null);
-                            setFetchStatus(FetchStatus.FAILED);
-                        }
                     }
-                });
+                    // if response contains no data
+                    else {
+                        setCustomLists(null);
+                        setFetchStatus(FetchStatus.NOT_EXISTS);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setCustomLists(null);
+                    setFetchStatus(FetchStatus.FAILED);
+                }
+
 
             } catch (Exception e) {
                 e.printStackTrace();

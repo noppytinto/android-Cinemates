@@ -268,8 +268,6 @@ public class ListViewModel extends ViewModel {
         }
     }// end removeSingleMovieFromWatchedList()
 
-
-
     public void removeMoviesFromList(ArrayList<Movie> moviesToRemove, MoviesList moviesList, User loggedUser) {
         if(moviesToRemove!=null) {
             MoviesList.ListType listType = moviesList.getListType();
