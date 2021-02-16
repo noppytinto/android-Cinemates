@@ -86,13 +86,13 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     //----------------------------------------------------------------------- METHODS
 
-    public void fetchLists(User loggedUser) {
-        Runnable task = createFetchListTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+    public void fetchCustomLists(User loggedUser) {
+        Runnable task = createFetchCustomListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
         Thread t_1 = new Thread(task);
         t_1.start();
     }
 
-    private Runnable createFetchListTask(String email, String token, String loggedUsername) {
+    private Runnable createFetchCustomListsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
                 // build httpurl and request for remote db
@@ -162,7 +162,7 @@ public class CustomListBrowserViewModel extends ViewModel {
         customList.setOwner(user);
         customList.setName(jsonDBobj.getString("list_name"));
         customList.setDescription(jsonDBobj.getString("Description"));
-        customList.setPrivate(jsonDBobj.getBoolean("Private"));
+        customList.setIsPrivate(jsonDBobj.getBoolean("Private"));
         ArrayList<Movie> moviesList = new ArrayList<>();
         moviesList = fetchMovies(jsonDBobj.getString("list_name"), email, token);
         customList.setMovies(moviesList);

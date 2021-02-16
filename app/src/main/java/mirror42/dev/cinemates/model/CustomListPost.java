@@ -54,4 +54,6 @@ public class CustomListPost extends Post implements Serializable {
     public String getMovieOverview() {
         return movie.getOverview();
     }
+
+
 }

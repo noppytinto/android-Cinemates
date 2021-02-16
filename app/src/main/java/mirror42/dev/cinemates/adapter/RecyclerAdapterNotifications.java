@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
+import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.Notification.NotificationType;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
@@ -29,13 +30,15 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private Context context;
 
     private static final int FOLLOW_REQUEST = 1;
-    private static final int POST_LIKED = 3;
     private static final int POST_COMMENTED = 2;
+    private static final int POST_LIKED = 3;
+    private static final int LIST_RECOMMENDATION = 4;
 
     public interface OnNotificationClickedListener {
         void onFollowRequestNotificationClicked(int position);
         void onPostLikedNotificationClicked(int position);
         void onPostCommentedNotificationClicked(int position);
+        void onListRecommendedNotificationClicked(int position);
     }
 
 
@@ -63,6 +66,8 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
                 return POST_LIKED;
             case POST_COMMENTED:
                 return POST_COMMENTED;
+            case LIST_RECOMMENDATION:
+                return LIST_RECOMMENDATION;
             default:
                 return 0;
         }
@@ -84,6 +89,10 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         else if(viewType == POST_COMMENTED) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_post_commented_notification_item, parent, false);
             return new PostCommentedNotificationViewHolder(view);
+        }
+        else if(viewType == LIST_RECOMMENDATION) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_recommendation_notification, parent, false);
+            return new ListRecommendationViewHolder(view);
         }
         else {
             return new FollowRequestNotificationViewHolder(null);
@@ -109,6 +118,12 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
             //
             buildPostCommentedNotificationItem((PostCommentedNotificationViewHolder) holder, postCommentedNotification);
+        }
+        else if(getItemViewType(position) == LIST_RECOMMENDATION) {
+            ListRecommendedNotification listRecommendedNotification = (ListRecommendedNotification) notificationsList.get(position);
+
+            //
+            buildListRecommendedNotificationItem((ListRecommendationViewHolder) holder, listRecommendedNotification);
         }
     }
 
@@ -160,7 +175,21 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
+    private void buildListRecommendedNotificationItem(ListRecommendationViewHolder holder, ListRecommendedNotification listRecommendedNotification) {
+        holder.textViewFullName.setText(listRecommendedNotification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(listRecommendedNotification.getDateInMillis()));
 
+        try {
+            Glide.with(context)  //2
+                    .load(listRecommendedNotification.getSender().getProfilePicturePath()) //3
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
+                    .circleCrop() //4
+                    .into(holder.imageViewProfilePicture); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
@@ -251,6 +280,28 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         @Override
         public void onClick(View v) {
             listener.onPostCommentedNotificationClicked(getAdapterPosition());
+
+        }
+    }// end PostCommentedNotificationViewHolder class
+
+    class ListRecommendationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView imageViewProfilePicture;
+        public TextView textViewFullName;
+        public TextView textViewPublishDate;
+        private CardView cardView;
+
+        public ListRecommendationViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageViewProfilePicture = itemView.findViewById(R.id.imageView_listRecommendationNotificatonLayout_profilePicture);
+            textViewFullName = itemView.findViewById(R.id.textView_listRecommendationNotificatonLayout_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_listRecommendationNotificatonLayout_publishDate);
+            cardView = itemView.findViewById(R.id.cardView_listRecommendationNotificatonLayout);
+            cardView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onListRecommendedNotificationClicked(getAdapterPosition());
 
         }
     }// end PostCommentedNotificationViewHolder class

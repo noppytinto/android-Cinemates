@@ -80,19 +80,22 @@ public class HomeFragment extends Fragment implements
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         homeViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            hideProgressIndicator();
-            progressIndicator.setVisibility(View.GONE);
             switch (fetchStatus) {
                 case SUCCESS: {
+                    hideProgressIndicator();
                     ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
                     recyclerAdapterPost.loadNewData(postsList);
                 }
                 break;
                 case NOT_EXISTS:
+                    hideProgressIndicator();
                     recyclerAdapterPost.loadNewData(null);
                     break;
                 case FAILED:
+//                    hideProgressIndicator();
                     break;
+                default:
+                    showProgressIndicator();
             }
         });
 
@@ -101,25 +104,26 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
+                    showProgressIndicator();
                     fetchPosts();
                 }
                 break;
                 case LOGGED_OUT:
                     buttonUpdateFeed.setVisibility(View.GONE);
-                    recyclerAdapterPost.loadNewData(null);
+                    recyclerAdapterPost.clearList();
+                    hideProgressIndicator();
                     break;
                 case FAILED:
                     break;
                 default:
                     buttonUpdateFeed.setVisibility(View.GONE);
+                    hideProgressIndicator();
             }
         });
 
         buttonUpdateFeed.setOnClickListener(v -> {
             // ignore v
-
             showProgressIndicator();
-
             recyclerAdapterPost.clearList();
 
             User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
@@ -147,7 +151,6 @@ public class HomeFragment extends Fragment implements
     }
 
     private void showProgressIndicator() {
-        //notes: Declare progressDialog before so you can use .hide() later!
         progressIndicator.setVisibility(View.VISIBLE);
     }
 

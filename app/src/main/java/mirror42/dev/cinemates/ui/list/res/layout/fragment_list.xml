@@ -24,9 +24,10 @@
 
     <TextView
         android:id="@+id/textView_listFragment_description"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:fontFamily="@font/poppins_light"
         android:padding="0dp"
         android:paddingBottom="10dp"
@@ -34,6 +35,8 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/switch_listFragment_isPrivate"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/textView_listFragment_listName"
         app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_listName"
         tools:visibility="visible" />
@@ -69,12 +72,13 @@
         android:id="@+id/switch_listFragment_isPrivate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
         android:fontFamily="@font/poppins_light"
         android:text="privata"
         android:textColor="@color/light_blue"
         android:visibility="gone"
-        app:layout_constraintBaseline_toBaselineOf="@+id/textView_listFragment_description"
         app:layout_constraintEnd_toEndOf="@+id/divider_listFragment"
+        app:layout_constraintTop_toBottomOf="@+id/divider_listFragment"
         tools:visibility="visible" />
 
     <View

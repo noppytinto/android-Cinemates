@@ -26,8 +26,11 @@ import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterNotifications;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
+import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
+import mirror42.dev.cinemates.ui.list.CustomListBrowserViewModel;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class NotificationsFragment extends Fragment implements
@@ -38,6 +41,7 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
+    private CustomListBrowserViewModel customListBrowserViewModel;
 
 
 
@@ -173,6 +177,53 @@ public class NotificationsFragment extends Fragment implements
         NavGraphDirections.ActionGlobalPostFragment postFragment =
                 NavGraphDirections.actionGlobalPostFragment(postID);
         navigateTo(postFragment, false);
+    }
+
+    @Override
+    public void onListRecommendedNotificationClicked(int position) {
+        ListRecommendedNotification currentNotification = (ListRecommendedNotification) recyclerAdapterNotifications.getNotification(position);
+        notificationsViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    CustomList list = notificationsViewModel.getObservableCustomList().getValue();
+                    if(list!=null) {
+                        list.setOwner(currentNotification.getSender());
+
+                        // delete from remote DB
+                        long notificationID = currentNotification.getId();
+                        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+                        NavGraphDirections.ActionGlobalListFragment listFragment =
+                                NavGraphDirections.actionGlobalListFragment(list, "", "");
+                        NavHostFragment.findNavController(NotificationsFragment.this).navigate(listFragment);
+                    }
+                    else showCenteredToast("impossibile aprire lista");
+                }
+                break;
+                case FAILED: {
+                    CustomList list = notificationsViewModel.getObservableCustomList().getValue();
+
+                    if(list!=null) {
+                        list.setOwner(currentNotification.getSender());
+
+                        // delete from remote DB
+                        long notificationID = currentNotification.getId();
+                        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+                        NavGraphDirections.ActionGlobalListFragment listFragment =
+                                NavGraphDirections.actionGlobalListFragment(list, "", "");
+                        NavHostFragment.findNavController(NotificationsFragment.this).navigate(listFragment);
+                    }
+                    else showCenteredToast("impossibile aprire lista");
+                }
+                    break;
+            }
+        });
+
+        notificationsViewModel.fetchCustomListMovies(currentNotification.getCustomList().getName(),
+                                                     currentNotification.getCustomList().getDescription(),
+                                                     loginViewModel.getLoggedUser());
+
     }
 
     private void loadNotifications(User loggedUser) {

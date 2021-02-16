@@ -39,6 +39,7 @@ public class CustomListBrowserFragment extends Fragment
     private RecyclerAdapterCustomLists recyclerAdapterCustomLists;
     private String newListName;
     private String newListDescription;
+    private boolean isPrivate;
 
 
 
@@ -109,7 +110,7 @@ public class CustomListBrowserFragment extends Fragment
             }
         });
 
-        customListBrowserViewModel.fetchLists(loginViewModel.getLoggedUser());
+        customListBrowserViewModel.fetchCustomLists(loginViewModel.getLoggedUser());
     }
 
     @Override
@@ -151,6 +152,7 @@ public class CustomListBrowserFragment extends Fragment
         // listName and listDescription will alwaysbe  non-empty
         // checks are made up front
 
+        isPrivate = isChecked;
         customListBrowserViewModel.createNewList(listName , listDescription, isChecked, loginViewModel.getLoggedUser());
         newListName = listName;
         newListDescription = listDescription;
@@ -160,7 +162,8 @@ public class CustomListBrowserFragment extends Fragment
         CustomList placeholder = new CustomList();
         placeholder.setName(name);
         placeholder.setDescription(description);
-
+        placeholder.setIsPrivate(isPrivate);
+        placeholder.setOwner(loginViewModel.getLoggedUser());
         //
         recyclerAdapterCustomLists.addPlaceholderItem(placeholder);
     }
@@ -170,12 +173,12 @@ public class CustomListBrowserFragment extends Fragment
     public void onCoverClicked(int position) {
         CustomList clickedList = recyclerAdapterCustomLists.getList(position);
 
-        if(clickedList!=null && clickedList.getMovies() != null && clickedList.getMovies().size()>0) {
+        if(clickedList!=null) {
             NavGraphDirections.ActionGlobalListFragment listFragment =
-                    NavGraphDirections.actionGlobalListFragment(clickedList, clickedList.getName(), clickedList.getDescription());
+                    NavGraphDirections.actionGlobalListFragment(clickedList, "", "");
             NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(listFragment);
         }
-        else showCenteredToast("lista vuota");
+        else showCenteredToast("impossibile aprire lista");
     }
 
     private void moveRecyclerToBottom() {

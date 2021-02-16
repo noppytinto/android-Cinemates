@@ -63,6 +63,8 @@ public class ListViewModel extends ViewModel {
 
 
 
+
+
     //----------------------------------------------------------------------------------------- METHODS
 
     public void removeSingleMovieFromEssentialList(int movieId, MoviesList.ListType listType, User loggedUser) {
@@ -76,10 +78,6 @@ public class ListViewModel extends ViewModel {
                 break;
             case WD: {
                 removeSingleMovieFromWatchedList(movieId, loggedUser.getEmail(), loggedUser.getAccessToken());
-            }
-                break;
-            case CL: {
-                //TODO
             }
                 break;
         }
@@ -372,7 +370,7 @@ public class ListViewModel extends ViewModel {
                     .add("new_is_private", String.valueOf(newList.isPrivate()))
                     .add("email", loggedUser.getEmail())
                     .build();
-            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getEmail());
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
 
             // performing http request
             Call call = httpClient.newCall(request);
@@ -409,4 +407,7 @@ public class ListViewModel extends ViewModel {
             e.printStackTrace();
         }
     }
-}// end WatchlistViewModel class
+
+
+
+}// end ListViewModel class

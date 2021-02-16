@@ -59,4 +59,8 @@ public class MoviesList implements Serializable {
     public void setOwner(User owner) {
         this.owner = owner;
     }
+
+    public boolean isEmpty() {
+        return movies==null || movies.size()==0;
+    }
 }// end List class

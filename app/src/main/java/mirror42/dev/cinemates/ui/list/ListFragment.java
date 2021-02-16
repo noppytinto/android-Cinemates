@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.ActionMode;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -34,13 +35,14 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.ui.dialog.RecommendListDialogFragment;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 public class ListFragment extends Fragment implements
         RecyclerAdapterMoviesList.ClickAdapterListener,
-        CompoundButton.OnCheckedChangeListener {
+        CompoundButton.OnCheckedChangeListener, RecommendListDialogFragment.RecommendListDialogListener, View.OnClickListener {
     private final String TAG = getClass().getSimpleName();
     private RecyclerAdapterMoviesList recyclerAdapterMoviesList;
     private ArrayList<Movie> selectedMovies;
@@ -85,8 +87,14 @@ public class ListFragment extends Fragment implements
             currentList = args.getList();
             //
             setupListAppearance(currentList);
+
             //
-            populateList(currentList);
+            if(currentList.isEmpty()) {
+                // TODO: show information image
+            }
+            else {
+                populateList(currentList);
+            }
         }
     }
 
@@ -105,6 +113,18 @@ public class ListFragment extends Fragment implements
     }
 
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked) {
+            setPrivate(true);
+            hideRecommendButton();
+        }
+        else {
+            setPrivate(false);
+            showRecommendButton();
+        }
+    }
+
 
 
     //--------------------------------------------------------------------------------------- METHODS
@@ -119,6 +139,8 @@ public class ListFragment extends Fragment implements
         listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
         selectedMovies = new ArrayList<>();
         isPrivateSwitch.setOnCheckedChangeListener(this);
+        recommendButton.setOnClickListener(this);
+        subscribeButton.setOnClickListener(this);
 
         //
         initRecyclerView(view);
@@ -160,7 +182,9 @@ public class ListFragment extends Fragment implements
                 if(((CustomList)currentList).isPrivate()) {
                     isPrivateSwitch.setChecked(true);
                 }
-                showRecommendButton();
+                else {
+                    showRecommendButton();
+                }
             }
             else {
                 showSubscribeButton();
@@ -233,20 +257,30 @@ public class ListFragment extends Fragment implements
 
     private void setPrivate(boolean value) {
         CustomList newList = new CustomList((CustomList) currentList);
-        newList.setPrivate(value);
+        newList.setIsPrivate(value);
+        // TODO: add setName/setDescription, if you want to change them
 
         listViewModel.updateCustomListDetails((CustomList) currentList, newList, loginViewModel.getLoggedUser());
     }
 
+    public void showRecommendListDialog() {
+        DialogFragment newFragment = new RecommendListDialogFragment(this, ((CustomList)currentList).getName());
+        newFragment.show(requireActivity().getSupportFragmentManager(), "RecommendListDialogFragment");
+    }
+
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked) {
-            setPrivate(true);
-        }
-        else {
-            setPrivate(false);
+    public void onRecommendButtonOnDialogClicked() {
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == recommendButton.getId()) {
+            showRecommendListDialog();
         }
     }
+
+
 
 
     //---------------------------------------------------- action mode

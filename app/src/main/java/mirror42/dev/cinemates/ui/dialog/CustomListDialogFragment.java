@@ -50,7 +50,7 @@ public class CustomListDialogFragment extends DialogFragment implements View.OnC
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_custom_list_creation_dialog, null);
+        View view = inflater.inflate(R.layout.layout_create_custom_list_dialog, null);
         positiveButton = view.findViewById(R.id.button_customListDialog_positive);
         negativeButton = view.findViewById(R.id.button_customListDialog_negative);
         nameTextInputLayout = view.findViewById(R.id.textInputLayout_customListDialog_name);

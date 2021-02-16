@@ -151,61 +151,49 @@ public class HomeViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // executing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                        setFetchStatus(FetchStatus.FAILED);
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    WatchlistPost watchlistPost;
-                                    ArrayList<Post> postsList = new ArrayList<>();
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        WatchlistPost watchlistPost;
+                        ArrayList<Post> postsList = new ArrayList<>();
 
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        watchlistPost = buildWatchlistPost(jsonDBobj, email, token, loggedUsername);
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            watchlistPost = buildWatchlistPost(jsonDBobj, email, token, loggedUsername);
 
-                                        postsList.add(watchlistPost);
-                                    }// for
+                            postsList.add(watchlistPost);
+                        }// for
 
-                                    // once finished set result
+                        // once finished set result
 //                                    Collections.reverse(postsList);
-                                    watchlistPosts.addAll(postsList);
+                        watchlistPosts.addAll(postsList);
 //                                    setFetchStatus(FetchStatus.SUCCESS);
 
-                                }
-                                // if response contains no data
-                                else {
+                    }
+                    // if response contains no data
+                    else {
 //                                    setPostsList(null);
 //                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setPostsList(null);
-//                            setFetchStatus(FetchStatus.FAILED);
-                        }
                     }
-                });
+
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
 
             } catch (Exception e) {
                 e.printStackTrace();
-                setPostsList(null);
-                setFetchStatus(FetchStatus.FAILED);
+//                setPostsList(null);
+//                setFetchStatus(FetchStatus.FAILED);
             }
         };
     }// end createFetchWatchlistPostTask()
@@ -226,58 +214,42 @@ public class HomeViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // executing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                        setFetchStatus(FetchStatus.FAILED);
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        //
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    FavoritesPost favoritesPost;
-                                    ArrayList<Post> postsList = new ArrayList<>();
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        FavoritesPost favoritesPost;
+                        ArrayList<Post> postsList = new ArrayList<>();
 
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        favoritesPost = buildFavoritesPost(jsonDBobj, email, token, loggedUsername);
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            favoritesPost = buildFavoritesPost(jsonDBobj, email, token, loggedUsername);
 
-                                        postsList.add(favoritesPost);
-                                    }// for
+                            postsList.add(favoritesPost);
+                        }// for
 
-                                    // once finished set result
-                                    favoritesPosts.addAll(postsList);
+                        // once finished set result
+                        favoritesPosts.addAll(postsList);
 
 //                                    Collections.reverse(postsList);
 //                                    setPostsList(postsList);
 //                                    setFetchStatus(FetchStatus.SUCCESS);
 
-                                }
-                                // if response contains no data
-                                else {
+                    }
+                    // if response contains no data
+                    else {
 //                                    setPostsList(null);
 //                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setPostsList(null);
-//                            setFetchStatus(FetchStatus.FAILED);
-                        }
                     }
-                });
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -350,7 +322,6 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchCustomListCreatedPostTask()
 
-
     private Runnable createFetchCustomListPostTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
@@ -414,8 +385,6 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchCustomListCreatedPostTask()
 
-    // todo: follow post
-
     private Runnable createFetchWatchedPostsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
@@ -432,65 +401,50 @@ public class HomeViewModel extends ViewModel {
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
                 // executing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                        setFetchStatus(FetchStatus.FAILED);
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        //
                     }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
+                    String responseData = response.body().string();
 
-                                // if response contains valid data
-                                if ( ! responseData.equals("null")) {
-                                    JSONArray jsonArray = new JSONArray(responseData);
-                                    WatchedPost watchedPost;
-                                    ArrayList<Post> postsList = new ArrayList<>();
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+                        WatchedPost watchedPost;
+                        ArrayList<Post> postsList = new ArrayList<>();
 
-                                    for(int i=0; i<jsonArray.length(); i++) {
-                                        JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                        watchedPost = buildWatchedPost(jsonDBobj, email, token, loggedUsername);
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            watchedPost = buildWatchedPost(jsonDBobj, email, token, loggedUsername);
 
-                                        postsList.add(watchedPost);
-                                    }// for
+                            postsList.add(watchedPost);
+                        }// for
 
-                                    // once finished set result
+                        // once finished set result
 //                                    Collections.reverse(postsList);
-                                    watchedPosts.addAll(postsList);
+                        watchedPosts.addAll(postsList);
 
-                                    // combining and sort all posts
-                                    ArrayList<Post> finalList = new ArrayList<>();
-                                    finalList = combineAllPosts();
-                                    finalList = sortPostsByDate(finalList);
+                        // combining and sort all posts
+                        ArrayList<Post> finalList = new ArrayList<>();
+                        finalList = combineAllPosts();
+                        finalList = sortPostsByDate(finalList);
 
-                                    // publish result
-                                    setPostsList(finalList);
-                                    setFetchStatus(FetchStatus.SUCCESS);
+                        // publish result
+                        setPostsList(finalList);
+                        setFetchStatus(FetchStatus.SUCCESS);
 
-                                }
-                                // if response contains no data
-                                else {
+                    }
+                    // if response contains no data
+                    else {
 //                                    setPostsList(null);
 //                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                                }
-                            } // if response is unsuccessful
-                            else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-//                            setPostsList(null);
-//                            setFetchStatus(FetchStatus.FAILED);
-                        }
                     }
-                });
 
+
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
 //                setPostsList(null);
@@ -499,6 +453,7 @@ public class HomeViewModel extends ViewModel {
         };
     }// end createFetchWatchedPostTask()
 
+    // todo: follow post
 
 
 
