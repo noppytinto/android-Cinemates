@@ -121,6 +121,9 @@
         <argument
             android:name="user_argument"
             app:argType="mirror42.dev.cinemates.model.User" />
+        <action
+            android:id="@+id/action_userProfileFragment_to_customListBrowserFragment"
+            app:destination="@id/customListBrowserFragment" />
     </fragment>
     <action
         android:id="@+id/action_global_userProfileFragment"
@@ -176,6 +179,10 @@
         <argument
             android:name="fetchMode"
             app:argType="string" />
+        <argument
+            android:name="listOwner"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/changePasswordFragment"

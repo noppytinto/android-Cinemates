@@ -150,8 +150,8 @@ public class LoginFragment extends Fragment  implements
         });
 
         // fast login
-        editTextEmail.setText(R.string.login_page_email_demo);
-        editTextPassword.setText(R.string.login_page_password_demo);
+//        editTextEmail.setText(R.string.login_page_email_demo);
+//        editTextPassword.setText(R.string.login_page_password_demo);
 
     }// end onViewCreated()
 

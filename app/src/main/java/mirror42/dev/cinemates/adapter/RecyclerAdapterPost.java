@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -465,7 +464,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public TextView textViewPostDescription;
         public ImageView imageViewMoviePoster;
@@ -485,7 +483,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
@@ -540,7 +537,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public TextView textViewPostDescription;
         public ImageView imageViewMoviePoster;
@@ -560,7 +556,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
@@ -615,7 +610,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public TextView textViewPostDescription;
         public ImageView imageViewMoviePoster;
@@ -635,7 +629,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
@@ -692,7 +685,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public Button buttonComment;
         public Button buttonLike;
@@ -710,7 +702,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentCustomListCreatedPost_description);
             container = itemView.findViewById(R.id.include_customListCreatedPostLayout_postContent);
@@ -762,7 +753,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public TextView textViewPostDescription;
         public ImageView imageViewMoviePoster;
@@ -782,7 +772,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
@@ -839,7 +828,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public ImageView imageViewProfilePicture;
         public TextView textViewUsername;
         public TextView textViewPublishDate;
-        public ImageButton buttonMore;
 
         public Button buttonComment;
         public Button buttonLike;
@@ -856,7 +844,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
-            buttonMore = itemView.findViewById(R.id.button_postOwnerLayout_more);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentFollowPost_description);
             container = itemView.findViewById(R.id.include_followPostLayout_postContent);

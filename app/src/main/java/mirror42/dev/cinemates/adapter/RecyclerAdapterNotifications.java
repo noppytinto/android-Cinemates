@@ -22,6 +22,7 @@ import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.Notification.NotificationType;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
 import mirror42.dev.cinemates.model.notification.PostLikedNotification;
+import mirror42.dev.cinemates.model.notification.SubscribedToListNotification;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
 public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -29,16 +30,19 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private OnNotificationClickedListener listener;
     private Context context;
 
-    private static final int FOLLOW_REQUEST = 1;
-    private static final int POST_COMMENTED = 2;
-    private static final int POST_LIKED = 3;
-    private static final int LIST_RECOMMENDATION = 4;
+    private static final int FR = 1;
+    private static final int PC = 2;
+    private static final int PL = 3;
+    private static final int CR = 4;
+    private static final int CS = 5;
 
     public interface OnNotificationClickedListener {
         void onFollowRequestNotificationClicked(int position);
         void onPostLikedNotificationClicked(int position);
         void onPostCommentedNotificationClicked(int position);
         void onListRecommendedNotificationClicked(int position);
+        void onSubscribedToListNotificationClicked(int position);
+
     }
 
 
@@ -60,14 +64,16 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         NotificationType notificationType = notificationsList.get(position).getNotificationType();
 
         switch (notificationType) {
-            case FOLLOW_REQUEST:
-                return FOLLOW_REQUEST;
-            case POST_LIKED:
-                return POST_LIKED;
-            case POST_COMMENTED:
-                return POST_COMMENTED;
-            case LIST_RECOMMENDATION:
-                return LIST_RECOMMENDATION;
+            case FR:
+                return FR;
+            case PL:
+                return PL;
+            case PC:
+                return PC;
+            case CR:
+                return CR;
+            case CS:
+                return CS;
             default:
                 return 0;
         }
@@ -78,22 +84,27 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = null;
 
-        if(viewType == FOLLOW_REQUEST) {
+        if(viewType == FR) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_follow_request_notification_item, parent, false);
             return new FollowRequestNotificationViewHolder(view);
         }
-        else if(viewType == POST_LIKED) {
+        else if(viewType == PL) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_post_liked_notification_item, parent, false);
             return new PostLikedNotificationViewHolder(view);
         }
-        else if(viewType == POST_COMMENTED) {
+        else if(viewType == PC) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_post_commented_notification_item, parent, false);
             return new PostCommentedNotificationViewHolder(view);
         }
-        else if(viewType == LIST_RECOMMENDATION) {
+        else if(viewType == CR) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_list_recommendation_notification, parent, false);
-            return new ListRecommendationViewHolder(view);
+            return new ListRecommendationNotificationViewHolder(view);
         }
+        else if(viewType == CS) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_subscribed_to_list_notification, parent, false);
+            return new SubscribedToListNotificationViewHolder(view);
+        }
+
         else {
             return new FollowRequestNotificationViewHolder(null);
         }
@@ -101,39 +112,45 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(getItemViewType(position) == FOLLOW_REQUEST) {
+        if(getItemViewType(position) == FR) {
             FollowRequestNotification followRequestNotification = (FollowRequestNotification) notificationsList.get(position);
 
             //
             buildFollowNotificationItem((FollowRequestNotificationViewHolder) holder, followRequestNotification);
         }
-        else if(getItemViewType(position) == POST_LIKED) {
+        else if(getItemViewType(position) == PL) {
             PostLikedNotification postLikedNotification = (PostLikedNotification) notificationsList.get(position);
 
             //
             buildPostLikedNotificationItem((PostLikedNotificationViewHolder) holder, postLikedNotification);
         }
-        else if(getItemViewType(position) == POST_COMMENTED) {
+        else if(getItemViewType(position) == PC) {
             PostCommentedNotification postCommentedNotification = (PostCommentedNotification) notificationsList.get(position);
 
             //
             buildPostCommentedNotificationItem((PostCommentedNotificationViewHolder) holder, postCommentedNotification);
         }
-        else if(getItemViewType(position) == LIST_RECOMMENDATION) {
+        else if(getItemViewType(position) == CR) {
             ListRecommendedNotification listRecommendedNotification = (ListRecommendedNotification) notificationsList.get(position);
 
             //
-            buildListRecommendedNotificationItem((ListRecommendationViewHolder) holder, listRecommendedNotification);
+            buildListRecommendedNotificationItem((ListRecommendationNotificationViewHolder) holder, listRecommendedNotification);
+        }
+        else if(getItemViewType(position) == CS) {
+            SubscribedToListNotification subscribedToListNotification = (SubscribedToListNotification) notificationsList.get(position);
+
+            //
+            buildSubscribeToListNotificationItem((SubscribedToListNotificationViewHolder) holder, subscribedToListNotification);
         }
     }
 
-    private void buildFollowNotificationItem(FollowRequestNotificationViewHolder holder, FollowRequestNotification followRequestNotification) {
-        holder.textViewFullName.setText(followRequestNotification.getSender().getFullName());
-        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(followRequestNotification.getDateInMillis()));
+    private void buildFollowNotificationItem(FollowRequestNotificationViewHolder holder, FollowRequestNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
-                    .load(followRequestNotification.getSender().getProfilePicturePath()) //3
+                    .load(notification.getSender().getProfilePicturePath()) //3
                     .fallback(R.drawable.icon_user_dark_blue)
                     .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
@@ -143,13 +160,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
-    private void buildPostLikedNotificationItem(PostLikedNotificationViewHolder holder, PostLikedNotification postLikedNotification) {
-        holder.textViewFullName.setText(postLikedNotification.getSender().getFullName());
-        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postLikedNotification.getDateInMillis()));
+    private void buildPostLikedNotificationItem(PostLikedNotificationViewHolder holder, PostLikedNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
-                    .load(postLikedNotification.getSender().getProfilePicturePath()) //3
+                    .load(notification.getSender().getProfilePicturePath()) //3
                     .fallback(R.drawable.icon_user_dark_blue)
                     .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
@@ -159,13 +176,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
-    private void buildPostCommentedNotificationItem(PostCommentedNotificationViewHolder holder, PostCommentedNotification postCommentedNotification) {
-        holder.textViewFullName.setText(postCommentedNotification.getSender().getFullName());
-        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(postCommentedNotification.getDateInMillis()));
+    private void buildPostCommentedNotificationItem(PostCommentedNotificationViewHolder holder, PostCommentedNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
-                    .load(postCommentedNotification.getSender().getProfilePicturePath()) //3
+                    .load(notification.getSender().getProfilePicturePath()) //3
                     .fallback(R.drawable.icon_user_dark_blue)
                     .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
@@ -175,13 +192,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
-    private void buildListRecommendedNotificationItem(ListRecommendationViewHolder holder, ListRecommendedNotification listRecommendedNotification) {
-        holder.textViewFullName.setText(listRecommendedNotification.getSender().getFullName());
-        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(listRecommendedNotification.getDateInMillis()));
+    private void buildListRecommendedNotificationItem(ListRecommendationNotificationViewHolder holder, ListRecommendedNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
 
         try {
             Glide.with(context)  //2
-                    .load(listRecommendedNotification.getSender().getProfilePicturePath()) //3
+                    .load(notification.getSender().getProfilePicturePath()) //3
                     .fallback(R.drawable.icon_user_dark_blue)
                     .placeholder(R.drawable.icon_user_dark_blue)
                     .circleCrop() //4
@@ -191,7 +208,22 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
+    private void buildSubscribeToListNotificationItem(SubscribedToListNotificationViewHolder holder, SubscribedToListNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
+        holder.notificationText.setText("si e' iscritto alla lista: " + notification.getListName());
 
+        try {
+            Glide.with(context)  //2
+                    .load(notification.getSender().getProfilePicturePath()) //3
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
+                    .circleCrop() //4
+                    .into(holder.imageViewProfilePicture); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
@@ -284,13 +316,13 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }// end PostCommentedNotificationViewHolder class
 
-    class ListRecommendationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ListRecommendationNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
         public TextView textViewFullName;
         public TextView textViewPublishDate;
         private CardView cardView;
 
-        public ListRecommendationViewHolder(@NonNull View itemView) {
+        public ListRecommendationNotificationViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_listRecommendationNotificatonLayout_profilePicture);
             textViewFullName = itemView.findViewById(R.id.textView_listRecommendationNotificatonLayout_fullName);
@@ -306,5 +338,30 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }// end PostCommentedNotificationViewHolder class
 
+    class SubscribedToListNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView imageViewProfilePicture;
+        public TextView textViewFullName;
+        public TextView textViewPublishDate;
+        public TextView notificationText;
+
+        private CardView cardView;
+
+        public SubscribedToListNotificationViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageViewProfilePicture = itemView.findViewById(R.id.imageView_subscribedToListNotificatonLayout_profilePicture);
+            textViewFullName = itemView.findViewById(R.id.textView_subscribedToListNotificatonLayout_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_subscribedToListNotificatonLayout_publishDate);
+            notificationText = itemView.findViewById(R.id.textView_subscribedToListNotificatonLayout_text);
+
+            cardView = itemView.findViewById(R.id.cardView_subscribedToListNotificatonLayout);
+            cardView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onSubscribedToListNotificationClicked(getAdapterPosition());
+
+        }
+    }// end PostCommentedNotificationViewHolder class
 
 }// end RecylerAdapterNotifications class

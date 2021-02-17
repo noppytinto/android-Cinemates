@@ -16,6 +16,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
@@ -24,6 +25,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
     private ArrayList<CustomList> customLists;
     private CustomListCoverListener listener;
     private Context context;
+    private boolean areNotMyLists;
 
     public interface CustomListCoverListener {
         void onCoverClicked(int position);
@@ -35,10 +37,11 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
     public RecyclerAdapterCustomLists(ArrayList<CustomList> customLists,
                                        Context context,
-                                      CustomListCoverListener listener) {
+                                      CustomListCoverListener listener, boolean areNotMyLists) {
         this.customLists = customLists;
         this.context = context;
         this.listener = listener;
+        this.areNotMyLists = areNotMyLists;
     }
 
 
@@ -80,6 +83,18 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
         holder.listDescription.setText(customList.getDescription());
 
         holder.progressIndicator.setVisibility(View.GONE);
+
+        if(areNotMyLists) {
+            User owner = customList.getOwner();
+
+            holder.ownerFullname.setVisibility(View.VISIBLE);
+            holder.ownerUsername.setVisibility(View.VISIBLE);
+            holder.profilePicture.setVisibility(View.VISIBLE);
+
+            holder.ownerFullname.setText(owner.getFullName());
+            holder.ownerUsername.setText(owner.getUsername());
+            ImageUtilities.loadCircularImageInto(owner.getProfilePicturePath(), holder.profilePicture, context);
+        }
     }
 
     @Override
@@ -129,6 +144,9 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
         private TextView listDescription;
         private CardView containter;
         private LinearProgressIndicator progressIndicator;
+        private ImageView profilePicture;
+        private TextView ownerFullname;
+        private TextView ownerUsername;
 
         public CustomListViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -145,6 +163,9 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
             containter = itemView.findViewById(R.id.cardView_customListcover);
             progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
             progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
+            profilePicture = itemView.findViewById(R.id.imageView_customListCover_profilePicture);
+            ownerFullname = itemView.findViewById(R.id.textView_customListCover_fullName);
+            ownerUsername = itemView.findViewById(R.id.textView_customListCover_username);
 
             containter.setOnClickListener(v -> listener.onCoverClicked(getAdapterPosition()));
         }

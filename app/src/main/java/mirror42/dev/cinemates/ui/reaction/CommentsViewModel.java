@@ -32,8 +32,22 @@ public class CommentsViewModel extends ViewModel {
     private String commentText;
 
 
-
-    public enum TaskStatus {COMMENT_DELETED, COMMENT_NOT_DELETED, COMMENT_POSTED, COMMNET_NOT_POSTED, SUCCESS, FAILED, IDLE}
+    public enum TaskStatus {
+        COMMENT_DELETED,
+        COMMENT_NOT_DELETED,
+        COMMENT_POSTED,
+        COMMNET_NOT_POSTED,
+        SUCCESS,
+        FAILED,
+        SUBSCRIBED,
+        UNSUBSCRIBED,
+        FAILED_SUBSCRIPTION,
+        FAILED_UNSUBSCRIPTION,
+        ALREADY_SUBSCRIBED,
+        NOT_SUBSCRIBED,
+        SUBSCRIPTION_CHECK_FAILED,
+        IDLE
+    }
 
 
 

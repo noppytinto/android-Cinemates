@@ -41,6 +41,7 @@ public class CustomListBrowserFragment extends Fragment
     private String newListName;
     private String newListDescription;
     private boolean isPrivate;
+    private boolean areNotMyLists;
 
 
 
@@ -67,30 +68,56 @@ public class CustomListBrowserFragment extends Fragment
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
 
         if(getArguments()!=null) {
-            initRecycleView(view);
 
             CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
             String fetchMode = args.getFetchMode();
-            setUpFragment(fetchMode);
+            String profileOwnerUsername = args.getListOwner();
+
+            setUpFragment(fetchMode, profileOwnerUsername, view);
 
         }
 
     }
 
-    private void setUpFragment(String fetchMode) {
+    private void setUpFragment(String fetchMode, String profileOwnerUsername, View view) {
         switch (fetchMode) {
             case "fetch_my_custom_lists": {
+                areNotMyLists = false;
+                initRecycleView(view, areNotMyLists);
                 initForFetchModeMyCustomLists();
-
             }
-                break;
+            break;
             case "fetch_subscribed_lists": {
-                initForFetchModeMySubscribedLists();
+                areNotMyLists = true;
+                initRecycleView(view, areNotMyLists);
+                initForFetchModeSubscribedLists();
             }
-                break;
+            break;
+            case "fetch_public_lists": {
+                areNotMyLists = true;
+                initRecycleView(view, areNotMyLists);
+                initForFetchModePublicLists(profileOwnerUsername);
+            }
+            break;
         }
     }
 
+    private void initForFetchModePublicLists(String profileOwnerUsername) {
+        buttonAdd.setOnClickListener(this);
+        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
+        customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
+                    }
+                }
+                break;
+            }
+        });
+        customListBrowserViewModel.fetchPublicLists(profileOwnerUsername, loginViewModel.getLoggedUser());
+    }
 
     private void initForFetchModeMyCustomLists() {
         buttonAdd.setOnClickListener(this);
@@ -126,38 +153,24 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.fetchMyCustomLists(loginViewModel.getLoggedUser());
     }
 
-    private void initForFetchModeMySubscribedLists() {
+    private void initForFetchModeSubscribedLists() {
         buttonAdd.setVisibility(View.GONE);
-//        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-//        customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-//            switch (fetchStatus) {
-//                case SUCCESS: {
-//                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-//                    if(lists!=null) {
-//                        recyclerAdapterCustomLists.loadNewData(lists);
-//                    }
-//                }
-//                break;
-//                case FAILED:
-//                    break;
-//            }
-//        });
-//
-//        customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-//            switch (taskStatus) {
-//                case SUCCESS: {
-//                    createCustomListPlaceholder(newListName, newListDescription);
-//                    moveRecyclerToBottom();
-//                    showCenteredToast("lista creata");
-//                    break;
-//                }
-//                case FAILED: {
-//                    showCenteredToast("errore creazione lista");
-//                }
-//            }
-//        });
+        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
+        customListBrowserViewModel.getObservableSubscribedFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
+                    }
+                }
+                break;
+                case FAILED:
+                    break;
+            }
+        });
 
-        // TODO: customListBrowserViewModel.fetchSubscribedLists(loginViewModel.getLoggedUser());
+        customListBrowserViewModel.fetchSubscribedLists(loginViewModel.getLoggedUser());
     }
 
     @Override
@@ -168,19 +181,25 @@ public class CustomListBrowserFragment extends Fragment
         menu.getItem(1).setVisible(false);
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == buttonAdd.getId()) {
+            showCreateListDialog();
+        }
+    }
+
 
 
     //------------------------------------------------------------- MY METHODS
 
-    private void initRecycleView(View view) {
+    private void initRecycleView(View view, boolean areNotMyLists) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_customListBrowser);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerAdapterCustomLists = new RecyclerAdapterCustomLists(new ArrayList<>(), getContext(), this);
+        recyclerAdapterCustomLists = new RecyclerAdapterCustomLists(new ArrayList<>(), getContext(), this, areNotMyLists);
         recyclerView.setAdapter(recyclerAdapterCustomLists);
     }
-
 
     public void showCreateListDialog() {
         DialogFragment newFragment = new CustomListDialogFragment(this);
@@ -215,7 +234,6 @@ public class CustomListBrowserFragment extends Fragment
         recyclerAdapterCustomLists.addPlaceholderItem(placeholder);
     }
 
-
     @Override
     public void onCoverClicked(int position) {
         CustomList clickedList = recyclerAdapterCustomLists.getList(position);
@@ -235,10 +253,6 @@ public class CustomListBrowserFragment extends Fragment
     }
 
 
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == buttonAdd.getId()) {
-            showCreateListDialog();
-        }
-    }
+
+
 }// end CustomListBrowserFragment class

@@ -50,10 +50,10 @@
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.461"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_description"
-        app:layout_constraintVertical_bias="0.11" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton_listFragment_recommend"
@@ -106,6 +106,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/button_listFragment_unsubscribe"
+        style="@style/Cinemates.Button.Rounded.Outlined"
+        android:layout_width="165dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="16dp"
+        android:text="cancella iscrizione"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/button_listFragment_subscribe"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

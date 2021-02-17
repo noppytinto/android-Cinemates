@@ -467,12 +467,12 @@ public class SignUpFragment extends Fragment implements
     }
 
     private void fastSignUp() {
-        editTextUsername.setText("foo");
-        editTextEmail.setText("noto42@outlook.com");
-        editTextPassword.setText("aaaaaaa");
-        editTextRepeatPassword.setText("aaaaaaa");
-        editTextFirstName.setText("mrfoo");
-        editTextLastName.setText("bar");
+//        editTextUsername.setText("foo");
+//        editTextEmail.setText("noto42@outlook.com");
+//        editTextPassword.setText("aaaaaaa");
+//        editTextRepeatPassword.setText("aaaaaaa");
+//        editTextFirstName.setText("mrfoo");
+//        editTextLastName.setText("bar");
         editTextBirthDate.setText("1-1-1970");
     }
 

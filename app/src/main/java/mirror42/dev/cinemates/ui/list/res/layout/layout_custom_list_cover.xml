@@ -166,4 +166,46 @@
 
     </androidx.cardview.widget.CardView>
 
+    <ImageView
+        android:id="@+id/imageView_customListCover_profilePicture"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/shape_circle_light_blue"
+        android:elevation="3dp"
+        android:padding="1dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/cardView_customListcover"
+        app:layout_constraintTop_toBottomOf="@+id/cardView_customListcover"
+        app:srcCompat="@drawable/icon_user_primary_blue"
+        tools:visibility="visible" />
+
+
+    <TextView
+        android:id="@+id/textView_customListCover_fullName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Mario Rossi"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/imageView_customListCover_profilePicture"
+        app:layout_constraintTop_toTopOf="@+id/imageView_customListCover_profilePicture"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/textView_customListCover_username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:text="@mario"
+        android:textColor="@color/light_blue"
+        android:textSize="10sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/textView_customListCover_fullName"
+        app:layout_constraintTop_toBottomOf="@+id/textView_customListCover_fullName"
+        tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

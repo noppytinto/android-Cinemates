@@ -192,14 +192,17 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         }
         else if(v.getId() == buttonCustomLists.getId()){
             String fetchMode = "fetch_my_custom_lists";
+            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
             NavDirections customListBrowserFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode);
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
             Navigation.findNavController(v).navigate(customListBrowserFragment);
         }
         else if(v.getId() == followedListsButton.getId()){
             String fetchMode = "fetch_subscribed_lists";
+            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
+
             NavDirections customListBrowserFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode);
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
             Navigation.findNavController(v).navigate(customListBrowserFragment);
         }
 

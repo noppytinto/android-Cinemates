@@ -30,6 +30,7 @@ import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
 import mirror42.dev.cinemates.model.notification.PostLikedNotification;
+import mirror42.dev.cinemates.model.notification.SubscribedToListNotification;
 import mirror42.dev.cinemates.model.room.CinematesLocalDatabase;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
@@ -71,7 +72,7 @@ public class NotificationsViewModel extends ViewModel {
     private final String POST_LIKED_NOTIFICATION_TYPE = "PL";          //(Post Liked)
     private final String POST_COMMENTED_NOTIFICATION_TYPE = "PC";      //(Post Commented)
     private final String LIST_RECOMMENDED_NOTIFICATION_TYPE = "CR";    //(List recommendation)
-    private final String LIST_SUBSCRIBED_NOTIFICATION_TYPE = "CS";     //(subscribed to list)
+    private final String SUBSCRIBED_TO_LIST_NOTIFICATION_TYPE = "CS";     //(subscribed to list)
     private final String MOVIE_RECOMMENDED_NOTIFICATION_TYPE = "MR";   //(Movie recommendation)
 
 
@@ -400,6 +401,73 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
+    public Observable<ArrayList<Notification>> getObservableSubscribedToListNotifications(String email, String token) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Notification> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_select_notifications";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", email)
+                        .add("notification_type", SUBSCRIBED_TO_LIST_NOTIFICATION_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            SubscribedToListNotification notification = new SubscribedToListNotification();
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            User sender = new User();
+                            sender.setFirstName(jsonDBobj.getString("sender_fname"));
+                            sender.setLastName(jsonDBobj.getString("sender_lname"));
+                            sender.setUsername(jsonDBobj.getString("sender_username"));
+                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            notification.setId(jsonDBobj.getLong("Id_Notification"));
+                            notification.setIsNew(true);
+                            notification.setSender(sender);
+                            notification.setListName(jsonDBobj.getString("list_name"));
+                            notification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
+
+                            tempResult.add(notification);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no notifications"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }
+
 
     /**
      * notes: notifications are ordered by date (DESC order)
@@ -421,6 +489,9 @@ public class NotificationsViewModel extends ViewModel {
         Observable<ArrayList<Notification>> listRecommendedNotificationsObservable =
                 getObservableListRecommendedNotifications(email, token);
 
+        Observable<ArrayList<Notification>> subscribedToListNotificationsObservable =
+                getObservableSubscribedToListNotifications(email, token);
+
 
         Observable<ArrayList<Notification>> combinedNotificationsObservable =
                 Observable.combineLatest(
@@ -428,12 +499,14 @@ public class NotificationsViewModel extends ViewModel {
                         likeNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),    // don't block the chain,
                         commentNotificationsObservable.onErrorReturn(e-> new ArrayList<>()), // return an empty list instead
                         listRecommendedNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),
-                        (followNotifications, likeNotifications, commentsNotifications, listRecommendedNotifications) -> {
+                        subscribedToListNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),
+                        (followNotifications, likeNotifications, commentsNotifications, listRecommendedNotifications, subscribedToListNotifications) -> {
                             final ArrayList<Notification> combinedNotifications = new ArrayList<>();
                             combinedNotifications.addAll(followNotifications);
                             combinedNotifications.addAll(likeNotifications);
                             combinedNotifications.addAll(commentsNotifications);
                             combinedNotifications.addAll(listRecommendedNotifications);
+                            combinedNotifications.addAll(subscribedToListNotifications);
                             return combinedNotifications;
                         }
                 );
@@ -614,7 +687,7 @@ public class NotificationsViewModel extends ViewModel {
 
     // custom lists
 
-    public void fetchCustomListMovies(String listName, String description, User loggedUser) {
+    public void fetchCustomListMovies(String listOwnerUsername, String listName, String description, User loggedUser) {
         try {
             // build httpurl and request for remote db
             final String dbFunction = "fn_select_custom_list";
@@ -622,7 +695,7 @@ public class NotificationsViewModel extends ViewModel {
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("list_name", listName)
-                    .add("email", loggedUser.getEmail())
+                    .add("owner_username", listOwnerUsername)
                     .build();
             Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
 

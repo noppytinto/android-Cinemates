@@ -7,7 +7,7 @@ public class PostCommentedNotification extends Notification{
 
     public PostCommentedNotification() {
         super();
-        notificationType = NotificationType.POST_COMMENTED;
+        notificationType = NotificationType.PC;
 
     }
 

@@ -19,6 +19,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDeepLinkBuilder;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 
@@ -43,6 +45,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private User profileOwner;
     private NotificationsViewModel notificationsViewModel;
     private View followRequestPrompt;
+    private Button buttonCustomLists;
 
 
 
@@ -67,10 +70,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonAcceptFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_accept);
         buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
         followRequestPrompt = view.findViewById(R.id.include_userProfileFragment_requestPrompt);
+        buttonCustomLists = view.findViewById(R.id.button_userProfileFragment_customLists);
 
         buttonSendFollow.setOnClickListener(this);
         buttonAcceptFollow.setOnClickListener(this);
         buttonDeclineFollow.setOnClickListener(this);
+        buttonCustomLists.setOnClickListener(this);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
@@ -79,12 +84,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             if(user!=null) {
                 profileOwner = user;
                 String profilePictureUrl = user.getProfilePicturePath();
-                Glide.with(getContext())
-                        .load(profilePictureUrl)
-                        .fallback(R.drawable.icon_user_dark_blue)
-                        .placeholder(R.drawable.icon_user_dark_blue)
-                        .circleCrop()
-                        .into(imageViewProfilePicture);
+                try {
+                    Glide.with(requireContext())
+                            .load(profilePictureUrl)
+                            .fallback(R.drawable.icon_user_dark_blue)
+                            .placeholder(R.drawable.icon_user_dark_blue)
+                            .circleCrop()
+                            .into(imageViewProfilePicture);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 textViewfullName.setText(user.getFullName());
                 textViewusername.setText("@" + user.getUsername());
@@ -274,6 +283,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     profileOwner.getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+        }
+        else if(v.getId() == buttonCustomLists.getId()) {
+            String fetchMode = "fetch_public_lists";
+            String ownerUsername = profileOwner.getUsername();
+//
+            NavDirections customListBrowserFragment =
+                    UserProfileFragmentDirections.actionUserProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
+            Navigation.findNavController(v).navigate(customListBrowserFragment);
         }
 
     }

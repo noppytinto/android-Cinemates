@@ -220,10 +220,26 @@ public class NotificationsFragment extends Fragment implements
             }
         });
 
-        notificationsViewModel.fetchCustomListMovies(currentNotification.getCustomList().getName(),
-                                                     currentNotification.getCustomList().getDescription(),
-                                                     loginViewModel.getLoggedUser());
+        notificationsViewModel.fetchCustomListMovies(
+                currentNotification.getSender().getUsername(),
+                currentNotification.getCustomList().getName(),
+                currentNotification.getCustomList().getDescription(),
+                loginViewModel.getLoggedUser());
 
+    }
+
+    @Override
+    public void onSubscribedToListNotificationClicked(int position) {
+        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        long notificationID = currentNotification.getId();
+
+        // delete from remote DB
+        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+        //TODO
+//        NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
+//                NavGraphDirections.actionGlobalUserProfileFragment(user);
+//        navigateTo(userProfileDirection, true);
     }
 
     private void loadNotifications(User loggedUser) {
@@ -301,6 +317,7 @@ public class NotificationsFragment extends Fragment implements
 
         return user;
     }
+
 
     private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
         if(direction==null) return;

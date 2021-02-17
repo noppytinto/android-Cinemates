@@ -8,7 +8,7 @@ public class ListRecommendedNotification extends Notification {
     public ListRecommendedNotification() {
         super();
         recommendedList = new CustomList();
-        notificationType = NotificationType.LIST_RECOMMENDATION;
+        notificationType = NotificationType.CR;
 
     }
 

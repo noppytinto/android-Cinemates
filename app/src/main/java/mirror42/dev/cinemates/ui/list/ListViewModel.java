@@ -15,6 +15,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -31,6 +32,7 @@ public class ListViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> selectedMovies;
     private MutableLiveData<FetchStatus> fetchStatus;
+    private MutableLiveData<TaskStatus> taskStatus;
 
 
 
@@ -40,6 +42,7 @@ public class ListViewModel extends ViewModel {
     public ListViewModel() {
         selectedMovies = new MutableLiveData<>();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+        taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
     }
 
 
@@ -61,7 +64,13 @@ public class ListViewModel extends ViewModel {
         return fetchStatus;
     }
 
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus.postValue(taskStatus);
+    }
 
+    public LiveData<TaskStatus> getObservableTaskStatus() {
+        return taskStatus;
+    }
 
 
 
@@ -409,5 +418,155 @@ public class ListViewModel extends ViewModel {
     }
 
 
+    // subsciptions
+    public void subscribeToList(CustomList customList, User loggedUser) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
+        try {
+            // generating url request
+            final String dbFunction = "fn_subscribe_to_custom_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("list_owner_username", customList.getOwner().getUsername())
+                    .add("requester_email", loggedUser.getEmail())
+                    .add("list_name", customList.getName())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        setTaskStatus(TaskStatus.FAILED_SUBSCRIPTION);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.SUBSCRIBED);
+                            }
+                            else {
+                                setTaskStatus(TaskStatus.FAILED_SUBSCRIPTION);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setTaskStatus(TaskStatus.FAILED_SUBSCRIPTION);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.FAILED_SUBSCRIPTION);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.FAILED_SUBSCRIPTION);
+        }
+    }
+
+    public void unsubscribeFromList(CustomList customList, User loggedUser) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "fn_unsubscribe_from_custom_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("list_owner_username", customList.getOwner().getUsername())
+                    .add("requester_email", loggedUser.getEmail())
+                    .add("list_name", customList.getName())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setTaskStatus(TaskStatus.FAILED_UNSUBSCRIPTION);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.UNSUBSCRIBED);
+                            }
+                            else {
+                                setTaskStatus(TaskStatus.FAILED_UNSUBSCRIPTION);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setTaskStatus(TaskStatus.FAILED_UNSUBSCRIPTION);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.FAILED_UNSUBSCRIPTION);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.FAILED_UNSUBSCRIPTION);
+        }
+    }
+
+
+    public void checkMySubscriptionToThisList(CustomList customList, User loggedUser) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "fn_check_subscription_to_list";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("list_owner_username", customList.getOwner().getUsername())
+                    .add("requester_email", loggedUser.getEmail())
+                    .add("list_name", customList.getName())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setTaskStatus(TaskStatus.SUBSCRIPTION_CHECK_FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.ALREADY_SUBSCRIBED);
+                            }
+                            else {
+                                setTaskStatus(TaskStatus.NOT_SUBSCRIBED);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setTaskStatus(TaskStatus.SUBSCRIPTION_CHECK_FAILED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.SUBSCRIPTION_CHECK_FAILED);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.SUBSCRIPTION_CHECK_FAILED);
+        }
+    }
 }// end ListViewModel class

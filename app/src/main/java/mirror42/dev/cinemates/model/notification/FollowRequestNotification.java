@@ -8,7 +8,7 @@ public class FollowRequestNotification extends Notification {
 
     public FollowRequestNotification() {
         super();
-        notificationType = NotificationType.FOLLOW_REQUEST;
+        notificationType = NotificationType.FR;
     }
 
 

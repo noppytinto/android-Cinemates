@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,10 +54,13 @@ public class ListFragment extends Fragment implements
     private MoviesList currentList;
     private FloatingActionButton recommendButton;
     private Button subscribeButton;
+    private Button unsubscribeButton;
+
     private SwitchMaterial isPrivateSwitch;
     private TextView textViewListName;
     private TextView textViewListDescription;
     private boolean navigatedToMovieDetailsFragment;
+    private User listOwner;
 
 
 
@@ -85,6 +89,7 @@ public class ListFragment extends Fragment implements
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentList = args.getList();
+            listOwner = currentList.getOwner();
             //
             setupListAppearance(currentList);
 
@@ -125,6 +130,49 @@ public class ListFragment extends Fragment implements
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == recommendButton.getId()) {
+            showRecommendListDialog();
+        }
+        else if(v.getId() == subscribeButton.getId()) {
+            listViewModel.subscribeToList((CustomList) currentList, loginViewModel.getLoggedUser());
+            listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case SUBSCRIBED:
+                        Toast.makeText(requireContext(), "iscritto con successo!", Toast.LENGTH_SHORT).show();
+                        hideSubscribeButton();
+                        showUnubscribeButton();
+                    break;
+                    case FAILED_SUBSCRIPTION:
+                        Toast.makeText(requireContext(), "errore iscrizione!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            });
+
+        }
+        else if(v.getId() == unsubscribeButton.getId()) {
+            listViewModel.unsubscribeFromList((CustomList) currentList, loginViewModel.getLoggedUser());
+            listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case UNSUBSCRIBED:
+                        Toast.makeText(requireContext(), "iscrizione cancellata!", Toast.LENGTH_SHORT).show();
+                        showSubscribeButton();
+                        hideUnsubscribeButton();
+                        break;
+                    case FAILED_UNSUBSCRIPTION:
+                        Toast.makeText(requireContext(), "errore cancellazione iscrizione!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            });
+
+        }
+
+    }
+
+
+
+
 
 
     //--------------------------------------------------------------------------------------- METHODS
@@ -132,15 +180,18 @@ public class ListFragment extends Fragment implements
     private void init(View view) {
         recommendButton = view.findViewById(R.id.floatingActionButton_listFragment_recommend);
         subscribeButton = view.findViewById(R.id.button_listFragment_subscribe);
+        unsubscribeButton = view.findViewById(R.id.button_listFragment_unsubscribe);
+
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
         textViewListName = view.findViewById(R.id.textView_listFragment_listName);
         textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        listViewModel = new ViewModelProvider(requireActivity()).get(ListViewModel.class);
+        listViewModel = new ViewModelProvider(this).get(ListViewModel.class);
         selectedMovies = new ArrayList<>();
         isPrivateSwitch.setOnCheckedChangeListener(this);
         recommendButton.setOnClickListener(this);
         subscribeButton.setOnClickListener(this);
+        unsubscribeButton.setOnClickListener(this);
 
         //
         initRecyclerView(view);
@@ -187,7 +238,24 @@ public class ListFragment extends Fragment implements
                 }
             }
             else {
-                showSubscribeButton();
+                // check wheter i'm subscibed or not
+                listViewModel.checkMySubscriptionToThisList((CustomList) currentList, loggerUser);
+                listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                    switch (taskStatus) {
+                        case ALREADY_SUBSCRIBED:
+                            Toast.makeText(requireContext(), "sei iscritto a questa lista!", Toast.LENGTH_SHORT).show();
+                            hideSubscribeButton();
+                            showUnubscribeButton();
+                            break;
+                        case NOT_SUBSCRIBED:
+                            showSubscribeButton();
+                            hideUnsubscribeButton();
+                            break;
+                        case SUBSCRIPTION_CHECK_FAILED:
+                            Toast.makeText(requireContext(), "errore controllo iscrizione!", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                });
             }
         }
     }
@@ -273,12 +341,6 @@ public class ListFragment extends Fragment implements
 
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == recommendButton.getId()) {
-            showRecommendListDialog();
-        }
-    }
 
 
 
@@ -410,6 +472,8 @@ public class ListFragment extends Fragment implements
     private void hideIsPrivateSwitchButton() {isPrivateSwitch.setVisibility(View.GONE);}
     private void showSubscribeButton() {subscribeButton.setVisibility(View.VISIBLE);}
     private void hideSubscribeButton() {subscribeButton.setVisibility(View.GONE);}
+    private void showUnubscribeButton() {unsubscribeButton.setVisibility(View.VISIBLE);}
+    private void hideUnsubscribeButton() {unsubscribeButton.setVisibility(View.GONE);}
 
     public void hideMainToolbar() {
         try {

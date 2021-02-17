@@ -36,7 +36,8 @@ public class CustomListBrowserViewModel extends ViewModel {
     private MutableLiveData<TaskStatus> taskStatus;
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
-
+    private MutableLiveData<FetchStatus> publicFetchStatus;
+    private MutableLiveData<FetchStatus> subscribedFetchStatus;
 
 
 
@@ -47,6 +48,9 @@ public class CustomListBrowserViewModel extends ViewModel {
         customLists = new MutableLiveData<>();
         taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+        publicFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+        subscribedFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
 
@@ -82,9 +86,92 @@ public class CustomListBrowserViewModel extends ViewModel {
         this.fetchStatus.postValue(fetchStatus);
     }
 
+    public LiveData<FetchStatus> getObservablePublicFetchStatus() {
+        return publicFetchStatus;
+    }
+
+    public void setPublicFetchStatus(FetchStatus fetchStatus) {
+        this.publicFetchStatus.postValue(fetchStatus);
+    }
+
+    public LiveData<FetchStatus> getObservableSubscribedFetchStatus() {
+        return subscribedFetchStatus;
+    }
+
+    public void setSubscribedFetchStatus(FetchStatus fetchStatus) {
+        this.subscribedFetchStatus.postValue(fetchStatus);
+    }
 
 
     //----------------------------------------------------------------------- METHODS
+
+    public void fetchPublicLists(String targetUsername, User loggedUser) {
+        Runnable task = createFetchPublicListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), targetUsername);
+        Thread t_1 = new Thread(task);
+        t_1.start();
+    }
+
+    private Runnable createFetchPublicListsTask(String requesterEmail, String token, String targetUsername) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_custom_lists";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("target_username", targetUsername)
+                        .add("requester_email", requesterEmail)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        setCustomLists(null);
+                        setPublicFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    //
+                    String responseData = response.body().string();
+                    ArrayList<CustomList> customLists = new ArrayList<>();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            CustomList customList = buildCustomList(jsonDBobj, token, targetUsername);
+                            customLists.add(customList);
+                        }// for
+
+                        // once finished set result
+//                                    Collections.reverse(postsList);
+                        setCustomLists(customLists);
+                        setPublicFetchStatus(FetchStatus.SUCCESS);
+
+                    }
+                    // if response contains no data
+                    else {
+                        setCustomLists(null);
+                        setPublicFetchStatus(FetchStatus.NOT_EXISTS);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setCustomLists(null);
+                    setPublicFetchStatus(FetchStatus.FAILED);
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                setCustomLists(null);
+                setPublicFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchPublicListsTask()
+
 
     public void fetchMyCustomLists(User loggedUser) {
         Runnable task = createFetchMyCustomListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
@@ -122,7 +209,7 @@ public class CustomListBrowserViewModel extends ViewModel {
 
                         for(int i=0; i<jsonArray.length(); i++) {
                             JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                            CustomList customList = buildCustomList(jsonDBobj, email, token, loggedUsername);
+                            CustomList customList = buildCustomList(jsonDBobj, token, loggedUsername);
                             customLists.add(customList);
                         }// for
 
@@ -153,7 +240,6 @@ public class CustomListBrowserViewModel extends ViewModel {
         };
     }// end createFetchMyCustomListsTask()
 
-    //TODO
     public void fetchSubscribedLists(User loggedUser) {
         Runnable task = createFetchSubscribedListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
         Thread t_1 = new Thread(task);
@@ -165,7 +251,7 @@ public class CustomListBrowserViewModel extends ViewModel {
         return ()-> {
             try {
                 // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_custom_lists";
+                final String dbFunction = "fn_select_all_subscribed_lists";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
@@ -178,7 +264,7 @@ public class CustomListBrowserViewModel extends ViewModel {
                 try (Response response = httpClient.newCall(request).execute()) {
                     if (!response.isSuccessful()) {
                         setCustomLists(null);
-                        setFetchStatus(FetchStatus.FAILED);
+                        setSubscribedFetchStatus(FetchStatus.FAILED);
                     }
 
                     //
@@ -191,33 +277,34 @@ public class CustomListBrowserViewModel extends ViewModel {
 
                         for(int i=0; i<jsonArray.length(); i++) {
                             JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                            CustomList customList = buildCustomList(jsonDBobj, email, token, loggedUsername);
+                            String listOwnerUsername = jsonDBobj.getString("Username");
+                            CustomList customList = buildCustomList(jsonDBobj, token, listOwnerUsername);
                             customLists.add(customList);
                         }// for
 
                         // once finished set result
 //                                    Collections.reverse(postsList);
                         setCustomLists(customLists);
-                        setFetchStatus(FetchStatus.SUCCESS);
+                        setSubscribedFetchStatus(FetchStatus.SUCCESS);
 
                     }
                     // if response contains no data
                     else {
                         setCustomLists(null);
-                        setFetchStatus(FetchStatus.NOT_EXISTS);
+                        setSubscribedFetchStatus(FetchStatus.NOT_EXISTS);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     setCustomLists(null);
-                    setFetchStatus(FetchStatus.FAILED);
+                    setSubscribedFetchStatus(FetchStatus.FAILED);
                 }
 
 
             } catch (Exception e) {
                 e.printStackTrace();
                 setCustomLists(null);
-                setFetchStatus(FetchStatus.FAILED);
+                setSubscribedFetchStatus(FetchStatus.FAILED);
             }
         };
     }// end createFetchMyCustomListsTask()
@@ -237,7 +324,7 @@ public class CustomListBrowserViewModel extends ViewModel {
 
 
 
-    private CustomList buildCustomList(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+    private CustomList buildCustomList(JSONObject jsonDBobj, String token, String targetUsername) throws Exception{
         // getting post owner data
         User user = buildOwner(jsonDBobj);
         // assembling post
@@ -248,12 +335,12 @@ public class CustomListBrowserViewModel extends ViewModel {
         customList.setDescription(jsonDBobj.getString("Description"));
         customList.setIsPrivate(jsonDBobj.getBoolean("Private"));
         ArrayList<Movie> moviesList = new ArrayList<>();
-        moviesList = fetchMovies(jsonDBobj.getString("list_name"), email, token);
+        moviesList = fetchMovies(jsonDBobj.getString("list_name"), targetUsername, token);
         customList.setMovies(moviesList);
         return customList;
     }
 
-    private ArrayList<Movie> fetchMovies(String listName, String ownerEmail, String token) {
+    private ArrayList<Movie> fetchMovies(String listName, String ownerUsername, String token) {
         ArrayList<Movie> moviesList = new ArrayList<>();
 
         // build httpurl and request for remote db
@@ -262,7 +349,7 @@ public class CustomListBrowserViewModel extends ViewModel {
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         RequestBody requestBody = new FormBody.Builder()
                 .add("list_name", listName)
-                .add("email", ownerEmail)
+                .add("owner_username", ownerUsername)
                 .build();
         Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
         try (Response response = httpClient.newCall(request).execute()) {
