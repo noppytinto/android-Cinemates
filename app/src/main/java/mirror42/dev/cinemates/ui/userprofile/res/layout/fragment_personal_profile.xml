@@ -16,6 +16,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <Button
+                android:id="@+id/button_personalProfileFragment_followedLists"
+                style="@style/Cinemates.Button.Rectangular.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="125dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:text="liste che seguo"
+                app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_customLists" />
+
+            <TextView
+                android:id="@+id/textView_personalProfileFragment_label1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Liste"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
+
             <TextView
                 android:id="@+id/textView_personalProfileFragment_email"
                 android:layout_width="wrap_content"
@@ -54,7 +83,6 @@
                 android:text="@string/logout"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_changePassword" />
 
@@ -64,14 +92,13 @@
                 android:layout_width="200dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="105dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="80dp"
                 android:layout_marginEnd="106dp"
                 android:text="@string/change_password"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_customList" />
+                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_followedLists" />
 
             <include
                 android:id="@+id/include_personalProfileFragment_accountVerification"
@@ -83,37 +110,51 @@
                 android:layout_marginEnd="56dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_email"
                 tools:visibility="visible" />
 
             <include
-                android:id="@+id/include_personalProfileFragment_content"
-                layout="@layout/personal_profile_lists"
+                android:id="@+id/include_personalProfileFragment_myLists"
+                layout="@layout/personal_profile_essential_lists"
                 android:layout_width="358dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
+                app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_label1" />
 
             <Button
-                android:id="@+id/button_personalProfileFragment_customList"
+                android:id="@+id/button_personalProfileFragment_customLists"
                 style="@style/Cinemates.Button.Rectangular.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="125dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginEnd="8dp"
                 android:text="@string/custom_lists"
-                app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_content"
+                app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_myLists" />
+
+            <TextView
+                android:id="@+id/textView_personalProfileFragment_label2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Liste"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_content"
-                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_content" />
+                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

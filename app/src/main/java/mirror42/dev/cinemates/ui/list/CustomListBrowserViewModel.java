@@ -86,13 +86,13 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     //----------------------------------------------------------------------- METHODS
 
-    public void fetchCustomLists(User loggedUser) {
-        Runnable task = createFetchCustomListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+    public void fetchMyCustomLists(User loggedUser) {
+        Runnable task = createFetchMyCustomListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
         Thread t_1 = new Thread(task);
         t_1.start();
     }
 
-    private Runnable createFetchCustomListsTask(String email, String token, String loggedUsername) {
+    private Runnable createFetchMyCustomListsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
                 // build httpurl and request for remote db
@@ -151,7 +151,91 @@ public class CustomListBrowserViewModel extends ViewModel {
                 setFetchStatus(FetchStatus.FAILED);
             }
         };
-    }// end createFetchListTask()
+    }// end createFetchMyCustomListsTask()
+
+    //TODO
+    public void fetchSubscribedLists(User loggedUser) {
+        Runnable task = createFetchSubscribedListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
+        Thread t_1 = new Thread(task);
+        t_1.start();
+    }
+
+    //TODO
+    private Runnable createFetchSubscribedListsTask(String email, String token, String loggedUsername) {
+        return ()-> {
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_custom_lists";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("target_username", loggedUsername)
+                        .add("requester_email", email)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        setCustomLists(null);
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+
+                    //
+                    String responseData = response.body().string();
+                    ArrayList<CustomList> customLists = new ArrayList<>();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            CustomList customList = buildCustomList(jsonDBobj, email, token, loggedUsername);
+                            customLists.add(customList);
+                        }// for
+
+                        // once finished set result
+//                                    Collections.reverse(postsList);
+                        setCustomLists(customLists);
+                        setFetchStatus(FetchStatus.SUCCESS);
+
+                    }
+                    // if response contains no data
+                    else {
+                        setCustomLists(null);
+                        setFetchStatus(FetchStatus.NOT_EXISTS);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setCustomLists(null);
+                    setFetchStatus(FetchStatus.FAILED);
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                setCustomLists(null);
+                setFetchStatus(FetchStatus.FAILED);
+            }
+        };
+    }// end createFetchMyCustomListsTask()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private CustomList buildCustomList(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
         // getting post owner data

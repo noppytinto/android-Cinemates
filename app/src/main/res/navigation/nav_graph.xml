@@ -172,7 +172,11 @@
         android:id="@+id/customListBrowserFragment"
         android:name="mirror42.dev.cinemates.ui.list.CustomListBrowserFragment"
         android:label="Liste Personalizzate"
-        tools:layout="@layout/custom_list_browser_fragment" />
+        tools:layout="@layout/custom_list_browser_fragment" >
+        <argument
+            android:name="fetchMode"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/changePasswordFragment"
         android:name="mirror42.dev.cinemates.ui.changePassword.changePasswordFragment"

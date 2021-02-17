@@ -31,7 +31,8 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
-        RecyclerAdapterCustomLists.CustomListCoverListener {
+        RecyclerAdapterCustomLists.CustomListCoverListener,
+        View.OnClickListener {
     private CustomListBrowserViewModel customListBrowserViewModel;
     private LoginViewModel loginViewModel;
     private FloatingActionButton buttonAdd;
@@ -64,36 +65,48 @@ public class CustomListBrowserFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
-        buttonAdd.setOnClickListener(v -> {
-            // ignore v
 
-            showCreateListDialog();
+        if(getArguments()!=null) {
+            initRecycleView(view);
 
-        });
+            CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
+            String fetchMode = args.getFetchMode();
+            setUpFragment(fetchMode);
 
-        initRecycleView(view);
+        }
+
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void setUpFragment(String fetchMode) {
+        switch (fetchMode) {
+            case "fetch_my_custom_lists": {
+                initForFetchModeMyCustomLists();
+
+            }
+                break;
+            case "fetch_subscribed_lists": {
+                initForFetchModeMySubscribedLists();
+            }
+                break;
+        }
+    }
+
+
+    private void initForFetchModeMyCustomLists() {
+        buttonAdd.setOnClickListener(this);
         customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        customListBrowserViewModel.getObservableCustomList().observe(getViewLifecycleOwner(), customLists -> {
-
-        });
-
         customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-                switch (fetchStatus) {
-                    case SUCCESS: {
-                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                        if(lists!=null) {
-                            recyclerAdapterCustomLists.loadNewData(lists);
-                        }
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
                     }
-                        break;
-                    case FAILED:
-                        break;
                 }
+                break;
+                case FAILED:
+                    break;
+            }
         });
 
         customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
@@ -110,7 +123,41 @@ public class CustomListBrowserFragment extends Fragment
             }
         });
 
-        customListBrowserViewModel.fetchCustomLists(loginViewModel.getLoggedUser());
+        customListBrowserViewModel.fetchMyCustomLists(loginViewModel.getLoggedUser());
+    }
+
+    private void initForFetchModeMySubscribedLists() {
+        buttonAdd.setVisibility(View.GONE);
+//        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
+//        customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+//            switch (fetchStatus) {
+//                case SUCCESS: {
+//                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+//                    if(lists!=null) {
+//                        recyclerAdapterCustomLists.loadNewData(lists);
+//                    }
+//                }
+//                break;
+//                case FAILED:
+//                    break;
+//            }
+//        });
+//
+//        customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+//            switch (taskStatus) {
+//                case SUCCESS: {
+//                    createCustomListPlaceholder(newListName, newListDescription);
+//                    moveRecyclerToBottom();
+//                    showCenteredToast("lista creata");
+//                    break;
+//                }
+//                case FAILED: {
+//                    showCenteredToast("errore creazione lista");
+//                }
+//            }
+//        });
+
+        // TODO: customListBrowserViewModel.fetchSubscribedLists(loginViewModel.getLoggedUser());
     }
 
     @Override
@@ -188,5 +235,10 @@ public class CustomListBrowserFragment extends Fragment
     }
 
 
-
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == buttonAdd.getId()) {
+            showCreateListDialog();
+        }
+    }
 }// end CustomListBrowserFragment class

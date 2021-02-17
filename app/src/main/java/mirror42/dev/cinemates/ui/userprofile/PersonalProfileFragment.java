@@ -44,7 +44,8 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private View includeAccountActivationView;
     private View includeUserProfileContent;
     private NotificationsViewModel notificationsViewModel;
-    private Button buttonCustomList;
+    private Button buttonCustomLists;
+    private Button followedListsButton;
 
 
 
@@ -73,26 +74,20 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
         buttonChangePassword = view.findViewById(R.id.button_personalProfileFragment_changePassword);
-        buttonCustomList = view.findViewById(R.id.button_personalProfileFragment_customList);
+        buttonCustomLists = view.findViewById(R.id.button_personalProfileFragment_customLists);
+        followedListsButton = view.findViewById(R.id.button_personalProfileFragment_followedLists);
         remoteConfigServer = RemoteConfigServer.getInstance();
         // setting listeners
         buttonLogout.setOnClickListener(this);
         buttonChangePassword.setOnClickListener(this);
+        buttonCustomLists.setOnClickListener(this);
+        followedListsButton.setOnClickListener(this);
         //
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);
         includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
-        includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_content);
+        includeUserProfileContent = view.findViewById(R.id.include_personalProfileFragment_myLists);
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-
-        buttonCustomList.setOnClickListener(v -> {
-            // ignore v
-
-            NavDirections personalProfileFragmentDirections = PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment();
-            Navigation.findNavController(v).navigate(personalProfileFragmentDirections);
-
-
-        });
 
         hideResendEmail();
 
@@ -189,11 +184,25 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
                 buttonResendEmail.setText("Email attivazione rinviata!");
                 buttonResendEmail.setEnabled(false);
             }
-        }else if(v.getId() == buttonChangePassword.getId()){
+        }
+        else if(v.getId() == buttonChangePassword.getId()){
             NavController navController = Navigation.findNavController(v);
             navController.navigate(R.id.changePasswordFragment);
 
         }
+        else if(v.getId() == buttonCustomLists.getId()){
+            String fetchMode = "fetch_my_custom_lists";
+            NavDirections customListBrowserFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode);
+            Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }
+        else if(v.getId() == followedListsButton.getId()){
+            String fetchMode = "fetch_subscribed_lists";
+            NavDirections customListBrowserFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode);
+            Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }
+
     }
 
     @Override
