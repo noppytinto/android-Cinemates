@@ -52,6 +52,18 @@ public class User implements Serializable, Parcelable {
         this.analytics = analytics;
     }
 
+    public User(String username,String password ,String email, String firstName, String lastName, String birthDate, String profilePicturePath, String accessToken, boolean analytics) {
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.profilePicturePath = profilePicturePath;
+        this.accessToken = accessToken;
+        this.analytics = analytics;
+        this.password = password;
+    }
+
 //    public User(String username, String email, String firstName, String lastName, Date birthDate, String profilePicturePath, String accessToken, boolean promo, boolean analytics) {
 //        this.username = username;
 //        this.email = email;
@@ -168,6 +180,7 @@ public class User implements Serializable, Parcelable {
 
         try {
             String username = jsonObject.getString("Username");
+            String password = jsonObject.getString("Password");
             String email = jsonObject.getString("Email");
             String firstName = jsonObject.getString("Name");
             String secondName = jsonObject.getString("LastName");
@@ -176,7 +189,7 @@ public class User implements Serializable, Parcelable {
             String accessToken = jsonObject.getString("AccessToken");
             boolean analytics = jsonObject.getBoolean("Analytics");
 
-            user = new User(username, email, firstName, secondName, birthDate, profilePicturePath, accessToken, analytics);
+            user = new User(username,password, email, firstName, secondName, birthDate, profilePicturePath, accessToken, analytics);
         } catch (JSONException e) {
             e.printStackTrace();
         }

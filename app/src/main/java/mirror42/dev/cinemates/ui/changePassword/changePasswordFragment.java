@@ -90,16 +90,11 @@ public class changePasswordFragment extends Fragment implements
     public void onClick(View v) {
         if(v.getId() == changePassword.getId()){
 
-            String actualPass =   editTextActualPassword.getText().toString();
-            String newPass =   editTextNewPassword.getText().toString();
-            String RepNewPass =   editTextRepPassword.getText().toString();
-
-            // metti tra i due checkActualPasswordMatch()!!
-            if(checkAllFieldsAreFilled() && checkRepeatPasswordMatch()){
+            if(checkAllFieldsAreFilled() && checkActualPasswordMatch() && checkRepeatPasswordMatch()){
+                String newPass =   editTextNewPassword.getText().toString();
                 changePasswordViewModel.changePassword(loginViewModel.getLoggedUser(), newPass);
-            }else{
+            }else
                 showCenteredToast("Completare prima tutti i campi evidenziati in rosso.");
-            }
         }
     }
 
