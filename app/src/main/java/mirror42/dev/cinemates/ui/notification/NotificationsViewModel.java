@@ -67,11 +67,11 @@ public class NotificationsViewModel extends ViewModel {
         IDLE
     }
 
-    private final String FOLLOW_REQUEST_NOTIFICATION_TYPE = "FR";   //(Friend Request)
-    private final String POST_LIKED_NOTIFICATION_TYPE = "PL";       //(Post Liked)
-    private final String POST_COMMENTED_NOTIFICATION_TYPE = "PC";   //(Post Commented)
-    private final String LIST_RECOMMENDED_NOTIFICATION_TYPE = "CR";   //(List recommendation)
-    private final String LIST_SUBSCRIBED_NOTIFICATION_TYPE = "CS";   //(subscribed to list)
+    private final String FOLLOW_REQUEST_NOTIFICATION_TYPE = "FR";      //(Friend Request)
+    private final String POST_LIKED_NOTIFICATION_TYPE = "PL";          //(Post Liked)
+    private final String POST_COMMENTED_NOTIFICATION_TYPE = "PC";      //(Post Commented)
+    private final String LIST_RECOMMENDED_NOTIFICATION_TYPE = "CR";    //(List recommendation)
+    private final String LIST_SUBSCRIBED_NOTIFICATION_TYPE = "CS";     //(subscribed to list)
     private final String MOVIE_RECOMMENDED_NOTIFICATION_TYPE = "MR";   //(Movie recommendation)
 
 

@@ -31,6 +31,7 @@ public class UserProfileViewModel extends ViewModel {
         HIS_FOLLOW_REQUEST_IS_PENDING,
         HIS_FOLLOW_REQUEST_IS_NOT_PENDING,
         HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED,
+        HIS_FOLLOW_REQUEST_HAS_BEEN_DECLINED,
         HE_FOLLOWS_ME,
         HE_DOESNT_FOLLOW_ME,
         FAILED,
@@ -96,7 +97,7 @@ public class UserProfileViewModel extends ViewModel {
         t_1.start();
     }
 
-    private Runnable createCheckIfollowHimTask(String senderUsername, String receiverUsername, String token) {
+    private Runnable createCheckIfollowHimTask(String myUsername, String hisUsername, String token) {
         return ()-> {
             Response response = null;
 
@@ -111,8 +112,8 @@ public class UserProfileViewModel extends ViewModel {
                         .build();
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("sender_username", senderUsername)
-                        .add("receiver_username", receiverUsername)
+                        .add("his_username", hisUsername)
+                        .add("my_username", myUsername)
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
@@ -262,7 +263,7 @@ public class UserProfileViewModel extends ViewModel {
         t.start();
     }
 
-    private Runnable createcheckHeFollowMeTask(String senderUsername, String receiverUsername, String token) {
+    private Runnable createcheckHeFollowMeTask(String myUsername, String hisUsername, String token) {
         return ()-> {
             Response response = null;
 
@@ -277,8 +278,8 @@ public class UserProfileViewModel extends ViewModel {
                         .build();
                 final OkHttpClient httpClient = OkHttpSingleton.getClient();
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("sender_username", senderUsername)
-                        .add("receiver_username", receiverUsername)
+                        .add("his_username", hisUsername)
+                        .add("my_username", myUsername)
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
@@ -499,15 +500,61 @@ public class UserProfileViewModel extends ViewModel {
     }// end createAcceptFollowRequestTask()
 
 
-
-
-    private HttpUrl buildHttpUrl(String dbFunctionName) {
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunctionName)
-                .build();
+    public void declineFollowRequest(String senderUsername, String receiverUsername, String token) {
+        Runnable task = createDeclineFollowRequestTask(senderUsername, receiverUsername, token);
+        Thread t = new Thread(task);
+        t.start();
     }
+
+    private Runnable createDeclineFollowRequestTask(String senderUsername, String receiverUsername, String token) {
+        return ()-> {
+            Response response = null;
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_delete_follow_request";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("sender_username", senderUsername)
+                        .add("receiver_username", receiverUsername)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if (responseData.equals("true") || responseData.equals("false")) {
+                        boolean operationSuccessful = Boolean.parseBoolean(responseData);
+
+                        if(operationSuccessful)
+                            setHisSendFollowStatus(FollowStatus.HIS_FOLLOW_REQUEST_HAS_BEEN_DECLINED);
+                        else
+                            setHisSendFollowStatus(FollowStatus.FAILED);
+                    }
+                    // if response contains no data
+                    else setHisSendFollowStatus(FollowStatus.FAILED);
+                }
+                // if response is unsuccessful
+                else setHisSendFollowStatus(FollowStatus.FAILED);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setHisSendFollowStatus(FollowStatus.FAILED);
+            }  finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        };
+    }// end createAcceptFollowRequestTask()
+
+
+
+
 
 }// end UserProfileViewModel class

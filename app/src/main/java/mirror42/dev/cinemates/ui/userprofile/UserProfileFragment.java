@@ -36,11 +36,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private ImageView imageViewProfilePicture;
     private TextView textViewfullName;
     private TextView textViewusername;
-    private TextView textViewMessage;
-    private Button buttonFollow;
+    private TextView followStatusMessage;
+    private Button buttonSendFollow;
     private Button buttonAcceptFollow;
+    private Button buttonDeclineFollow;
     private User profileOwner;
     private NotificationsViewModel notificationsViewModel;
+    private View followRequestPrompt;
 
 
 
@@ -58,14 +60,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         imageViewProfilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
         textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
-        textViewMessage = view.findViewById(R.id.textView_userProfileFragment_message);
+        followStatusMessage = view.findViewById(R.id.textView_userProfileFragment_message);
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
-        buttonFollow = view.findViewById(R.id.button_userProfileFragment_follow);
-        buttonAcceptFollow = view.findViewById(R.id.button_userProfileFragment_acceptRequest);
+        buttonSendFollow = view.findViewById(R.id.button_userProfileFragment_follow);
+        buttonAcceptFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_accept);
+        buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
+        followRequestPrompt = view.findViewById(R.id.include_userProfileFragment_requestPrompt);
 
-        buttonFollow.setOnClickListener(this);
+        buttonSendFollow.setOnClickListener(this);
         buttonAcceptFollow.setOnClickListener(this);
+        buttonDeclineFollow.setOnClickListener(this);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
@@ -97,12 +102,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             userProfileViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
                 switch (followStatus) {
                     case I_FOLLOW_HIM: {
-                        buttonFollow.setVisibility(View.GONE);
+                        buttonSendFollow.setVisibility(View.GONE);
                         showCenteredToast("sei un suo follower");
                     }
                         break;
                     case I_DONT_FOLLOW_HIM: {
-                        buttonFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setVisibility(View.VISIBLE);
                         showCenteredToast("NON sei un suo follower");
 
 
@@ -115,19 +120,19 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     }
                         break;
                     case MY_FOLLOW_REQUEST_IS_PENDING: {
-                        buttonFollow.setVisibility(View.VISIBLE);
-                        buttonFollow.setEnabled(false);
-                        buttonFollow.setText("Richiesta inviata");
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setEnabled(false);
+                        buttonSendFollow.setText("Richiesta inviata");
                     }
                     break;
                     case MY_FOLLOW_REQUEST_IS_NOT_PENDING: {
-                        buttonFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setVisibility(View.VISIBLE);
                     }
                     break;
                     case REQUEST_SENT_SUCCESSFULLY: {
-                        buttonFollow.setVisibility(View.VISIBLE);
-                        buttonFollow.setEnabled(false);
-                        buttonFollow.setText("Richiesta inviata");
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setEnabled(false);
+                        buttonSendFollow.setText("Richiesta inviata");
                         showCenteredToast("richiesta inviata");
 
 
@@ -146,11 +151,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             userProfileViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
                 switch (followStatus) {
                     case HE_FOLLOWS_ME: {
-                        textViewMessage.setVisibility(View.VISIBLE);
+                        followStatusMessage.setVisibility(View.VISIBLE);
                     }
                     break;
                     case HE_DOESNT_FOLLOW_ME: {
-                        textViewMessage.setVisibility(View.GONE);
+                        followStatusMessage.setVisibility(View.GONE);
 
                         userProfileViewModel.checkHisFollowIsPending(
                                 profileOwner.getUsername(),
@@ -159,12 +164,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     }
                     break;
                     case HIS_FOLLOW_REQUEST_IS_PENDING: {
-                        buttonAcceptFollow.setVisibility(View.VISIBLE);
-                        textViewMessage.setVisibility(View.GONE);
+                        showFollowRequestPrompt();
+                        followStatusMessage.setVisibility(View.GONE);
                     }
                     break;
                     case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
-                        buttonAcceptFollow.setVisibility(View.GONE);
+                        hideFollowRequestPrompt();
                     }
                     break;
                     case FAILED: {
@@ -185,13 +190,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         super.onResume();
         if(currentUserIsLogged()) {
             userProfileViewModel.checkIfollowHim(
-                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     profileOwner.getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
             userProfileViewModel.checkHeFollowsMe(
-                    profileOwner.getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                    profileOwner.getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
 
         }
@@ -199,13 +204,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == buttonFollow.getId()) {
+        if(v.getId() == buttonSendFollow.getId()) {
             userProfileViewModel.getMySendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case REQUEST_SENT_SUCCESSFULLY: {
-                        buttonFollow.setVisibility(View.VISIBLE);
-                        buttonFollow.setEnabled(false);
-                        buttonFollow.setText("Richiesta inviata");
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setEnabled(false);
+                        buttonSendFollow.setText("Richiesta inviata");
                         showCenteredToast("richiesta inviata");
 
 
@@ -230,9 +235,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED: {
-                        buttonAcceptFollow.setVisibility(View.GONE);
+                        hideFollowRequestPrompt();
                         showCenteredToast("richiesta accettata");
-                        textViewMessage.setVisibility(View.VISIBLE);
+                        followStatusMessage.setVisibility(View.VISIBLE);
                     }
                     break;
                     case FAILED: {
@@ -249,6 +254,28 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                     loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
         }
+        else if(v.getId() == buttonDeclineFollow.getId()) {
+            userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+                switch (taskStatus) {
+                    case HIS_FOLLOW_REQUEST_HAS_BEEN_DECLINED: {
+                        showCenteredToast("richiesta rifiutata");
+                        hideFollowRequestPrompt();
+                    }
+                    break;
+                    case FAILED: {
+                        showCenteredToast("operazione annullata");
+                    }
+                    break;
+                    default:
+                }
+            });
+
+            userProfileViewModel.declineFollowRequest(
+                    profileOwner.getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+        }
+
     }
 
     @Override
@@ -257,7 +284,19 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         checkForNewNotifications();
     }
 
+
+
+
     //-------------------------------------------------------------------------- MY METHODS
+
+    private void showFollowRequestPrompt() {
+        followRequestPrompt.setVisibility(View.VISIBLE);
+    }
+
+    private void hideFollowRequestPrompt() {
+        followRequestPrompt.setVisibility(View.GONE);
+    }
+
 
     private boolean currentUserIsLogged() {
         return loginViewModel != null && (( loginViewModel.getObservableLoginResult().getValue() == LoginViewModel.LoginResult.SUCCESS) ||
