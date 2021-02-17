@@ -239,6 +239,7 @@ public class MyUtilities {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("Username", user.getUsername());
+            jsonObject.put("Password", user.getPassword());
             jsonObject.put("Email", user.getEmail());
             jsonObject.put("Name", user.getFirstName());
             jsonObject.put("LastName", user.getLastName());
