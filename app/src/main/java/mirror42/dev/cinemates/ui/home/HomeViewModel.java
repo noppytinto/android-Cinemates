@@ -67,10 +67,10 @@ public class HomeViewModel extends ViewModel {
 
     public HomeViewModel() {
         postsList = new MutableLiveData<>();
-        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         postsSubscription = new SerialDisposable();
         taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
+        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
 
 

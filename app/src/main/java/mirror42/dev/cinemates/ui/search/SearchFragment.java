@@ -299,21 +299,9 @@ public class SearchFragment extends Fragment implements
     @Override
     public void onUserSearchResultClicked(int position, View v) {
         UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position);
-//        TextView textViewUsername = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.textView_userListItem_username);
-//        String username = textViewUsername.getText().toString();
-
-        String username = itemSelected.getUsername();
-        String firstName = itemSelected.getFirstName();
-        String lastName = itemSelected.getLastName();
-        String profilePictureUrl = itemSelected.getProfilePictureUrl();
-        User user = new User();
-        user.setUsername(username);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setProfilePictureURL(profilePictureUrl);
 
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
-                NavGraphDirections.actionGlobalUserProfileFragment(user);
+                NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getUsername());
         NavHostFragment.findNavController(SearchFragment.this).navigate(userProfileFragment);
     }
 

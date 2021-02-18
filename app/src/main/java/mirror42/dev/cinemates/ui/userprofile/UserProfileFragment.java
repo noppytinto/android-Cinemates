@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
@@ -46,6 +47,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private NotificationsViewModel notificationsViewModel;
     private View followRequestPrompt;
     private Button buttonCustomLists;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -64,6 +66,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
         followStatusMessage = view.findViewById(R.id.textView_userProfileFragment_message);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_userProfileFragment);
+
         notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
 
         buttonSendFollow = view.findViewById(R.id.button_userProfileFragment_follow);
@@ -76,58 +80,71 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonAcceptFollow.setOnClickListener(this);
         buttonDeclineFollow.setOnClickListener(this);
         buttonCustomLists.setOnClickListener(this);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
-            User user = args.getUserArgument();
+            String username = args.getUsername();
 
-            if(user!=null) {
-                profileOwner = user;
-                String profilePictureUrl = user.getProfilePicturePath();
-                try {
-                    Glide.with(requireContext())
-                            .load(profilePictureUrl)
-                            .fallback(R.drawable.icon_user_dark_blue)
-                            .placeholder(R.drawable.icon_user_dark_blue)
-                            .circleCrop()
-                            .into(imageViewProfilePicture);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                textViewfullName.setText(user.getFullName());
-                textViewusername.setText("@" + user.getUsername());
+            if(username!=null || username.isEmpty()) {
+                fetchUserProfileData(username);
             }
         }
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+    private void fetchUserProfileData(String username) {
+        userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
+        userProfileViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    profileOwner = userProfileViewModel.getObservableFetchedUser().getValue();
+                    String profilePictureUrl = profileOwner.getProfilePicturePath();
+                    try {
+                        Glide.with(requireContext())
+                                .load(profilePictureUrl)
+                                .fallback(R.drawable.icon_user_dark_blue)
+                                .placeholder(R.drawable.icon_user_dark_blue)
+                                .circleCrop()
+                                .into(imageViewProfilePicture);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
+                    textViewfullName.setText(profileOwner.getFullName());
+                    textViewusername.setText("@" + profileOwner.getUsername());
+
+                    startCheckOperations();
+                }
+                    break;
+                case FAILED:
+                    break;
+            }
+        });
+        userProfileViewModel.fetchUserProfileData(username, loginViewModel.getLoggedUser());
+    }// fetchUserProfileData()
+
+    private void startCheckOperations() {
         if (currentUserIsLogged()) {
-            userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
+            enableSwipeDownToRefresh();
+
             userProfileViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
                 switch (followStatus) {
                     case I_FOLLOW_HIM: {
                         buttonSendFollow.setVisibility(View.GONE);
-                        showCenteredToast("sei un suo follower");
+//                        showCenteredToast("sei un suo follower");
                     }
-                        break;
+                    break;
                     case I_DONT_FOLLOW_HIM: {
                         buttonSendFollow.setVisibility(View.VISIBLE);
                         showCenteredToast("NON sei un suo follower");
-
 
                         //
                         userProfileViewModel.checkMyFollowIsPending(
                                 loginViewModel.getObservableLoggedUser().getValue().getUsername(),
                                 profileOwner.getUsername(),
                                 loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-
                     }
-                        break;
+                    break;
                     case MY_FOLLOW_REQUEST_IS_PENDING: {
                         buttonSendFollow.setVisibility(View.VISIBLE);
                         buttonSendFollow.setEnabled(false);
@@ -143,14 +160,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         buttonSendFollow.setEnabled(false);
                         buttonSendFollow.setText("Richiesta inviata");
                         showCenteredToast("richiesta inviata");
-
-
-//                            sendFollowNotification("test");
                     }
                     break;
                     case FAILED: {
                         showCenteredToast("operazione annullata");
-
                     }
                     break;
                     default:
@@ -190,26 +203,31 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
                 }
             });
-
+            checkFollowStatus();
         }
+    }// end startCheckOperations()
+
+    private void checkIFollowHim() {
+        userProfileViewModel.checkIfollowHim(
+                profileOwner.getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void checkHeFollowsMe() {
+        userProfileViewModel.checkHeFollowsMe(
+                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                profileOwner.getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+    }
+
+    private void checkFollowStatus() {
         if(currentUserIsLogged()) {
-            userProfileViewModel.checkIfollowHim(
-                    profileOwner.getUsername(),
-                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-
-            userProfileViewModel.checkHeFollowsMe(
-                    loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                    profileOwner.getUsername(),
-                    loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-
+            checkIFollowHim();
+            checkHeFollowsMe();
         }
     }
+
 
     @Override
     public void onClick(View v) {
@@ -301,6 +319,23 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         checkForNewNotifications();
     }
 
+
+    private void enableSwipeDownToRefresh() {
+        /*
+         * Sets up a SwipeRefreshLayout.OnRefreshListener that is invoked when the user
+         * performs a swipe-to-refresh gesture.
+         */
+        swipeRefreshLayout.setOnRefreshListener( () -> {
+            // This method performs the actual data-refresh operation.
+            // The method calls setRefreshing(false) when it's finished.
+            if(currentUserIsLogged()) {
+                checkFollowStatus();
+            }
+
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), "Refresh completato.", Toast.LENGTH_SHORT).show();
+        });
+    }
 
 
 

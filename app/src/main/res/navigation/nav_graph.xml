@@ -118,12 +118,12 @@
         android:name="mirror42.dev.cinemates.ui.userprofile.UserProfileFragment"
         android:label="Profilo utente"
         tools:layout="@layout/fragment_user_profile" >
-        <argument
-            android:name="user_argument"
-            app:argType="mirror42.dev.cinemates.model.User" />
         <action
             android:id="@+id/action_userProfileFragment_to_customListBrowserFragment"
             app:destination="@id/customListBrowserFragment" />
+        <argument
+            android:name="username"
+            app:argType="string" />
     </fragment>
     <action
         android:id="@+id/action_global_userProfileFragment"

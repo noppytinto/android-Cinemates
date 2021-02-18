@@ -141,7 +141,7 @@ public class NotificationsFragment extends Fragment implements
         if(user==null) return;
 
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
-                NavGraphDirections.actionGlobalUserProfileFragment(user);
+                NavGraphDirections.actionGlobalUserProfileFragment(user.getUsername());
         navigateTo(userProfileDirection, true);
     }
 
@@ -234,10 +234,10 @@ public class NotificationsFragment extends Fragment implements
         // delete from remote DB
         notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
 
-        //TODO
-//        NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
-//                NavGraphDirections.actionGlobalUserProfileFragment(user);
-//        navigateTo(userProfileDirection, true);
+        //
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
+                NavGraphDirections.actionGlobalUserProfileFragment(currentNotification.getSender().getUsername());
+        navigateTo(userProfileDirection, true);
     }
 
     private void loadNotifications(User loggedUser) {

@@ -404,6 +404,10 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         }
     }
 
+    public void setToolbarTitle(String value) {
+        toolbar.setTitle(value);
+    }
+
 
 
 }// end MainActivity class

@@ -22,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterCustomLists;
@@ -89,12 +90,14 @@ public class CustomListBrowserFragment extends Fragment
             break;
             case "fetch_subscribed_lists": {
                 areNotMyLists = true;
+                ((MainActivity)requireActivity()).setToolbarTitle("Liste che seguo");
                 initRecycleView(view, areNotMyLists);
                 initForFetchModeSubscribedLists();
             }
             break;
             case "fetch_public_lists": {
                 areNotMyLists = true;
+                ((MainActivity)requireActivity()).setToolbarTitle("Liste di: @" + profileOwnerUsername);
                 initRecycleView(view, areNotMyLists);
                 initForFetchModePublicLists(profileOwnerUsername);
             }

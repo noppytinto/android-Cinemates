@@ -1,18 +1,31 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
+import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 
 public class UserProfileViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -21,6 +34,9 @@ public class UserProfileViewModel extends ViewModel {
     private MutableLiveData<FollowStatus> mySendFollowStatus;
     private MutableLiveData<FollowStatus> hisSendFollowStatus;
     private RemoteConfigServer remoteConfigServer;
+    private MutableLiveData<TaskStatus> taskStatus;
+    private MutableLiveData<FetchStatus> fetchStatus;
+    private MutableLiveData<User> fetchedUser;
 
     public enum FollowStatus {
         I_FOLLOW_HIM,
@@ -48,6 +64,10 @@ public class UserProfileViewModel extends ViewModel {
         mySendFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
         hisSendFollowStatus = new MutableLiveData<>(FollowStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
+        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+        fetchedUser = new MutableLiveData<>();
+
     }
 
 
@@ -85,9 +105,122 @@ public class UserProfileViewModel extends ViewModel {
         this.hisSendFollowStatus.postValue(followStatus);
     }
 
+    public LiveData<FetchStatus> getFetchStatus() {
+        return fetchStatus;
+    }
+
+    public void setFetchStatus(FetchStatus fetchStatus) {
+        this.fetchStatus.postValue(fetchStatus);
+    }
+
+    public LiveData<TaskStatus> getObservableTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus.postValue(taskStatus);
+    }
+
+    public LiveData<User> getObservableFetchedUser() {
+        return fetchedUser;
+    }
+
+    public void setFetchedUser(User user) {
+        this.fetchedUser.postValue(user);
+    }
+
+
 
 
     //-------------------------------------------------------------------------- METHODS
+
+
+    // fetch user profile data
+    public void fetchUserProfileData(String username, User loggedUser) {
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_select_user_profile_details";
+            //
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_username", username)
+                    .add("requester_email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.d(TAG, "onFailure: ");
+                    setFetchStatus(FetchStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            // if response is true
+                            if ( ! responseData.equals("null")) {
+                                JSONObject jsonObject = new JSONObject(responseData);
+                                User user = buildUser(jsonObject);
+                                setFetchedUser(user);
+                                setFetchStatus(FetchStatus.SUCCESS);
+                            }
+                            else {
+                                setFetchStatus(FetchStatus.NOT_EXISTS);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setFetchStatus(FetchStatus.FAILED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setFetchStatus(FetchStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setFetchStatus(FetchStatus.FAILED);
+        }
+    }
+
+
+    private User buildUser(JSONObject jsonObject) throws JSONException {
+        User user = new User();
+        user.setUsername(jsonObject.getString("Username"));
+        user.setFirstName(jsonObject.getString("Name"));
+        user.setLastName(jsonObject.getString("LastName"));
+        user.setBirthDate(jsonObject.getString("BirthDate"));
+        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        return user;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // I follow him status
 
