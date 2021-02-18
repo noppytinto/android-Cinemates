@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,17 +38,18 @@ import mirror42.dev.cinemates.ui.post.PostFragmentDirections;
 import mirror42.dev.cinemates.ui.search.SearchFragmentDirections;
 
 public class HomeFragment extends Fragment implements
-        RecyclerAdapterPost.ReactionsClickAdapterListener{
+        RecyclerAdapterPost.ReactionsClickAdapterListener, View.OnClickListener {
     private final String TAG = this.getClass().getSimpleName();
     private HomeViewModel homeViewModel;
     private RecyclerAdapterPost recyclerAdapterPost;
     private View view;
     private LoginViewModel loginViewModel;
-    private Button buttonUpdateFeed;
+    private Button updateFeedButton;
     private RecyclerView recyclerView;
     private NotificationsViewModel notificationsViewModel;
     private CircularProgressIndicator progressIndicator;
     private View welcomeMessage;
+    private Button signUpButton;
 
 
 
@@ -62,9 +64,12 @@ public class HomeFragment extends Fragment implements
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
+        updateFeedButton = view.findViewById(R.id.button_homeFragment_updateFeed);
         progressIndicator = view.findViewById(R.id.progressIndicator_homeFragment);
         welcomeMessage = view.findViewById(R.id.include_homeFragment);
+        signUpButton = view.findViewById(R.id.include_homeFragment).findViewById(R.id.button_homeMessagePost_signUp);
+        signUpButton.setOnClickListener(this);
+        updateFeedButton.setOnClickListener(this);
 
         initRecyclerView();
 
@@ -107,7 +112,7 @@ public class HomeFragment extends Fragment implements
                 }
                 break;
                 case LOGGED_OUT:
-                    buttonUpdateFeed.setVisibility(View.GONE);
+                    updateFeedButton.setVisibility(View.GONE);
                     recyclerAdapterPost.clearList();
                     hideProgressIndicator();
                     welcomeMessage.setVisibility(View.VISIBLE);
@@ -115,21 +120,12 @@ public class HomeFragment extends Fragment implements
                 case FAILED:
                     break;
                 default:
-                    buttonUpdateFeed.setVisibility(View.GONE);
+                    updateFeedButton.setVisibility(View.GONE);
                     welcomeMessage.setVisibility(View.VISIBLE);
                     hideProgressIndicator();
             }
         });
 
-        buttonUpdateFeed.setOnClickListener(v -> {
-            // ignore v
-            showProgressIndicator();
-            recyclerAdapterPost.clearList();
-
-            User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-            homeViewModel.fetchPosts(loggedUser);
-            checkForNewNotifications(loggedUser);
-        });
 
     }// end onActivityCreated()
 
@@ -139,7 +135,7 @@ public class HomeFragment extends Fragment implements
     //------------------------------------------------------------------------------- METHODS
 
     private void fetchPosts() {
-        buttonUpdateFeed.setVisibility(View.VISIBLE);
+        updateFeedButton.setVisibility(View.VISIBLE);
         User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
         progressIndicator.setVisibility(View.VISIBLE);
         homeViewModel.fetchPosts(loggedUser);
@@ -312,6 +308,22 @@ public class HomeFragment extends Fragment implements
 
     private void hideProgressIndicator() {
         progressIndicator.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == signUpButton.getId()) {
+            Navigation.findNavController(v).navigate(R.id.action_main_fragment_to_signUpFragment);
+        }
+        else if(v.getId() == updateFeedButton.getId()) {
+            // ignore v
+            showProgressIndicator();
+            recyclerAdapterPost.clearList();
+
+            User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
+            homeViewModel.fetchPosts(loggedUser);
+            checkForNewNotifications(loggedUser);
+        }
     }
 
 }// end HomeFragment class

@@ -206,22 +206,6 @@ public class LoginFragment extends Fragment  implements
         else if (v.getId() == buttonSignUp.getId()) {
 
             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
-
-//            // Choose authentication providers
-//            List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                    new AuthUI.IdpConfig.EmailBuilder().build(),
-//                    new AuthUI.IdpConfig.GoogleBuilder().build());
-//
-//            int RC_SIGN_IN = 99;
-//            // Create and launch sign-in intent
-//            startActivityForResult(
-//                    AuthUI.getInstance()
-//                            .createSignInIntentBuilder()
-//                            .setAvailableProviders(providers)
-//                            .build(),
-//                    RC_SIGN_IN);
-
-
         }
         else if(v.getId() == textViewResetPassword.getId()){
             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_resetPasswordFragment);
