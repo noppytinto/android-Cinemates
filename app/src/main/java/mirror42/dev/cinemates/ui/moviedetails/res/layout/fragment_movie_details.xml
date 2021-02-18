@@ -330,31 +330,13 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="40dp"
                 android:backgroundTint="@color/darkSemiTransparent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView_movieDetailsFragment_castNcrewLabel" />
-
-            <TextView
-                android:id="@+id/textView_movieDetailsFragment_reviewsLabel"
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="32dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/poppins_bold"
-                android:maxLines="3"
-                android:text="@string/reviews"
-                android:textColor="@color/white"
-                android:textSize="@dimen/cast_crew_movie_details_page"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerview_movieDetailsFragment_cast" />
+                app:layout_constraintTop_toBottomOf="@+id/textView_movieDetailsFragment_castNcrewLabel"
+                app:layout_constraintVertical_bias="0.0" />
 
             <!--            app:layout_anchor="@id/imageView_backdrop_movieDetails"-->
             <!--            app:layout_anchorGravity="bottom|end|right"-->

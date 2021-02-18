@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_insetEdge="none"
     tools:context=".ui.login.LoginFragment">
 
 
@@ -19,16 +20,22 @@
 
     <Button
         android:id="@+id/button_loginFragment_signUp"
-        style="@style/Cinemates.Button.Rounded.Outlined"
-        android:layout_width="161dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="32dp"
+        style="@style/Cinemates.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:layout_margin="0dp"
+        android:backgroundTint="@color/light_blue"
         android:text="@string/login_page_sign_up"
+        android:textColor="@color/dark_blue"
         android:textSize="18sp"
-        app:cornerRadius="10dp"
+        app:cornerRadius="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHeight_min="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_min="0dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_loginFragment_email"
@@ -85,13 +92,11 @@
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="159dp"
         android:layout_height="60dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/login_page_login"
-        app:layout_constraintBottom_toTopOf="@+id/button_loginFragment_signUp"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe"
-        app:layout_constraintVertical_bias="0.555" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
 
     <CheckBox
         android:id="@+id/checkBox_loginFragment_rememberMe"
