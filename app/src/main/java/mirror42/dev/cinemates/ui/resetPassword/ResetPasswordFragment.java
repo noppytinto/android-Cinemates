@@ -3,6 +3,8 @@ package mirror42.dev.cinemates.ui.resetPassword;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +34,11 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
     private ResetPasswordViewModel resetPasswordViewModel;
     private FirebaseAnalytics firebaseAnalytics;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +73,13 @@ public class ResetPasswordFragment extends Fragment implements View.OnClickListe
             if(checkAllFieldsAreFilled() && isVaildMail( email))
                 resetPasswordViewModel.resetPassword(email);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem userIcon = menu.getItem(1);
+        userIcon.setVisible(false);
     }
 
 

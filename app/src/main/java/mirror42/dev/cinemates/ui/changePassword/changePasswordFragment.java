@@ -11,6 +11,8 @@ import androidx.navigation.Navigation;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -53,6 +55,21 @@ public class changePasswordFragment extends Fragment implements
     private FirebaseAnalytics firebaseAnalytics;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem userIcon = menu.getItem(1);
+        MenuItem notifyIcon = menu.getItem(0);
+        userIcon.setVisible(false);
+        notifyIcon.setVisible(false);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -90,7 +107,7 @@ public class changePasswordFragment extends Fragment implements
     public void onClick(View v) {
         if(v.getId() == changePassword.getId()){
 
-            if(checkAllFieldsAreFilled() && checkActualPasswordMatch() && checkRepeatPasswordMatch()){
+            if(checkAllFieldsAreFilled() && checkActualPasswordMatch() && checkNewPasswordLength() && checkRepeatPasswordMatch()){
                 String newPass =   editTextNewPassword.getText().toString();
                 changePasswordViewModel.changePassword(loginViewModel.getLoggedUser(), newPass);
             }else
@@ -157,6 +174,19 @@ public class changePasswordFragment extends Fragment implements
         }
         else {
             textInputLayoutRepPassword.setError(null);
+        }
+
+        return true;
+    }
+
+    private boolean  checkNewPasswordLength() {
+
+        if( editTextNewPassword.getText().toString().length()<6) {
+            textInputLayoutNewPassword.setError(getString(R.string.passwordHelper));
+            return false;
+        }
+        else {
+            textInputLayoutNewPassword.setError(null);
         }
 
         return true;

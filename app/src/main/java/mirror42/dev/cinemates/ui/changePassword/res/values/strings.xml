@@ -2,6 +2,8 @@
 <resources>
     <string name="change_password">Cambia password</string>
     <string name="change_password_newPassword">Nuova password</string>
+
+    <string name="passwordHelper">La password deve contenere  più di 5 caratteri</string>
     <string name="change_password_text">Salve, in questa pagina viene data l\'opportunità di cambiare la propria password</string>
 
     <!-- firebase -->

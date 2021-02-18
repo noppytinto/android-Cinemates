@@ -127,7 +127,7 @@
                 android:layout_marginEnd="32dp"
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle"
-                app:helperText="la password deve contenere almeno 5 caratteri"
+                app:helperText="@string/passwordHelper"
                 app:layout_constraintEnd_toEndOf="@+id/textInputLayout_signUpFragment_password"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/textInputLayout_signUpFragment_password"

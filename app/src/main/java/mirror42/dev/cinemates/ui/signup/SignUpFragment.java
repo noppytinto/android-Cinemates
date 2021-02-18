@@ -206,7 +206,7 @@ public class SignUpFragment extends Fragment implements
                     break;
                 case WEAK_PASSWORD:
                     showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5");
-                    textInputLayoutEmail.setError("la password deve contenere un numero di caratteri superiori a 5");
+                    textInputLayoutEmail.setError(getString(R.string.passwordHelper));
                     break;
                 case NO_POSTGRES_USER_COLLISION:
                     signUpViewModel.checkPendingUserCollision();
