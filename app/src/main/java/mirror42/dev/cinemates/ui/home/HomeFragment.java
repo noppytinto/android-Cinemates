@@ -47,6 +47,7 @@ public class HomeFragment extends Fragment implements
     private RecyclerView recyclerView;
     private NotificationsViewModel notificationsViewModel;
     private CircularProgressIndicator progressIndicator;
+    private View welcomeMessage;
 
 
 
@@ -63,6 +64,7 @@ public class HomeFragment extends Fragment implements
         this.view = view;
         buttonUpdateFeed = view.findViewById(R.id.button_homeFragment_updateFeed);
         progressIndicator = view.findViewById(R.id.progressIndicator_homeFragment);
+        welcomeMessage = view.findViewById(R.id.include_homeFragment);
 
         initRecyclerView();
 
@@ -101,17 +103,20 @@ public class HomeFragment extends Fragment implements
                     showProgressIndicator();
                     fetchPosts();
                     checkForNewNotifications(loggedUser);
+                    welcomeMessage.setVisibility(View.GONE);
                 }
                 break;
                 case LOGGED_OUT:
                     buttonUpdateFeed.setVisibility(View.GONE);
                     recyclerAdapterPost.clearList();
                     hideProgressIndicator();
+                    welcomeMessage.setVisibility(View.VISIBLE);
                     break;
                 case FAILED:
                     break;
                 default:
                     buttonUpdateFeed.setVisibility(View.GONE);
+                    welcomeMessage.setVisibility(View.VISIBLE);
                     hideProgressIndicator();
             }
         });

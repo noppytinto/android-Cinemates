@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.list;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -140,13 +141,13 @@ public class ListFragment extends Fragment implements
             listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case SUBSCRIBED:
-                        Toast.makeText(requireContext(), "iscritto con successo!", Toast.LENGTH_SHORT).show();
+                        showCenteredToast("iscritto con successo!");
                         hideSubscribeButton();
                         showUnubscribeButton();
                     break;
                     case FAILED_SUBSCRIPTION:
-                        Toast.makeText(requireContext(), "errore iscrizione!", Toast.LENGTH_SHORT).show();
-                    break;
+                        showCenteredToast("errore iscrizione!");
+                        break;
                 }
             });
 
@@ -156,12 +157,12 @@ public class ListFragment extends Fragment implements
             listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case UNSUBSCRIBED:
-                        Toast.makeText(requireContext(), "iscrizione cancellata!", Toast.LENGTH_SHORT).show();
+                        showCenteredToast("iscrizione cancellata!");
                         showSubscribeButton();
                         hideUnsubscribeButton();
                         break;
                     case FAILED_UNSUBSCRIPTION:
-                        Toast.makeText(requireContext(), "errore cancellazione iscrizione!", Toast.LENGTH_SHORT).show();
+                        showCenteredToast("errore cancellazione iscrizione!");
                         break;
                 }
             });
@@ -243,7 +244,7 @@ public class ListFragment extends Fragment implements
                 listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                     switch (taskStatus) {
                         case ALREADY_SUBSCRIBED:
-                            Toast.makeText(requireContext(), "sei iscritto a questa lista!", Toast.LENGTH_SHORT).show();
+                            showCenteredToast("sei iscritto a questa lista!");
                             hideSubscribeButton();
                             showUnubscribeButton();
                             break;
@@ -252,7 +253,7 @@ public class ListFragment extends Fragment implements
                             hideUnsubscribeButton();
                             break;
                         case SUBSCRIPTION_CHECK_FAILED:
-                            Toast.makeText(requireContext(), "errore controllo iscrizione!", Toast.LENGTH_SHORT).show();
+                            showCenteredToast("errore controllo iscrizione!");
                             break;
                     }
                 });
@@ -427,7 +428,7 @@ public class ListFragment extends Fragment implements
                 actionMode.finish();
             }
             else {
-                actionMode.setTitle("selezionati: " + String.valueOf(count));
+                actionMode.setTitle("selezionati: " + count);
                 actionMode.invalidate();
             }
         } catch (Exception e) {
@@ -489,6 +490,12 @@ public class ListFragment extends Fragment implements
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 }// end ListFragment class
