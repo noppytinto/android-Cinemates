@@ -30,7 +30,6 @@ import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
 import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
-import mirror42.dev.cinemates.ui.list.CustomListBrowserViewModel;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 
 public class NotificationsFragment extends Fragment implements
@@ -41,7 +40,6 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
-    private CustomListBrowserViewModel customListBrowserViewModel;
 
 
 

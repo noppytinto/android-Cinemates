@@ -56,8 +56,6 @@ public class NotificationsViewModel extends ViewModel {
     private MutableLiveData<FetchStatus> fetchStatus;
     private MutableLiveData<CustomList> customList;
 
-
-
     public enum NotificationsStatus {
         NOTIFICATIONS_FETCHED,
         GOT_NEW_NOTIFICATIONS,
@@ -72,8 +70,8 @@ public class NotificationsViewModel extends ViewModel {
     private final String POST_LIKED_NOTIFICATION_TYPE = "PL";          //(Post Liked)
     private final String POST_COMMENTED_NOTIFICATION_TYPE = "PC";      //(Post Commented)
     private final String LIST_RECOMMENDED_NOTIFICATION_TYPE = "CR";    //(List recommendation)
-    private final String SUBSCRIBED_TO_LIST_NOTIFICATION_TYPE = "CS";     //(subscribed to list)
-    private final String MOVIE_RECOMMENDED_NOTIFICATION_TYPE = "MR";   //(Movie recommendation)
+    private final String SUBSCRIBED_TO_LIST_NOTIFICATION_TYPE = "CS";  //(user subscribed to your list)
+    private final String MOVIE_RECOMMENDED_NOTIFICATION_TYPE = "MR";   //(user recommended a movie)
 
 
 
@@ -530,12 +528,12 @@ public class NotificationsViewModel extends ViewModel {
     public void fetchNotifications(User loggedUser, Context context) {
         if(loggedUser==null) return;
 
-        Observable<ArrayList<Notification>> observableNnotifications =
+        Observable<ArrayList<Notification>> observableNotifications =
                 getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        notificationsSubscription.set(observableNnotifications
+        notificationsSubscription.set(observableNotifications
                 .subscribe(notifications -> {
                     if(notifications != null && notifications.size()>0) {
                         saveOnLocalDatabase(notifications, context);

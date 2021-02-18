@@ -46,6 +46,16 @@ public class CommentsViewModel extends ViewModel {
         ALREADY_SUBSCRIBED,
         NOT_SUBSCRIBED,
         SUBSCRIPTION_CHECK_FAILED,
+        COMMENT_ADDED,
+        COMMENT_NOT_ADDED,
+        COMMENT_FAILED,
+        LIKE_ADDED,
+        LIKE_NOT_ADDED,
+        LIKE_ADDED_FAIL,
+        LIKE_FAILED,
+        LIKE_REMOVED,
+        LIKE_NOT_REMOVED,
+        LIKE_REMOVED_FAIL,
         IDLE
     }
 

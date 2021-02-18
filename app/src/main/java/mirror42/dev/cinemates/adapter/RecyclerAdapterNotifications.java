@@ -30,11 +30,11 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private OnNotificationClickedListener listener;
     private Context context;
 
-    private static final int FR = 1;
-    private static final int PC = 2;
-    private static final int PL = 3;
-    private static final int CR = 4;
-    private static final int CS = 5;
+    private static final int FR = 1; // follow request notification
+    private static final int PC = 2; // post commented
+    private static final int PL = 3; // post liked
+    private static final int CR = 4; // custom list recommendation
+    private static final int CS = 5; // user subscribed to your custom list
 
     public interface OnNotificationClickedListener {
         void onFollowRequestNotificationClicked(int position);

@@ -12,10 +12,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.SerialDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.CustomListCreatedPost;
@@ -27,6 +32,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchedPost;
 import mirror42.dev.cinemates.model.WatchlistPost;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -45,12 +51,16 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Post>> postsList;
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
-    private ArrayList<Post> watchlistPosts;
-    private ArrayList<Post> favoritesPosts;
-    private ArrayList<Post> watchedPosts;
-    private ArrayList<Post> customListCreatedPosts;
-    private ArrayList<Post> customListPosts;
-    private ArrayList<Post> followPosts;
+    private SerialDisposable postsSubscription;
+    private ArrayList<Post> followPosts; //TODO
+    private MutableLiveData<TaskStatus> taskStatus;
+
+    private final String WATCHLIST_POST_TYPE = "WL";
+    private final String WATCHED_LIST_POST_TYPE = "WD";
+    private final String FAVORITE_LIST_POST_TYPE = "FV";
+    private final String CUSTOM_LIST_CREATED_POST_TYPE = "CC";
+    private final String CUSTOM_LIST_POST_TYPE = "CL";
+    private final String FOLLOW_POST_TYPE = "FW";
 
 
     //-------------------------------------------------------------------------- CONSTRUCTORS
@@ -59,6 +69,8 @@ public class HomeViewModel extends ViewModel {
         postsList = new MutableLiveData<>();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        postsSubscription = new SerialDisposable();
+        taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
     }
 
 
@@ -83,6 +95,13 @@ public class HomeViewModel extends ViewModel {
         this.fetchStatus.postValue(fetchStatus);
     }
 
+    public LiveData<TaskStatus> getObservableTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus.postValue(taskStatus);
+    }
 
 
 
@@ -90,370 +109,387 @@ public class HomeViewModel extends ViewModel {
     //-------------------------------------------------------------------------- METHODS
 
     public void fetchPosts(User loggedUser) {
-        Runnable watchlistPostsTask = createFetchWatchlistPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_1 = new Thread(watchlistPostsTask);
-        t_1.start();
+        if(loggedUser==null) return;
 
-        try {
-            t_1.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Observable<ArrayList<Post>> observablePosts =
+                getObservablePosts(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread());
 
-        Runnable favoritesPostsTask = createFetchFavoritesPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_2 = new Thread(favoritesPostsTask);
-        t_2.start();
-
-        try {
-            t_2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Runnable customListCreatedPostsTask = createFetchCustomListCreatedPostTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_3 = new Thread(customListCreatedPostsTask);
-        t_3.start();
-
-        try {
-            t_3.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Runnable customListPostsTask = createFetchCustomListPostTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_4 = new Thread(customListPostsTask);
-        t_4.start();
-
-        try {
-            t_4.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Runnable watchedPostsTask = createFetchWatchedPostsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_end = new Thread(watchedPostsTask);
-        t_end.start();
+        postsSubscription.set(observablePosts
+                .subscribe(notifications -> {
+                    if(notifications != null && notifications.size()>0) {
+                        setPostsList(notifications);
+                        setFetchStatus(FetchStatus.SUCCESS);
+                    }
+                    else {
+                        setFetchStatus(FetchStatus.EMPTY);
+                    }
+                }));
     }
 
-    private Runnable createFetchWatchlistPostsTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                watchlistPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "WL")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // executing request
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-
-                    }
-
-                    String responseData = response.body().string();
-
-                    // if response contains valid data
-                    if ( ! responseData.equals("null")) {
-                        JSONArray jsonArray = new JSONArray(responseData);
-                        WatchlistPost watchlistPost;
-                        ArrayList<Post> postsList = new ArrayList<>();
-
-                        for(int i=0; i<jsonArray.length(); i++) {
-                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                            watchlistPost = buildWatchlistPost(jsonDBobj, email, token, loggedUsername);
-
-                            postsList.add(watchlistPost);
-                        }// for
-
-                        // once finished set result
-//                                    Collections.reverse(postsList);
-                        watchlistPosts.addAll(postsList);
-//                                    setFetchStatus(FetchStatus.SUCCESS);
-
-                    }
-                    // if response contains no data
-                    else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                    }
-
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchWatchlistPostTask()
-
-    private Runnable createFetchFavoritesPostsTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                favoritesPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "FV")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // executing request
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-                        //
-                    }
-
-                    String responseData = response.body().string();
-
-                    // if response contains valid data
-                    if ( ! responseData.equals("null")) {
-                        JSONArray jsonArray = new JSONArray(responseData);
-                        FavoritesPost favoritesPost;
-                        ArrayList<Post> postsList = new ArrayList<>();
-
-                        for(int i=0; i<jsonArray.length(); i++) {
-                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                            favoritesPost = buildFavoritesPost(jsonDBobj, email, token, loggedUsername);
-
-                            postsList.add(favoritesPost);
-                        }// for
-
-                        // once finished set result
-                        favoritesPosts.addAll(postsList);
-
-//                                    Collections.reverse(postsList);
-//                                    setPostsList(postsList);
-//                                    setFetchStatus(FetchStatus.SUCCESS);
-
-                    }
-                    // if response contains no data
-                    else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                    }
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchFavoritesPostTask()
-
-    private Runnable createFetchCustomListCreatedPostTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                customListCreatedPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "CC")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-
-
-                // calling
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (response.isSuccessful()) {
-                        String responseData = response.body().string();
-
-                        // if response contains valid data
-                        if ( ! responseData.equals("null")) {
-                            JSONArray jsonArray = new JSONArray(responseData);
-                            ArrayList<Post> postsList = new ArrayList<>();
-
-                            for(int i=0; i<jsonArray.length(); i++) {
-                                JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                CustomListCreatedPost customListCreatedPost = buildCustomListCreatedPost(jsonDBobj, email, token, loggedUsername);
-
-                                postsList.add(customListCreatedPost);
-                            }// for
-
-                            // once finished set result
-//                                    Collections.reverse(postsList);
-                            customListCreatedPosts.addAll(postsList);
-
-                        }
-                        // if response contains no data
-                        else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                        }
-                    } // if response is unsuccessful
-                    else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                    }
-
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchCustomListCreatedPostTask()
-
-    private Runnable createFetchCustomListPostTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                customListPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "CL")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-
-
-                // calling
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (response.isSuccessful()) {
-                        String responseData = response.body().string();
-
-                        // if response contains valid data
-                        if ( ! responseData.equals("null")) {
-                            JSONArray jsonArray = new JSONArray(responseData);
-                            ArrayList<Post> postsList = new ArrayList<>();
-
-                            for(int i=0; i<jsonArray.length(); i++) {
-                                JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                                CustomListPost customListPost = buildCustomListPost(jsonDBobj, email, token, loggedUsername);
-
-                                postsList.add(customListPost);
-                            }// for
-
-                            // once finished set result
-//                                    Collections.reverse(postsList);
-                            customListPosts.addAll(postsList);
-
-                        }
-                        // if response contains no data
-                        else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                        }
-                    } // if response is unsuccessful
-                    else {
-//                                setPostsList(null);
-//                                setFetchStatus(FetchStatus.FAILED);
-                    }
-
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchCustomListCreatedPostTask()
-
-    private Runnable createFetchWatchedPostsTask(String email, String token, String loggedUsername) {
-        return ()-> {
-            try {
-                watchedPosts = new ArrayList<>();
-
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_select_all_posts";
-                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("given_email", email)
-                        .add("post_type", "WD")
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
-
-                // executing request
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-                        //
-                    }
-
-                    String responseData = response.body().string();
-
-                    // if response contains valid data
-                    if ( ! responseData.equals("null")) {
-                        JSONArray jsonArray = new JSONArray(responseData);
-                        WatchedPost watchedPost;
-                        ArrayList<Post> postsList = new ArrayList<>();
-
-                        for(int i=0; i<jsonArray.length(); i++) {
-                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
-                            watchedPost = buildWatchedPost(jsonDBobj, email, token, loggedUsername);
-
-                            postsList.add(watchedPost);
-                        }// for
-
-                        // once finished set result
-//                                    Collections.reverse(postsList);
-                        watchedPosts.addAll(postsList);
-
-                        // combining and sort all posts
-                        ArrayList<Post> finalList = new ArrayList<>();
-                        finalList = combineAllPosts();
-                        finalList = sortPostsByDate(finalList);
-
-                        // publish result
-                        setPostsList(finalList);
-                        setFetchStatus(FetchStatus.SUCCESS);
-
-                    }
-                    // if response contains no data
-                    else {
-//                                    setPostsList(null);
-//                                    setFetchStatus(FetchStatus.NOT_EXISTS);
-                    }
-
-
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-//                setPostsList(null);
-//                setFetchStatus(FetchStatus.FAILED);
-            }
-        };
-    }// end createFetchWatchedPostTask()
 
     // todo: follow post
+
+    // rxjava
+    public Observable<ArrayList<Post>> getObservableWatchlistPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", WATCHLIST_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            WatchlistPost post = buildWatchlistPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no watchlist posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableWatchlistPosts()
+
+    public Observable<ArrayList<Post>> getObservableFavoriteListPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", FAVORITE_LIST_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            FavoritesPost post = buildFavoritesPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no favorite posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableFavoriteListPosts()
+
+    public Observable<ArrayList<Post>> getObservableCustomListCreatedPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", CUSTOM_LIST_CREATED_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            CustomListCreatedPost post = buildCustomListCreatedPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no custom list created posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableCustomListCreatedPosts()
+
+    public Observable<ArrayList<Post>> getObservableCustomListPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", CUSTOM_LIST_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            CustomListPost post = buildCustomListPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no custom list posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableCustomListPosts()
+
+    public Observable<ArrayList<Post>> getObservableWatchedListPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", WATCHED_LIST_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            WatchedPost post = buildWatchedPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no watched list posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableWatchedListPosts()
+
+    public Observable<ArrayList<Post>> getObservablePosts(String email, String token, String loggedUsername) {
+        Observable<ArrayList<Post>> observableWatchlistPosts =
+                getObservableWatchlistPosts(email, token, loggedUsername);
+
+        Observable<ArrayList<Post>> observableFavoriteListPosts =
+                getObservableFavoriteListPosts(email, token, loggedUsername);
+
+
+        Observable<ArrayList<Post>> observableCustomListCreatedPosts =
+                getObservableCustomListCreatedPosts(email, token, loggedUsername);
+
+        Observable<ArrayList<Post>> observableCustomListPosts =
+                getObservableCustomListPosts(email, token, loggedUsername);
+
+        Observable<ArrayList<Post>> observableWatchedListPosts =
+                getObservableWatchedListPosts(email, token, loggedUsername);
+
+        // TODO: follow posts
+
+        Observable<ArrayList<Post>> observableCombinedPosts =
+                Observable.combineLatest(
+                        observableWatchlistPosts.onErrorReturn(e -> new ArrayList<>()),         // if some error occurs during pipeline,
+                        observableFavoriteListPosts.onErrorReturn(e-> new ArrayList<>()),       // don't block the chain,
+                        observableCustomListCreatedPosts.onErrorReturn(e-> new ArrayList<>()),  // return an empty list instead
+                        observableCustomListPosts.onErrorReturn(e-> new ArrayList<>()),
+                        observableWatchedListPosts.onErrorReturn(e-> new ArrayList<>()),
+                        (watchlistPosts, favoriteListPosts, customListCreatedPosts, customListPosts, watchedListPosts) -> {
+                            final ArrayList<Post> combinedPosts = new ArrayList<>();
+                            combinedPosts.addAll(watchlistPosts);
+                            combinedPosts.addAll(favoriteListPosts);
+                            combinedPosts.addAll(customListCreatedPosts);
+                            combinedPosts.addAll(customListPosts);
+                            combinedPosts.addAll(watchedListPosts);
+                            return combinedPosts;
+                        }
+                );
+
+
+        Observable<ArrayList<Post>> observableSortedCombinedPosts =
+                observableCombinedPosts
+                        .map(this::sortPostsByDate);
+
+
+
+        return observableSortedCombinedPosts;
+    }
+
+    /**
+     * sorting in DESC order
+     * @param list
+     * @return
+     */
+    ArrayList<Post> sortPostsByDate(List<Post> list) {
+        ArrayList<Post> sortedList = new ArrayList<>(); // create a copy for immutability principle
+        sortedList.addAll(list);
+        Collections.sort(sortedList);
+        return sortedList;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -576,19 +612,6 @@ public class HomeViewModel extends ViewModel {
 //    }
 
 
-    public ArrayList<Post> combineAllPosts() {
-        ArrayList<Post> finalList = new ArrayList<>();
-        finalList.addAll(watchlistPosts);
-        finalList.addAll(favoritesPosts);
-        finalList.addAll(customListCreatedPosts);
-        finalList.addAll(customListPosts);
-        finalList.addAll(watchedPosts);
-
-        return finalList;
-    }
-
-
-
 
     private User buildOwner(JSONObject jsonObject) throws JSONException {
         User user = new User();
@@ -635,7 +658,7 @@ public class HomeViewModel extends ViewModel {
 
     //----------------- likes
 
-    private Post fetchLikes(Post watchlistPost, long postId, String email, String token, String loggedUsername) {
+    private Post fetchLikes(Post post, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_likes";
             // building db url
@@ -675,8 +698,8 @@ public class HomeViewModel extends ViewModel {
                             l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
                             likes.add(l);
                         }
-                        watchlistPost.setLikes(likes);
-                        watchlistPost.setIsLikedByMe(loggedUsername);
+                        post.setLikes(likes);
+                        post.setIsLikedByMe(loggedUsername);
                     }
                 }
             }catch (Exception e) {
@@ -686,136 +709,125 @@ public class HomeViewModel extends ViewModel {
             e.printStackTrace();
         }
 
-        return watchlistPost;
+        return post;
     }
 
     public void removeLike(long postId, String email, String token) {
-        Runnable task = createRemoveLikeTask(postId, email, token);
-        Thread t = new Thread(task);
-        t.start();
-    }
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_delete_reaction_like";
+            //
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postId))
+                    .add("email_reaction_owner", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-    private Runnable createRemoveLikeTask(long postId, String email, String token) {
-        return ()-> {
-            try {
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_delete_reaction_like";
-                //
-                HttpUrl httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("target_post_id", String.valueOf(postId))
-                        .add("email_reaction_owner", email)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.d(TAG, "onFailure: ");
+                    setTaskStatus(TaskStatus.LIKE_REMOVED_FAIL);
+                }
 
-                // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setFetchStatus(FetchStatus.FAILED);
-                    }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response is true
-                                if (responseData.equals("true")) {
-                                    setFetchStatus(FetchStatus.REFETCH);
-                                }
-
+                            // if response is true
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.LIKE_REMOVED);
                             }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                            else setTaskStatus(TaskStatus.LIKE_NOT_REMOVED);
+                        } else setTaskStatus(TaskStatus.LIKE_REMOVED_FAIL);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.LIKE_REMOVED_FAIL);
                     }
-                });
+                }
+            });
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.LIKE_REMOVED_FAIL);
+        }
     }
 
     public void addLike(long postId, String email, String token) {
-        Runnable task = creatAddLikeTask(postId, email, token);
-        Thread t = new Thread(task);
-        t.start();
-    }
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_add_reaction_like";
+            //
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_post_id", String.valueOf(postId))
+                    .add("email_reaction_owner", email)
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
 
-    private Runnable creatAddLikeTask(long postId, String email, String token) {
-        return ()-> {
-            try {
-                // build httpurl and request for remote db
-                final String dbFunction = "fn_add_reaction_like";
-                //
-                HttpUrl httpUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host(remoteConfigServer.getAzureHostName())
-                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-                        .addPathSegment(dbFunction)
-                        .build();
-                final OkHttpClient httpClient = OkHttpSingleton.getClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("target_post_id", String.valueOf(postId))
-                        .add("email_reaction_owner", email)
-                        .build();
-                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.d(TAG, "onFailure: ");
+                    setTaskStatus(TaskStatus.LIKE_ADDED_FAIL);
+                }
 
-                // performing request
-                Call call = httpClient.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        Log.d(TAG, "onFailure: ");
-                        setFetchStatus(FetchStatus.FAILED);
-                    }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        try {
-                            // check responses
-                            if (response.isSuccessful()) {
-                                String responseData = response.body().string();
-
-                                // if response is true
-                                if (responseData.equals("true")) {
-                                    setFetchStatus(FetchStatus.REFETCH);
-                                }
-                                else {
-                                }
-                            } // if response is unsuccessful
-                            else {
+                            // if response is true
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.LIKE_ADDED);
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            else {
+                                setTaskStatus(TaskStatus.LIKE_NOT_ADDED);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setTaskStatus(TaskStatus.LIKE_ADDED_FAIL);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.LIKE_ADDED_FAIL);
                     }
-                });
+                }
+            });
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.LIKE_ADDED_FAIL);
+        }
     }
 
 
 
     //----------------- comments
 
-    private Post fetchComments(Post watchlistPost, long postId, String email, String token, String loggedUsername) {
+    private Post fetchComments(Post post, long postId, String email, String token, String loggedUsername) {
         try {
             final String dbFunction = "fn_select_comments";
             // building db url
@@ -858,8 +870,8 @@ public class HomeViewModel extends ViewModel {
                             comments.add(cm);
                         }
                         Collections.reverse(comments);
-                        watchlistPost.setComments(comments);
-                        watchlistPost.setIsCommentedByMe(loggedUsername);
+                        post.setComments(comments);
+                        post.setIsCommentedByMe(loggedUsername);
                     }
                 }
             }catch (Exception e) {
@@ -869,14 +881,7 @@ public class HomeViewModel extends ViewModel {
             e.printStackTrace();
         }
 
-        return watchlistPost;
-    }
-
-    ArrayList<Post> sortPostsByDate(List<Post> list) {
-        // create a copy for immutability principle
-        ArrayList<Post> sortedList = new ArrayList<>(list);
-        Collections.sort(sortedList);
-        return sortedList;
+        return post;
     }
 
 }// end HomeViewModel class

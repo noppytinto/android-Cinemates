@@ -53,11 +53,6 @@ public class HomeFragment extends Fragment implements
     //------------------------------------------------------------------------------- ANDROID METHODS
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
@@ -87,15 +82,13 @@ public class HomeFragment extends Fragment implements
                     recyclerAdapterPost.loadNewData(postsList);
                 }
                 break;
-                case NOT_EXISTS:
+                case EMPTY:
                     hideProgressIndicator();
                     recyclerAdapterPost.loadNewData(null);
                     break;
                 case FAILED:
 //                    hideProgressIndicator();
                     break;
-                default:
-                    showProgressIndicator();
             }
         });
 
@@ -104,8 +97,10 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
+                    User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
                     showProgressIndicator();
                     fetchPosts();
+                    checkForNewNotifications(loggedUser);
                 }
                 break;
                 case LOGGED_OUT:
@@ -130,12 +125,8 @@ public class HomeFragment extends Fragment implements
             homeViewModel.fetchPosts(loggedUser);
             checkForNewNotifications(loggedUser);
         });
-    }// end onActivityCreated()
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+    }// end onActivityCreated()
 
 
 
@@ -147,15 +138,7 @@ public class HomeFragment extends Fragment implements
         User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
         progressIndicator.setVisibility(View.VISIBLE);
         homeViewModel.fetchPosts(loggedUser);
-//                    checkForNewNotifications(loggedUser);
-    }
 
-    private void showProgressIndicator() {
-        progressIndicator.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressIndicator() {
-        progressIndicator.setVisibility(View.GONE);
     }
 
     private void initRecyclerView() {
@@ -173,7 +156,7 @@ public class HomeFragment extends Fragment implements
 //        recyclerAdapterPost.updateLikeCounter(position);
         Post currentPost = recyclerAdapterPost.getPost(position);
         long postId = currentPost.getPostId();
-        String currentLoggedUserEmail = loginViewModel.getObservableLoggedUser().getValue().getEmail();
+        String currentLoggedUserEmail = loginViewModel.getLoggedUser().getEmail();
         TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_showLikes);
         Button likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
@@ -183,7 +166,7 @@ public class HomeFragment extends Fragment implements
             if(currentLikesCounter>0)
                 currentLikesCounter = currentLikesCounter - 1;
 
-            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+            homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLoggedUser().getAccessToken());
 
             // removing like from current cached list
             ArrayList<Like> currentLikes = currentPost.getLikes();
@@ -195,7 +178,7 @@ public class HomeFragment extends Fragment implements
         }
         else { //add like
             currentLikesCounter = currentLikesCounter + 1;
-            homeViewModel.addLike(postId, loginViewModel.getObservableLoggedUser().getValue().getEmail(), loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+            homeViewModel.addLike(postId, loginViewModel.getObservableLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getAccessToken());
 
             // adding placehoder like to the current cached list
             Like placeholderLike = new Like();
@@ -303,14 +286,14 @@ public class HomeFragment extends Fragment implements
                     }
                     break;
                     case GOT_NEW_NOTIFICATIONS: {
-                        ((MainActivity) getActivity()).activateNotificationsIcon();
+                        ((MainActivity) requireActivity()).activateNotificationsIcon();
                     }
                     break;
                     case NO_NOTIFICATIONS:
 //                        deactivateNotificationsIcon();
                         break;
                     case ALL_NOTIFICATIONS_READ:
-                        ((MainActivity) getActivity()).deactivateNotificationsIcon();
+                        ((MainActivity) requireActivity()).deactivateNotificationsIcon();
                         break;
                 }
             });
@@ -318,5 +301,12 @@ public class HomeFragment extends Fragment implements
         }
     }
 
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
 
 }// end HomeFragment class
