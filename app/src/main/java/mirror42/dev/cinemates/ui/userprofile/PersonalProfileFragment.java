@@ -1,6 +1,14 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,11 +22,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import static android.app.Activity.RESULT_OK;
+
+import com.bumptech.glide.Glide;
+
+import java.io.IOException;
 
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
@@ -49,7 +64,11 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private Button followersButton;
     private Button followingButton;
 
+    private static int PICK_IMAGE = 30;
+    private final int PERMISSION_CODE = 5;
 
+    private String filePath;
+    private PersonalProfileViewModel personalProfileViewModel;
 
 
     //----------------------------------------------------------------------- ANDROID METHODS
@@ -89,7 +108,7 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         followedListsButton.setOnClickListener(this);
         followersButton.setOnClickListener(this);
         followingButton.setOnClickListener(this);
-
+        profilePicture.setOnClickListener(this);
         //
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);
@@ -99,6 +118,13 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
 
         hideResendEmail();
 
+        personalProfileViewModel =  new ViewModelProvider(this).get(PersonalProfileViewModel.class);  // on view created
+        personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
+            if(changeImageResult == PersonalProfileViewModel.ChangeImageResult.SUCCESS)
+                showCenteredToast( "cambio immagine profilo riuscito ");
+            else if(changeImageResult == PersonalProfileViewModel.ChangeImageResult.FAILED)
+                showCenteredToast( "cambio immagine profilo riuscito");
+        });
 
     }// end onViewCreated()
 
@@ -170,6 +196,41 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
 
     }// end onActivityCreated()
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+
+        Bitmap thumbnail = null;
+        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
+            try {
+                //set picked image to the mProfile
+                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+//                mProfile.setImageBitmap(bitmap);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            filePath = "-";
+            try {
+                filePath = getRealPathFromUri(data.getData(), getActivity());
+
+                // load thumbnail
+                Glide.with(this)  //2
+                        .load(filePath) //3
+                        .fallback(R.drawable.broken_image)
+                        .placeholder(R.drawable.placeholder_image)
+                        .circleCrop() //4
+                        .into(profilePicture); //8
+
+
+                personalProfileViewModel.changeProfileImage(loginViewModel.getLoggedUser(),filePath);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -212,6 +273,8 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
             NavDirections customListBrowserFragment =
                     PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
             Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }else if(v.getId() == profilePicture.getId()){
+            fetchImageFromGallery(v);
         }
 
     }
@@ -229,6 +292,35 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
 
 
     //----------------------------------------------------------------------- METHODS
+
+    private String getRealPathFromUri(Uri imageUri, Activity activity){
+        Cursor cursor = activity.getContentResolver().query(imageUri, null,  null, null, null); if(cursor==null) {
+            return imageUri.getPath();
+        }else{
+            cursor.moveToFirst();
+            int idx =  cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+
+
+    void fetchImageFromGallery(View view){
+        requestPermission();
+    }
+
+    private void requestPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            accessTheGallery();
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
+        }
+    }
+
+    public void accessTheGallery(){
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        i.setType("image/*");
+        startActivityForResult(i, PICK_IMAGE);
+    }
 
     private void showResendEmail() {
         includeAccountActivationView.setVisibility(View.VISIBLE);
