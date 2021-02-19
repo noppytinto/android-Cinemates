@@ -140,7 +140,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             //
             buildWatchedPost((WatchedPostViewHolder) holder, watchedPost);
         }
-        //TODO
         else if(getItemViewType(position) == CL) {
             CustomListPost post = (CustomListPost) postList.get(position);
 
@@ -153,7 +152,6 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             //
             buildCustomListCreatedPost((CustomListCreatedPostViewHolder) holder, post);
         }
-        //TODO
         else if(getItemViewType(position) == FW) {
             FollowPost post = (FollowPost) postList.get(position);
 
@@ -412,49 +410,36 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
 
     //TODO
     private void buildFollowListPost(FollowPostViewHolder holder, FollowPost post) {
-//        holder.textViewUsername.setText(post.getOwner().getUsername());
-//        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(post.getPublishDateMillis()));
-//        holder.textViewPostDescription.setText(post.getListDescription());
-//        holder.buttonShowLikes.setText(String.valueOf(post.getLikesCount()));
-//        holder.textViewMovieOverview.setText(post.getMovieOverview());
-//
-//        int commentsCount = post.getCommentsCount();
-//        if(commentsCount==1)
-//            holder.buttonShowComments.setText(commentsCount + " commento");
-//        else
-//            holder.buttonShowComments.setText(commentsCount + " commenti");
-//
-//
-//
-//        if(post.isLikedByMe())
-//            holder.buttonLike.setActivated(true);
-//        else
-//            holder.buttonLike.setActivated(false);
-//
-//        // TODO: set commented by me
-//
-//        try {
-//            String posterUrl_1 = post.getMovie().getPosterURL();
-//            Glide.with(context)  //2
-//                    .load(posterUrl_1) //3
-//                    .fallback(R.drawable.broken_image)
-//                    .placeholder(R.drawable.placeholder_image)
-//                    .fitCenter() //4
-//                    .into(holder.imageViewMoviePoster); //8
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            Glide.with(context)  //2
-//                    .load(post.getOwner().getProfilePicturePath()) //3
-//                    .fallback(R.drawable.icon_user_dark_blue)
-//                    .placeholder(R.drawable.icon_user_dark_blue)
-//                    .circleCrop() //4
-//                    .into(holder.imageViewProfilePicture); //8
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        holder.textViewUsername.setText(post.getOwner().getUsername());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(post.getPublishDateMillis()));
+        holder.textViewPostDescription.setText(post.getDescription());
+        holder.buttonShowLikes.setText(String.valueOf(post.getLikesCount()));
+
+        int commentsCount = post.getCommentsCount();
+        if(commentsCount==1)
+            holder.buttonShowComments.setText(commentsCount + " commento");
+        else
+            holder.buttonShowComments.setText(commentsCount + " commenti");
+
+
+
+        if(post.isLikedByMe())
+            holder.buttonLike.setActivated(true);
+        else
+            holder.buttonLike.setActivated(false);
+
+        // TODO: set commented by me
+
+        try {
+            Glide.with(context)  //2
+                    .load(post.getOwner().getProfilePicturePath()) //3
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
+                    .circleCrop() //4
+                    .into(holder.imageViewProfilePicture); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

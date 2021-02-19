@@ -12,7 +12,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="24dp"
         android:fontFamily="@font/poppins_medium"
-        android:text="ora segue Pinco Pallino (@pinco)"
+        android:text="ora segue: Pinco Pallino (@pinco)"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

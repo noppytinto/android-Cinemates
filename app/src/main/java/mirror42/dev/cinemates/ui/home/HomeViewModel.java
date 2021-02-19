@@ -26,6 +26,7 @@ import mirror42.dev.cinemates.model.Comment;
 import mirror42.dev.cinemates.model.CustomListCreatedPost;
 import mirror42.dev.cinemates.model.CustomListPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
+import mirror42.dev.cinemates.model.FollowPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
@@ -417,6 +418,64 @@ public class HomeViewModel extends ViewModel {
         });
     }// end getObservableWatchedListPosts()
 
+    public Observable<ArrayList<Post>> getObservableFollowPosts(String email, String token, String loggedUsername) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Post> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunction = "fn_select_all_posts";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("given_email", email)
+                        .add("post_type", FOLLOW_POST_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // executing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            FollowPost post = buildFollowPost(jsonDBobj, email, token, loggedUsername);
+
+                            tempResult.add(post);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no follow posts"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }// end getObservableFollowPosts()
+
+
     public Observable<ArrayList<Post>> getObservablePosts(String email, String token, String loggedUsername) {
         Observable<ArrayList<Post>> observableWatchlistPosts =
                 getObservableWatchlistPosts(email, token, loggedUsername);
@@ -434,7 +493,8 @@ public class HomeViewModel extends ViewModel {
         Observable<ArrayList<Post>> observableWatchedListPosts =
                 getObservableWatchedListPosts(email, token, loggedUsername);
 
-        // TODO: follow posts
+        Observable<ArrayList<Post>> observableFollowPosts =
+                getObservableFollowPosts(email, token, loggedUsername);
 
         Observable<ArrayList<Post>> observableCombinedPosts =
                 Observable.combineLatest(
@@ -443,13 +503,15 @@ public class HomeViewModel extends ViewModel {
                         observableCustomListCreatedPosts.onErrorReturn(e-> new ArrayList<>()),  // return an empty list instead
                         observableCustomListPosts.onErrorReturn(e-> new ArrayList<>()),
                         observableWatchedListPosts.onErrorReturn(e-> new ArrayList<>()),
-                        (watchlistPosts, favoriteListPosts, customListCreatedPosts, customListPosts, watchedListPosts) -> {
+                        observableFollowPosts.onErrorReturn(e-> new ArrayList<>()),
+                        (watchlistPosts, favoriteListPosts, customListCreatedPosts, customListPosts, watchedListPosts, followPosts) -> {
                             final ArrayList<Post> combinedPosts = new ArrayList<>();
                             combinedPosts.addAll(watchlistPosts);
                             combinedPosts.addAll(favoriteListPosts);
                             combinedPosts.addAll(customListCreatedPosts);
                             combinedPosts.addAll(customListPosts);
                             combinedPosts.addAll(watchedListPosts);
+                            combinedPosts.addAll(followPosts);
                             return combinedPosts;
                         }
                 );
@@ -594,22 +656,22 @@ public class HomeViewModel extends ViewModel {
     }
 
     //TODO
-//    private FollowPost buildFollowPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
-//        // getting post owner data
-//        User user = buildOwner(jsonDBobj);
-//
-//        // assembling post
-//        CustomListCreatedPost customListCreatedPost = new CustomListCreatedPost();
-//        customListCreatedPost.setPostId(jsonDBobj.getLong("Id_Post"));
-//        customListCreatedPost.setOwner(user);
-//        customListCreatedPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
-//        customListCreatedPost.setName(jsonDBobj.getString("list_name"));
-//        customListCreatedPost.setDescription("ha creato la lista: " + jsonDBobj.getString("list_name"));
-//        // getting reactions
-//        fetchLikes(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-//        fetchComments(customListCreatedPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
-//        return customListCreatedPost;
-//    }
+    private FollowPost buildFollowPost(JSONObject jsonDBobj, String email, String token, String loggedUsername) throws Exception{
+        User user = buildOwner(jsonDBobj);
+        User followed = buildFollowed(jsonDBobj);
+
+        // assembling post
+        FollowPost followPost = new FollowPost();
+        followPost.setPostId(jsonDBobj.getLong("Id_Post"));
+        followPost.setOwner(user);
+        followPost.setPublishDateMillis(jsonDBobj.getLong("Date_Post_Creation"));
+        followPost.setFollowed(followed);
+        followPost.setDescription("ora segue: " + followed.getFullName() + " (@" + followed.getUsername() + ")");
+        // getting reactions
+        fetchLikes(followPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        fetchComments(followPost, jsonDBobj.getLong("Id_Post"), email, token, loggedUsername);
+        return followPost;
+    }
 
 
 
@@ -619,6 +681,14 @@ public class HomeViewModel extends ViewModel {
         user.setFirstName(jsonObject.getString("Name"));
         user.setLastName(jsonObject.getString("LastName"));
         user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        return user;
+    }
+
+    private User buildFollowed(JSONObject jsonObject) throws JSONException {
+        User user = new User();
+        user.setUsername(jsonObject.getString("followed_username"));
+        user.setFirstName(jsonObject.getString("followed_firstname"));
+        user.setLastName(jsonObject.getString("followed_lastname"));
         return user;
     }
 

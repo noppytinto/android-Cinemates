@@ -113,6 +113,9 @@ public class Movie implements Parcelable, Serializable {
     }
 
     public String getOverview() {
+        if(overview==null || overview.isEmpty())
+            return "(trama non disponibile in italiano)";
+
         return overview;
     }
 

@@ -159,7 +159,6 @@ public class PostViewModel extends ViewModel {
                 post = buildWatchedPost(jsonObject, loggedUser);
             }
             break;
-            // TODO
             case "CL": {
                 post = buildCustomListPost(jsonObject, loggedUser);
             }
@@ -168,11 +167,10 @@ public class PostViewModel extends ViewModel {
                 post = buildCustomListCreatedPost(jsonObject, loggedUser);
             }
             break;
-            // TODO
-//            case "FW": {
-//                post = buildWatchedPost(jsonObject, loggedUser);
-//            }
-//            break;
+            case "FW": {
+                post = buildFollowPost(jsonObject, loggedUser);
+            }
+            break;
             default:
         }
 
@@ -254,7 +252,6 @@ public class PostViewModel extends ViewModel {
         return post;
     }
 
-    // TODO
     private CustomListPost buildCustomListPost(JSONObject jsonObject, User loggedUser) throws Exception{
         // getting post owner data
         User user = buildUser(jsonObject);
@@ -274,27 +271,32 @@ public class PostViewModel extends ViewModel {
         return post;
     }
 
-    // TODO
     private FollowPost buildFollowPost(JSONObject jsonObject, User loggedUser) throws Exception{
-        // getting post owner data
-        User user = buildUser(jsonObject);
+        User postOwner = buildUser(jsonObject);
+        User followed = buildFollowed(jsonObject);
 
         // assembling post
         FollowPost post = new FollowPost();
-//        post.setPostId(postID);
-//        post.setOwner(user);
-//        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
-//        String listName = jsonObject.getString("list_name");
-//        post.setName(listName);
-//        post.setDescription("ha creato la lista: " + listName);
-//        // getting reactions
-//        fetchPostLikes(post, loggedUser);
-//        fetchPostComments(post, loggedUser);
+        post.setPostId(postID);
+        post.setOwner(postOwner);
+        post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
+        post.setFollowed(followed);
+        post.setDescription("ora segue: " + followed.getFullName() + " (@" + followed.getUsername() + ")");
+        // getting reactions
+        fetchPostLikes(post, loggedUser);
+        fetchPostComments(post, loggedUser);
         return post;
     }
 
 
 
+    private User buildFollowed(JSONObject jsonObject) throws JSONException {
+        User user = new User();
+        user.setUsername(jsonObject.getString("followed_username"));
+        user.setFirstName(jsonObject.getString("followed_firstname"));
+        user.setLastName(jsonObject.getString("followed_lastname"));
+        return user;
+    }
 
 
 

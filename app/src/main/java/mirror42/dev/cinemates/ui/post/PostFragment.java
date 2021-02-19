@@ -97,11 +97,6 @@ public class PostFragment extends Fragment implements
             postID = args.getPostId();
             tabToFocus = args.getTabToFocus();
 
-            // TODO: getting details from db
-
-
-
-
             // if post exists
             // - show post details
             // - setup tabs
@@ -240,7 +235,6 @@ public class PostFragment extends Fragment implements
                 arguments.putSerializable("follow_post_data", followPost);
             }
             break;
-            default:
         }
 
         return arguments;
@@ -290,7 +284,6 @@ public class PostFragment extends Fragment implements
                 display(postFragment);
             }
             break;
-            default:
         }
     }
 

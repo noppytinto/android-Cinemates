@@ -26,6 +26,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.CustomListPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
+import mirror42.dev.cinemates.model.FollowPost;
 import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
@@ -275,6 +276,11 @@ public class HomeFragment extends Fragment implements
 
     @Override
     public void onFollowPostClicked(int position) {
+        FollowPost itemSelected = (FollowPost) recyclerAdapterPost.getPost(position);
+
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getFollowed().getUsername());
+        NavHostFragment.findNavController(HomeFragment.this).navigate(userProfileFragment);
 
     }
 
