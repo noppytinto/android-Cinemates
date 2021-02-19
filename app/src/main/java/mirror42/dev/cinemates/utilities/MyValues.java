@@ -25,6 +25,8 @@ public class MyValues {
         FOLLOWING_FETCHED,
         FOLLOWING_FETCH_FAILED,
         FOLLOWERS_FETCH_FAILED,
+        NO_FOLLOWERS,
+        NO_FOLLOWING,
         IDLE
     }
 

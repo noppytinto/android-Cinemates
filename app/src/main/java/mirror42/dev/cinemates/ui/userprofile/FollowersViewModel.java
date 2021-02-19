@@ -121,7 +121,7 @@ public class FollowersViewModel extends ViewModel {
                                 setFetchStatus(FetchStatus.FOLLOWERS_FETCHED);
                             }
                             else {
-                                setFetchStatus(FetchStatus.FOLLOWERS_FETCH_FAILED);
+                                setFetchStatus(FetchStatus.NO_FOLLOWERS);
                             }
                         } // if response is unsuccessful
                         else {

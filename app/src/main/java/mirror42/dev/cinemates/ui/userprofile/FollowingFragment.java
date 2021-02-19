@@ -97,9 +97,11 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                     }
                 }
                 break;
-                case FOLLOWING_FETCH_FAILED: {
+                case NO_FOLLOWING:
+                    showCenteredToast("lista vuota");
+                    break;
+                case FOLLOWING_FETCH_FAILED:
                     showCenteredToast("impossibile caricare utenti!");
-                }
                 break;
             }
         });

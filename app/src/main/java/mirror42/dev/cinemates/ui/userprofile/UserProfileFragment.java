@@ -194,7 +194,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     break;
                     case I_DONT_FOLLOW_HIM: {
                         buttonSendFollow.setVisibility(View.VISIBLE);
-                        showCenteredToast("NON sei un suo follower");
+//                        showCenteredToast("NON sei un suo follower");
 
                         //
                         userProfileViewModel.checkMyFollowIsPending(

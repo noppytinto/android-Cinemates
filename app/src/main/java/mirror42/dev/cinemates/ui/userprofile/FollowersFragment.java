@@ -98,10 +98,12 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
                     }
                 }
                 break;
-                case FOLLOWERS_FETCH_FAILED: {
+                case NO_FOLLOWERS:
+                    showCenteredToast("lista vuota");
+                break;
+                case FOLLOWERS_FETCH_FAILED:
                     showCenteredToast("impossibile caricare utenti!");
-                }
-                    break;
+                break;
             }
         });
         followersViewModel.fetchFollowers(username, loginViewModel.getLoggedUser());

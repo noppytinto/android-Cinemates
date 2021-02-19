@@ -117,10 +117,10 @@
                 <Button
                     android:id="@+id/button_userProfileFragment_following"
                     style="@style/Cinemates.Button.TextButton"
-                    android:layout_width="70dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="seguiti 156"
+                    android:text="seguiti 0"
                     android:textSize="10sp"
                     app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_fullName"
                     app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_message" />
@@ -131,7 +131,7 @@
                     android:layout_height="0dp"
                     android:background="@color/divider_toolbar"
                     app:layout_constraintBottom_toBottomOf="@+id/button_userProfileFragment_following"
-                    app:layout_constraintEnd_toStartOf="@+id/button_personalProfileFragment_followers"
+                    app:layout_constraintEnd_toStartOf="@+id/button_userProfileFragment_followers"
                     app:layout_constraintStart_toEndOf="@+id/button_userProfileFragment_following"
                     app:layout_constraintTop_toTopOf="@+id/button_userProfileFragment_following"
                     app:layout_constraintVertical_bias="1.0" />
@@ -140,10 +140,10 @@
                 <Button
                     android:id="@+id/button_userProfileFragment_followers"
                     style="@style/Cinemates.Button.TextButton"
-                    android:layout_width="80dp"
+                    android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
-                    android:text="follower 84"
+                    android:text="follower 0"
                     android:textSize="10sp"
                     app:layout_constraintBottom_toBottomOf="@+id/button_userProfileFragment_following"
                     app:layout_constraintStart_toEndOf="@+id/button_userProfileFragment_following"

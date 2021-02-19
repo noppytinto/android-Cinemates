@@ -131,7 +131,7 @@ public class FollowingViewModel extends ViewModel {
                                 setFetchStatus(FetchStatus.FOLLOWING_FETCHED    );
                             }
                             else {
-                                setFetchStatus(FetchStatus.FOLLOWING_FETCH_FAILED);
+                                setFetchStatus(FetchStatus.NO_FOLLOWING);
                             }
                         } // if response is unsuccessful
                         else {
