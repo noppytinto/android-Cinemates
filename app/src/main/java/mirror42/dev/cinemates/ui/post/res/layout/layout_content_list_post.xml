@@ -17,10 +17,10 @@
         android:text="@string/overview"
         android:textColor="@color/white"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/include_conentListPost_moviePoster"
+        app:layout_constraintBottom_toBottomOf="@+id/include_contentListPost_moviePoster"
         app:layout_constraintEnd_toEndOf="@+id/textView_contentListPost_movieTitle"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/include_conentListPost_moviePoster"
+        app:layout_constraintStart_toEndOf="@+id/include_contentListPost_moviePoster"
         app:layout_constraintTop_toBottomOf="@+id/textView_contentListPost_movieTitle" />
 
     <TextView
@@ -36,8 +36,8 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@+id/textView_contentListPost_description"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/include_conentListPost_moviePoster"
-        app:layout_constraintTop_toTopOf="@+id/include_conentListPost_moviePoster" />
+        app:layout_constraintStart_toEndOf="@+id/include_contentListPost_moviePoster"
+        app:layout_constraintTop_toTopOf="@+id/include_contentListPost_moviePoster" />
 
     <TextView
         android:id="@+id/textView_contentListPost_description"
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/include_conentListPost_moviePoster"
+        android:id="@+id/include_contentListPost_moviePoster"
         layout="@layout/movie_thumbnail"
         android:layout_width="100dp"
         android:layout_height="160dp"

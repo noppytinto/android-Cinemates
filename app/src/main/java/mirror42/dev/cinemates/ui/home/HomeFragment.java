@@ -16,7 +16,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.util.ArrayList;
 
@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment implements
     private Button updateFeedButton;
     private RecyclerView recyclerView;
     private NotificationsViewModel notificationsViewModel;
-    private CircularProgressIndicator progressIndicator;
+    private LinearProgressIndicator progressIndicator;
     private View welcomeMessage;
     private Button signUpButton;
 
@@ -282,6 +282,19 @@ public class HomeFragment extends Fragment implements
                 NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getFollowed().getUsername());
         NavHostFragment.findNavController(HomeFragment.this).navigate(userProfileFragment);
 
+    }
+
+    @Override
+    public void onPostOwnerAreaClicked(int position) {
+        Post itemSelected = recyclerAdapterPost.getPost(position);
+        String postOwnerUsername = itemSelected.getOwner().getUsername();
+        String currentLoggedUsername = loginViewModel.getLoggedUser().getUsername();
+
+        if( ! postOwnerUsername.equals(currentLoggedUsername)) {
+            NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                    NavGraphDirections.actionGlobalUserProfileFragment(postOwnerUsername);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(userProfileFragment);
+        }
     }
 
     private void checkForNewNotifications(User loggedUser) {

@@ -26,7 +26,7 @@
             android:background="@color/dark_blue">
 
             <include
-                android:id="@+id/include_customListCreatedPostLayout_postOwnerLayout"
+                android:id="@+id/include_customListCreatedPostLayout_postOwner"
                 layout="@layout/layout_post_owner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_customListCreatedPostLayout_postOwnerLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/include_customListCreatedPostLayout_postOwner" />
 
             <View
                 android:id="@+id/divider_customListCreatedPostLayout_1"

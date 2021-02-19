@@ -48,6 +48,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         void onPostContentClicked(int position);
         void onCustomListCreatedPostClicked(int position);
         void onFollowPostClicked(int position);
+        void onPostOwnerAreaClicked(int position);
 
     }
 
@@ -461,6 +462,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public Button buttonShowComments;
         public Button buttonShowLikes;
 
+        public View postOwnerArea;
 
 
         public WatchlistPostViewHolder(@NonNull View itemView) {
@@ -468,10 +470,11 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_watchListPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
-            imageViewMoviePoster = (itemView.findViewById(R.id.include_conentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewMoviePoster = (itemView.findViewById(R.id.include_contentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
             container = itemView.findViewById(R.id.include_watchListPostLayout_postContentLayout);
             textViewMovieOverview = itemView.findViewById(R.id.textView_contentListPost_movieOverview);
 
@@ -487,6 +490,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
         }
 
         @Override
@@ -513,6 +517,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             }
             else if(view.getId() == container.getId()) {
                 listener.onPostContentClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
         }
@@ -534,6 +542,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public Button buttonShowComments;
         public Button buttonShowLikes;
 
+        public View postOwnerArea;
 
 
         public FavoritesPostViewHolder(@NonNull View itemView) {
@@ -541,10 +550,11 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_favoritesPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
-            imageViewMoviePoster = (itemView.findViewById(R.id.include_conentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewMoviePoster = (itemView.findViewById(R.id.include_contentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
             container = itemView.findViewById(R.id.include_favoritesPostLayout_postContent);
             textViewMovieOverview = itemView.findViewById(R.id.textView_contentListPost_movieOverview);
 
@@ -560,6 +570,8 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
+
         }
 
         @Override
@@ -586,6 +598,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             }
             else if(view.getId() == container.getId()) {
                 listener.onPostContentClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
         }
@@ -607,6 +623,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public Button buttonShowComments;
         public Button buttonShowLikes;
 
+        public View postOwnerArea;
 
 
         public WatchedPostViewHolder(@NonNull View itemView) {
@@ -614,11 +631,12 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_watchedPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
             textViewMovieTitle.setVisibility(View.GONE);
-            imageViewMoviePoster = (itemView.findViewById(R.id.include_conentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewMoviePoster = (itemView.findViewById(R.id.include_contentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
             container = itemView.findViewById(R.id.include_watchedPostLayout_postContent);
             textViewMovieOverview = itemView.findViewById(R.id.textView_contentListPost_movieOverview);
             textViewMovieOverview.setMaxLines(8);
@@ -635,6 +653,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
         }
 
         @Override
@@ -663,6 +682,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                 listener.onPostContentClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
         }
     }// end WatchedPostViewHolder class
 
@@ -680,6 +703,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView textViewPostDescription;
         public View container;
 
+        public View postOwnerArea;
 
 
         public CustomListCreatedPostViewHolder(@NonNull View itemView) {
@@ -687,6 +711,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_customListCreatedPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentCustomListCreatedPost_description);
             container = itemView.findViewById(R.id.include_customListCreatedPostLayout_postContent);
@@ -703,6 +728,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
         }
 
         @Override
@@ -731,6 +757,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                 listener.onCustomListCreatedPostClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
         }
     }// end CustomListCreatedPostViewHolder class
 
@@ -750,6 +780,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public Button buttonShowComments;
         public Button buttonShowLikes;
 
+        public View postOwnerArea;
 
 
         public CustomListPostViewHolder(@NonNull View itemView) {
@@ -757,11 +788,12 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_customListPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentListPost_description);
             textViewMovieTitle = itemView.findViewById(R.id.textView_contentListPost_movieTitle);
             textViewMovieTitle.setVisibility(View.GONE);
-            imageViewMoviePoster = (itemView.findViewById(R.id.include_conentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
+            imageViewMoviePoster = (itemView.findViewById(R.id.include_contentListPost_moviePoster)).findViewById(R.id.imageview_movieThumbnail);
             container = itemView.findViewById(R.id.include_customListPostLayout_postContent);
             textViewMovieOverview = itemView.findViewById(R.id.textView_contentListPost_movieOverview);
             textViewMovieOverview.setMaxLines(8);
@@ -778,6 +810,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
         }
 
         @Override
@@ -806,6 +839,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
                 listener.onPostContentClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
         }
     }// end CustomListPostViewHolder class
 
@@ -822,6 +859,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView textViewPostDescription;
         public View container;
 
+        public View postOwnerArea;
 
 
         public FollowPostViewHolder(@NonNull View itemView) {
@@ -829,6 +867,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_postOwnerLayout_profilePicture);
             textViewUsername = itemView.findViewById(R.id.textView_postOwnerLayout_username);
             textViewPublishDate = itemView.findViewById(R.id.textView_postOwnerLayout_publishDate);
+            postOwnerArea = itemView.findViewById(R.id.include_followPostLayout_postOwner);
 
             textViewPostDescription = itemView.findViewById(R.id.textView_contentFollowPost_description);
             container = itemView.findViewById(R.id.include_followPostLayout_postContent);
@@ -846,6 +885,7 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             buttonShowLikes.setOnClickListener(this);
             buttonShowComments.setOnClickListener(this);
             container.setOnClickListener(this);
+            postOwnerArea.setOnClickListener(this);
         }
 
         @Override
@@ -872,6 +912,10 @@ public class RecyclerAdapterPost extends RecyclerView.Adapter<RecyclerView.ViewH
             }
             else if(view.getId() == container.getId()) {
                 listener.onFollowPostClicked(getAdapterPosition());
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            }
+            else if(view.getId() == postOwnerArea.getId()) {
+                listener.onPostOwnerAreaClicked(getAdapterPosition());
                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             }
         }
