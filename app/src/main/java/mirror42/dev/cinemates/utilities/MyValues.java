@@ -21,6 +21,10 @@ public class MyValues {
         MOVIES_DETAILS_DOWNLOADED,
         REFETCH,
         EMPTY,
+        FOLLOWERS_FETCHED,
+        FOLLOWING_FETCHED,
+        FOLLOWING_FETCH_FAILED,
+        FOLLOWERS_FETCH_FAILED,
         IDLE
     }
 

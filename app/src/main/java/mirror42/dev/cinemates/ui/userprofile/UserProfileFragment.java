@@ -25,6 +25,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -48,7 +50,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private View followRequestPrompt;
     private Button buttonCustomLists;
     private SwipeRefreshLayout swipeRefreshLayout;
-
+    private FollowingViewModel followingViewModel;
+    private FollowersViewModel followersViewModel;
+    private Button followersButton;
+    private Button followingButton;
 
 
     //-------------------------------------------------------------------------- ANDROID METHODS
@@ -75,12 +80,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
         followRequestPrompt = view.findViewById(R.id.include_userProfileFragment_requestPrompt);
         buttonCustomLists = view.findViewById(R.id.button_userProfileFragment_customLists);
-
+        followersButton = view.findViewById(R.id.button_userProfileFragment_followers);
+        followingButton = view.findViewById(R.id.button_userProfileFragment_following);
         buttonSendFollow.setOnClickListener(this);
         buttonAcceptFollow.setOnClickListener(this);
         buttonDeclineFollow.setOnClickListener(this);
         buttonCustomLists.setOnClickListener(this);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
+        followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
+        followersButton.setOnClickListener(this);
+        followingButton.setOnClickListener(this);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
@@ -91,6 +101,53 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             }
         }
     }
+
+    private void loadSocialStatistics() {
+        followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case FOLLOWING_FETCHED: {
+                    ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();
+                    if(following!=null || following.size()>0) {
+                        setFollowingCount(following);
+                    }
+                }
+                break;
+            }
+        });
+        followingViewModel.fetchFollowing(profileOwner.getUsername(), loginViewModel.getLoggedUser());
+
+        followersViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case FOLLOWERS_FETCHED: {
+                    ArrayList<User> followers = followersViewModel.getObservableFollowers().getValue();
+                    if(followers!=null || followers.size()>0) {
+                        setFollowersCount(followers);
+                    }
+                }
+                break;
+            }
+        });
+        followersViewModel.fetchFollowers(profileOwner.getUsername(), loginViewModel.getLoggedUser());
+    }
+
+    private void setFollowersCount(ArrayList<User> users) {
+        int count = 0;
+        if(users!=null || users.size()>0) {
+            count = users.size();
+        }
+
+        followersButton.setText("Follower " + count);
+    }
+
+    private void setFollowingCount(ArrayList<User> users) {
+        int count = 0;
+        if(users!=null || users.size()>0) {
+            count = users.size();
+        }
+
+        followingButton.setText("Seguiti " + count);
+    }
+
 
     private void fetchUserProfileData(String username) {
         userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
@@ -114,6 +171,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     textViewusername.setText("@" + profileOwner.getUsername());
 
                     startCheckOperations();
+                    loadSocialStatistics();
                 }
                     break;
                 case FAILED:
@@ -309,6 +367,16 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             NavDirections customListBrowserFragment =
                     UserProfileFragmentDirections.actionUserProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
             Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }
+        else if(v.getId() == followersButton.getId()){
+            NavDirections followersFragment =
+                    UserProfileFragmentDirections.actionUserProfileFragmentToFollowersFragment(profileOwner.getUsername());
+            Navigation.findNavController(v).navigate(followersFragment);
+        }
+        else if(v.getId() == followingButton.getId()){
+            NavDirections followersFragment =
+                    UserProfileFragmentDirections.actionUserProfileFragmentToFollowingFragment(profileOwner.getUsername());
+            Navigation.findNavController(v).navigate(followersFragment);
         }
 
     }

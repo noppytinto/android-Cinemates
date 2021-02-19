@@ -787,12 +787,7 @@ public class HomeViewModel extends ViewModel {
             // build httpurl and request for remote db
             final String dbFunction = "fn_delete_reaction_like";
             //
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("target_post_id", String.valueOf(postId))
@@ -840,12 +835,7 @@ public class HomeViewModel extends ViewModel {
             // build httpurl and request for remote db
             final String dbFunction = "fn_add_reaction_like";
             //
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("target_post_id", String.valueOf(postId))

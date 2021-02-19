@@ -128,7 +128,6 @@ public class RecyclerAdapterShowLikesDialog extends RecyclerView.Adapter<Recycle
             this.imageViewProfilePicture = itemView.findViewById(R.id.imageView_userListItem_profilePicture);
             this.textViewFullName = itemView.findViewById(R.id.textView_userListItem_fullName);
             this.textViewUsername = itemView.findViewById(R.id.textView_userListItem_username);
-            this.buttonAddFriend = itemView.findViewById(R.id.imageButton_userListItem_addFriend);
 
             this.imageViewProfilePicture.setOnClickListener(this);
         }

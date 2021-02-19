@@ -130,8 +130,8 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     private void buildUserSearchResult(UserSearchResultViewHolder holder, UserSearchResult searchResult) {
         Glide.with(context)  //2
                 .load(searchResult.getProfilePictureUrl()) //3
-                .fallback(R.drawable.broken_image)
-                .placeholder(R.drawable.placeholder_image)
+                .fallback(R.drawable.icon_user_dark_blue)
+                .placeholder(R.drawable.icon_user_dark_blue)
                 .circleCrop() //4
                 .into(holder.imageViewProfilePicture); //8
 
@@ -163,7 +163,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.size() : 0);
     }
 
-    public SearchResult getSearchResult(int position) {
+    public SearchResult getItem(int position) {
         return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.get(position) : null);
     }
 
@@ -233,7 +233,6 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
         public UserSearchResultViewHolder(@NonNull View itemView) {
             super(itemView);
-
             cardView = itemView.findViewById(R.id.cardView_userListItem);
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_userListItem_profilePicture);
             textViewFullName = itemView.findViewById(R.id.textView_userListItem_fullName);

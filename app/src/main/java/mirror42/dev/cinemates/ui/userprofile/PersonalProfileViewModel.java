@@ -18,6 +18,7 @@ import java.util.Map;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -36,12 +37,17 @@ public class PersonalProfileViewModel extends ViewModel {
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private MutableLiveData<ChangeImageResult> changeImageResult;
+    private MutableLiveData<FetchStatus> fetchStatus;
+
+
 
     public enum ChangeImageResult {
         FAILED,
         SUCCESS,
         NONE
     }
+
+
 
 
     //----------------------------------------------------------------- CONSTRUCTORS
@@ -51,11 +57,8 @@ public class PersonalProfileViewModel extends ViewModel {
         changeImageResult = new MutableLiveData<>(ChangeImageResult.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
-
-
-
-
 
 
 
@@ -69,12 +72,22 @@ public class PersonalProfileViewModel extends ViewModel {
         this.changeImageResult.postValue(changeImageResult);
     }
 
+    public LiveData<FetchStatus> getFetchStatus() {
+        return fetchStatus;
+    }
+
+    public void setFetchStatus(FetchStatus fetchStatus) {
+        this.fetchStatus.postValue(fetchStatus);
+    }
+
+
+
     //----------------------------------------------------------------- METHODS
 
-    public void changeProfileImage(User user, String url){
 
+    public void changeProfileImage(User user, String url){
         Runnable downloadTask = uploadImageAsync(user,url);
-        Thread t = new Thread(downloadTask, "THREAD: Personal Profile view model : upload image");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
@@ -101,12 +114,7 @@ public class PersonalProfileViewModel extends ViewModel {
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_update_profile_picture"; // vedi se è corretto
         try{
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             RequestBody requestBody = new FormBody.Builder()
                     .add("email",user.getEmail())
                     .add("picture_path",imageName+".png")

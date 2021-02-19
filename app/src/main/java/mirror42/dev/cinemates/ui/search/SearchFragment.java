@@ -283,7 +283,7 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onMovieSearchResultClicked(int position, View v) {
-        MovieSearchResult itemSelected = (MovieSearchResult)  recyclerAdapterSearchPage.getSearchResult(position);
+        MovieSearchResult itemSelected = (MovieSearchResult)  recyclerAdapterSearchPage.getItem(position);
         firebaseAnalytics.logSelectedSearchedMovie(itemSelected, "selected movie in search tab", this, getContext());
         Movie mv = new Movie();
         mv.setTmdbID(itemSelected.getTmdbID());
@@ -298,7 +298,7 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onUserSearchResultClicked(int position, View v) {
-        UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getSearchResult(position);
+        UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getItem(position);
 
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
                 NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getUsername());
