@@ -56,6 +56,10 @@ public class CommentsViewModel extends ViewModel {
         LIKE_REMOVED,
         LIKE_NOT_REMOVED,
         LIKE_REMOVED_FAIL,
+        FOLLOWER_REMOVED,
+        FOLLOWING_REMOVED,
+        FOLLOWER_REMOVED_FAIL,
+        FOLLOWING_REMOVED_FAIL,
         IDLE
     }
 

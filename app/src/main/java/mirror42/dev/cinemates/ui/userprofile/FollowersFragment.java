@@ -57,32 +57,33 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initRecyclerView(view);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+
 
         if(getArguments() != null) {
             FollowersFragmentArgs args = FollowersFragmentArgs.fromBundle(getArguments());
             String username = args.getTargetUsername();
 
             if(username!=null || username.isEmpty()) {
+                if(username.equals(loginViewModel.getLoggedUser().getUsername()))
+                    initRecyclerView(view, true);
+                else
+                    initRecyclerView(view, false);
+
                 fetchFollowers(username);
             }
         }
     }
 
-    private void initRecyclerView(View view) {
+
+    private void initRecyclerView(View view, boolean showRemoveUserButton) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_followersFragment);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // adding recycle listener for touch detection
-        recyclerAdapterUsersList = new RecyclerAdapterUsersList(new ArrayList<>(), getContext(), this);
+        recyclerAdapterUsersList = new RecyclerAdapterUsersList(new ArrayList<>(), getContext(), this, showRemoveUserButton);
         recyclerView.setAdapter(recyclerAdapterUsersList);
     }
 
@@ -123,7 +124,23 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onRemoveButtonClicked(int position) {
+        User targetUser = recyclerAdapterUsersList.getItem(position);
+        String targetUsername = targetUser.getUsername();
 
+        followersViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            switch (taskStatus) {
+                case FOLLOWER_REMOVED: {
+                    recyclerAdapterUsersList.removeItem(targetUser);
+                    showCenteredToast("operazione effettuata!");
+                }
+                break;
+                case FOLLOWER_REMOVED_FAIL: {
+                    showCenteredToast("operazione annullata!");
+                }
+                break;
+            }
+        });
+        followersViewModel.removeFollower(targetUsername, loginViewModel.getLoggedUser());
     }
 
     public void showCenteredToast(String message) {

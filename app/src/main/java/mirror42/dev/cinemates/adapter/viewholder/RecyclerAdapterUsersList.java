@@ -25,6 +25,7 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
     private ClickAdapterListener listener;
     private Context context;
     private ArrayList<User> recyclerList;
+    private boolean showRemoveUserButton;
 
     public interface ClickAdapterListener {
         void onUserClicked(int position);
@@ -37,10 +38,11 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
 
     //-------------------------------------------------------------------------------------- CONSTRUCTORS
 
-    public RecyclerAdapterUsersList(ArrayList<User> users, Context context, ClickAdapterListener listener) {
+    public RecyclerAdapterUsersList(ArrayList<User> users, Context context, ClickAdapterListener listener, boolean showRemoveUserButton) {
         this.recyclerList = users;
         this.context = context;
         this.listener = listener;
+        this.showRemoveUserButton = showRemoveUserButton;
     }
 
 
@@ -58,6 +60,8 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
     @Override
     public void onBindViewHolder(@NonNull UserItemViewHolder holder, int position) {
         User item = recyclerList.get(position);
+        if(showRemoveUserButton)
+            holder.removeUserButton.setVisibility(View.VISIBLE);
 
         Glide.with(context)  //2
                 .load(item.getProfilePicturePath()) //3
@@ -88,6 +92,12 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
     }
 
 
+    public void removeItem(User item) {
+        recyclerList.remove(item);
+        notifyDataSetChanged();
+    }
+
+
 
     //-------------------------------------------------------------------------------------- VIEWHOLDERS
 
@@ -96,7 +106,7 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
         private ImageView imageViewProfilePicture;
         private TextView textViewFullName;
         private TextView textViewUsername;
-        private ImageButton removeUser;
+        private ImageButton removeUserButton;
 
 
 
@@ -106,17 +116,17 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
             imageViewProfilePicture = itemView.findViewById(R.id.imageView_userListItem_profilePicture);
             textViewFullName = itemView.findViewById(R.id.textView_userListItem_fullName);
             textViewUsername = itemView.findViewById(R.id.textView_userListItem_username);
-            removeUser = itemView.findViewById(R.id.imageButton_userListItem_remove);
+            removeUserButton = itemView.findViewById(R.id.imageButton_userListItem_remove);
 
             cardView.setOnClickListener(this);
-            removeUser.setOnClickListener(this);
+            removeUserButton.setOnClickListener(this);
         }
 
         //--------------------------------------------- METHODS
 
         @Override
         public void onClick(View v) {
-            if(v.getId() == removeUser.getId()) {
+            if(v.getId() == removeUserButton.getId()) {
                 listener.onRemoveButtonClicked(getAdapterPosition());
                 v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
             }

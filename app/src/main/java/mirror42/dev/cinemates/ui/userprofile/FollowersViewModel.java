@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -31,6 +32,7 @@ public class FollowersViewModel extends ViewModel {
     private MutableLiveData<ArrayList<User>> followers;
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
+    private MutableLiveData<TaskStatus> taskStatus;
 
 
     //------------------------------------------------------------------------ CONSTRUCTORS
@@ -39,6 +41,7 @@ public class FollowersViewModel extends ViewModel {
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         followers = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
+        taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
 
     }
 
@@ -61,6 +64,14 @@ public class FollowersViewModel extends ViewModel {
 
     public void setFollowers(ArrayList<User> users) {
         this.followers.postValue(users);
+    }
+
+    public LiveData<TaskStatus> getObservableTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus.postValue(taskStatus);
     }
 
 
@@ -139,6 +150,58 @@ public class FollowersViewModel extends ViewModel {
         return user;
     }
 
+    public void removeFollower(String targetUsername, User loggedUser) {
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_delete_follower";
+            //
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_username", targetUsername)
+                    .add("requester_email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setTaskStatus(TaskStatus.FOLLOWER_REMOVED_FAIL);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            // if response is true
+                            if (responseData.equals("true")) {
+                                setTaskStatus(TaskStatus.FOLLOWER_REMOVED);
+                            }
+                            else {
+                                setTaskStatus(TaskStatus.FOLLOWER_REMOVED_FAIL);
+                            }
+                        } // if response is unsuccessful
+                        else {
+                            setTaskStatus(TaskStatus.FOLLOWER_REMOVED_FAIL);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setTaskStatus(TaskStatus.FOLLOWER_REMOVED_FAIL);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setTaskStatus(TaskStatus.FOLLOWER_REMOVED_FAIL);
+        }
+
+    }// end removeFollower()
 
 
 
