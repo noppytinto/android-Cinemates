@@ -46,6 +46,8 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
     private NotificationsViewModel notificationsViewModel;
     private Button buttonCustomLists;
     private Button followedListsButton;
+    private Button followersButton;
+    private Button followingButton;
 
 
 
@@ -77,11 +79,17 @@ public class PersonalProfileFragment extends Fragment implements View.OnClickLis
         buttonCustomLists = view.findViewById(R.id.button_personalProfileFragment_customLists);
         followedListsButton = view.findViewById(R.id.button_personalProfileFragment_followedLists);
         remoteConfigServer = RemoteConfigServer.getInstance();
+        followersButton = view.findViewById(R.id.button_personalProfileFragment_followers);
+        followingButton = view.findViewById(R.id.button_personalProfileFragment_following);
+
         // setting listeners
         buttonLogout.setOnClickListener(this);
         buttonChangePassword.setOnClickListener(this);
         buttonCustomLists.setOnClickListener(this);
         followedListsButton.setOnClickListener(this);
+        followersButton.setOnClickListener(this);
+        followingButton.setOnClickListener(this);
+
         //
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         buttonResendEmail.setOnClickListener(this);

@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/poppins_light"
+                    android:fontFamily="@font/poppins"
                     android:text="@mario"
                     android:textAlignment="textStart"
                     android:textColor="@color/light_blue"
@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/poppins_medium"
+                    android:fontFamily="@font/poppins_bold"
                     android:text="Mario Rossi"
                     android:textAlignment="textStart"
                     android:textColor="@color/white"
@@ -100,37 +100,54 @@
                     app:layout_constraintStart_toEndOf="@+id/imageView_userProfileFragment_profilePicture"
                     app:layout_constraintTop_toTopOf="@+id/imageView_userProfileFragment_profilePicture" />
 
-                <Button
-                    android:id="@+id/button_userProfileFragment_follow"
-                    style="@style/Cinemates.Button.Rounded"
-                    android:layout_width="231dp"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Segui"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    app:icon="@drawable/add_icon_black"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/black"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_message"
-                    app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_message"
-                    tools:visibility="visible" />
-
                 <TextView
                     android:id="@+id/textView_userProfileFragment_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:fontFamily="@font/poppins_medium"
                     android:text="(e' un tuo follower)"
                     android:textColor="@color/light_blue"
+                    android:textSize="12sp"
                     android:visibility="gone"
                     app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_fullName"
                     app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_fullName"
                     tools:visibility="visible" />
 
+                <Button
+                    android:id="@+id/button_userProfileFragment_following"
+                    style="@style/Cinemates.Button.TextButton"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="chi segue 156"
+                    android:textSize="10sp"
+                    app:layout_constraintStart_toStartOf="@+id/textView_userProfileFragment_fullName"
+                    app:layout_constraintTop_toBottomOf="@+id/textView_userProfileFragment_message" />
+
+                <View
+                    android:id="@+id/divider_userProfileFragment"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="@color/divider_toolbar"
+                    app:layout_constraintBottom_toBottomOf="@+id/button_userProfileFragment_following"
+                    app:layout_constraintEnd_toStartOf="@+id/button_personalProfileFragment_followers"
+                    app:layout_constraintStart_toEndOf="@+id/button_userProfileFragment_following"
+                    app:layout_constraintTop_toTopOf="@+id/button_userProfileFragment_following"
+                    app:layout_constraintVertical_bias="1.0" />
+
+
+                <Button
+                    android:id="@+id/button_personalProfileFragment_followers"
+                    style="@style/Cinemates.Button.TextButton"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="follower 84"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/button_userProfileFragment_following"
+                    app:layout_constraintStart_toEndOf="@+id/button_userProfileFragment_following"
+                    app:layout_constraintTop_toTopOf="@+id/button_userProfileFragment_following" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
@@ -149,6 +166,22 @@
             tools:visibility="visible" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <Button
+        android:id="@+id/button_userProfileFragment_follow"
+        style="@style/Cinemates.Button.Rounded"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:text="Segui"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:icon="@drawable/add_icon_black"
+        app:iconGravity="textStart"
+        app:iconTint="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

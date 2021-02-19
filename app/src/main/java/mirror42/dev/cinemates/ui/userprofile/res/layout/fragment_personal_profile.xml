@@ -16,6 +16,55 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <View
+                android:id="@+id/divider_personalProfileFragment"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:background="@color/divider_toolbar"
+                app:layout_constraintBottom_toBottomOf="@+id/button_personalProfileFragment_following"
+                app:layout_constraintEnd_toStartOf="@+id/button_personalProfileFragment_followers"
+                app:layout_constraintStart_toEndOf="@+id/button_personalProfileFragment_following"
+                app:layout_constraintTop_toTopOf="@+id/button_personalProfileFragment_following" />
+
+            <Button
+                android:id="@+id/button_personalProfileFragment_followers"
+                style="@style/Cinemates.Button.TextButton"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="follower 84"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="@+id/button_personalProfileFragment_following"
+                app:layout_constraintStart_toEndOf="@+id/button_personalProfileFragment_following"
+                app:layout_constraintTop_toTopOf="@+id/button_personalProfileFragment_following" />
+
+            <TextView
+                android:id="@+id/textView_personalProfileFragment_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/poppins"
+                android:text="@mario"
+                android:textAlignment="textStart"
+                android:textColor="@color/light_blue"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintStart_toStartOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture" />
+
+            <TextView
+                android:id="@+id/textView_personalProfileFragment_fullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Mario Rossi"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintTop_toTopOf="@+id/imageView_personalProfileFragment_profilePicture" />
+
             <Button
                 android:id="@+id/button_personalProfileFragment_followedLists"
                 style="@style/Cinemates.Button.Rectangular.Outlined"
@@ -49,25 +98,24 @@
                 android:id="@+id/textView_personalProfileFragment_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:fontFamily="@font/poppins_medium"
                 android:text="test@mail.com"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture" />
+                android:textColor="@color/light_blue"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/textView_personalProfileFragment_fullName"
+                app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_fullName" />
 
             <ImageView
                 android:id="@+id/imageView_personalProfileFragment_profilePicture"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/shape_circle_light_blue"
                 android:elevation="@dimen/default_elevation"
                 android:padding="1.5dp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/icon_user_primary_blue" />
@@ -106,12 +154,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="161dp"
                 android:layout_marginStart="55dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="56dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_email"
+                app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_username"
                 tools:visibility="visible" />
 
             <include
@@ -141,21 +189,18 @@
                 app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
                 app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_myLists" />
 
-            <TextView
-                android:id="@+id/textView_personalProfileFragment_label2"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_personalProfileFragment_following"
+                style="@style/Cinemates.Button.TextButton"
+                android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="Liste"
-                android:textAlignment="textStart"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
-                app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
+                android:layout_marginTop="8dp"
+                android:text="chi segui 156"
+                android:textSize="10sp"
+                app:layout_constraintStart_toStartOf="@+id/textView_personalProfileFragment_email"
+                app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_email" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 
 
