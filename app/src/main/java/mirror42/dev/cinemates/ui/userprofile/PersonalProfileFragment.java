@@ -252,7 +252,7 @@ public class PersonalProfileFragment extends Fragment implements
             count = users.size();
         }
 
-        followersButton.setText("Follower " + count);
+        followersButton.setText("Follower\n" + count);
     }
 
     private void setFollowingCount(ArrayList<User> users) {
@@ -261,7 +261,7 @@ public class PersonalProfileFragment extends Fragment implements
             count = users.size();
         }
 
-        followingButton.setText("Seguiti " + count);
+        followingButton.setText("Seguiti\n" + count);
     }
 
     private void showLoggedUserContent() {

@@ -117,7 +117,7 @@
                 <Button
                     android:id="@+id/button_userProfileFragment_following"
                     style="@style/Cinemates.Button.TextButton"
-                    android:layout_width="60dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="seguiti 0"
@@ -140,7 +140,7 @@
                 <Button
                     android:id="@+id/button_userProfileFragment_followers"
                     style="@style/Cinemates.Button.TextButton"
-                    android:layout_width="75dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:text="follower 0"
