@@ -33,13 +33,10 @@ import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -63,7 +60,7 @@ public class PersonalProfileFragment extends Fragment implements
     private LoginViewModel loginViewModel;
     private View includeAccountActivationView;
     private View includePersonalProfileContent;
-    private NotificationsViewModel notificationsViewModel;
+//    private NotificationsViewModel notificationsViewModel;
     private Button buttonCustomLists;
     private Button subscribedListsButton;
     private Button followersButton;
@@ -114,9 +111,8 @@ public class PersonalProfileFragment extends Fragment implements
         includeAccountActivationView = view.findViewById(R.id.include_personalProfileFragment_accountVerification);
         includePersonalProfileContent = view.findViewById(R.id.include_personalProfileFragment_myLists);
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+//        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
         personalProfileViewModel =  new ViewModelProvider(this).get(PersonalProfileViewModel.class);  // on view created
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
         followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
@@ -145,38 +141,25 @@ public class PersonalProfileFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         //
         checkLoginStatus();
-        observeNotifications();
+//        observeNotifications();
     }// end onActivityCreated()
 
     private void observeNotifications() {
-        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
-            switch (status) {
-                case GOT_NEW_NOTIFICATIONS:
-                    ((MainActivity) getActivity()).activateNotificationsIcon();
-                    break;
-                case NO_NOTIFICATIONS:
-                    break;
-            }
-        });
+//        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
+//            switch (status) {
+//                case GOT_NEW_NOTIFICATIONS:
+//                    ((MainActivity) getActivity()).activateNotificationsIcon();
+//                    break;
+//                case NO_NOTIFICATIONS:
+//                    break;
+//            }
+//        });
     }
 
     private void checkLoginStatus() {
         loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
-                case SUCCESS: {
-                    showLoggedUserContent();
-                    hidePendingUserContent();
-                    User user = loginViewModel.getLoggedUser();
-                    String profilePicturePath = user.getProfilePicturePath();
-                    ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
-                    textViewEmail.setText(user.getEmail());
-                    fullNameTextView.setText(user.getFullName());
-                    usernameTextView.setText("@" + user.getUsername());
-                    loadSocialStatistics();
-                }
-                break;
-                case LOGGED_OUT:
-                    break;
+                case SUCCESS:
                 case REMEMBER_ME_EXISTS:
                     try {
                         showLoggedUserContent();
@@ -219,49 +202,10 @@ public class PersonalProfileFragment extends Fragment implements
 
 
     private void loadSocialStatistics() {
-        followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case FOLLOWING_FETCHED: {
-                    ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();
-                    if(following!=null || following.size()>0) {
-                        setFollowingCount(following);
-                    }
-                }
-                break;
-            }
-        });
-        followingViewModel.fetchFollowing(loginViewModel.getLoggedUser().getUsername(), loginViewModel.getLoggedUser());
-
-        followersViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case FOLLOWERS_FETCHED: {
-                    ArrayList<User> followers = followersViewModel.getObservableFollowers().getValue();
-                    if(followers!=null || followers.size()>0) {
-                        setFollowersCount(followers);
-                    }
-                }
-                break;
-            }
-        });
-        followersViewModel.fetchFollowers(loginViewModel.getLoggedUser().getUsername(), loginViewModel.getLoggedUser());
-    }
-
-    private void setFollowersCount(ArrayList<User> users) {
-        int count = 0;
-        if(users!=null || users.size()>0) {
-            count = users.size();
-        }
-
-        followersButton.setText("Follower\n" + count);
-    }
-
-    private void setFollowingCount(ArrayList<User> users) {
-        int count = 0;
-        if(users!=null || users.size()>0) {
-            count = users.size();
-        }
-
-        followingButton.setText("Seguiti\n" + count);
+        int followersCount = loginViewModel.getLoggedUser().getFollowersCount();
+        int followingCount = loginViewModel.getLoggedUser().getFollowingCount();
+        followingButton.setText("Seguiti\n" + followingCount);
+        followersButton.setText("Follower\n" + followersCount);
     }
 
     private void showLoggedUserContent() {
@@ -455,14 +399,14 @@ public class PersonalProfileFragment extends Fragment implements
     }
 
     private void checkForNewNotifications() {
-        if(notificationsViewModel!=null) {
-            if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
-                ((MainActivity) requireActivity()).activateNotificationsIcon();
-            }
-            else {
-                ((MainActivity) requireActivity()).deactivateNotificationsIcon();
-            }
-        }
+//        if(notificationsViewModel!=null) {
+//            if(notificationsViewModel.getNotificationsStatus().getValue() == NotificationsViewModel.NotificationsStatus.GOT_NEW_NOTIFICATIONS) {
+//                ((MainActivity) requireActivity()).activateNotificationsIcon();
+//            }
+//            else {
+//                ((MainActivity) requireActivity()).deactivateNotificationsIcon();
+//            }
+//        }
     }
 
 

@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.model.tmdb;
 
-public class Person {
+import java.io.Serializable;
+
+public class Person implements Serializable {
     private int tmdbID; // 6193
     private String fullName; // Leonardo DiCaprio
     private String character; // Jack Dawson

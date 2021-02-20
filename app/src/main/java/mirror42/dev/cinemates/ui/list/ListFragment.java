@@ -62,6 +62,7 @@ public class ListFragment extends Fragment implements
     private TextView textViewListDescription;
     private boolean navigatedToMovieDetailsFragment;
     private User listOwner;
+    private boolean deleteAllowed;
 
 
 
@@ -179,6 +180,7 @@ public class ListFragment extends Fragment implements
     //--------------------------------------------------------------------------------------- METHODS
 
     private void init(View view) {
+        deleteAllowed = true;
         recommendButton = view.findViewById(R.id.floatingActionButton_listFragment_recommend);
         subscribeButton = view.findViewById(R.id.button_listFragment_subscribe);
         unsubscribeButton = view.findViewById(R.id.button_listFragment_unsubscribe);
@@ -231,6 +233,7 @@ public class ListFragment extends Fragment implements
             User listOwner = list.getOwner();
             if(loggerUser.getUsername().equals(listOwner.getUsername())) {
                 showIsPrivateSwitchButton();
+                allowDeleteMovies();
                 if(((CustomList)currentList).isPrivate()) {
                     isPrivateSwitch.setChecked(true);
                 }
@@ -240,11 +243,11 @@ public class ListFragment extends Fragment implements
             }
             else {
                 // check wheter i'm subscibed or not
+                disallowDeleteMovies();
                 listViewModel.checkMySubscriptionToThisList((CustomList) currentList, loggerUser);
                 listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                     switch (taskStatus) {
                         case ALREADY_SUBSCRIBED:
-                            showCenteredToast("sei iscritto a questa lista!");
                             hideSubscribeButton();
                             showUnubscribeButton();
                             break;
@@ -259,6 +262,14 @@ public class ListFragment extends Fragment implements
                 });
             }
         }
+    }
+
+    private void allowDeleteMovies() {
+        deleteAllowed = true;
+    }
+
+    private void disallowDeleteMovies() {
+        deleteAllowed = false;
     }
 
     private void setListNameAndDescription(MoviesList list) {
@@ -314,7 +325,8 @@ public class ListFragment extends Fragment implements
 
     @Override
     public void onItemLongClicked(int position) {
-        enableActionMode(position);
+        if(deleteAllowed)
+            enableActionMode(position);
     }
 
     private void navigateToMovieDetailsFragment(Movie targetMovie) {

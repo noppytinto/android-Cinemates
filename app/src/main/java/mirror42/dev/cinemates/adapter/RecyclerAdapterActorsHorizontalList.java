@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.viewholder.ActorCardHolder;
-import mirror42.dev.cinemates.model.tmdb.Person;
+import mirror42.dev.cinemates.model.tmdb.Cast;
 
 
 public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<ActorCardHolder>{
-    private ArrayList<Person> peopleList;
+    private ArrayList<Cast> castList;
     private Context context;
 
 
@@ -26,8 +26,8 @@ public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<Ac
 
     //------------------------------------------------------------------------CONSTRUCTORS
 
-    public RecyclerAdapterActorsHorizontalList(ArrayList<Person> peopleList, Context context) {
-        this.peopleList = peopleList;
+    public RecyclerAdapterActorsHorizontalList(ArrayList<Cast> castList, Context context) {
+        this.castList = castList;
         this.context = context;
     }
 
@@ -48,7 +48,7 @@ public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<Ac
 
         // Your Adapter now knows how many items to display on the screen
 
-        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.size() : 0);
+        return ( (castList != null) && (castList.size() != 0) ? castList.size() : 0);
     }
 
     @NonNull
@@ -80,26 +80,28 @@ public class RecyclerAdapterActorsHorizontalList extends RecyclerView.Adapter<Ac
         //
         // This is called repeatedly as you scroll through the RecyclerView
 
-        Person person = peopleList.get(position);
+        Cast cast = castList.get(position);
 
         Glide.with(context)  //2
-                .load(person.getProfileImageURL()) //3
+                .load(cast.getProfilePictureUrl()) //3
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.placeholder_image)
                 .fitCenter() //4
                 .into(holder.imageViewActorCard); //8
 
-        holder.textViewActorCard.setText(person.getFullName() +"\n"+ person.getCharacter() + "\n(" + person.getDepartment() + ")");
+        holder.textViewActorCard.setText(cast.getFullName() +"\n " + cast.getCharacter() + "\n" + cast.getDepartment());
     }
 
 
 
-    public Person getPerson(int position) {
-        return ( (peopleList != null) && (peopleList.size() != 0) ? peopleList.get(position) : null);
+
+
+    public Cast getCastItem(int position) {
+        return ( (castList != null) && (castList.size() != 0) ? castList.get(position) : null);
     }
 
-    public void loadNewData(ArrayList<Person> newPeopleList) {
-        peopleList = newPeopleList;
+    public void loadNewData(ArrayList<Cast> newPeopleList) {
+        castList = newPeopleList;
         notifyDataSetChanged();
     }
 

@@ -34,8 +34,8 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterActorsHorizontalList;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.MoviesList;
+import mirror42.dev.cinemates.model.tmdb.Genre;
 import mirror42.dev.cinemates.model.tmdb.Movie;
-import mirror42.dev.cinemates.model.tmdb.Person;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
@@ -123,13 +123,13 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 initRecyclerView();
 
                 //2
-                movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), movie1 -> {
-                    if(movie1 !=null) updateUI(movie1);
-                    else showCenteredToast("errore caricamento dettagli Film");
+                movieDetailsViewModel.getMovie().observe(getViewLifecycleOwner(), fetchedMovie -> {
+                    if(fetchedMovie !=null)
+                        updateUI(fetchedMovie);
+                    else
+                        showCenteredToast("errore caricamento dettagli Film");
                 });
-
-                // downloading data
-                movieDetailsViewModel.downloadData(movieId);
+                movieDetailsViewModel.fetchMovieDetails(movieId);
 
                 // observe add to list action status
                 movieDetailsViewModel.getAddToListStatus().observe(getViewLifecycleOwner(), addToListStatus ->  {
@@ -335,11 +335,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         // defining Recycler view
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_movieDetailsFragment_cast);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerview_movieDetailsFragment_cast);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         // assigning adapter to recycle
-        recyclerAdapterActorsHorizontalList = new RecyclerAdapterActorsHorizontalList(new ArrayList<Person>(), getContext());
+        recyclerAdapterActorsHorizontalList = new RecyclerAdapterActorsHorizontalList(new ArrayList<>(), getContext());
         recyclerView.setAdapter(recyclerAdapterActorsHorizontalList);
     }
 
@@ -358,7 +358,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         releaseDate.setText(movie.getReleaseDate());
         overview.setText(movie.getOverview());
         duration.setText(String.valueOf(movie.getDuration()) + " min");
-        genres.setText(fixGenresPrint(movie));
+        genres.setText(addCommasToGenres(movie));
         releaseStatus.setText(movie.getReleaseStatus());
 
 
@@ -390,17 +390,26 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         recyclerAdapterActorsHorizontalList.loadNewData(movie.getCastAndCrew());
     }
 
-    public String fixGenresPrint(Movie in) {
+    public String addCommasToGenres(Movie movie) {
         // delete square brackets
-        String temp = in.getGenres().toString();
-        if(temp == null || temp.isEmpty()) {
-            return "";
-        }
-        else {
-            temp = temp.substring(1, temp.length()-1);
+        ArrayList<Genre> temp = movie.getGenres();
+        String accumulator = "";
+
+        int i = temp.size();
+        for(Genre g: temp) {
+            if(g == null || g.getName().isEmpty()) {
+                accumulator = accumulator + "";
+            }
+            else {
+                accumulator = accumulator + g.getName();
+                i--;
+                if(i>0) {
+                    accumulator = accumulator + ", ";
+                }
+            }
         }
 
-        return temp;
+        return accumulator;
     }
 
     private void checkForNewNotifications() {

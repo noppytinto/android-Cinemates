@@ -236,7 +236,8 @@ public class LoginViewModel extends ViewModel {
 
         try {
             // generating url request
-            HttpUrl httpUrl = buildStandardLoginUrl();
+            final String dbFunction = "login";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             RequestBody requestBody = new FormBody.Builder()
                 .add("mail", email)
                 .add("pass", password)
@@ -296,19 +297,7 @@ public class LoginViewModel extends ViewModel {
         }
     }// end standardLogin()
 
-    private HttpUrl buildStandardLoginUrl() throws Exception {
-        final String dbFunction = "login";
 
-        //
-        HttpUrl httpUrl = new HttpUrl.Builder()
-                .scheme("https")
-                .host(remoteConfigServer.getAzureHostName())
-                .addPathSegments(remoteConfigServer.getPostgrestPath())
-                .addPathSegment(dbFunction)
-                .build();
-
-        return httpUrl;
-    }
 
     public boolean checkEmailVerificationState() {
         if(currentFirebaseUser !=null) {

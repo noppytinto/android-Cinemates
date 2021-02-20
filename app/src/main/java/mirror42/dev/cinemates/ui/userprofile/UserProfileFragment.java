@@ -25,8 +25,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-
 import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
@@ -103,49 +101,10 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     }
 
     private void loadSocialStatistics() {
-        followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case FOLLOWING_FETCHED: {
-                    ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();
-                    if(following!=null || following.size()>0) {
-                        setFollowingCount(following);
-                    }
-                }
-                break;
-            }
-        });
-        followingViewModel.fetchFollowing(profileOwner.getUsername(), loginViewModel.getLoggedUser());
-
-        followersViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case FOLLOWERS_FETCHED: {
-                    ArrayList<User> followers = followersViewModel.getObservableFollowers().getValue();
-                    if(followers!=null || followers.size()>0) {
-                        setFollowersCount(followers);
-                    }
-                }
-                break;
-            }
-        });
-        followersViewModel.fetchFollowers(profileOwner.getUsername(), loginViewModel.getLoggedUser());
-    }
-
-    private void setFollowersCount(ArrayList<User> users) {
-        int count = 0;
-        if(users!=null || users.size()>0) {
-            count = users.size();
-        }
-
-        followersButton.setText("Follower\n" + count);
-    }
-
-    private void setFollowingCount(ArrayList<User> users) {
-        int count = 0;
-        if(users!=null || users.size()>0) {
-            count = users.size();
-        }
-
-        followingButton.setText("Seguiti\n" + count);
+        int followersCount = profileOwner.getFollowersCount();
+        int followingCount = profileOwner.getFollowingCount();
+        followingButton.setText("Seguiti\n" + followingCount);
+        followersButton.setText("Follower\n" + followersCount);
     }
 
 

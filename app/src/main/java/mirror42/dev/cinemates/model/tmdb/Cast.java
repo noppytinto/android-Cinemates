@@ -36,6 +36,9 @@ public class Cast implements Parcelable, Serializable {
     @SerializedName("place_of_birth")
     @Expose
     private String placeOfBirth;
+    @SerializedName("character")
+    @Expose
+    private String character;
     private int age;
 
 
@@ -89,7 +92,7 @@ public class Cast implements Parcelable, Serializable {
     }
 
     public String getDepartment() {
-        return department;
+        return translateDepartment(department);
     }
 
     public void setDepartment(String department) {
@@ -128,6 +131,59 @@ public class Cast implements Parcelable, Serializable {
         this.placeOfBirth = placeOfBirth;
     }
 
+    public String getCharacter() {
+        return character;
+    }
+
+    public void setCharacter(String character) {
+        this.character = character;
+    }
+
+    public String translateDepartment(String original) {
+        String translated = "";
+
+        if(original!=null || !original.isEmpty()) {
+            translated = original.toLowerCase();
+
+            switch (translated) {
+                case "acting":
+                    translated = "(attore)";
+                    break;
+                case "directing":
+                    translated = "(regista)";
+                    break;
+                case "writing":
+                    translated = "(scrittore)";
+                    break;
+                case "sound":
+                    translated = "(compositore)";
+                    break;
+                case "crew":
+                    translated = "(membro crew)";
+                    break;
+                case "production":
+                    translated = "(produttore)";
+                    break;
+                case "art":
+                    translated = "(artista)";
+                    break;
+                case "costume & make-up":
+                    translated = "(costumi & make-up)";
+                    break;
+                case "lighting":
+                    translated = "(luci)";
+                    break;
+                case "visual effects":
+                    translated = "(effetti speciali)";
+                    break;
+                default:
+                    translated = "(" + translated + ")";
+            }
+        }
+
+        return translated;
+    }
+
 
 
     //----------------------------------------------------------------- PARCELABLE METHODS
@@ -150,6 +206,8 @@ public class Cast implements Parcelable, Serializable {
         this.biography = ((String) in.readValue((String.class.getClassLoader())));
         this.birthday = ((String) in.readValue((String.class.getClassLoader())));
         this.placeOfBirth = ((String) in.readValue((String.class.getClassLoader())));
+        this.character = ((String) in.readValue((String.class.getClassLoader())));
+
     }
 
     @Override
@@ -161,6 +219,8 @@ public class Cast implements Parcelable, Serializable {
         dest.writeValue(biography);
         dest.writeValue(placeOfBirth);
         dest.writeValue(birthday);
+        dest.writeValue(character);
+
     }
 
     public int describeContents() {

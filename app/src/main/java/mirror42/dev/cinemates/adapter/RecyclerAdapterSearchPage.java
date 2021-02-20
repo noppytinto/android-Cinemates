@@ -148,7 +148,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
                 .into(holder.imageViewProfilePicture); //8
 
         holder.textViewFullName.setText(searchResult.getFullName());
-        holder.textViewDepartment.setText(translate(searchResult.getDepartment()));
+        holder.textViewDepartment.setText(translateDepartment(searchResult.getDepartment()));
         holder.textViewKnownFor.setText(searchResult.getKnwonForAsString());
     }
 
@@ -176,7 +176,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     }
 
 
-    public String translate(String original) {
+    public String translateDepartment(String original) {
         String translated = "";
 
         if(original!=null || !original.isEmpty()) {

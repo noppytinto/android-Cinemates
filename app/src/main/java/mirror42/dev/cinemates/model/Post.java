@@ -13,6 +13,8 @@ public class Post implements Comparable<Post> {
     protected PostType postType;
     private boolean isLikedByMe;
     private boolean isCommentedByMe;
+    private int commentsCount;
+    private int likesCount;
 
     @Override
     public int compareTo(Post another) {
@@ -32,7 +34,6 @@ public class Post implements Comparable<Post> {
         CL,
         CC,
         FW,
-        RW,
         NONE
     }
 
@@ -47,6 +48,24 @@ public class Post implements Comparable<Post> {
 
 
     //---------------------------------------------------------------------- GETTERS/SETTERS
+
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public int getLikesCount() {
+        return likesCount;
+    }
+
     public User getOwner() {
         return owner;
     }
@@ -113,19 +132,8 @@ public class Post implements Comparable<Post> {
         return isLikedByMe;
     }
 
-    public void setIsLikedByMe(String loggedUsername) {
-        boolean res = false;
-        if(likes!=null && likes.size()>0) {
-            for(int i=0; i<likes.size(); i++) {
-                String reactionOwnerUsername = likes.get(i).getOwner().getUsername();
-                if(loggedUsername.equals(reactionOwnerUsername)) {
-                    res = true;
-                    break;
-                }
-            }
-        }
-
-        isLikedByMe = res;
+    public void setIsLikedByMe(boolean value) {
+        this.isLikedByMe = value;
     }
 
     public boolean isCommentedByMe() {
@@ -145,24 +153,6 @@ public class Post implements Comparable<Post> {
         }
 
         isCommentedByMe = res;
-    }
-
-    public int getCommentsCount() {
-        int count = 0;
-        if(comments!=null && comments.size()>0) {
-            count = comments.size();
-        }
-
-        return count;
-    }
-
-    public int getLikesCount() {
-        int count = 0;
-        if(likes!=null && likes.size()>0) {
-            count = likes.size();
-        }
-
-        return count;
     }
 
     public ArrayList<User> getLikesOwnersList() {

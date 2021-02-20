@@ -391,25 +391,8 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     private Movie buildMovie(JSONObject jsonObject) throws JSONException {
         TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-
-        Movie movie = new Movie();
         int movieId = jsonObject.getInt("fk_movie");
-        movie.setTmdbID(movieId);
-
-        try{
-            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-            try {
-                String posterURL = jsonMovieDetails.getString("poster_path");
-                posterURL = tmdb.buildPosterUrl(posterURL);
-                movie.setPosterURL(posterURL);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        Movie movie = tmdb.getMoviesDetailsById(movieId);
         return movie;
     }
 

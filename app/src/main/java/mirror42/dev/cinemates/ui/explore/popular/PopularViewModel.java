@@ -1,13 +1,8 @@
 package mirror42.dev.cinemates.ui.explore.popular;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -19,6 +14,7 @@ public class PopularViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
+    private static ArrayList<Movie> cachedPopular;
 
 
 
@@ -53,13 +49,12 @@ public class PopularViewModel extends ViewModel {
 
     public void downloadData(int givenPage) {
         Runnable downloadTask = createDownloadTask(givenPage);
-        Thread t = new Thread(downloadTask, "THREAD: EXPLORE PAGE - DOWNLOAD POPULARS");
+        Thread t = new Thread(downloadTask);
         t.start();
     }
 
     private Runnable createDownloadTask(int givenPage) {
         return ()-> {
-            Log.d(TAG, "THREAD: EXPLORE PAGE - DOWNLOAD POPULARS");
             int page = givenPage;
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
@@ -68,36 +63,11 @@ public class PopularViewModel extends ViewModel {
 
             try {
                 // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonPopular(page);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
-
-                // fetching results
-                for(int i=0; i<resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-                    int id = x.getInt("id");
-
-                    String title = x.getString("title");
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String posterURL = null;
-                    try {
-                        posterURL = x.getString("poster_path");
-                        posterURL = tmdb.buildPosterUrl(posterURL);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                    }
-
-                    //
-                    Movie mv = new Movie(id, title, posterURL);
-                    result.add(mv);
-                }// for
-
+                result = tmdb.getPopular(givenPage);
 
                 // once finished set results
 //                Collections.shuffle(result);
+                cachedPopular = new ArrayList<>(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
@@ -110,6 +80,12 @@ public class PopularViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
+    public void loadCached() {
+        postMoviesList(cachedPopular);
+        postDownloadStatus(DownloadStatus.SUCCESS);
+        downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
+
+    }
 
 
 }// end PopularFragmentViewModel class

@@ -133,29 +133,14 @@ public class ListCoverViewModel extends ViewModel {
                     if ( ! responseData.equals("null")) {
                         result = new ArrayList<>();
                         JSONArray jsonArray = new JSONArray(responseData);
-                        String posterURL = null;
 
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject x = jsonArray.getJSONObject(i);
                             int movieId = x.getInt("fk_movie");
 
                             try{
-                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-
-                                try {
-                                    posterURL = jsonMovieDetails.getString("poster_path");
-                                    posterURL = tmdb.buildPosterUrl(posterURL);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-
-                                Movie movie = new Movie();
-                                movie.setTmdbID(movieId);
-                                movie.setPosterURL(posterURL);
-
+                                Movie movie = tmdb.getMoviesDetailsById(movieId);
                                 result.add(movie);
-
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -219,20 +204,7 @@ public class ListCoverViewModel extends ViewModel {
                             int movieId = x.getInt("fk_Movie");
 
                             try{
-                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-
-                                try {
-                                    posterURL = jsonMovieDetails.getString("poster_path");
-                                    posterURL = tmdb.buildPosterUrl(posterURL);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-
-                                Movie movie = new Movie();
-                                movie.setTmdbID(movieId);
-                                movie.setPosterURL(posterURL);
-
+                                Movie movie = tmdb.getMoviesDetailsById(movieId);
                                 result.add(movie);
 
                             } catch (Exception e) {
@@ -288,27 +260,13 @@ public class ListCoverViewModel extends ViewModel {
                     if (!responseData.equals("null")) {
                         result = new ArrayList<>();
                         JSONArray jsonArray = new JSONArray(responseData);
-                        String posterURL = null;
 
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject x = jsonArray.getJSONObject(i);
                             int movieId = x.getInt("fk_movie");
 
                             try {
-                                JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-
-                                try {
-                                    posterURL = jsonMovieDetails.getString("poster_path");
-                                    posterURL = tmdb.buildPosterUrl(posterURL);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-
-                                Movie movie = new Movie();
-                                movie.setTmdbID(movieId);
-                                movie.setPosterURL(posterURL);
-
+                                Movie movie = tmdb.getMoviesDetailsById(movieId);
                                 result.add(movie);
 
                             } catch (Exception e) {

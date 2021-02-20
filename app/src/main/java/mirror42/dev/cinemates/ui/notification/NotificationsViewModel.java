@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.notification;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -81,10 +82,10 @@ public class NotificationsViewModel extends ViewModel {
     public NotificationsViewModel() {
         notificationsList = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
-        notificationsSubscription = new SerialDisposable();
         notificationsStatus = new MutableLiveData<>(NotificationsStatus.NO_NOTIFICATIONS);
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         customList = new MutableLiveData<>();
+        notificationsSubscription = new SerialDisposable();
 
     }
 
@@ -543,9 +544,17 @@ public class NotificationsViewModel extends ViewModel {
                     else {
                         setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
                     }
+                }, throwable -> {
+                    Log.d(TAG, "fetchNotifications: " + throwable.getMessage());
                 }));
 
 
+    }
+
+
+    public void stopFetchingNotifications() {
+//        if(notificationsSubscription!=null && (!notificationsSubscription.isDisposed()))
+//            notificationsSubscription.dispose();
     }
 
     private void handleFetchErrors(Throwable e) {
@@ -758,25 +767,8 @@ public class NotificationsViewModel extends ViewModel {
 
     private Movie buildMovie(JSONObject jsonObject) throws JSONException {
         TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-
-        Movie movie = new Movie();
         int movieId = jsonObject.getInt("fk_movie");
-        movie.setTmdbID(movieId);
-
-        try{
-            JSONObject jsonMovieDetails = tmdb.getJsonMovieDetailsById(movieId);
-            try {
-                String posterURL = jsonMovieDetails.getString("poster_path");
-                posterURL = tmdb.buildPosterUrl(posterURL);
-                movie.setPosterURL(posterURL);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        Movie movie = tmdb.getMoviesDetailsById(movieId);
         return movie;
     }
 

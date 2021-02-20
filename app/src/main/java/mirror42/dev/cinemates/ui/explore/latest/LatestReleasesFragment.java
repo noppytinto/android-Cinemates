@@ -32,6 +32,7 @@ public class LatestReleasesFragment extends Fragment implements
     private LatestReleasesViewModel latestReleasesViewModel;
     private RecyclerAdapterExploreLatest recyclerAdapterExploreLatest;
     private View view;
+    private static boolean stopFetchingLatest;
 
 
 
@@ -65,7 +66,13 @@ public class LatestReleasesFragment extends Fragment implements
         });
 
         //3 downloading data
-        latestReleasesViewModel.downloadData(PAGE_1);
+        if(!stopFetchingLatest) {
+            latestReleasesViewModel.downloadData(PAGE_1);
+            stopFetchingLatest = true;
+        }
+        else {
+            latestReleasesViewModel.loadCached();
+        }
     }// end onViewCreated()
 
 

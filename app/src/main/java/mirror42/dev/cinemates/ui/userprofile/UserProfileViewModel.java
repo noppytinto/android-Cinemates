@@ -141,12 +141,7 @@ public class UserProfileViewModel extends ViewModel {
             // build httpurl and request for remote db
             final String dbFunction = "fn_select_user_profile_details";
             //
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("target_username", username)
@@ -205,6 +200,10 @@ public class UserProfileViewModel extends ViewModel {
         user.setLastName(jsonObject.getString("LastName"));
         user.setBirthDate(jsonObject.getString("BirthDate"));
         user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        int followersCount = jsonObject.getInt("followers_count");
+        int followingCount = jsonObject.getInt("following_count");
+        user.setFollowersCount(followersCount);
+        user.setFollowingCount(followingCount);
         return user;
     }
 

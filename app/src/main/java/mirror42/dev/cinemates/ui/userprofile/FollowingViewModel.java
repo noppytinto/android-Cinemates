@@ -35,6 +35,7 @@ public class FollowingViewModel extends ViewModel {
     private MutableLiveData<TaskStatus> taskStatus;
 
 
+
     //------------------------------------------------------------------------ CONSTRUCTORS
 
     public FollowingViewModel() {

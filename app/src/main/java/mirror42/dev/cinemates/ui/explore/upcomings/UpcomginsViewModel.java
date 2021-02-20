@@ -4,9 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
@@ -17,6 +14,7 @@ public class UpcomginsViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
     private MutableLiveData<ArrayList<Movie>> moviesList;
     private MutableLiveData<DownloadStatus> downloadStatus;
+    private static ArrayList<Movie> cachedUpcomings;
 
 
 
@@ -65,41 +63,13 @@ public class UpcomginsViewModel extends ViewModel {
             TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
             ArrayList<Movie> result = null;
 
-            result = new ArrayList<>();
-
             try {
-                // querying TBDb
-                JSONObject jsonObj = tmdb.getJsonUpcoming(page);
-                JSONArray resultsArray = jsonObj.getJSONArray("results");
-
                 // fetching results
-                for(int i=0; i<resultsArray.length(); i++) {
-                    JSONObject x = resultsArray.getJSONObject(i);
-
-                    int id = x.getInt("id");
-
-                    String title = x.getString("title");
-
-                    // if poster_path is null
-                    // getString() will fail
-                    // that's why the try-catch
-                    String posterURL = null;
-                    try {
-                        posterURL = x.getString("poster_path");
-                        posterURL = tmdb.buildPosterUrl(posterURL);
-                    } catch (Exception e) {
-                        e.getMessage();
-                        e.printStackTrace();
-                    }
-
-                    //
-                    Movie mv = new Movie(id, title, posterURL);
-                    result.add(mv);
-                }// for
-
+                result = tmdb.getUpcomgins(givenPage);
 
                 // once finished set results
 //                Collections.shuffle(result);
+                cachedUpcomings = new ArrayList<>(result);
                 postMoviesList(result);
                 postDownloadStatus(DownloadStatus.SUCCESS);
             } catch (Exception e) {
@@ -112,6 +82,11 @@ public class UpcomginsViewModel extends ViewModel {
         };
     }// end createDownloadTask()
 
+    public void loadCached() {
+        postMoviesList(cachedUpcomings);
+        postDownloadStatus(DownloadStatus.SUCCESS);
+        downloadStatus = new MutableLiveData<>(DownloadStatus.IDLE);
 
+    }
 
 }// end UpcomginsViewModel class

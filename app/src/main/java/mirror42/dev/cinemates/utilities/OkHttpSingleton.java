@@ -17,9 +17,10 @@ public class OkHttpSingleton {
 
     private OkHttpSingleton(Context context) {
         File httpCacheDirectory = new File(context.getCacheDir(), "http-cache");
-        int cacheSize = 50 * 1024 * 1024; // 50 MB cache
+        int cacheSize = 100 * 1024 * 1024; // 50 MB cache
         Cache cache = new Cache(httpCacheDirectory, cacheSize);
         client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
                 .cache(cache)
                 .build();
     }

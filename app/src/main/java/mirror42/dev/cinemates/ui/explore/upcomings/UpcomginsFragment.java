@@ -34,8 +34,8 @@ public class UpcomginsFragment extends Fragment implements
     private UpcomginsViewModel upcomginsViewModel;
     private RecyclerAdapterExploreUpcoming recyclerAdapterExploreUpcoming;
     private View view;
-//    private ArrayList<Movie> moviesList;
-//    private final String MOVIES_LIST_KEY = "MOVIE_LIST_KEY";
+    private static boolean stopFetchingUpcomings;
+
 
 
 
@@ -72,7 +72,13 @@ public class UpcomginsFragment extends Fragment implements
         });
 
         // downloading data
-        upcomginsViewModel.downloadData(PAGE_1);
+        if(!stopFetchingUpcomings) {
+            upcomginsViewModel.downloadData(PAGE_1);
+            stopFetchingUpcomings = true;
+        }
+        else {
+            upcomginsViewModel.loadCached();
+        }
     }// end onViewCreated()
 
 //    @Override

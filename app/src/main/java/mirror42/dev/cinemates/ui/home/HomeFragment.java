@@ -27,7 +27,6 @@ import mirror42.dev.cinemates.adapter.RecyclerAdapterPost;
 import mirror42.dev.cinemates.model.CustomListPost;
 import mirror42.dev.cinemates.model.FavoritesPost;
 import mirror42.dev.cinemates.model.FollowPost;
-import mirror42.dev.cinemates.model.Like;
 import mirror42.dev.cinemates.model.Post;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.WatchedPost;
@@ -55,6 +54,8 @@ public class HomeFragment extends Fragment implements
 
 
     //------------------------------------------------------------------------------- ANDROID METHODS
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,6 +89,8 @@ public class HomeFragment extends Fragment implements
                     hideProgressIndicator();
                     ArrayList<Post> postsList = homeViewModel.getPostsList().getValue();
                     recyclerAdapterPost.loadNewData(postsList);
+//                    homeViewModel.resetFetchStatus();
+
                 }
                 break;
                 case EMPTY:
@@ -105,10 +108,10 @@ public class HomeFragment extends Fragment implements
             switch (loginResult) {
                 case SUCCESS:
                 case REMEMBER_ME_EXISTS: {
-                    User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
                     showProgressIndicator();
+                    updateFeedButton.setVisibility(View.VISIBLE);
+                    progressIndicator.setVisibility(View.VISIBLE);
                     fetchPosts();
-                    checkForNewNotifications(loggedUser);
                     welcomeMessage.setVisibility(View.GONE);
                 }
                 break;
@@ -136,11 +139,12 @@ public class HomeFragment extends Fragment implements
     //------------------------------------------------------------------------------- METHODS
 
     private void fetchPosts() {
-        updateFeedButton.setVisibility(View.VISIBLE);
-        User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-        progressIndicator.setVisibility(View.VISIBLE);
-        homeViewModel.fetchPosts(loggedUser);
-
+            try {
+                User loggedUser = loginViewModel.getLoggedUser();
+                homeViewModel.fetchLimitedPosts(1, loggedUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     private void initRecyclerView() {
@@ -160,39 +164,22 @@ public class HomeFragment extends Fragment implements
         long postId = currentPost.getPostId();
         String currentLoggedUserEmail = loginViewModel.getLoggedUser().getEmail();
         TextView likesCounter = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_showLikes);
-        Button likebutton = recyclerView.getLayoutManager().findViewByPosition(position).findViewById(R.id.button_reactionsLayout_like);
 
         // updating likes counter
-        int currentLikesCounter = Integer.parseInt(likesCounter.getText().toString());
-        if(likebutton.isActivated()) { //remove like
+        int currentLikesCounter = currentPost.getLikesCount();
+        if(currentPost.isLikedByMe()) {
             if(currentLikesCounter>0)
                 currentLikesCounter = currentLikesCounter - 1;
-
             homeViewModel.removeLike(postId, currentLoggedUserEmail, loginViewModel.getLoggedUser().getAccessToken());
-
-            // removing like from current cached list
-            ArrayList<Like> currentLikes = currentPost.getLikes();
-            if(currentLikes!=null && currentLikes.size()>0) {
-                Like placeholderLike = new Like();
-                placeholderLike.setOwner(loginViewModel.getObservableLoggedUser().getValue());
-                currentLikes.remove(placeholderLike);
-            }
+            currentPost.setIsLikedByMe(false);
         }
         else { //add like
+            currentPost.setIsLikedByMe(true);
             currentLikesCounter = currentLikesCounter + 1;
-            homeViewModel.addLike(postId, loginViewModel.getObservableLoggedUser().getValue().getEmail(), loginViewModel.getLoggedUser().getAccessToken());
-
-            // adding placehoder like to the current cached list
-            Like placeholderLike = new Like();
-            User currentUser = loginViewModel.getObservableLoggedUser().getValue();
-            placeholderLike.setOwner(currentUser);
-            ArrayList<Like> currentLikes = currentPost.getLikes();
-            if(currentLikes==null)
-                currentLikes = new ArrayList<>();
-
-            currentLikes.add(placeholderLike);
+            homeViewModel.addLike(postId, loginViewModel.getLoggedUser().getEmail(), loginViewModel.getLoggedUser().getAccessToken());
         }
 
+        currentPost.setLikesCount(currentLikesCounter);
         likesCounter.setText(String.valueOf(currentLikesCounter));
     }
 
@@ -317,7 +304,11 @@ public class HomeFragment extends Fragment implements
                         break;
                 }
             });
-            notificationsViewModel.fetchNotifications(loggedUser, getContext());
+            try {
+                notificationsViewModel.fetchNotifications(loggedUser, getContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -340,8 +331,9 @@ public class HomeFragment extends Fragment implements
             recyclerAdapterPost.clearList();
 
             User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-            homeViewModel.fetchPosts(loggedUser);
-            checkForNewNotifications(loggedUser);
+            progressIndicator.setVisibility(View.VISIBLE);
+            fetchPosts();
+//            checkForNewNotifications(loggedUser);
         }
     }
 

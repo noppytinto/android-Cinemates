@@ -106,7 +106,7 @@ public class CustomListBrowserFragment extends Fragment
     }
 
     private void initForFetchModePublicLists(String profileOwnerUsername) {
-        buttonAdd.setOnClickListener(this);
+        buttonAdd.setVisibility(View.GONE);
         customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
         customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {

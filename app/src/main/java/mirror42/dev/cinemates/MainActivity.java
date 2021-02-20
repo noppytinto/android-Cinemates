@@ -201,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
 
 
     private void loadRemoteParams() {
-        showProgressDialog();
         remoteConfigServer = RemoteConfigServer.getInstance();
         remoteConfigServer.setListener(this);
         remoteConfigServer.loadConfigParams();
@@ -227,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                         break;
                 }
             });
-            notificationsViewModel.fetchNotifications(loggedUser, getApplicationContext());
+//            notificationsViewModel.fetchNotifications(loggedUser, getApplicationContext());
         }
     }
 
@@ -312,20 +311,20 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
     public void showToolbar() {
         toolbar.setVisibility(View.VISIBLE);
     }
-
-    private void showProgressDialog() {
-        //notes: Declare progressDialog before so you can use .hide() later!
-        progressDialog = new ProgressDialog(getApplicationContext());
-        progressDialog.setMessage("Avvio in corso...");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        try {
-            progressDialog.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private void showProgressDialog() {
+//        //notes: Declare progressDialog before so you can use .hide() later!
+//        progressDialog = new ProgressDialog(getApplicationContext());
+//        progressDialog.setMessage("Avvio in corso...");
+//        progressDialog.setCancelable(false);
+//        progressDialog.setCanceledOnTouchOutside(false);
+//        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        try {
+//            progressDialog.show();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void hideProgressDialog() {
         if(progressDialog!=null)

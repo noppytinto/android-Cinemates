@@ -43,13 +43,14 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="60dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/switch_listFragment_isPrivate"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_description" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_description"
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton_listFragment_recommend"

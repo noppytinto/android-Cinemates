@@ -242,7 +242,11 @@ public class NotificationsFragment extends Fragment implements
 
     private void loadNotifications(User loggedUser) {
         if(loggedUser==null) return;
-        notificationsViewModel.fetchNotifications(loggedUser, getContext());
+        try {
+            notificationsViewModel.fetchNotifications(loggedUser, getContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateUI(ArrayList<Notification> notifications) {

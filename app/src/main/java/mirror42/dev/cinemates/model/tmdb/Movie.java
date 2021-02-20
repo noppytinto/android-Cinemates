@@ -35,9 +35,10 @@ public class Movie implements Parcelable, Serializable {
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
-    private ArrayList<String> genres;
-    private ArrayList<Person> castAndCrew;
-    private ArrayList<Review> reviews;
+    @SerializedName("genres")
+    @Expose
+    private ArrayList<Genre> genres;
+    private ArrayList<Cast> castAndCrew;
     private boolean isSelected;
 
 
@@ -69,8 +70,8 @@ public class Movie implements Parcelable, Serializable {
                  int duration,
                  String releaseStatus,
                  String releaseDate,
-                 ArrayList<String> genres,
-                 ArrayList<Person> castAndCrew) {
+                 ArrayList<Genre> genres,
+                 ArrayList<Cast> castAndCrew) {
         this(tmdbID, title, posterURL, overview);
         this.backdropURL = backdropURL;
         this.duration = duration;
@@ -155,28 +156,20 @@ public class Movie implements Parcelable, Serializable {
         this.releaseDate = releaseDate;
     }
 
-    public ArrayList<String> getGenres() {
+    public ArrayList<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(ArrayList<String> genres) {
+    public void setGenres(ArrayList<Genre> genres) {
         this.genres = genres;
     }
 
-    public ArrayList<Person> getCastAndCrew() {
+    public ArrayList<Cast> getCastAndCrew() {
         return castAndCrew;
     }
 
-    public void setCastAndCrew(ArrayList<Person> castAndCrew) {
+    public void setCastAndCrew(ArrayList<Cast> castAndCrew) {
         this.castAndCrew = castAndCrew;
-    }
-
-    public ArrayList<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(ArrayList<Review> reviews) {
-        this.reviews = reviews;
     }
 
     public int getDuration() {
@@ -216,11 +209,10 @@ public class Movie implements Parcelable, Serializable {
         this.duration = source.readInt();
         this.releaseStatus = source.readString();
         this.releaseDate = source.readString();
-        this.genres = source.createStringArrayList();
-        this.castAndCrew = new ArrayList<Person>();
+        this.genres = new ArrayList<Genre>();
+        this.castAndCrew = new ArrayList<Cast>();
+        source.readList(genres, Genre.class.getClassLoader());
         source.readList(castAndCrew, Person.class.getClassLoader());
-        this.reviews = new ArrayList<Review>();
-        source.readList(reviews, Review.class.getClassLoader());
     }
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -234,7 +226,6 @@ public class Movie implements Parcelable, Serializable {
         dest.writeString(releaseDate);
         dest.writeList(genres);
         dest.writeList(castAndCrew);
-        dest.writeList(reviews);
     }
 
     // Method to recreate a Question from a Parcel

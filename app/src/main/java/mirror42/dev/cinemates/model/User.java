@@ -19,6 +19,8 @@ public class User implements Serializable, Parcelable {
     private String accessToken;
     private boolean promo;
     private boolean analytics;
+    private int followersCount;
+    private int followingCount;
 
 
 
@@ -170,6 +172,22 @@ public class User implements Serializable, Parcelable {
         return firstName + " " + lastName;
     }
 
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(int followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public int getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(int followingCount) {
+        this.followingCount = followingCount;
+    }
+
     //----------------------------------------------- METHODS
 
     public static User parseUserFromJsonObject(JSONObject jsonObject) {
@@ -188,8 +206,11 @@ public class User implements Serializable, Parcelable {
             String profilePicturePath = jsonObject.getString("ProfileImage");
             String accessToken = jsonObject.getString("AccessToken");
             boolean analytics = jsonObject.getBoolean("Analytics");
-
+            int followersCount = jsonObject.getInt("followers_count");
+            int followingCount = jsonObject.getInt("following_count");
             user = new User(username,password, email, firstName, secondName, birthDate, profilePicturePath, accessToken, analytics);
+            user.setFollowersCount(followersCount);
+            user.setFollowingCount(followingCount);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -216,6 +237,8 @@ public class User implements Serializable, Parcelable {
         firstName = in.readString();
         lastName = in.readString();
         birthDate = in.readString();
+        followersCount = in.readInt();
+        followingCount = in.readInt();
         profilePicturePath = in.readString();
         accessToken = in.readString();
         promo = in.readByte() != 0;
@@ -249,6 +272,8 @@ public class User implements Serializable, Parcelable {
         dest.writeString(birthDate);
         dest.writeString(profilePicturePath);
         dest.writeString(accessToken);
+        dest.writeInt(followersCount);
+        dest.writeInt(followingCount);
         dest.writeByte((byte) (promo ? 1 : 0));
         dest.writeByte((byte) (analytics ? 1 : 0));
     }

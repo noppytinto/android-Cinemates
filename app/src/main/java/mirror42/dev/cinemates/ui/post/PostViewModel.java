@@ -191,6 +191,9 @@ public class PostViewModel extends ViewModel {
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         post.setDescription("ha aggiunto un film alla Watchlist.");
         post.setMovie(movie);
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
+
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
         return post;
@@ -210,6 +213,8 @@ public class PostViewModel extends ViewModel {
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         post.setDescription("ha aggiunto un film nei Preferiti.");
         post.setMovie(movie);
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
         return post;
@@ -229,6 +234,8 @@ public class PostViewModel extends ViewModel {
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         post.setDescription("ha visto: " + movie.getTitle());
         post.setMovie(movie);
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
         return post;
@@ -246,6 +253,8 @@ public class PostViewModel extends ViewModel {
         String listName = jsonObject.getString("list_name");
         post.setListName(listName);
         post.setDescription("ha creato la lista: " + listName);
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
         // getting reactions
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
@@ -266,6 +275,8 @@ public class PostViewModel extends ViewModel {
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         post.setDescription("aggiunto un film alla lista: " + jsonObject.getString("list_name"));
         post.setMovie(movie);
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
         return post;
@@ -282,6 +293,8 @@ public class PostViewModel extends ViewModel {
         post.setPublishDateMillis(jsonObject.getLong("Date_Post_Creation"));
         post.setFollowed(followed);
         post.setDescription("ora segue: " + followed.getFullName() + " (@" + followed.getUsername() + ")");
+        post.setCommentsCount(jsonObject.getInt("comments_count"));
+        post.setLikesCount(jsonObject.getInt("likes_count"));
         // getting reactions
         fetchPostLikes(post, loggedUser);
         fetchPostComments(post, loggedUser);
@@ -314,33 +327,8 @@ public class PostViewModel extends ViewModel {
 
     private Movie buildMovie(JSONObject jsonObject) throws JSONException {
         TheMovieDatabaseApi tmdb = TheMovieDatabaseApi.getInstance();
-
-        Movie movie = new Movie();
-        movie.setTmdbID(jsonObject.getInt("MovieId"));
-
-        JSONObject jsonTmdbObj = tmdb.getJsonMovieDetailsById(movie.getTmdbID());
-        try {
-            // if poster_path is null
-            // json.getString() will fail
-            // that's why the try-catch
-
-            String posterURL = jsonTmdbObj.getString("poster_path");
-            posterURL = tmdb.buildPosterUrl(posterURL);
-            movie.setPosterURL(posterURL);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        movie.setTitle(jsonTmdbObj.getString("title"));
-
-        String overview = "";
-        try {
-            overview = jsonTmdbObj.getString("overview");
-            if(overview==null || overview.isEmpty()) movie.setOverview("(trama non disponibile in italiano)");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        movie.setOverview(overview);
-
+        int movieId = jsonObject.getInt("MovieId");
+        Movie movie = tmdb.getMoviesDetailsById(movieId);
         return movie;
     }
 
@@ -357,12 +345,7 @@ public class PostViewModel extends ViewModel {
         try {
             final String dbFunction = "fn_select_comments";
             // building db url
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("target_post_id", String.valueOf(postID))
@@ -397,7 +380,7 @@ public class PostViewModel extends ViewModel {
                         }
                         Collections.reverse(comments);
                         watchlistPost.setComments(comments);
-                        watchlistPost.setIsCommentedByMe(loggedUser.getUsername());
+//                        watchlistPost.setIsCommentedByMe(loggedUser.getUsername());
                     }
                 }
             }catch (Exception e) {
@@ -414,12 +397,7 @@ public class PostViewModel extends ViewModel {
         try {
             final String dbFunction = "fn_select_likes";
             // building db url
-            HttpUrl httpUrl = new HttpUrl.Builder()
-                    .scheme("https")
-                    .host(remoteConfigServer.getAzureHostName())
-                    .addPathSegments(remoteConfigServer.getPostgrestPath())
-                    .addPathSegment(dbFunction)
-                    .build();
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
             RequestBody requestBody = new FormBody.Builder()
                     .add("target_post_id", String.valueOf(postID))
@@ -451,7 +429,7 @@ public class PostViewModel extends ViewModel {
                             likes.add(l);
                         }
                         watchlistPost.setLikes(likes);
-                        watchlistPost.setIsLikedByMe(loggedUser.getUsername());
+//                        watchlistPost.setIsLikedByMe(loggedUser.getUsername());
                     }
                 }
             }catch (Exception e) {

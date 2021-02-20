@@ -33,8 +33,8 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
     private PopularViewModel popularViewModel;
     private RecyclerAdaptExplorePopular recyclerAdaptExplorePopular;
     private View view;
-//    private ArrayList<Movie> moviesList;
-//    private final String MOVIES_LIST_KEY = "MOVIE_LIST_KEY";
+    private static boolean stopFetchingPopular;
+
 
 
 
@@ -70,7 +70,13 @@ public class PopularFragment extends Fragment implements RecyclerListener.OnClic
         });
 
         // downloading data
-        popularViewModel.downloadData(PAGE_1);
+        if(!stopFetchingPopular) {
+            popularViewModel.downloadData(PAGE_1);
+            stopFetchingPopular = true;
+        }
+        else {
+            popularViewModel.loadCached();
+        }
     }// end onViewCreated()
 
 

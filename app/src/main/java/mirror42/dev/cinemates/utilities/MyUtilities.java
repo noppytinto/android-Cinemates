@@ -247,6 +247,8 @@ public class MyUtilities {
             jsonObject.put("ProfileImage", user.getProfilePicturePath());
             jsonObject.put("AccessToken", user.getAccessToken());
             jsonObject.put("Analytics", user.getAnalytics());
+            jsonObject.put("followers_count", user.getFollowersCount());
+            jsonObject.put("following_count", user.getFollowingCount());
 
             string = jsonObject.toString();
 

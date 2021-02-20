@@ -84,7 +84,6 @@ public class PersonalProfileViewModel extends ViewModel {
 
     //----------------------------------------------------------------- METHODS
 
-
     public void changeProfileImage(User user, String url){
         Runnable downloadTask = uploadImageAsync(user,url);
         Thread t = new Thread(downloadTask);
