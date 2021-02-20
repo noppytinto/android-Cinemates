@@ -26,8 +26,6 @@
         android:id="@+id/textView_listFragment_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
         android:fontFamily="@font/poppins_light"
         android:padding="0dp"
         android:paddingBottom="10dp"
@@ -35,8 +33,7 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/switch_listFragment_isPrivate"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toEndOf="@+id/divider_listFragment"
         app:layout_constraintStart_toStartOf="@+id/textView_listFragment_listName"
         app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_listName"
         tools:visibility="visible" />
@@ -46,14 +43,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/switch_listFragment_isPrivate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_description"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_listFragment_description" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton_listFragment_recommend"
@@ -72,13 +68,14 @@
         android:id="@+id/switch_listFragment_isPrivate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="@font/poppins_light"
         android:text="privata"
         android:textColor="@color/light_blue"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/divider_listFragment"
-        app:layout_constraintTop_toBottomOf="@+id/divider_listFragment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 
     <View
@@ -99,7 +96,7 @@
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="121dp"
         android:layout_height="51dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Iscriviti"
         android:textSize="12sp"
         android:visibility="gone"
@@ -114,7 +111,7 @@
         style="@style/Cinemates.Button.Rounded.Outlined"
         android:layout_width="165dp"
         android:layout_height="52dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="cancella iscrizione"
         android:textSize="12sp"
         android:visibility="gone"
