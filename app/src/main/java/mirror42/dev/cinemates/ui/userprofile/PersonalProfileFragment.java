@@ -1,7 +1,6 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -39,6 +38,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
+import mirror42.dev.cinemates.utilities.RealPathUtil;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 import static android.app.Activity.RESULT_OK;
@@ -74,7 +74,7 @@ public class PersonalProfileFragment extends Fragment implements
 
     private String filePath;
     private PersonalProfileViewModel personalProfileViewModel;
-
+    int SELECT_PICTURE = 200;
 
     //----------------------------------------------------------------------- ANDROID METHODS
 
@@ -246,34 +246,31 @@ public class PersonalProfileFragment extends Fragment implements
         super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
 
         Bitmap thumbnail = null;
-        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
+        if(requestCode==SELECT_PICTURE && resultCode==RESULT_OK){
+            filePath = "-";
             try {
-                //set picked image to the mProfile
-                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
-//                mProfile.setImageBitmap(bitmap);
+                filePath = RealPathUtil.getRealPath(requireContext(), data.getData());
+
+                if(filePath==null || filePath.isEmpty()) {
+                    personalProfileViewModel.setResetStatus(PersonalProfileViewModel.ChangeImageResult.FAILED);
+                }
+                else {
+                    //set picked image to the mProfile
+                    thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+                    Glide.with(this)  //2
+                            .load(thumbnail) //3
+                            .fallback(R.drawable.broken_image)
+                            .placeholder(R.drawable.icon_user_dark_blue)
+                            .circleCrop() //4
+                            .into(profilePicture); //8
+                    personalProfileViewModel.changeProfileImage(loginViewModel.getLoggedUser(),filePath);
+
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            filePath = "-";
-            try {
-                filePath = getRealPathFromUri(data.getData(), getActivity());
-
-                // load thumbnail
-                Glide.with(this)  //2
-                        .load(filePath) //3
-                        .fallback(R.drawable.broken_image)
-                        .placeholder(R.drawable.placeholder_image)
-                        .circleCrop() //4
-                        .into(profilePicture); //8
-
-
-                personalProfileViewModel.changeProfileImage(loginViewModel.getLoggedUser(),filePath);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -321,6 +318,7 @@ public class PersonalProfileFragment extends Fragment implements
         }
         else if(v.getId() == profilePicture.getId()){
             pickImageFromGallery(v);
+//            imageChooser();
         }
         else if(v.getId() == followersButton.getId()){
             NavDirections followersFragment =
@@ -348,8 +346,80 @@ public class PersonalProfileFragment extends Fragment implements
 
     //----------------------------------------------------------------------- METHODS
 
-    private String getRealPathFromUri(Uri imageUri, Activity activity){
-        Cursor cursor = activity.getContentResolver().query(imageUri, null,  null, null, null); if(cursor==null) {
+    void imageChooser() {
+        personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
+            switch (changeImageResult) {
+                case SUCCESS:
+                    showCenteredToast( "cambio immagine profilo riuscito ");
+                    break;
+                case FAILED:
+                    showCenteredToast( "cambio immagine profilo NON riuscito");
+                    break;
+            }
+        });
+
+        // create an instance of the
+        // intent of the type image
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+
+        // pass the constant to compare it
+        // with the returned requestCode
+        startActivityForResult(Intent.createChooser(i, "Select Picture"), SELECT_PICTURE);
+    }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (resultCode == RESULT_OK) {
+//
+//            // compare the resultCode with the
+//            // SELECT_PICTURE constant
+//            if (requestCode == SELECT_PICTURE) {
+//                // Get the url of the image from data
+//                Uri selectedImageUri = data.getData();
+//                if (null != selectedImageUri) {
+//                    // update the preview image in the layout
+//
+//                    filePath = "-";
+//                    try {
+////                        Log.d(TAG, "onActivityResult: " + getPath(selectedImageUri));
+//                        filePath = RealPathUtil.getRealPath(requireContext(), selectedImageUri);
+//
+//                        if(filePath==null || filePath.isEmpty()) {
+//                            personalProfileViewModel.setResetStatus(PersonalProfileViewModel.ChangeImageResult.FAILED);
+//                            return;
+//                        }
+//
+//                        // load thumbnail
+//                        try {
+//                            Glide.with(this)  //2
+//                                    .load(filePath) //3
+//                                    .fallback(R.drawable.broken_image)
+//                                    .placeholder(R.drawable.broken_image)
+//                                    .circleCrop() //4
+//                                    .into(profilePicture); //8
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                        personalProfileViewModel.changeProfileImage(loginViewModel.getLoggedUser(), filePath);
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+
+    private String getRealPathFromUri(Uri imageUri){
+        Cursor cursor = null;
+        cursor = requireActivity().getContentResolver().query(imageUri, null,  null, null, null);
+        if(cursor==null) {
             return imageUri.getPath();
         }else{
             cursor.moveToFirst();
@@ -360,13 +430,34 @@ public class PersonalProfileFragment extends Fragment implements
 
     void pickImageFromGallery(View view){
         personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
-            if(changeImageResult == PersonalProfileViewModel.ChangeImageResult.SUCCESS)
-                showCenteredToast( "cambio immagine profilo riuscito ");
-            else if(changeImageResult == PersonalProfileViewModel.ChangeImageResult.FAILED)
-                showCenteredToast( "cambio immagine profilo NON riuscito");
+            switch (changeImageResult) {
+                case SUCCESS:
+                    showCenteredToast( "cambio immagine profilo riuscito ");
+                    break;
+                case FAILED:
+                    showCenteredToast( "cambio immagine profilo NON riuscito");
+                    break;
+            }
         });
         requestPermission();
     }
+
+//    public String getPath(Uri uri) {
+//        Cursor cursor = requireActivity().getContentResolver().query(uri, null, null, null, null);
+//        cursor.moveToFirst();
+//        String document_id = cursor.getString(0);
+//        document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+//        cursor.close();
+//
+//        cursor = requireActivity().getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+//        cursor.moveToFirst();
+//        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+//        cursor.close();
+//
+//        return path;
+//    }
 
     private void requestPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
@@ -379,18 +470,8 @@ public class PersonalProfileFragment extends Fragment implements
     public void accessTheGallery(){
         Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         i.setType("image/*");
-        startActivityForResult(i, PICK_IMAGE);
+        startActivityForResult(i, SELECT_PICTURE);
     }
-//
-//    private void showResendEmail() {
-//        includeAccountActivationView.setVisibility(View.VISIBLE);
-//        includePersonalProfileContent.setVisibility(View.GONE);
-//    }
-//
-//    private void hideResendEmail() {
-//        includeAccountActivationView.setVisibility(View.GONE);
-//        includePersonalProfileContent.setVisibility(View.VISIBLE);
-//    }
 
     public void showCenteredToast(String message) {
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);

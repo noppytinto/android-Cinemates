@@ -69,7 +69,7 @@ public class PersonalProfileViewModel extends ViewModel {
         return changeImageResult;
     }
 
-    public void postResetStatus(ChangeImageResult changeImageResult) {
+    public void setResetStatus(ChangeImageResult changeImageResult) {
         this.changeImageResult.postValue(changeImageResult);
     }
 
@@ -86,9 +86,9 @@ public class PersonalProfileViewModel extends ViewModel {
     //----------------------------------------------------------------- METHODS
 
     public void changeProfileImage(User user, String url){
-        Runnable task = uploadImageAsync(user,url);
-        ThreadManager t = ThreadManager.getInstance();
         try {
+            Runnable task = uploadImageAsync(user,url);
+            ThreadManager t = ThreadManager.getInstance();
             t.runTaskInPool(task);
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,14 +103,13 @@ public class PersonalProfileViewModel extends ViewModel {
             Map<String, Object> uploadResult = null;
             try {
                 uploadResult = cloudinary.uploader().upload(url, ObjectUtils.emptyMap());
+                imageName = (String) uploadResult.get("public_id");
+                changeProfileImageToServer(user, imageName);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.v(TAG,"upload su cloudinary non riuscito");
-                postResetStatus(ChangeImageResult.FAILED);
+                setResetStatus(ChangeImageResult.FAILED);
             }
-            imageName = (String) uploadResult.get("public_id");
-
-            changeProfileImageToServer(user, imageName);
         };
     }
 
@@ -130,7 +129,7 @@ public class PersonalProfileViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     Log.v(TAG,"cambio immagine fallito");
-                    postResetStatus(ChangeImageResult.FAILED);
+                    setResetStatus(ChangeImageResult.FAILED);
                 }
 
                 @Override
@@ -142,23 +141,23 @@ public class PersonalProfileViewModel extends ViewModel {
                             String responseData = response.body().toString();
                             Log.v(TAG,"Tutto ok cambio immagine profilo avvenuto con successo");
                             user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
-                            postResetStatus(ChangeImageResult.SUCCESS);
+                            setResetStatus(ChangeImageResult.SUCCESS);
                         }else{
                             Log.v(TAG,"cambio immagine profilo fallito");
-                            postResetStatus(ChangeImageResult.FAILED);
+                            setResetStatus(ChangeImageResult.FAILED);
                         }
 
 
                     }catch(Exception e){
                         e.printStackTrace();
-                        postResetStatus(ChangeImageResult.FAILED);
+                        setResetStatus(ChangeImageResult.FAILED);
                     }
 
                 }
             });
         }catch(Exception e){
             e.printStackTrace();
-            postResetStatus(ChangeImageResult.FAILED);
+            setResetStatus(ChangeImageResult.FAILED);
         }
     }
 
