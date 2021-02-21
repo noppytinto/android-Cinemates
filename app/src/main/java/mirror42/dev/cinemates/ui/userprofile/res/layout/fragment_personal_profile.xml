@@ -122,6 +122,9 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/icon_user_primary_blue" />
 
+
+
+
             <Button
                 android:id="@+id/button_personalProfileFragment_logout"
                 style="@style/Cinemates.Button.Rounded.Outlined"
@@ -202,6 +205,17 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/textView_personalProfileFragment_email"
                 app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_email"
+                tools:visibility="visible" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressIndicator_personalProfileFragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintStart_toStartOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture"
                 tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

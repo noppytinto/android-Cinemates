@@ -39,6 +39,7 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
+import mirror42.dev.cinemates.utilities.MyMediaManager;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 import okhttp3.Call;
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             Toast.makeText(this, "Firebase remote config:\nfetching config data completed", Toast.LENGTH_SHORT).show();
             establishAzureConnection();
             loginViewModel.checkRememberMeData(this);
+            MyMediaManager.init(getApplicationContext(), remoteConfigServer);
         }
         else
             Toast.makeText(this, "Firebase remote config:\nfetching config data failed", Toast.LENGTH_SHORT).show();

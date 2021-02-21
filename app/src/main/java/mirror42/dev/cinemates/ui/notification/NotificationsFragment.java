@@ -29,8 +29,11 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
 import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
+import mirror42.dev.cinemates.model.notification.MovieRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
+import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.search.SearchFragmentDirections;
 
 public class NotificationsFragment extends Fragment implements
         RecyclerAdapterNotifications.OnNotificationClickedListener {
@@ -137,7 +140,7 @@ public class NotificationsFragment extends Fragment implements
 
     @Override
     public void onFollowRequestNotificationClicked(int position) {
-        User user = getUserFromNotification(recyclerAdapterNotifications.getNotification(position));
+        User user = getUserFromNotification(recyclerAdapterNotifications.getItem(position));
         if(user==null) return;
 
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
@@ -148,7 +151,7 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onPostLikedNotificationClicked(int position) {
         //TODO
-        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        Notification currentNotification = recyclerAdapterNotifications.getItem(position);
         long postID = currentNotification.getPostID();
         long notificationID = currentNotification.getId();
 
@@ -164,7 +167,7 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onPostCommentedNotificationClicked(int position) {
         //TODO
-        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        Notification currentNotification = recyclerAdapterNotifications.getItem(position);
         long postID = currentNotification.getPostID();
         long notificationID = currentNotification.getId();
 
@@ -179,7 +182,7 @@ public class NotificationsFragment extends Fragment implements
 
     @Override
     public void onListRecommendedNotificationClicked(int position) {
-        ListRecommendedNotification currentNotification = (ListRecommendedNotification) recyclerAdapterNotifications.getNotification(position);
+        ListRecommendedNotification currentNotification = (ListRecommendedNotification) recyclerAdapterNotifications.getItem(position);
         notificationsViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
@@ -228,7 +231,7 @@ public class NotificationsFragment extends Fragment implements
 
     @Override
     public void onSubscribedToListNotificationClicked(int position) {
-        Notification currentNotification = recyclerAdapterNotifications.getNotification(position);
+        Notification currentNotification = recyclerAdapterNotifications.getItem(position);
         long notificationID = currentNotification.getId();
 
         // delete from remote DB
@@ -238,6 +241,21 @@ public class NotificationsFragment extends Fragment implements
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileDirection =
                 NavGraphDirections.actionGlobalUserProfileFragment(currentNotification.getSender().getUsername());
         navigateTo(userProfileDirection, true);
+    }
+
+    @Override
+    public void onMovieRecommendedNotificationClicked(int position) {
+        MovieRecommendedNotification itemSelected = (MovieRecommendedNotification) recyclerAdapterNotifications.getItem(position);
+        long notificationID = itemSelected.getId();
+
+        // delete from remote DB
+        notificationsViewModel.deleteNotificationFromRemoteDB(notificationID, loginViewModel.getLoggedUser());
+
+        //
+        Movie mv = new Movie();
+        mv.setTmdbID(itemSelected.getMovieId());
+        NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
+        NavHostFragment.findNavController(NotificationsFragment.this).navigate(action);
     }
 
     private void loadNotifications(User loggedUser) {

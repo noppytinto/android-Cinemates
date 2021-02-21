@@ -7,7 +7,7 @@ plugins {
     // firebase
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
-//    id 'com.google.firebase.firebase-perf'
+    id 'com.google.firebase.firebase-perf'
 }
 
 android {
@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
-//    implementation 'com.google.firebase:firebase-perf'
+    implementation 'com.google.firebase:firebase-perf'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-storage'

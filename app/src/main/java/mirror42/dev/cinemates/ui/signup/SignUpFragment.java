@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -38,7 +37,6 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import mirror42.dev.cinemates.R;
@@ -88,6 +86,8 @@ public class SignUpFragment extends Fragment implements
     private ImageView imageViewProfilePicture;
     //
     private ProgressDialog progressDialog;
+    private final int SELECT_PICTURE = 200;
+    private Uri localImageUri;
 
 
 
@@ -221,7 +221,8 @@ public class SignUpFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonUpload.getId()) {
-            fetchImageFromGallery(v);
+//            fetchImageFromGallery(v);
+            imageChooser();
         }
         else if(v.getId() == buttonsignUp.getId()) {
             // getting data
@@ -240,42 +241,10 @@ public class SignUpFragment extends Fragment implements
 
             if(allFieldsAreFilled && repeatPasswordMatches) {
                 showProgressDialog();
-                String profilePicturePath = filePath;
-                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, profilePicturePath, promo, analytics);
+                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, localImageUri, promo, analytics);
             }
             else {
                 showCenteredToast("Completare prima tutti i campi evidenziati in rosso.");
-            }
-
-
-
-            try {
-
-                //
-
-//                mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
-//                        user.getEmail(), user.isEmailVerified()));
-
-//
-//                //
-//                httpUrl = new HttpUrl.Builder()
-//                        .scheme("https")
-//                        .host(remoteConfigServer.getAzureHostName())
-//                        .addPathSegments(remoteConfigServer.getPostgrestPath())
-//                        .addPathSegment(dbFunction)
-//                        .build();
-//
-
-//
-//                Request request = HttpUtilities.buildPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
-//
-//                //
-//                Call call = httpClient.newCall(request);
-//                call.enqueue(this);
-
-            } catch (Exception e) {
-                System.out.println("failed");
-                e.printStackTrace();
             }
         }
         else if(v.getId() == buttonDatePicker.getId()) {
@@ -313,8 +282,59 @@ public class SignUpFragment extends Fragment implements
     //--------------------------------------------------------------- METHODS
 
     void fetchImageFromGallery(View view){
-        requestPermission();
+//        requestPermission();
+
     }
+
+    void imageChooser() {
+//        personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
+//            switch (changeImageResult) {
+//                case SUCCESS: {
+//                    Glide.with(this)  //2
+//                            .load(localImageUri) //3
+//                            .fallback(R.drawable.broken_image)
+//                            .placeholder(R.drawable.icon_user_dark_blue)
+//                            .circleCrop() //4
+//                            .into(profilePicture); //8
+//                    loginViewModel.updateProfileImageUrl(personalProfileViewModel.getImageName());
+//                    showCenteredToast( "cambio immagine profilo riuscito ");
+//                }
+//                break;
+//                case FAILED:
+//                    showCenteredToast( "cambio immagine profilo NON riuscito");
+//                    break;
+//            }
+//        });
+
+        // create an instance of the
+        // intent of the type image
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+
+        // pass the constant to compare it
+        // with the returned requestCode
+        startActivityForResult(Intent.createChooser(i, "Select Picture"), SELECT_PICTURE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+        if(requestCode==SELECT_PICTURE && resultCode==RESULT_OK){
+            try {
+                localImageUri = data.getData();
+                Glide.with(this)  //2
+                    .load(localImageUri) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.icon_user_dark_blue)
+                    .circleCrop() //4
+                    .into(imageViewProfilePicture); //8
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private void requestPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
@@ -357,37 +377,37 @@ public class SignUpFragment extends Fragment implements
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
-
-        Bitmap thumbnail = null;
-        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
-            try {
-                //set picked image to the mProfile
-                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
-//                mProfile.setImageBitmap(bitmap);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            filePath = "-";
-            try {
-                filePath = getRealPathFromUri(data.getData(), getActivity());
-
-                // load thumbnail
-                Glide.with(this)  //2
-                        .load(filePath) //3
-                        .fallback(R.drawable.broken_image)
-                        .placeholder(R.drawable.placeholder_image)
-                        .circleCrop() //4
-                        .into(imageViewProfilePicture); //8
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+//
+//        Bitmap thumbnail = null;
+//        if(requestCode==PICK_IMAGE && resultCode==RESULT_OK){
+//            try {
+//                //set picked image to the mProfile
+//                thumbnail = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+////                mProfile.setImageBitmap(bitmap);
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            filePath = "-";
+//            try {
+//                filePath = getRealPathFromUri(data.getData(), getActivity());
+//
+//                // load thumbnail
+//                Glide.with(this)  //2
+//                        .load(filePath) //3
+//                        .fallback(R.drawable.broken_image)
+//                        .placeholder(R.drawable.placeholder_image)
+//                        .circleCrop() //4
+//                        .into(imageViewProfilePicture); //8
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private String getRealPathFromUri(Uri imageUri, Activity activity){
         Cursor cursor = activity.getContentResolver().query(imageUri, null,  null, null, null); if(cursor==null) {

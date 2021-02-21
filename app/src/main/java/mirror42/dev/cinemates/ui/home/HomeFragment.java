@@ -112,6 +112,7 @@ public class HomeFragment extends Fragment implements
                     updateFeedButton.setVisibility(View.VISIBLE);
                     progressIndicator.setVisibility(View.VISIBLE);
                     fetchPosts();
+//                    checkForNewNotifications(loginViewModel.getLoggedUser());
                     welcomeMessage.setVisibility(View.GONE);
                 }
                 break;
@@ -333,7 +334,7 @@ public class HomeFragment extends Fragment implements
             User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
             progressIndicator.setVisibility(View.VISIBLE);
             fetchPosts();
-//            checkForNewNotifications(loggedUser);
+            checkForNewNotifications(loggedUser);
         }
     }
 

@@ -80,6 +80,7 @@ public class LoginFragment extends Fragment  implements
         remoteConfigServer = RemoteConfigServer.getInstance();
         buttonSignUp = view.findViewById(R.id.button_loginFragment_signUp);
         textViewResetPassword = view.findViewById(R.id.textView_loginFragment_resetPassword);
+
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);

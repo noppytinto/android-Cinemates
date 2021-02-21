@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,12 +38,13 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.MoviesList;
 import mirror42.dev.cinemates.model.tmdb.Genre;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.ui.dialog.RecommendMovieDialogFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
-public class MovieDetailsFragment extends Fragment implements View.OnClickListener {
+public class MovieDetailsFragment extends Fragment implements View.OnClickListener, RecommendMovieDialogFragment.RecommendMovieDialogListener {
     private final String TAG = getClass().getSimpleName();
     private MovieDetailsViewModel movieDetailsViewModel;
     private RecyclerAdapterActorsHorizontalList recyclerAdapterActorsHorizontalList;
@@ -59,6 +62,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     private boolean isInWatchedList;
     private boolean isInFavoritesList;
     private LinkedHashMap<String, Boolean> customListsCheckMapping;
+    private Button recommendButton;
 
 
 
@@ -89,6 +93,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         chipWatched = view.findViewById(R.id.chip_movieDetailsfragment_watched);
         chipWatchlist = view.findViewById(R.id.chip_movieDetailsfragment_watchlist);
         chipFavorites = view.findViewById(R.id.chip_movieDetailsfragment_favorites);
+        recommendButton = view.findViewById(R.id.button_movieDetailsFragment_recommend);
+        recommendButton.setOnClickListener(this);
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -106,8 +112,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
                 loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
                     switch (loginResult) {
-                        case SUCCESS: case REMEMBER_ME_EXISTS: {
+                        case SUCCESS:
+                        case REMEMBER_ME_EXISTS: {
                             addToListButton.setVisibility(View.VISIBLE);
+                            showRecommendButton();
                             //
                             setListChips(movieId, loginViewModel.getLoggedUser());
                             setCustomList(movieId, loginViewModel.getLoggedUser());
@@ -115,6 +123,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                             break;
                         default:
                             addToListButton.setVisibility(View.GONE);
+                            hideRecommendButton();
                     }
                 });
 
@@ -156,6 +165,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void showRecommendButton() {
+        recommendButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideRecommendButton() {
+        recommendButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -243,11 +260,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             builder.show();
 
         }
-        else if(buttonId == R.id.button_movieDetailsFragment_seeAllCast) {
-
+        if(buttonId == recommendButton.getId()) {
+            showRecommendMovieDialog();
         }
-
-    }
+    }// onClick()
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
@@ -423,5 +439,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    public void showRecommendMovieDialog() {
+        DialogFragment newFragment = new RecommendMovieDialogFragment(this, currentMovieId);
+        newFragment.show(requireActivity().getSupportFragmentManager(), "RecommendMovieDialogFragment");
+    }
 
+
+    @Override
+    public void onRecommendButtonOnDialogClicked() {
+        // ignore
+    }
 }// end MovieDetailsFragment class

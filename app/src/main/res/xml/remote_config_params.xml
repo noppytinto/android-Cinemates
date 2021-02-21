@@ -48,4 +48,16 @@
         <key>gmail_pass</key>
         <value>-</value>
     </entry>
+    <entry>
+        <key>cloudinary_name</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>cloudinary_api_key</key>
+        <value>-</value>
+    </entry>
+    <entry>
+        <key>cloudinary_api_secret</key>
+        <value>-</value>
+    </entry>
 </defaultsMap>

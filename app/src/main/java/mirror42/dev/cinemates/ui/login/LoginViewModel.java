@@ -43,7 +43,7 @@ import okhttp3.ResponseBody;
 
 public class LoginViewModel extends ViewModel {
     private final String TAG = this.getClass().getSimpleName();
-    private MutableLiveData<User> user;
+    private MutableLiveData<User> loggedUser;
     private MutableLiveData<LoginResult> loginResult;
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
@@ -71,7 +71,7 @@ public class LoginViewModel extends ViewModel {
     //----------------------------------------------------------------------- CONSTRUCTORS
 
     public LoginViewModel() {
-        this.user = new MutableLiveData<>();
+        this.loggedUser = new MutableLiveData<>();
         loginResult = new MutableLiveData<>(LoginResult.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -83,20 +83,20 @@ public class LoginViewModel extends ViewModel {
     //----------------------------------------------------------------------- GETTERS/SETTERS
 
     public LiveData<User> getObservableLoggedUser() {
-        return user;
+        return loggedUser;
     }
 
     public User getLoggedUser() {
-        return user.getValue();
+        return loggedUser.getValue();
     }
 
 
     public void postUser(User user) {
-        this.user.postValue(user);
+        this.loggedUser.postValue(user);
     }
 
     public void setUser(User user) {
-        this.user.setValue(user);
+        this.loggedUser.setValue(user);
     }
 
     public MutableLiveData<LoginResult> getObservableLoginResult() {
@@ -225,6 +225,11 @@ public class LoginViewModel extends ViewModel {
             }
         });
     }// end loadPendingUserBasicData()
+
+    public void updateProfileImageUrl(String imageName) {
+        loggedUser.getValue().setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
+
+    }
 
     public void standardLogin(String email, String password) {
         if(password==null) {
@@ -485,7 +490,7 @@ public class LoginViewModel extends ViewModel {
         if(checked) {
             remoteConfigServer = RemoteConfigServer.getInstance();
             MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
-                    MyUtilities.convertUserInJSonString(user.getValue()), context);
+                    MyUtilities.convertUserInJSonString(loggedUser.getValue()), context);
         }
     }
 
@@ -513,11 +518,11 @@ public class LoginViewModel extends ViewModel {
                 .build();
 
         RequestBody requestBody = new FormBody.Builder()
-                .add("email", user.getValue().getEmail())
-                .add("access_token", user.getValue().getAccessToken())
+                .add("email", loggedUser.getValue().getEmail())
+                .add("access_token", loggedUser.getValue().getAccessToken())
                 .build();
 
-        Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, user.getValue().getAccessToken());
+        Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getValue().getAccessToken());
 
         Call call = httpClient.newCall(request);
 

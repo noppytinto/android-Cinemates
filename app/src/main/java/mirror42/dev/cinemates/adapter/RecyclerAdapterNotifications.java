@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
 import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
+import mirror42.dev.cinemates.model.notification.MovieRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.Notification.NotificationType;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
@@ -35,6 +36,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
     private static final int PL = 3; // post liked
     private static final int CR = 4; // custom list recommendation
     private static final int CS = 5; // user subscribed to your custom list
+    private static final int MR = 6; // user recommended movie
 
     public interface OnNotificationClickedListener {
         void onFollowRequestNotificationClicked(int position);
@@ -42,6 +44,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         void onPostCommentedNotificationClicked(int position);
         void onListRecommendedNotificationClicked(int position);
         void onSubscribedToListNotificationClicked(int position);
+        void onMovieRecommendedNotificationClicked(int position);
 
     }
 
@@ -74,6 +77,8 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
                 return CR;
             case CS:
                 return CS;
+            case MR:
+                return MR;
             default:
                 return 0;
         }
@@ -104,7 +109,10 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_subscribed_to_list_notification, parent, false);
             return new SubscribedToListNotificationViewHolder(view);
         }
-
+        else if(viewType == MR) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_movie_recommended_notification, parent, false);
+            return new MovieRecommendedNotificationViewHolder(view);
+        }
         else {
             return new FollowRequestNotificationViewHolder(null);
         }
@@ -141,6 +149,12 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
 
             //
             buildSubscribeToListNotificationItem((SubscribedToListNotificationViewHolder) holder, subscribedToListNotification);
+        }
+        else if(getItemViewType(position) == MR) {
+            MovieRecommendedNotification movieRecommendedNotification = (MovieRecommendedNotification) notificationsList.get(position);
+
+            //
+            buildMovieRecommendedNotificationItem((MovieRecommendedNotificationViewHolder) holder, movieRecommendedNotification);
         }
     }
 
@@ -225,13 +239,29 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
         }
     }
 
+    private void buildMovieRecommendedNotificationItem(MovieRecommendedNotificationViewHolder holder, MovieRecommendedNotification notification) {
+        holder.textViewFullName.setText(notification.getSender().getFullName());
+        holder.textViewPublishDate.setText(MyUtilities.convertMillisToReadableTimespan(notification.getDateInMillis()));
+
+        try {
+            Glide.with(context)  //2
+                    .load(notification.getSender().getProfilePicturePath()) //3
+                    .fallback(R.drawable.icon_user_dark_blue)
+                    .placeholder(R.drawable.icon_user_dark_blue)
+                    .circleCrop() //4
+                    .into(holder.imageViewProfilePicture); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public int getItemCount() {
         return ( (notificationsList != null) && (notificationsList.size() != 0) ? notificationsList.size() : 0);
     }
 
-    public Notification getNotification(int position) {
+    public Notification getItem(int position) {
         return ( (notificationsList != null) && (notificationsList.size() != 0) ? notificationsList.get(position) : null);
     }
 
@@ -336,7 +366,7 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             listener.onListRecommendedNotificationClicked(getAdapterPosition());
 
         }
-    }// end PostCommentedNotificationViewHolder class
+    }// end ListRecommendationNotificationViewHolder class
 
     class SubscribedToListNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView imageViewProfilePicture;
@@ -362,6 +392,28 @@ public class RecyclerAdapterNotifications extends RecyclerView.Adapter<RecyclerV
             listener.onSubscribedToListNotificationClicked(getAdapterPosition());
 
         }
-    }// end PostCommentedNotificationViewHolder class
+    }// end SubscribedToListNotificationViewHolder class
+
+    class MovieRecommendedNotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView imageViewProfilePicture;
+        public TextView textViewFullName;
+        public TextView textViewPublishDate;
+        private CardView cardView;
+
+        public MovieRecommendedNotificationViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageViewProfilePicture = itemView.findViewById(R.id.imageView_movieRecommendedNotificatonLayout_profilePicture);
+            textViewFullName = itemView.findViewById(R.id.textView_movieRecommendedNotificatonLayout_fullName);
+            textViewPublishDate = itemView.findViewById(R.id.textView_movieRecommendedNotificatonLayout_publishDate);
+            cardView = itemView.findViewById(R.id.cardView_movieRecommendedNotificatonLayout);
+            cardView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onMovieRecommendedNotificationClicked(getAdapterPosition());
+
+        }
+    }// end MovieRecommendedNotificationViewHolder class
 
 }// end RecylerAdapterNotifications class

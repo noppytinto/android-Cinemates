@@ -14,6 +14,18 @@ public class RemoteConfigServer {
     private final FirebaseRemoteConfig mFirebaseRemoteConfig;
     private RemoteConfigListener listener;
 
+    public String getCloudinaryName() {
+        return mFirebaseRemoteConfig.getString("cloudinary_name");
+    }
+
+    public Object getCloudnaryApiKey() {
+        return mFirebaseRemoteConfig.getString("cloudinary_api_key");
+    }
+
+    public Object getCloudnaryApiSecret() {
+        return mFirebaseRemoteConfig.getString("cloudinary_api_secret");
+    }
+
     public interface RemoteConfigListener {
         public void onRemoteParamsLoaded(boolean taskIsSuccessful);
     }

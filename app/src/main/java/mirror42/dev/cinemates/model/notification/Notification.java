@@ -20,7 +20,7 @@ public class Notification implements Parcelable, Comparable<Notification>{
     @Ignore private User sender;
 
     public enum NotificationType {
-        FR, PC, PL, CR, CS, NONE
+        FR, PC, PL, CR, CS, MR, NONE
     }
 
 

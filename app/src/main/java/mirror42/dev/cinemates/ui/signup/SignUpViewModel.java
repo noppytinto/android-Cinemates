@@ -1,5 +1,6 @@
 package mirror42.dev.cinemates.ui.signup;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -7,13 +8,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import com.cloudinary.android.MediaManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
@@ -23,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
@@ -48,6 +48,9 @@ private final String TAG = this.getClass().getSimpleName();
     private FirebaseUser firebaseUser;
     private MutableLiveData<FirebaseSignUpServerStatusCode> firebaseAuthState;
     private User newUser;
+    private Uri localImageUri;
+    private String imageName;
+    private String randomImageName;
 
     public enum FirebaseSignUpServerStatusCode {
         SIGN_IN_SUCCESS,
@@ -118,15 +121,15 @@ private final String TAG = this.getClass().getSimpleName();
     //--------------------------------------------------------------- METHODS
 
     public void signUpAsPendingUser(
-                                    String username,
-                                    String email,
-                                    String password,
-                                    String firstName,
-                                    String lastName,
-                                    String birthDate,
-                                    String profilePicturePath,
-                                    boolean promo,
-                                    boolean analytics) {
+            String username,
+            String email,
+            String password,
+            String firstName,
+            String lastName,
+            String birthDate,
+            Uri localImageUri,
+            boolean promo,
+            boolean analytics) {
         newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
@@ -134,9 +137,13 @@ private final String TAG = this.getClass().getSimpleName();
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setBirthDate(birthDate);
-        newUser.setProfilePictureURL(profilePicturePath);
         newUser.setPromo(promo);
         newUser.setAnalytics(analytics);
+
+        this.localImageUri = localImageUri;
+        randomImageName = UUID.randomUUID().toString();
+        imageName = randomImageName + ".png";
+        newUser.setProfilePictureURL(imageName);
 
         checkUserCollision();
     }
@@ -210,54 +217,47 @@ private final String TAG = this.getClass().getSimpleName();
 
     public void checkPendingUserCollision() {
         mAuth.createUserWithEmailAndPassword(newUser.getEmail(), newUser.getPassword())
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) { // sign in success
-                            Log.d(TAG, "createUserWithEmail:success");
-                            firebaseUser = mAuth.getCurrentUser();
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) { // sign in success
+                        Log.d(TAG, "createUserWithEmail:success");
+                        firebaseUser = mAuth.getCurrentUser();
 
-                            // fetch profile picture
-                            Runnable runnable = () -> {
-                                String imageName = "-";
-                                try {
-                                    // uploading promo image to the cloud
-                                    Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
-                                    Map<String, Object> uploadResult = cloudinary.uploader().upload(newUser.getProfilePicturePath(), ObjectUtils.emptyMap());
-                                    imageName = (String) uploadResult.get("public_id");
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                newUser.setProfilePictureURL(imageName+".png");
-                                setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.NO_PENDING_USER_COLLISION);
-                            };
-
-
-
-                            ThreadManager t = ThreadManager.getInstance();
+                        // fetch profile picture
+                        Runnable runnable = () -> {
                             try {
-                                t.runTaskInPool(runnable);
+                                String requestId = MediaManager.get().upload(localImageUri)
+                                        .option("public_id", randomImageName)
+                                        .unsigned("qvrfptez")
+                                        .dispatch();
+
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                Log.v(TAG,"upload su cloudinary non riuscito");
                             }
+                            setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.NO_PENDING_USER_COLLISION);
+                        };
 
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            try {
-                                throw task.getException();
-                            } catch (FirebaseAuthUserCollisionException e) {
-                                e.printStackTrace();
-                                setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.PENDING_USER_COLLISION);
-                            } catch (FirebaseAuthWeakPasswordException e) {
-                                e.printStackTrace();
-                                setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.WEAK_PASSWORD);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.FIREBASE_GENERIC_ERROR);
-                            }
+                        ThreadManager t = ThreadManager.getInstance();
+                        try {
+                            t.runTaskInPool(runnable);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        try {
+                            throw task.getException();
+                        } catch (FirebaseAuthUserCollisionException e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.PENDING_USER_COLLISION);
+                        } catch (FirebaseAuthWeakPasswordException e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.WEAK_PASSWORD);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.FIREBASE_GENERIC_ERROR);
                         }
                     }
                 });

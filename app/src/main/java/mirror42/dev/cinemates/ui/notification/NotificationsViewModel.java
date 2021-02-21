@@ -28,6 +28,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.model.notification.FollowRequestNotification;
 import mirror42.dev.cinemates.model.notification.ListRecommendedNotification;
+import mirror42.dev.cinemates.model.notification.MovieRecommendedNotification;
 import mirror42.dev.cinemates.model.notification.Notification;
 import mirror42.dev.cinemates.model.notification.PostCommentedNotification;
 import mirror42.dev.cinemates.model.notification.PostLikedNotification;
@@ -468,6 +469,73 @@ public class NotificationsViewModel extends ViewModel {
         });
     }
 
+    public Observable<ArrayList<Notification>> getObservableMovieRecommendedNotifications(String email, String token) {
+        return Observable.create(emitter->{
+            Response response = null;
+            ArrayList<Notification> tempResult = new ArrayList<>();
+
+            try {
+                // build httpurl and request for remote db
+                final String dbFunctionName = "fn_select_notifications";
+                HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunctionName);
+                final OkHttpClient httpClient = OkHttpSingleton.getClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("owner_email", email)
+                        .add("notification_type", MOVIE_RECOMMENDED_NOTIFICATION_TYPE)
+                        .build();
+                Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
+
+                // performing request
+                response = httpClient.newCall(request).execute();
+
+                // check responses
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+
+                    // if response contains valid data
+                    if ( ! responseData.equals("null")) {
+                        JSONArray jsonArray = new JSONArray(responseData);
+
+                        for(int i=0; i<jsonArray.length(); i++) {
+                            MovieRecommendedNotification notification = new MovieRecommendedNotification();
+                            JSONObject jsonDBobj = jsonArray.getJSONObject(i);
+                            User sender = new User();
+                            sender.setFirstName(jsonDBobj.getString("sender_fname"));
+                            sender.setLastName(jsonDBobj.getString("sender_lname"));
+                            sender.setUsername(jsonDBobj.getString("sender_username"));
+                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            notification.setId(jsonDBobj.getLong("Id_Notification"));
+                            notification.setIsNew(true);
+                            notification.setSender(sender);
+                            notification.setMovieId(jsonDBobj.getInt("Movie_Id"));
+                            notification.setDateInMillis(jsonDBobj.getLong("Date_In_Millis"));
+
+                            tempResult.add(notification);
+                        }// for
+
+                        // once finished set result
+                        emitter.onNext(tempResult);
+                        emitter.onComplete();
+                    }
+                    // if the response is null (no notifications)
+                    else emitter.onError(new Exception("no notifications"));
+                }
+                // if the response is unsuccesfull
+                else emitter.onError(new Exception("response unsuccesufull"));
+            }
+            catch (ConnectException ce) {
+                emitter.onError(ce);
+            }
+            catch (Exception e) {
+                emitter.onError(e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        });
+    }
+
 
     /**
      * notes: notifications are ordered by date (DESC order)
@@ -492,6 +560,8 @@ public class NotificationsViewModel extends ViewModel {
         Observable<ArrayList<Notification>> subscribedToListNotificationsObservable =
                 getObservableSubscribedToListNotifications(email, token);
 
+        Observable<ArrayList<Notification>> movieRecommendedNotificationsObservable =
+                getObservableMovieRecommendedNotifications(email, token);
 
         Observable<ArrayList<Notification>> combinedNotificationsObservable =
                 Observable.combineLatest(
@@ -500,13 +570,15 @@ public class NotificationsViewModel extends ViewModel {
                         commentNotificationsObservable.onErrorReturn(e-> new ArrayList<>()), // return an empty list instead
                         listRecommendedNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),
                         subscribedToListNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),
-                        (followNotifications, likeNotifications, commentsNotifications, listRecommendedNotifications, subscribedToListNotifications) -> {
+                        movieRecommendedNotificationsObservable.onErrorReturn(e-> new ArrayList<>()),
+                        (followNotifications, likeNotifications, commentsNotifications, listRecommendedNotifications, subscribedToListNotifications, movieRecommendedNotifications) -> {
                             final ArrayList<Notification> combinedNotifications = new ArrayList<>();
                             combinedNotifications.addAll(followNotifications);
                             combinedNotifications.addAll(likeNotifications);
                             combinedNotifications.addAll(commentsNotifications);
                             combinedNotifications.addAll(listRecommendedNotifications);
                             combinedNotifications.addAll(subscribedToListNotifications);
+                            combinedNotifications.addAll(movieRecommendedNotifications);
                             return combinedNotifications;
                         }
                 );

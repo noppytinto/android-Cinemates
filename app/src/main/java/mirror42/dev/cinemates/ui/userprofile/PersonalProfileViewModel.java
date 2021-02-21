@@ -1,13 +1,16 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
@@ -39,6 +43,7 @@ public class PersonalProfileViewModel extends ViewModel {
     private FirebaseUser firebaseUser;
     private MutableLiveData<ChangeImageResult> changeImageResult;
     private MutableLiveData<FetchStatus> fetchStatus;
+    private String imageName;
 
 
 
@@ -81,13 +86,15 @@ public class PersonalProfileViewModel extends ViewModel {
         this.fetchStatus.postValue(fetchStatus);
     }
 
-
+    public String getImageName() {
+        return imageName;
+    }
 
     //----------------------------------------------------------------- METHODS
 
-    public void changeProfileImage(User user, String url){
+    public void changeProfilePicture(User user, Uri localImageUri, Context context){
         try {
-            Runnable task = uploadImageAsync(user,url);
+            Runnable task = uploadImageAsync(user, localImageUri, context);
             ThreadManager t = ThreadManager.getInstance();
             t.runTaskInPool(task);
         } catch (Exception e) {
@@ -95,17 +102,60 @@ public class PersonalProfileViewModel extends ViewModel {
         }
     }
 
-    private Runnable uploadImageAsync(User user, String url){
+    private Runnable uploadImageAsync(User user, Uri localImageUri, Context context){
         // uploading promo image to the cloud
         return ()-> {
-            String imageName = "-";
-            Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
-            Map<String, Object> uploadResult = null;
+
             try {
-                uploadResult = cloudinary.uploader().upload(url, ObjectUtils.emptyMap());
-                imageName = (String) uploadResult.get("public_id");
-                changeProfileImageToServer(user, imageName);
-            } catch (IOException e) {
+//                imageName = DocumentFile.fromSingleUri(context, localImageUri).getName();
+//                imageName = imageName.toLowerCase();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String randomImageName = UUID.randomUUID().toString();
+            imageName = randomImageName;
+
+            try {
+                String requestId = MediaManager.get().upload(localImageUri)
+                        .callback(new UploadCallback() {
+                            @Override
+                            public void onStart(String requestId) {
+
+                            }
+
+                            @Override
+                            public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(String requestId, Map resultData) {
+
+                                // getting name from uri
+
+                                changeProfileImageToServer(user, randomImageName);
+                            }
+
+                            @Override
+                            public void onError(String requestId, ErrorInfo error) {
+                                Log.v(TAG,"upload su cloudinary non riuscito");
+                                setResetStatus(ChangeImageResult.FAILED);
+                            }
+
+                            @Override
+                            public void onReschedule(String requestId, ErrorInfo error) {
+
+                            }
+                        })
+                        .option("public_id", randomImageName)
+                        .unsigned("qvrfptez")
+                        .dispatch();
+
+
+//                uploadResult = cloudinary.uploader().upload(url, ObjectUtils.emptyMap());
+//                imageName = (String) uploadResult.get("public_id");
+            } catch (Exception e) {
                 e.printStackTrace();
                 Log.v(TAG,"upload su cloudinary non riuscito");
                 setResetStatus(ChangeImageResult.FAILED);
