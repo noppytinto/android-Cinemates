@@ -21,6 +21,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -107,8 +108,12 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     public void fetchPublicLists(String targetUsername, User loggedUser) {
         Runnable task = createFetchPublicListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), targetUsername);
-        Thread t_1 = new Thread(task);
-        t_1.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createFetchPublicListsTask(String requesterEmail, String token, String targetUsername) {
@@ -175,8 +180,12 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     public void fetchMyCustomLists(User loggedUser) {
         Runnable task = createFetchMyCustomListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_1 = new Thread(task);
-        t_1.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createFetchMyCustomListsTask(String email, String token, String loggedUsername) {
@@ -242,8 +251,12 @@ public class CustomListBrowserViewModel extends ViewModel {
 
     public void fetchSubscribedLists(User loggedUser) {
         Runnable task = createFetchSubscribedListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), loggedUser.getUsername());
-        Thread t_1 = new Thread(task);
-        t_1.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //TODO

@@ -28,6 +28,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -93,8 +94,12 @@ public class PostViewModel extends ViewModel {
     public void fetchPost(long postId, User loggedUser) {
         this.postID = postId;
         Runnable task = createFetchPostTask(postId, loggedUser);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createFetchPostTask(long postId, User loggedUser) {

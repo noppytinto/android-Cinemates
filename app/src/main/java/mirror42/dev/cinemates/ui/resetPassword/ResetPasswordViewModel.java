@@ -16,6 +16,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -116,9 +117,13 @@ public class ResetPasswordViewModel extends ViewModel {
 
     private void sendEmail(String email, String password){
 
-        Runnable emailSendTask = sendNewPasswordEmailTask(email, password);
-        Thread t = new Thread(emailSendTask);
-        t.start();
+        Runnable task = sendNewPasswordEmailTask(email, password);
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

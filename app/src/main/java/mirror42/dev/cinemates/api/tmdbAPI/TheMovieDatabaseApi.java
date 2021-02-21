@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.tmdb.Cast;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -300,6 +301,7 @@ public class TheMovieDatabaseApi {
 
     private RetrofitAPI buildRetrofitService() {
         final Retrofit retrofitClient = new Retrofit.Builder()
+                .client(OkHttpSingleton.getClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(getBaseURL())
                 .build();

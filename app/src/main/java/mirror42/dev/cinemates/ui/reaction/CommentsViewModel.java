@@ -12,6 +12,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -102,8 +103,12 @@ public class CommentsViewModel extends ViewModel {
         //TODO: handle commentID and logged user errors
 
         Runnable task = createDeleteCommentTask(commentID, loggedUser);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -167,8 +172,12 @@ public class CommentsViewModel extends ViewModel {
     public void postComment(long postId, String commentText, User loggedUser) {
         this.commentText = commentText;
         Runnable task = creatPostCommentTask(postId, commentText, loggedUser);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable creatPostCommentTask(long postId, String commentText, User loggedUser) {

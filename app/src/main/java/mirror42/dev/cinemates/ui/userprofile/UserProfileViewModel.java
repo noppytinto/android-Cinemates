@@ -13,9 +13,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
+import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -24,8 +27,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import mirror42.dev.cinemates.ui.reaction.CommentsViewModel.TaskStatus;
-import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 
 public class UserProfileViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -224,9 +225,13 @@ public class UserProfileViewModel extends ViewModel {
     // I follow him status
 
     public void checkIfollowHim(String senderUsername, String receiverUsername, String token) {
-        Runnable task_1 = createCheckIfollowHimTask(senderUsername, receiverUsername, token);
-        Thread t_1 = new Thread(task_1);
-        t_1.start();
+        Runnable task = createCheckIfollowHimTask(senderUsername, receiverUsername, token);
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createCheckIfollowHimTask(String myUsername, String hisUsername, String token) {
@@ -282,8 +287,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void checkMyFollowIsPending(String senderUsername, String receiverUsername, String token) {
         Runnable task = createCheckMyFollowIsPendingTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createCheckMyFollowIsPendingTask(String senderUsername, String receiverUsername, String token) {
@@ -391,8 +400,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void checkHeFollowsMe(String senderUsername, String receiverUsername, String token) {
         Runnable task = createcheckHeFollowMeTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createcheckHeFollowMeTask(String myUsername, String hisUsername, String token) {
@@ -453,8 +466,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void checkHisFollowIsPending(String senderUsername, String receiverUsername, String token) {
         Runnable task = createCheckHisFollowIsPendingTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createCheckHisFollowIsPendingTask(String senderUsername, String receiverUsername, String token) {
@@ -516,8 +533,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void sendFollowRequest(String senderUsername, String receiverUsername, String token) {
         Runnable task = createSendFollowRequestTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createSendFollowRequestTask(String senderUsername, String receiverUsername, String token) {
@@ -575,8 +596,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void acceptFollowRequest(String senderUsername, String receiverUsername, String token) {
         Runnable task = createAcceptFollowRequestTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createAcceptFollowRequestTask(String senderUsername, String receiverUsername, String token) {
@@ -634,8 +659,12 @@ public class UserProfileViewModel extends ViewModel {
 
     public void declineFollowRequest(String senderUsername, String receiverUsername, String token) {
         Runnable task = createDeclineFollowRequestTask(senderUsername, receiverUsername, token);
-        Thread t = new Thread(task);
-        t.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createDeclineFollowRequestTask(String senderUsername, String receiverUsername, String token) {

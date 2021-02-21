@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import mirror42.dev.cinemates.api.tmdbAPI.TheMovieDatabaseApi;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 
 public class PopularViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
@@ -48,9 +49,13 @@ public class PopularViewModel extends ViewModel {
     //----------------------------------------------- METHODS
 
     public void downloadData(int givenPage) {
-        Runnable downloadTask = createDownloadTask(givenPage);
-        Thread t = new Thread(downloadTask);
-        t.start();
+        Runnable task = createDownloadTask(givenPage);
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createDownloadTask(int givenPage) {

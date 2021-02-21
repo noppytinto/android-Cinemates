@@ -29,6 +29,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -217,24 +218,30 @@ private final String TAG = this.getClass().getSimpleName();
                             firebaseUser = mAuth.getCurrentUser();
 
                             // fetch profile picture
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    String imageName = "-";
-                                    try {
-                                        // uploading promo image to the cloud
-                                        Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
-                                        Map<String, Object> uploadResult = cloudinary.uploader().upload(newUser.getProfilePicturePath(), ObjectUtils.emptyMap());
-                                        imageName = (String) uploadResult.get("public_id");
+                            Runnable runnable = () -> {
+                                String imageName = "-";
+                                try {
+                                    // uploading promo image to the cloud
+                                    Cloudinary cloudinary = new Cloudinary(remoteConfigServer.getCloudinaryUploadBaseUrl());
+                                    Map<String, Object> uploadResult = cloudinary.uploader().upload(newUser.getProfilePicturePath(), ObjectUtils.emptyMap());
+                                    imageName = (String) uploadResult.get("public_id");
 
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    newUser.setProfilePictureURL(imageName+".png");
-                                    setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.NO_PENDING_USER_COLLISION);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            }).start();
+
+                                newUser.setProfilePictureURL(imageName+".png");
+                                setFirebaseSignUpServerStatusCode(FirebaseSignUpServerStatusCode.NO_PENDING_USER_COLLISION);
+                            };
+
+
+
+                            ThreadManager t = ThreadManager.getInstance();
+                            try {
+                                t.runTaskInPool(runnable);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
 
                         } else {
                             // If sign in fails, display a message to the user.

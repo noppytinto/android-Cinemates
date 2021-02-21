@@ -29,6 +29,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -99,12 +100,16 @@ public class HomeViewModel extends ViewModel {
     //-------------------------------------------------------------------------- METHODS
 
     public void fetchLimitedPosts(int page, User loggedUser) {
-        Runnable task = createTaskgetLimitedPosts(page, loggedUser);
-        Thread t = new Thread(task);
-        t.start();
+        Runnable task = createTaskGetLimitedPosts(page, loggedUser);
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public Runnable createTaskgetLimitedPosts(int page, User loggedUser) {
+    public Runnable createTaskGetLimitedPosts(int page, User loggedUser) {
         return () -> {
             Response response = null;
             ArrayList<Post> tempResult = new ArrayList<>();

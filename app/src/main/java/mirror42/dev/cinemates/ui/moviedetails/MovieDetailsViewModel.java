@@ -22,6 +22,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.DownloadStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -152,9 +153,13 @@ public class MovieDetailsViewModel extends ViewModel {
 //        DownloadLatestReleases downloadLatestReleases = new DownloadLatestReleases(this);
 //        downloadLatestReleases.execute(1);
 
-        Runnable downloadTask = createFetchMovieDetailsTask(movieId);
-        Thread t = new Thread(downloadTask);
-        t.start();
+        Runnable task = createFetchMovieDetailsTask(movieId);
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createFetchMovieDetailsTask(int givenMovieId) {

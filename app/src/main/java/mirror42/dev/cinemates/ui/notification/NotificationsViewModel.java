@@ -38,6 +38,7 @@ import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -531,7 +532,7 @@ public class NotificationsViewModel extends ViewModel {
 
         Observable<ArrayList<Notification>> observableNotifications =
                 getObservableNotifications(loggedUser.getEmail(), loggedUser.getAccessToken())
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.from(ThreadManager.getInstance().getExecutor()))
                 .observeOn(AndroidSchedulers.mainThread());
 
         notificationsSubscription.set(observableNotifications
@@ -582,14 +583,25 @@ public class NotificationsViewModel extends ViewModel {
     public void saveOnLocalDatabase(@NotNull ArrayList<Notification> notifications, Context context) {
         NotificationDao notificationDao = getNotificationDao(context);
 
-        new Thread(() -> notificationDao.insertAll(notifications)).start();
+
+        Runnable task = () -> {
+            notificationDao.insertAll(notifications);
+        };
+
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setNotificationsAsOld(ArrayList<Notification> notifications, Context context) {
         if(notifications==null) return;
         NotificationDao notificationDao = getNotificationDao(context);
 
-        new Thread(() -> {
+
+        Runnable task = () -> {
             for (Notification x: notifications) {
                 x.setIsNew(false);
                 try {
@@ -600,22 +612,36 @@ public class NotificationsViewModel extends ViewModel {
             }
 
             setNotificationsStatus(NotificationsStatus.ALL_NOTIFICATIONS_READ);
-        }).start();
+        };
+
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     public void checkForNewNotifications(Context context) {
         NotificationDao notificationDao = getNotificationDao(context);
 
-        new Thread(() -> {
+        Runnable task = () -> {
             boolean gotNewNotifications = notificationDao.checkForNewNotifications();
 
             if(gotNewNotifications)
                 setNotificationsStatus(NotificationsStatus.GOT_NEW_NOTIFICATIONS);
             else
                 setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
-        }).start();
+        };
 
+
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -635,8 +661,12 @@ public class NotificationsViewModel extends ViewModel {
         this.notificationID = id;
 
         Runnable task = createDeletionTask(id, loggedUser);
-        Thread thread = new Thread(task);
-        thread.start();
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable createDeletionTask(long id, User loggedUser) {
@@ -688,7 +718,15 @@ public class NotificationsViewModel extends ViewModel {
 
     public void deleteNotificationFromLocalDB(long id, Context context) {
         NotificationDao notificationDao = getNotificationDao(context);
-        new Thread(() -> notificationDao.deleteByID(id)).start();
+        Runnable task = () -> notificationDao.deleteByID(id);
+
+        ThreadManager t = ThreadManager.getInstance();
+        try {
+            t.runTaskInPool(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 

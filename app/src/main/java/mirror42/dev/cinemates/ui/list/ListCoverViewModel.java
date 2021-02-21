@@ -20,6 +20,7 @@ import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyValues.FetchStatus;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
+import mirror42.dev.cinemates.utilities.ThreadManager;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -88,20 +89,32 @@ public class ListCoverViewModel extends ViewModel {
         switch (listType) {
             case WL: {
                 Runnable task = createFetchWatchlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
-                Thread t = new Thread(task);
-                t.start();
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
                 break;
             case FV: {
                 Runnable task = createFetchFavourites(loggedUser.getEmail(), loggedUser.getAccessToken());
-                Thread t = new Thread(task);
-                t.start();
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
                 break;
             case WD: {
                 Runnable task = createFetchWatchedlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
-                Thread t = new Thread(task);
-                t.start();
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
                 break;
         }
