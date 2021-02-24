@@ -116,6 +116,9 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_signUpFragment_to_privacyPolicyFragment"
+            app:destination="@id/privacyPolicyFragment" />
     </fragment>
     <action
         android:id="@+id/action_global_loginFragment"
@@ -259,4 +262,9 @@
             android:name="targetUsername"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/privacyPolicyFragment"
+        android:name="mirror42.dev.cinemates.PrivacyPolicyFragment"
+        android:label="Privacy policy"
+        tools:layout="@layout/fragment_privacy_policy" />
 </navigation>

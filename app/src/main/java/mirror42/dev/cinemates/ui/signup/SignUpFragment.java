@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -89,6 +90,7 @@ public class SignUpFragment extends Fragment implements
     private final int SELECT_PICTURE = 200;
     private Uri localImageUri;
 
+    private TextView privacyPolicy;
 
 
 
@@ -131,6 +133,8 @@ public class SignUpFragment extends Fragment implements
         editTextLastName = view.findViewById(R.id.editText_signUpFragment_lastName);
         editTextBirthDate = view.findViewById(R.id.editText_signUpFragment_birthDate);
         //
+        privacyPolicy = view.findViewById(R.id.textView_signUpFragment_privacyPolicy);
+        //
         buttonsignUp = view.findViewById(R.id.button_signUpFragment_signUp);
         buttonDatePicker = view.findViewById(R.id.button_signUpPage_datePicker);
         checkBoxPromo = view.findViewById(R.id.checkBox_loginFragment_promo);
@@ -146,6 +150,7 @@ public class SignUpFragment extends Fragment implements
         checkBoxPromo.setOnCheckedChangeListener(this);
         checkBoxAnalytics.setOnCheckedChangeListener(this);
         checkBoxTermsAndConditions.setOnCheckedChangeListener(this);
+        privacyPolicy.setOnClickListener(this);
 
         // fast sign up
         fastSignUp();
@@ -264,6 +269,8 @@ public class SignUpFragment extends Fragment implements
                 String selectedDate = MyUtilities.convertMillisInDate(selectedDateInMillis);
                 editTextBirthDate.setText(selectedDate);
             });
+        }else if(v.getId() == privacyPolicy.getId()){
+            Navigation.findNavController(v).navigate(R.id.action_signUpFragment_to_privacyPolicyFragment);
         }
     }// end onClick()
 

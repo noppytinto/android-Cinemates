@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        tools:layout_editor_absoluteX="-192dp"
-        tools:layout_editor_absoluteY="16dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -270,7 +270,7 @@
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="@string/sign_up_page_terms_and_conditions"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/textView"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/checkBox_loginFragment_analytics"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
@@ -299,6 +299,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.8" />
+
+            <TextView
+                android:id="@+id/textView_signUpFragment_privacyPolicy"
+                android:layout_width="88dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="36dp"
+                android:text="@string/sign_up_privacyPolicy_message"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
