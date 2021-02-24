@@ -1,4 +1,4 @@
-package mirror42.dev.cinemates;
+package mirror42.dev.cinemates.ui.privacyPolicy;
 
 import android.os.Bundle;
 
@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import mirror42.dev.cinemates.R;
 
 
 public class PrivacyPolicyFragment extends Fragment {

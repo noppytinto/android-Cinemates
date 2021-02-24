@@ -264,7 +264,7 @@
     </fragment>
     <fragment
         android:id="@+id/privacyPolicyFragment"
-        android:name="mirror42.dev.cinemates.PrivacyPolicyFragment"
+        android:name="mirror42.dev.cinemates.ui.privacyPolicy.PrivacyPolicyFragment"
         android:label="Privacy policy"
         tools:layout="@layout/fragment_privacy_policy" />
 </navigation>

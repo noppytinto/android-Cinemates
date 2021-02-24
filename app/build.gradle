@@ -57,6 +57,7 @@ android {
                 'src/main/java/mirror42/dev/cinemates/ui/list/res',
                 'src/main/java/mirror42/dev/cinemates/ui/dialog/res',
                 'src/main/java/mirror42/dev/cinemates/ui/changePassword/res',
+                'src/main/java/mirror42/dev/cinemates/ui/privacyPolicy/res',
                 'src/main/java/mirror42/dev/cinemates/res'
 
         ]
