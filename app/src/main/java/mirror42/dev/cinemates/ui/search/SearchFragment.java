@@ -238,32 +238,21 @@ public class SearchFragment extends Fragment implements
         // at least 3 chars are typed in, and search button hasn't been pressed yet (filter)
         // 1 second later after the last typed character (debounce)
 
-        if(enable) {
-            searchSubscription = new SerialDisposable();
-            Observable<String> searchTermObservable = RxTextView.textChanges(editTextSearch)
-                    .filter(text -> text.length()>=3)
-                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                    .map(text -> text.toString())
-                    .observeOn(AndroidSchedulers.mainThread());
-
-            searchSubscription.set(searchTermObservable
-                    .subscribe(this::autoSearch));
-        }
-        else {
+        if( ! enable) {
             if(searchSubscription!=null && !searchSubscription.isDisposed())
                 searchSubscription.dispose();
-
             // ri-enable
-            searchSubscription = new SerialDisposable();
-            Observable<String> searchTermObservable = RxTextView.textChanges(editTextSearch)
-                    .filter(text -> text.length()>=3)
-                    .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
-                    .map(text -> text.toString())
-                    .observeOn(AndroidSchedulers.mainThread());
-
-            searchSubscription.set(searchTermObservable
-                    .subscribe(this::autoSearch));
         }
+
+        searchSubscription = new SerialDisposable();
+        Observable<String> searchTermObservable = RxTextView.textChanges(editTextSearch)
+                .filter(text -> text.length()>=3)
+                .debounce(1, TimeUnit.SECONDS) /*NOTES: 1 seconds seems to be the sweetspot*/
+                .map(text -> text.toString())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        searchSubscription.set(searchTermObservable
+                .subscribe(this::autoSearch));
     }
 
     private void autoSearch(String searchQuery) {

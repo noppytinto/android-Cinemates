@@ -67,6 +67,7 @@ public class PersonalProfileFragment extends Fragment implements
     private FollowersViewModel followersViewModel;
     private Uri localImageUri;
     private LinearProgressIndicator uploadProgressIndicator;
+    private static boolean additionalActivationMailSent;
 
     private static int PICK_IMAGE = 30;
     private final int PERMISSION_CODE = 5;
@@ -268,10 +269,19 @@ public class PersonalProfileFragment extends Fragment implements
             if( ! accountEnabled) {
                 // insert into postgrest database
                 // and show new user profile page
-                loginViewModel.resendVerificationEmail();
-                showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
-                buttonResendEmail.setText("Email attivazione rinviata!");
-                buttonResendEmail.setEnabled(false);
+                if(additionalActivationMailSent) {
+                    showCenteredToast("email attivazione gia' rininviata");
+                    buttonResendEmail.setText("Email attivazione rinviata!");
+                    buttonResendEmail.setEnabled(false);
+                }
+                else {
+                    loginViewModel.resendVerificationEmail();
+                    showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
+                    buttonResendEmail.setText("Email attivazione rinviata!");
+                    buttonResendEmail.setEnabled(false);
+                    additionalActivationMailSent = true;
+                }
+
             }
         }
         else if(v.getId() == buttonChangePassword.getId()){

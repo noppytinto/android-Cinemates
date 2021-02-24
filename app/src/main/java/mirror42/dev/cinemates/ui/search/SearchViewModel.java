@@ -298,17 +298,16 @@ public class SearchViewModel extends ViewModel {
         };
     }// end createSearchUsersTask()
 
-    private CastSearchResult buildCastSearchResult(Cast item) {
-        if(item==null) throw new NullPointerException("CINEMATES EXCEPTIONS: argomento nullo");
+    private CastSearchResult buildCastSearchResult(Cast searchResultItem) {
+        if(searchResultItem==null) throw new NullPointerException("CINEMATES EXCEPTIONS: argomento nullo");
 
         TheMovieDatabaseApi api = TheMovieDatabaseApi.getInstance();
-        CastSearchResult searchResult = new CastSearchResult.Builder(item.getTmdbID(), item.getFullName())
-                .setKnownFor(item.getKnownFor())
-                .setProfilePicture(api.buildPersonImageUrl(item.getProfilePictureUrl()))
-                .setDepartment(item.getDepartment())
-                .build();
 
-        return searchResult;
+        return new CastSearchResult.Builder(searchResultItem.getTmdbID(), searchResultItem.getFullName())
+                .setKnownFor(searchResultItem.getKnownFor())
+                .setProfilePicture(api.buildPersonImageUrl(searchResultItem.getProfilePictureUrl()))
+                .setDepartment(searchResultItem.getDepartment())
+                .build();
     }
 
 

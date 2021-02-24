@@ -175,10 +175,14 @@ public class SignUpFragment extends Fragment implements
                 case SIGN_UP_FAILURE:
                     showCenteredToast("Firebase sign-up server:\ncreateUserWithEmail:failure");
                     break;
-                case VERIFICATION_MAIL_SENT:
-                    showCenteredToast("Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta");
+                case VERIFICATION_MAIL_SENT: {
+                    String msg = "Firebase sign-up server:\nRiceverai a breve un link di attivazione account nella tua posta";
+                    final Toast toast = Toast.makeText(getContext(), msg, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                     Navigation.findNavController(view).popBackStack();
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
+                }
                     break;
                 case VERIFICATION_MAIL_NOT_SENT:
                     showCenteredToast("Firebase sign-up server:\nVerification email NOT sent");
@@ -210,8 +214,8 @@ public class SignUpFragment extends Fragment implements
                     textInputLayoutEmail.setError("email gia' presente");
                     break;
                 case WEAK_PASSWORD:
-                    showCenteredToast("Firebase sign-up server:\nla password deve contenere un numero di caratteri superiori a 5");
-                    textInputLayoutEmail.setError(getString(R.string.passwordHelper));
+                    showCenteredToast("Firebase sign-up server:\nla password deve contenere almeno 6 caratteri");
+                    textInputLayoutPassword.setError(getString(R.string.passwordHelper));
                     break;
                 case NO_POSTGRES_USER_COLLISION:
                     signUpViewModel.checkPendingUserCollision();
@@ -230,26 +234,30 @@ public class SignUpFragment extends Fragment implements
             imageChooser();
         }
         else if(v.getId() == buttonsignUp.getId()) {
-            // getting data
-            String username = editTextUsername.getText().toString();
-            String email = editTextEmail.getText().toString();
-            String password = editTextPassword.getText().toString();
-            String firstName = editTextFirstName.getText().toString();
-            String lastName = editTextLastName.getText().toString();
-            String birthDate = editTextBirthDate.getText().toString();
-            boolean promo = checkBoxPromo.isChecked();
-            boolean analytics = checkBoxAnalytics.isChecked();
+
 
             // check fields
             boolean allFieldsAreFilled = checkAllFieldsAreFilled();
             boolean repeatPasswordMatches = checkRepeatPasswordMatch();
 
-            if(allFieldsAreFilled && repeatPasswordMatches) {
-                showProgressDialog();
-                signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, localImageUri, promo, analytics);
+            if(allFieldsAreFilled) {
+                // getting data and trim text
+                String username = editTextUsername.getText().toString().trim();
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
+                String firstName = editTextFirstName.getText().toString().trim();
+                String lastName = editTextLastName.getText().toString().trim();
+                String birthDate = editTextBirthDate.getText().toString().trim();
+                boolean promo = checkBoxPromo.isChecked();
+                boolean analytics = checkBoxAnalytics.isChecked();
+                boolean emailFromatIsValid = checkEmailFormat(email);
+                if(repeatPasswordMatches && emailFromatIsValid) {
+                    showProgressDialog();
+                    signUpViewModel.signUpAsPendingUser(username, email, password, firstName, lastName, birthDate, localImageUri, promo, analytics);
+                }
             }
             else {
-                showCenteredToast("Completare prima tutti i campi evidenziati in rosso.");
+                showCenteredToast("completare prima tutti i campi evidenziati in rosso");
             }
         }
         else if(v.getId() == buttonDatePicker.getId()) {
@@ -285,6 +293,9 @@ public class SignUpFragment extends Fragment implements
         MenuItem userIcon = menu.getItem(1);
         userIcon.setVisible(false);
     }
+
+
+
 
     //--------------------------------------------------------------- METHODS
 
@@ -360,10 +371,14 @@ public class SignUpFragment extends Fragment implements
 
     private void showProgressDialog() {
         //notes: Declare progressDialog before so you can use .hide() later!
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Operazione in corso...");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+        try {
+            progressDialog = new ProgressDialog(requireContext());
+            progressDialog.setMessage("Operazione in corso...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void hideProgressDialog() {
@@ -522,6 +537,17 @@ public class SignUpFragment extends Fragment implements
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
+    private boolean checkEmailFormat(String email) {
+        if(android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            textInputLayoutEmail.setError(null);
+            return true;
+        }
+
+        textInputLayoutEmail.setError("Il formato mail non e' valido!");
+        return false;
+    }
+
 
 
 }// end signUpFragment class

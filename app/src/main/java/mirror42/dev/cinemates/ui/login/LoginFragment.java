@@ -190,15 +190,21 @@ public class LoginFragment extends Fragment  implements
             firebaseAnalytics.logLoginEvent(getString(R.string.login_page_firebase_standard_login_method), getContext());
 
             // checks
-            boolean allFieldsAreOk = checkFields();
+            boolean allFieldsAreFilled = checkFieldsAreFilled();
 
             //
-            if(allFieldsAreOk) {
-                String email = editTextEmail.getText().toString();
-                String password = editTextPassword.getText().toString();
+            if(allFieldsAreFilled) {
+                // get data and trim text
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
 
-                //
-                loginViewModel.login(email, password);
+                if( ! android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    textInputLayoutEmail.setError("Il formato mail non e' valido!");
+                }
+                else {
+                    textInputLayoutEmail.setError(null);
+                    loginViewModel.login(email, password);
+                }
             }
             else {
                 hideProgressDialog();
@@ -219,12 +225,16 @@ public class LoginFragment extends Fragment  implements
 
     private void showProgressDialog() {
         //notes: Declare progressDialog before so you can use .hide() later!
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Login in corso...");
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+        try {
+            progressDialog = new ProgressDialog(requireContext());
+            progressDialog.setMessage("Login in corso...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void hideProgressDialog() {
@@ -232,13 +242,8 @@ public class LoginFragment extends Fragment  implements
             progressDialog.hide();
     }
 
-    private boolean checkFields() {
+    private boolean checkFieldsAreFilled() {
         String email = editTextEmail.getText().toString();
-
-        if( ! android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            textInputLayoutEmail.setError("Il formato mail non e' valido!");
-            return false;
-        }
 
         if (email.isEmpty()) {
             textInputLayoutEmail.setError(getString(R.string.login_page_no_email_error));
