@@ -1,9 +1,12 @@
 package mirror42.dev.cinemates.ui.explore;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,9 +15,14 @@ import androidx.fragment.app.Fragment;
 import mirror42.dev.cinemates.R;
 
 
-public class ExploreFragment extends Fragment{
+public class ExploreFragment extends Fragment implements View.OnClickListener{
 //    private SwipeRefreshLayout swipeRefreshLayout;
 
+    private Button buttonLatest;
+    private Button buttonUpcomings;
+    private Button buttonPopular;
+
+    private View view;
     public ExploreFragment() {
         // Required empty public constructor
     }
@@ -29,6 +37,8 @@ public class ExploreFragment extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);
 
         // TODO: swipe down to refresh
 //        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
@@ -60,5 +70,36 @@ public class ExploreFragment extends Fragment{
     }
 
 
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == buttonUpcomings.getId()){
+            final Toast toast = Toast.makeText(getContext(), "upcoming", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
 
+        }else  if(v.getId() == buttonLatest.getId()){
+            final Toast toast = Toast.makeText(getContext(), "Latest", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }else if(v.getId() == buttonPopular.getId()){
+
+            final Toast toast = Toast.makeText(getContext(), "popular", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+    }
+
+
+
+    private void initViews(View view){
+        this.view = view;
+
+        buttonUpcomings = view.findViewById(R.id.button_exploreFragment_seeAllUpcomings);
+        buttonLatest = view.findViewById(R.id.button_exploreFragment_seeAllLatest);
+        buttonPopular = view.findViewById(R.id.button_exploreFragment_seeAllPopular);
+
+        buttonPopular.setOnClickListener(this);
+        buttonLatest.setOnClickListener(this);
+        buttonUpcomings.setOnClickListener(this);
+    }
 }// end ExploreFragment class
