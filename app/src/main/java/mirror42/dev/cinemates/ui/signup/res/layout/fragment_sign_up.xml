@@ -305,7 +305,7 @@
                 android:layout_width="88dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="32dp"
-                android:layout_marginEnd="36dp"
+                android:layout_marginEnd="66dp"
                 android:text="@string/sign_up_privacyPolicy_message"
                 android:textColor="@color/white"
                 android:textSize="15sp"

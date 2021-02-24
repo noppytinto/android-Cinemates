@@ -1,4 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="privacy_policy_title">
+        Privacy Policy di CineMates20
+    </string>
+
+    <string name="privacy_policy_subtitle">
+        Questa Applicazione raccoglie alcuni Dati Personali dei propri Utenti.
+    </string>
+
+
+    <string name="privacy_policy_summary_title">
+        \n
+        Riassunto della policy
+    </string>
+
+    <string name="privacy_policy_summary_subtitle">
+        Dati personali raccolti per le seguenti finalità ed utilizzando i seguenti servizi:
+    </string>
+
+    <string name="privacy_policy_summary"><b>1.Contattare l\'Utente</b>\n
+        <i>-Mailing list o newsletter</i>\n
+        Dati Personali: email\n
+        <b>2.Hosting ed infrastruttura backend</b>\n
+        <i>-Firebase Cloud Functions</i>\n
+        Dati Personali: Dati di utilizzo; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio\n
+        <i>-Cloudinary</i>\n
+        Dati Personali: immagine del profilo; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio\n
+        <i>-Microsoft Azure</i>\n
+        Dati Personali trattati: nome; cognome; indirizzo email; username; password; data di nascita; immagine del profilo; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio.\n
+        <b>3.Registrazione ed autenticazione</b>\n
+        <i>-Firebase Authentication</i>\n
+        Dati Personali: cognome; email; immagine di profilo; nome; password; username\n
+        <i>-Google OAuth</i>\n
+        Dati Personali: nome; cognome; email; immagine del profilo; username; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio.\n
+        <b>4.Monitoraggio dell\'infrastruttura</b>\n
+        <i>-Firebase Performance Monitoring</i>\n
+        Dati Personali: varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio\n
+    </string>
+
+
+    <string name="privacy_policy_complete_title">
+        \n
+        Policy completa
+    </string>
+
+
+    <string name="privacy_policy_complete_titolare">
+        \n
+        Titolare del Trattamento dei Dati
+    </string>
+
+    <string name="privacy_policy_complete_titolare_info">
+        Nome: <b>INGSW2021_N_03</b>\n
+        Indirizzo: Via Vicinale Cupa Cintia, 80126 Napoli NA\n
+        Indirizzo e-mail: fabri.formicola@studenti.unina.it ; ch.iannotta@studenti.unina.it ; f.scutellaro@studenti.unina.it
+    </string>
+
+
+    <string name="privacy_policy_complete_tipologie_dati_raccolti_titolo">
+        \n
+        Tipologie di Dati raccolti
+    </string>
+
+    <string name="privacy_policy_complete_tipologie_dati_raccolti">
+        Fra i Dati Personali raccolti da questa Applicazione, in modo autonomo o tramite terze parti, ci sono: email; nome; cognome; username; password; immagine di profilo; Dati di utilizzo.\n
+        Dettagli completi su ciascuna tipologia di dati raccolti sono forniti nelle sezioni dedicate di questa privacy policy o mediante specifici testi informativi visualizzati prima della raccolta dei dati stessi.\n
+        I Dati Personali possono essere liberamente forniti dall\'Utente o, nel caso di Dati di Utilizzo, raccolti automaticamente durante l\'uso di questa Applicazione.\n
+        Se non diversamente specificato, tutti i Dati richiesti da questa Applicazione sono obbligatori. Se l\’Utente rifiuta di comunicarli, potrebbe essere impossibile per questa Applicazione fornire il Servizio. Nei casi in cui questa Applicazione indichi alcuni Dati come facoltativi, gli Utenti sono liberi di astenersi dal comunicare tali Dati, senza che ciò abbia alcuna conseguenza sulla disponibilità del Servizio o sulla sua operatività.\n
+        Gli Utenti che dovessero avere dubbi su quali Dati siano obbligatori, sono incoraggiati a contattare il Titolare.\n
+        L\’eventuale utilizzo di Cookie - o di altri strumenti di tracciamento - da parte di questa Applicazione o dei titolari dei servizi terzi utilizzati da questa Applicazione, ove non diversamente precisato, ha la finalità di fornire il Servizio richiesto dall\'Utente, oltre alle ulteriori finalità descritte nel presente documento e nella Cookie Policy, se disponibile.\n
+        L\'Utente si assume la responsabilità dei Dati Personali di terzi ottenuti, pubblicati o condivisi mediante questa Applicazione e garantisce di avere il diritto di comunicarli o diffonderli, liberando il Titolare da qualsiasi responsabilità verso terzi.\n
+    </string>
+
+
+    <string name="privacy_policy_modalità_e_luogo_di_trattamento_dei_dati_raccolti_titolo">
+        \n
+        Modalità e luogo del trattamento dei Dati raccolti
+    </string>
+
+    <string name="privacy_policy_modalità_e_luogo_di_trattamento_dei_dati_raccolti">
+        <b>Modalità di trattamento</b>\n
+        Il Titolare adotta le opportune misure di sicurezza volte ad impedire l\’accesso, la divulgazione, la modifica o la distruzione non autorizzate dei Dati Personali.\n
+        Il trattamento viene effettuato mediante strumenti informatici e/o telematici, con modalità organizzative e con logiche strettamente correlate alle finalità indicate. Oltre al Titolare, in alcuni casi, potrebbero avere accesso ai Dati altri soggetti coinvolti nell\’organizzazione di questa Applicazione (personale amministrativo, commerciale, marketing, legali, amministratori di sistema) ovvero soggetti esterni (come fornitori di servizi tecnici terzi, corrieri postali, hosting provider, società informatiche, agenzie di comunicazione) nominati anche, se necessario, Responsabili del Trattamento da parte del Titolare. L\’elenco aggiornato dei Responsabili potrà sempre essere richiesto al Titolare del Trattamento.\n
+        <b>Base giuridica del trattamento</b>\n
+        Il Titolare tratta Dati Personali relativi all\’Utente in caso sussista una delle seguenti condizioni:\n
+        -l\’Utente ha prestato il consenso per una o più finalità specifiche; Nota: in alcuni ordinamenti il Titolare può essere autorizzato a trattare Dati Personali senza che debba sussistere il consenso dell\’Utente o un\’altra delle basi giuridiche specificate di seguito, fino a quando l\’Utente non si opponga (“opt-out”) a tale trattamento. Ciò non è tuttavia applicabile qualora il trattamento di Dati Personali sia regolato dalla legislazione europea in materia di protezione dei Dati Personali;\n
+        -il trattamento è necessario all\'esecuzione di un contratto con l\’Utente e/o all\'esecuzione di misure precontrattuali;\n
+        -il trattamento è necessario per adempiere un obbligo legale al quale è soggetto il Titolare;\n
+        -il trattamento è necessario per l\'esecuzione di un compito di interesse pubblico o per l\'esercizio di pubblici poteri di cui è investito il Titolare;\n
+        -il trattamento è necessario per il perseguimento del legittimo interesse del Titolare o di terzi.\n
+        È comunque sempre possibile richiedere al Titolare di chiarire la concreta base giuridica di ciascun trattamento ed in particolare di specificare se il trattamento sia basato sulla legge, previsto da un contratto o necessario per concludere un contratto.\n
+        <b>Luogo</b>\n
+        I Dati sono trattati presso le sedi operative del Titolare ed in ogni altro luogo in cui le parti coinvolte nel trattamento siano localizzate. Per ulteriori informazioni, contatta il Titolare.\n
+        I Dati Personali dell\’Utente potrebbero essere trasferiti in un paese diverso da quello in cui l\’Utente si trova. Per ottenere ulteriori informazioni sul luogo del trattamento l\’Utente può fare riferimento alla sezione relativa ai dettagli sul trattamento dei Dati Personali.\n
+        L\’Utente ha diritto a ottenere informazioni in merito alla base giuridica del trasferimento di Dati al di fuori dell\’Unione Europea o ad un\’organizzazione internazionale di diritto internazionale pubblico o costituita da due o più paesi, come ad esempio l\’ONU, nonché in merito alle misure di sicurezza adottate dal Titolare per proteggere i Dati.\n
+        L\’Utente può verificare se abbia luogo uno dei trasferimenti appena descritti esaminando la sezione di questo documento relativa ai dettagli sul trattamento di Dati Personali o chiedere informazioni al Titolare contattandolo agli estremi riportati in apertura.\n
+        <b>Periodo di conservazione</b>\n
+        I Dati sono trattati e conservati per il tempo richiesto dalle finalità per le quali sono stati raccolti.\n
+        Pertanto:\n
+        -I Dati Personali raccolti per scopi collegati all\’esecuzione di un contratto tra il Titolare e \l’Utente saranno trattenuti sino a quando sia completata l\’esecuzione di tale contratto.\n
+        -I Dati Personali raccolti per finalità riconducibili all\’interesse legittimo del Titolare saranno trattenuti sino al soddisfacimento di tale interesse. L\’Utente può ottenere ulteriori informazioni in merito all\’interesse legittimo perseguito dal Titolare nelle relative sezioni di questo documento o contattando il Titolare.\n
+        Quando il trattamento è basato sul consenso dell\’Utente, il Titolare può conservare i Dati Personali più a lungo sino a quando detto consenso non venga revocato. Inoltre, il Titolare potrebbe essere obbligato a conservare i Dati Personali per un periodo più lungo in ottemperanza ad un obbligo di legge o per ordine di un\’autorità.\n
+        Al termine del periodo di conservazione i Dati Personali saranno cancellati. Pertanto, allo spirare di tale termine il diritto di accesso, cancellazione, rettificazione ed il diritto alla portabilità dei Dati non potranno più essere esercitati.
+    </string>
+
+
+    <string name="privacy_policy_finalità_del_trattamento_dei_dati_raccolti_titolo">
+        \n
+        Finalità del Trattamento dei Dati raccolti
+    </string>
+
+    <string name="privacy_policy_finalità_del_trattamento_dei_dati_raccolti">
+        I Dati dell\’Utente sono raccolti per consentire al Titolare di fornire il Servizio, adempiere agli obblighi di legge, rispondere a richieste o azioni esecutive, tutelare i propri diritti ed interessi (o quelli di Utenti o di terze parti), individuare eventuali attività dolose o fraudolente, nonché per le seguenti finalità: Registrazione ed autenticazione, Hosting ed infrastruttura backend, Monitoraggio dell\’infrastruttura e Contattare l\'Utente.\n
+        Per ottenere informazioni dettagliate sulle finalità del trattamento e sui Dati Personali trattati per ciascuna finalità, l\’Utente può fare riferimento alla sezione “Dettagli sul trattamento dei Dati Personali”.
+    </string>
+
+
+
+    <string name="privacy_policy_dettagli_sul_trattamento_dei_dati_personali_titolo">
+        \n
+        Dettagli sul trattamento dei Dati Personali
+    </string>
+
+    <string name="privacy_policy_dettagli_sul_trattamento_dei_dati_personali">
+        I Dati Personali sono raccolti per le seguenti finalità ed utilizzando i seguenti servizi:\n
+        <b>1.Hosting ed infrastruttura backend</b>\n
+        Questo tipo di servizi ha la funzione di ospitare Dati e file che permettono a questa Applicazione di funzionare, ne consentono la distribuzione e mettono a disposizione un\'infrastruttura pronta all\'uso per erogare specifiche funzionalità di questa Applicazione.\n
+        Alcuni servizi tra quelli elencati di seguito, se presenti, possono funzionare su server geograficamente distribuiti, rendendo difficile determinare l\'effettiva ubicazione in cui sono conservati i Dati Personali.\n
+        <i>-Firebase Cloud Functions (Google Ireland Limited) </i>\n
+        Firebase Cloud Functions è un servizio di hosting e backend fornito da Google Ireland Limited.\n
+        Dati Personali trattati: Dati di utilizzo; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio.\n
+        Luogo del trattamento: Irlanda – Privacy Policy.\n
+        <i>-Cloudinary (Cloudinary Ltd.) </i>\n
+        Cloudinary è un servizio di hosting fornito da Cloudinary Ltd.\n
+        Dati Personali trattati: immagine del profilo caricata dall\’Utente; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio. \n
+        Luogo del trattamento: Israele – Privacy Policy.\n
+        <i>-Microsoft Azure</i>\n
+        Microsoft Azure è una piattaforma Cloud pubblica che offre servizi di Cloud computing. Eroga servizi appartenenti a diverse categorie quali: risorse di elaborazione, archiviazione e memorizzazione dati, trasmissione dati e interconnessione di reti, analisi, intelligence, apprendimento automatico sicurezza e gestione delle identità, monitoraggio e gestione, servizi per lo sviluppo dell\’applicazione.\n
+        Dati Personali trattati: nome; cognome; indirizzo email; username; password; data di nascita; immagine del profilo; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio. \n
+        Luogo del trattamento: Irlanda – Privacy Policy.\n
+        <b>2.Contattare l\'Utente</b>\n
+        <i>-Mailing list o newsletter (questa Applicazione) </i>\n
+        Con la registrazione alla mailing list o alla newsletter, l\’indirizzo email dell\’Utente viene automaticamente inserito in una lista di contatti a cui potranno essere trasmessi messaggi email contenenti informazioni, anche di natura commerciale e promozionale, relative a questa Applicazione. \n
+        Dati Personali trattati: email.\n
+        <b>3.Registrazione ed autenticazione</b>\n
+        Con la registrazione o l\’autenticazione l\’Utente consente a questa Applicazione di identificarlo e di dargli accesso a servizi dedicati.\n
+        A seconda di quanto indicato di seguito, i servizi di registrazione e di autenticazione potrebbero essere forniti con l\’ausilio di terze parti. Qualora questo avvenga, questa Applicazione potrà accedere ad alcuni Dati conservati dal servizio terzo usato per la registrazione o l\’identificazione.\n
+        Alcuni dei servizi di seguito indicati potrebbero raccogliere Dati Personali anche per fini di targeting e profilazione; per saperne di più, si prega di fare riferimento alla descrizione di ciascun servizio.\n
+        <i>-Firebase Authentication (Google Ireland Limited) </i>\n
+        Firebase Authentication è un servizio di registrazione ed autenticazione fornito da Google Ireland Limited. Per semplificare il processo di registrazione ed autenticazione, Firebase Authentication può utilizzare fornitori di identità di terze parti e salvare le informazioni sulla propria piattaforma.\n
+        Dati Personali trattati: cognome; email; immagine di profilo; nome; password; username.\n
+        Luogo del trattamento: Irlanda – Privacy Policy.\n
+        <i>-Google OAuth (Google Ireland Limited) </i>\n
+        Google OAuth è un servizio di registrazione ed autenticazione fornito da Google Ireland Limited e collegato al network Google.\n
+        Dati Personali trattati: nome; cognome; email; immagine del profilo; username; varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio.\n
+        Luogo del trattamento: Irlanda – Privacy Policy.\n
+        <b>4.Monitoraggio dell\’infrastruttura </b>\n
+        Questo tipo di servizi permette a questa Applicazione di monitorare l\’utilizzo ed il comportamento di componenti della stessa, per consentirne il miglioramento delle prestazioni e delle funzionalità, la manutenzione o la risoluzione di problemi.\n
+        I Dati Personali trattati dipendono dalle caratteristiche e della modalità d\’implementazione di questi servizi, che per loro natura filtrano l\’attività di questa Applicazione.\n
+        <i>-Firebase Performance Monitoring (Google Ireland Limited) </i>\n
+        Firebase Performance Monitoring è un servizio di monitoraggio fornito da Google Ireland Limited.\n
+        Dati Personali trattati: varie tipologie di Dati secondo quanto specificato dalla privacy policy del servizio.\n
+        Luogo del trattamento: Irlanda – Privacy Policy.
+    </string>
+
+
+    <string name="privacy_policy_diritti_dell_utente_titolo">
+        \n
+        Diritti dell\’Utente
+    </string>
+
+    <string name="privacy_policy_diritti_dell_utente">
+        Gli Utenti possono esercitare determinati diritti con riferimento ai Dati trattati dal Titolare.\n
+        In particolare, l\’Utente ha il diritto di:\n
+        -<b>revocare il consenso in ogni momento. </b> L\’Utente può revocare il consenso al trattamento dei propri Dati Personali precedentemente espresso.
+        -<b>opporsi al trattamento dei propri Dati. </b> L\’Utente può opporsi al trattamento dei propri Dati quando esso avviene su una base giuridica diversa dal consenso. Ulteriori dettagli sul diritto di opposizione sono indicati nella sezione sottostante.\n
+        -<b>accedere ai propri Dati. </b> L\’Utente ha diritto ad ottenere informazioni sui Dati trattati dal Titolare, su determinati aspetti del trattamento ed a ricevere una copia dei Dati trattati.\n
+        -<b>verificare e chiedere la rettificazione. </b> L\’Utente può verificare la correttezza dei propri Dati e richiederne l\’aggiornamento o la correzione.\n
+        -<b>ottenere la limitazione del trattamento. </b> Quando ricorrono determinate condizioni, l\’Utente può richiedere la limitazione del trattamento dei propri Dati. In tal caso il Titolare non tratterà i Dati per alcun altro scopo se non la loro conservazione.\n
+        -<b>ottenere la cancellazione o rimozione dei propri Dati Personali. </b> Quando ricorrono determinate condizioni, l\’Utente può richiedere la cancellazione dei propri Dati da parte del Titolare.\n
+        -<b>ricevere i propri Dati o farli trasferire ad altro titolare. </b> L\’Utente ha diritto di ricevere i propri Dati in formato strutturato, di uso comune e leggibile da dispositivo automatico e, ove tecnicamente fattibile, di ottenerne il trasferimento senza ostacoli ad un altro titolare. Questa disposizione è applicabile quando i Dati sono trattati con strumenti automatizzati ed il trattamento è basato sul consenso dell\’Utente, su un contratto di cui l\’Utente è parte o su misure contrattuali ad esso connesse.\n
+        -<b>proporre reclamo. </b> L\’Utente può proporre un reclamo all\’autorità di controllo della protezione dei dati personali competente o agire in sede giudiziale.\n
+        <b>Dettagli sul diritto di opposizione</b>\n
+        Quando i Dati Personali sono trattati nell\’interesse pubblico, nell\’esercizio di pubblici poteri di cui è investito il Titolare oppure per perseguire un interesse legittimo del Titolare, gli Utenti hanno diritto ad opporsi al trattamento per motivi connessi alla loro situazione particolare.\n
+        Si fa presente agli Utenti che, ove i loro Dati fossero trattati con finalità di marketing diretto, possono opporsi al trattamento senza fornire alcuna motivazione. Per scoprire se il Titolare tratti dati con finalità di marketing diretto gli Utenti possono fare riferimento alle rispettive sezioni di questo documento.\n
+        <b>Come esercitare i diritti</b>\n
+        Per esercitare i diritti dell\’Utente, gli Utenti possono indirizzare una richiesta agli estremi di contatto del Titolare indicati in questo documento. Le richieste sono depositate a titolo gratuito e evase dal Titolare nel più breve tempo possibile, in ogni caso entro un mese.\n
+    </string>
+
+
+    <string name="privacy_policy_ulteriori_informazioni_sul_trattamento_titolo">
+        \n
+        Ulteriori informazioni sul trattamento
+    </string>
+
+    <string name="privacy_policy_ulteriori_informazioni_sul_trattamento">
+        <b>Difesa in giudizio</b>\n
+        I Dati Personali dell\’Utente possono essere utilizzati da parte del Titolare in giudizio o nelle fasi preparatorie alla sua eventuale instaurazione per la difesa da abusi nell\'utilizzo di questa Applicazione o dei Servizi connessi da parte dell\’Utente.\n
+        L\’Utente dichiara di essere consapevole che il Titolare potrebbe essere obbligato a rivelare i Dati per ordine delle autorità pubbliche.\n
+        <b>Informative specifiche</b>\n
+        Su richiesta dell\’Utente, in aggiunta alle informazioni contenute in questa privacy policy, questa Applicazione potrebbe fornire all\'Utente delle informative aggiuntive e contestuali riguardanti Servizi specifici, o la raccolta ed il trattamento di Dati Personali.\n
+        <b>Log di sistema e manutenzione</b>\n
+        Per necessità legate al funzionamento ed alla manutenzione, questa Applicazione e gli eventuali servizi terzi da essa utilizzati potrebbero raccogliere log di sistema, ossia file che registrano le interazioni e che possono contenere anche Dati Personali, quali l\’indirizzo IP Utente.\n
+        <b>Informazioni non contenute in questa policy</b>\n
+        Ulteriori informazioni in relazione al trattamento dei Dati Personali potranno essere richieste in qualsiasi momento al Titolare del Trattamento utilizzando gli estremi di contatto.\n
+        <b>Risposta alle richieste “Do Not Track” </b>\n
+        Questa Applicazione non supporta le richieste “Do Not Track”.\n
+        Per scoprire se gli eventuali servizi di terze parti utilizzati le supportino, l\'Utente è invitato a consultare le rispettive privacy policy.\n
+        <b>Modifiche a questa privacy policy</b>\n
+        Il Titolare del Trattamento si riserva il diritto di apportare modifiche alla presente privacy policy in qualunque momento notificandolo agli Utenti su questa pagina e, se possibile, su questa Applicazione nonché, qualora tecnicamente e legalmente fattibile, inviando una notifica agli Utenti attraverso uno degli estremi di contatto di cui è in possesso. Si prega dunque di consultare con frequenza questa pagina, facendo riferimento alla data di ultima modifica indicata in fondo.\n
+        Qualora le modifiche interessino trattamenti la cui base giuridica è il consenso, il Titolare provvederà a raccogliere nuovamente il consenso dell\’Utente, se necessario.\n
+    </string>
+
+
+    <string name="privacy_policy_definizioni_e_riferimenti_legali_titolo">
+        \n
+        Definizioni e riferimenti legali
+    </string>
+
+    <string name="privacy_policy_definizioni_e_riferimenti_legali">
+        <b>Dati Personali (o Dati)</b>\n
+        Costituisce dato personale qualunque informazione che, direttamente o indirettamente, anche in collegamento con qualsiasi altra informazione, ivi compreso un numero di identificazione personale, renda identificata o identificabile una persona fisica.\n
+        <b>Dati di Utilizzo</b>\n
+        Sono le informazioni raccolte automaticamente attraverso questa Applicazione (anche da applicazioni di parti terze integrate in questa Applicazione), tra cui: gli indirizzi IP o i nomi a dominio dei computer utilizzati dall\’Utente che si connette con questa Applicazione, gli indirizzi in notazione URI (Uniform Resource Identifier), l\’orario della richiesta, il metodo utilizzato nell\’inoltrare la richiesta al server, la dimensione del file ottenuto in risposta, il codice numerico indicante lo stato della risposta dal server (buon fine, errore, ecc.) il paese di provenienza, le caratteristiche del browser e del sistema operativo utilizzati dal visitatore, le varie connotazioni temporali della visita (ad esempio il tempo di permanenza su ciascuna pagina) e i dettagli relativi all\’itinerario seguito al\l’interno dell\’Applicazione, con particolare riferimento alla sequenza delle pagine consultate, ai parametri relativi al sistema operativo e all\’ambiente informatico dell\’Utente.\n
+        <b>Utente</b>\n
+        L\'individuo che utilizza questa Applicazione che, salvo ove diversamente specificato, coincide con l\'Interessato.\n
+        <b>Interessato</b>\n
+        La persona fisica cui si riferiscono i Dati Personali.\n
+        <b>Responsabile del Trattamento (o Responsabile) </b>\n
+        La persona fisica, giuridica, la pubblica amministrazione e qualsiasi altro ente che tratta dati personali per conto del Titolare, secondo quanto esposto nella presente privacy policy.\n
+        <b>Titolare del Trattamento (o Titolare) </b>\n
+        La persona fisica o giuridica, l\'autorità pubblica, il servizio o altro organismo che, singolarmente o insieme ad altri, determina le finalità e i mezzi del trattamento di dati personali e gli strumenti adottati, ivi comprese le misure di sicurezza relative al funzionamento ed alla fruizione di questa Applicazione. Il Titolare del Trattamento, salvo quanto diversamente specificato, è il titolare di questa Applicazione.\n
+        <b>Questa Applicazione</b>\n
+        Lo strumento hardware o software mediante il quale sono raccolti e trattati i Dati Personali degli Utenti.\n
+        <b>Servizio</b>\n
+        Il Servizio fornito da questa Applicazione così come definito nei relativi termini (se presenti) su questo sito/applicazione.\n
+        <b>Unione Europea (o UE) </b>\n
+        Salvo ove diversamente specificato, ogni riferimento all\’Unione Europea contenuto in questo documento si intende esteso a tutti gli attuali stati membri dell\’Unione Europea e dello Spazio Economico Europeo.\n
+        \n\n
+        <b>Riferimenti legali</b>\n
+        La presente informativa privacy è redatta sulla base di molteplici ordinamenti legislativi, inclusi gli artt. 13 e 14 del Regolamento (UE) 2016/679.\n
+        Ove non diversamente specificato, questa informativa privacy riguarda esclusivamente questa Applicazione.\n
+        \n
+    </string>
+
+
 </resources>
