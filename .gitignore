@@ -123,3 +123,4 @@ app/.project
 app/.classpath
 .settings/org.eclipse.buildship.core.prefs
 .project
+.idea/sonarlint/issuestore/index.pb

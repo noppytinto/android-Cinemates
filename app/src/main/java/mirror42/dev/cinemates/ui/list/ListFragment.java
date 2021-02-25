@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class ListFragment extends Fragment implements
     private FloatingActionButton recommendButton;
     private Button subscribeButton;
     private Button unsubscribeButton;
+    private CircularProgressIndicator progressIndicator;
 
     private SwitchMaterial isPrivateSwitch;
     private TextView textViewListName;
@@ -87,6 +89,7 @@ public class ListFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
@@ -184,6 +187,7 @@ public class ListFragment extends Fragment implements
         recommendButton = view.findViewById(R.id.floatingActionButton_listFragment_recommend);
         subscribeButton = view.findViewById(R.id.button_listFragment_subscribe);
         unsubscribeButton = view.findViewById(R.id.button_listFragment_unsubscribe);
+        progressIndicator = view.findViewById(R.id.progressIndicator_listFragment);
 
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
         textViewListName = view.findViewById(R.id.textView_listFragment_listName);
@@ -219,6 +223,15 @@ public class ListFragment extends Fragment implements
         recyclerAdapterMoviesList = new RecyclerAdapterMoviesList(new ArrayList<>(), getContext(), this);
         recyclerView.setAdapter(recyclerAdapterMoviesList);
     }
+
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
+
 
     private void setupListAppearance(MoviesList list) {
         MoviesList.ListType listType = list.getListType();

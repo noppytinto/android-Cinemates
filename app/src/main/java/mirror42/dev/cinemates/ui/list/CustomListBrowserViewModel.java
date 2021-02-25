@@ -223,7 +223,6 @@ public class CustomListBrowserViewModel extends ViewModel {
                         }// for
 
                         // once finished set result
-//                                    Collections.reverse(postsList);
                         setCustomLists(customLists);
                         setFetchStatus(FetchStatus.SUCCESS);
 
@@ -259,7 +258,6 @@ public class CustomListBrowserViewModel extends ViewModel {
         }
     }
 
-    //TODO
     private Runnable createFetchSubscribedListsTask(String email, String token, String loggedUsername) {
         return ()-> {
             try {
@@ -321,20 +319,6 @@ public class CustomListBrowserViewModel extends ViewModel {
             }
         };
     }// end createFetchMyCustomListsTask()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private CustomList buildCustomList(JSONObject jsonDBobj, String token, String targetUsername) throws Exception{

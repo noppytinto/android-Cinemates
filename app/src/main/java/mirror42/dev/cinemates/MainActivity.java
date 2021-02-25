@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                         break;
                 }
             });
-//            notificationsViewModel.fetchNotifications(loggedUser, getApplicationContext());
+            notificationsViewModel.fetchNotifications(loggedUser, getApplicationContext());
         }
     }
 

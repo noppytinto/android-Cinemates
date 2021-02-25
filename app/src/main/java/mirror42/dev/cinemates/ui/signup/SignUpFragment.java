@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,7 +75,7 @@ public class SignUpFragment extends Fragment implements
     //
     private Button buttonsignUp;
     private Button buttonUpload;
-    private ImageButton buttonDatePicker;
+    private Button buttonDatePicker;
     private MaterialDatePicker.Builder<Long> materialDatePickerBuilder;
     private SignUpViewModel signUpViewModel;
     private View view;
@@ -529,7 +528,7 @@ public class SignUpFragment extends Fragment implements
 //        editTextRepeatPassword.setText("aaaaaaa");
 //        editTextFirstName.setText("mrfoo");
 //        editTextLastName.setText("bar");
-        editTextBirthDate.setText("1-1-1970");
+        editTextBirthDate.setText("1/1/1970");
     }
 
     public void showCenteredToast(String message) {

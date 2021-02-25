@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="-54dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -199,16 +199,14 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_signUpFragment_birthDate"
                 style="@style/Cinemates.TextField.TextInputLayout"
-                android:layout_width="250dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginEnd="32dp"
+                android:layout_marginEnd="16dp"
                 android:hint="@string/birthdate"
-                app:endIconMode="clear_text"
-                app:helperText="(gg-mm-aaaa)"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:helperText="(gg/mm/aaaa)"
+                app:layout_constraintEnd_toStartOf="@+id/button_signUpPage_datePicker"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout_signUpFragment_lastName"
                 app:startIconDrawable="@drawable/icon_calendar_light_blue">
@@ -217,6 +215,7 @@
                     android:id="@+id/editText_signUpFragment_birthDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:enabled="false"
                     android:inputType="date"
                     android:textColor="@color/white" />
 
@@ -270,20 +269,20 @@
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="@string/sign_up_page_terms_and_conditions"
-                app:layout_constraintEnd_toStartOf="@+id/textView"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/checkBox_loginFragment_analytics"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
 
-            <ImageButton
+            <Button
                 android:id="@+id/button_signUpPage_datePicker"
-                android:layout_width="58dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="16dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/icon_clock_light_blue"
+                style="@style/Cinemates.Button.Rectangular.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:text="seleziona data"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textInputLayout_signUpFragment_birthDate"
-                app:layout_constraintStart_toEndOf="@+id/textInputLayout_signUpFragment_birthDate"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textInputLayout_signUpFragment_birthDate"
                 app:layout_constraintVertical_bias="0.0" />
 
@@ -304,12 +303,12 @@
                 android:id="@+id/textView_signUpFragment_privacyPolicy"
                 android:layout_width="88dp"
                 android:layout_height="42dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="32dp"
-                android:layout_marginEnd="66dp"
                 android:text="@string/sign_up_privacyPolicy_message"
                 android:textColor="@color/white"
                 android:textSize="15sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/checkBox_loginFragment_termsAndConditions"
                 app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_analytics" />
 
 

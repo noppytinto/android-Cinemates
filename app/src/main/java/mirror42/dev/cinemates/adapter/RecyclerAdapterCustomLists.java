@@ -162,7 +162,6 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
             listDescription = itemView.findViewById(R.id.textView_custmListCover_description);
             containter = itemView.findViewById(R.id.cardView_customListcover);
             progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
-            progressIndicator = itemView.findViewById(R.id.progressIndicator_customListCover);
             profilePicture = itemView.findViewById(R.id.imageView_customListCover_profilePicture);
             ownerFullname = itemView.findViewById(R.id.textView_customListCover_fullName);
             ownerUsername = itemView.findViewById(R.id.textView_customListCover_username);

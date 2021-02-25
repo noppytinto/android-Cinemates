@@ -195,33 +195,30 @@ public class LoginViewModel extends ViewModel {
     public void loadPendingUserDetails() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("pending_users").document(currentFirebaseUser.getUid());
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        try {
-                            JSONObject jsonObject = new JSONObject(document.getData());
-                            String email = jsonObject.getString("email");
-                            String profilePicturePath = jsonObject.getString("profilePicturePath");
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    try {
+                        JSONObject jsonObject = new JSONObject(document.getData());
+                        String email = jsonObject.getString("email");
+                        String profilePicturePath = jsonObject.getString("profilePicturePath");
 
-                            basicPendingUser = new User(email, remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath);
+                        basicPendingUser = new User(email, remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath);
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        setLoginResult(LoginResult.IS_PENDING_USER);
-                    } else {
-                        // NOTE: should not enter this case
-                        //       because of preconditions
-                        Log.d(TAG, "No such document");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
+                    setLoginResult(LoginResult.IS_PENDING_USER);
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    // NOTE: should not enter this case
+                    //       because of preconditions
+                    Log.d(TAG, "No such document");
                 }
+
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
             }
         });
     }// end loadPendingUserBasicData()

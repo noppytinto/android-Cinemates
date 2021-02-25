@@ -15,6 +15,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MainActivity;
@@ -128,7 +130,6 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
     public void onRemoveButtonClicked(int position) {
         User targetUser = recyclerAdapterUsersList.getItem(position);
         String targetUsername = targetUser.getUsername();
-
         followersViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
             switch (taskStatus) {
                 case FOLLOWER_REMOVED: {
@@ -142,7 +143,19 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
                 break;
             }
         });
-        followersViewModel.removeFollower(targetUsername, loginViewModel.getLoggedUser());
+
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Vuoi rimuovere follower?")
+                .setNegativeButton("No", (dialog, which) -> {
+                    showCenteredToast("operazione annullata");
+                })
+                .setPositiveButton("Si", (dialog, which) -> {
+                    followersViewModel.removeFollower(targetUsername, loginViewModel.getLoggedUser());
+//                    dialog.dismiss();
+                })
+                .show();
+
+
     }
 
     public void showCenteredToast(String message) {

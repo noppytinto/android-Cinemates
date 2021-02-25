@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.NavGraphDirections;
@@ -43,6 +45,7 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerAdapterNotifications recyclerAdapterNotifications;
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
+    private CircularProgressIndicator progressIndicator;
 
 
 
@@ -66,6 +69,7 @@ public class NotificationsFragment extends Fragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_notificationsFragment);
+        progressIndicator = view.findViewById(R.id.progressIndicator_notificationsFragment);
         initRecyclerView(view);
     }
 
@@ -79,6 +83,7 @@ public class NotificationsFragment extends Fragment implements
 
             switch (notificationsStatust) {
                 case NOTIFICATIONS_FETCHED: {
+                    hideProgressIndicator();
                     if(notifications!=null) {
                         updateUI(notifications);
                         notificationsViewModel.setNotificationsAsOld(notifications, getContext());
@@ -86,10 +91,11 @@ public class NotificationsFragment extends Fragment implements
                 }
                     break;
                 case GOT_NEW_NOTIFICATIONS: {
-
+//                    hideProgressIndicator();
                 }
                     break;
                 case NO_NOTIFICATIONS:
+                    hideProgressIndicator();
                     break;
                 case ALL_NOTIFICATIONS_READ:
                     break;
@@ -261,6 +267,7 @@ public class NotificationsFragment extends Fragment implements
     private void loadNotifications(User loggedUser) {
         if(loggedUser==null) return;
         try {
+            showProgressIndicator();
             notificationsViewModel.fetchNotifications(loggedUser, getContext());
         } catch (Exception e) {
             e.printStackTrace();
@@ -307,6 +314,7 @@ public class NotificationsFragment extends Fragment implements
             // The method calls setRefreshing(false) when it's finished.
             recyclerAdapterNotifications.clearList();
             if(currentUserIsLogged()) {
+                showProgressIndicator();
                 loadNotifications(loginViewModel.getObservableLoggedUser().getValue());
             }
 
@@ -347,6 +355,13 @@ public class NotificationsFragment extends Fragment implements
         navController.navigate(direction);
     }
 
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
 
 
 }// end NotificationsFragment class

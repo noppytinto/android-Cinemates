@@ -84,7 +84,7 @@ public class NotificationsViewModel extends ViewModel {
     public NotificationsViewModel() {
         notificationsList = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
-        notificationsStatus = new MutableLiveData<>(NotificationsStatus.NO_NOTIFICATIONS);
+        notificationsStatus = new MutableLiveData<>(NotificationsStatus.IDLE);
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         customList = new MutableLiveData<>();
         notificationsSubscription = new SerialDisposable();

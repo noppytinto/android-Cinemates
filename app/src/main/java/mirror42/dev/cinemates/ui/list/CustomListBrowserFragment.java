@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 
@@ -43,7 +44,7 @@ public class CustomListBrowserFragment extends Fragment
     private String newListDescription;
     private boolean isPrivate;
     private boolean areNotMyLists;
-
+    private CircularProgressIndicator progressIndicator;
 
 
 
@@ -67,9 +68,9 @@ public class CustomListBrowserFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
+        progressIndicator = view.findViewById(R.id.progressIndicator_customListBrowser);
 
         if(getArguments()!=null) {
-
             CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
             String fetchMode = args.getFetchMode();
             String profileOwnerUsername = args.getListOwner();
@@ -80,7 +81,16 @@ public class CustomListBrowserFragment extends Fragment
 
     }
 
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
+
     private void setUpFragment(String fetchMode, String profileOwnerUsername, View view) {
+        showProgressIndicator();
         switch (fetchMode) {
             case "fetch_my_custom_lists": {
                 areNotMyLists = false;
@@ -111,12 +121,16 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
+                    hideProgressIndicator();
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
                         recyclerAdapterCustomLists.loadNewData(lists);
                     }
                 }
-                break;
+                case NOT_EXISTS:
+                case FAILED:
+                    hideProgressIndicator();
+                    break;
             }
         });
         customListBrowserViewModel.fetchPublicLists(profileOwnerUsername, loginViewModel.getLoggedUser());
@@ -128,13 +142,16 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
+                    hideProgressIndicator();
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
                         recyclerAdapterCustomLists.loadNewData(lists);
                     }
                 }
                 break;
+                case NOT_EXISTS:
                 case FAILED:
+                    hideProgressIndicator();
                     break;
             }
         });
@@ -162,13 +179,16 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.getObservableSubscribedFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
+                    hideProgressIndicator();
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
                         recyclerAdapterCustomLists.loadNewData(lists);
                     }
                 }
                 break;
+                case NOT_EXISTS:
                 case FAILED:
+                    hideProgressIndicator();
                     break;
             }
         });

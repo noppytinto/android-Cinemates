@@ -15,6 +15,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.ArrayList;
 
 import mirror42.dev.cinemates.MainActivity;
@@ -141,7 +143,17 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                 break;
             }
         });
-        followingViewModel.removeFollowing(targetUsername, loginViewModel.getLoggedUser());
+
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Smettere di seguire?")
+                .setNegativeButton("No", (dialog, which) -> {
+                    showCenteredToast("operazione annullata");
+                })
+                .setPositiveButton("Si", (dialog, which) -> {
+                    followingViewModel.removeFollowing(targetUsername, loginViewModel.getLoggedUser());
+//                    dialog.dismiss();
+                })
+                .show();
     }
 
     public void showCenteredToast(String message) {
