@@ -7,7 +7,7 @@
     >
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_searchRecord"
+        android:id="@+id/cardview_movieRecord"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginStart="4dp"
@@ -27,7 +27,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/textview_searchRecord_overview"
+                android:id="@+id/textview_movieRecord_overview"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="16dp"
@@ -47,7 +47,7 @@
                 tools:text="As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. A despot of intergalactic infamy, his goal is to collect all six Infinity Stones, artifacts of unimaginable power, and use them to inflict his twisted will on all of reality. Everything the Avengers have fought for has led up to this moment - the fate of Earth and existence itself has never been more uncertain." />
 
             <TextView
-                android:id="@+id/textview_searchRecord_movie_title"
+                android:id="@+id/textview_movieRecord_movie_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -65,7 +65,7 @@
                 tools:text="Avengers: Infinity War" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardview_searchRecord_poster"
+                android:id="@+id/cardview_movieRecord_poster"
                 android:layout_width="110dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
@@ -79,7 +79,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/imageview_searchRecord_poster"
+                    android:id="@+id/imageview_movieRecord_poster"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
