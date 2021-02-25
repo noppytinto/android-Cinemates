@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import mirror42.dev.cinemates.model.tmdb.Cast;
 import mirror42.dev.cinemates.model.tmdb.Movie;
+import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -610,6 +611,67 @@ public class TheMovieDatabaseApi {
 
         return results;
     }// end getLatest()
+
+    public Integer getMaxNumPageLatest() {
+        JSONObject jsonObj = null;
+        int maxPageNum = new Integer(0);
+        try{
+            String myUrl  = BASE_URL +  "3/movie/now_playing?api_key=" + TMDB_API_KEY +
+                    "&language=" + "en" +
+                    "&page=" + 1;
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
+            maxPageNum = new Integer(jsonObj.getInt("total_pages"));
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
+
+        return maxPageNum;
+    }// end getMaxNumPageLatest()
+
+
+
+//----------------------------
+
+    public Integer getMaxNumPageUpcoming() {
+        JSONObject jsonObj = null;
+        Integer maxPageNum = new Integer(0);
+        try{
+            String myUrl  = BASE_URL +  "3/movie/upcoming?api_key=" + TMDB_API_KEY +
+                    "&language=" + defaultLanguage +
+                    "&page=" + 1;
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
+            maxPageNum = new Integer(jsonObj.getInt("total_pages"));
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
+
+        return maxPageNum;
+    }// end getMaxNumPageUpcoming()
+
+
+
+    //----------------------------
+    public Integer getMaxNumPagePopular() {
+        JSONObject jsonObj = null;
+        Integer maxPageNum = new Integer(0);
+        try{
+            String myUrl  = BASE_URL +  "3/movie/popular?api_key=" + TMDB_API_KEY +
+                    "&language=" + defaultLanguage +
+                    "&page=" + 1 +
+                    "&region=" + defaultLanguage;
+
+            jsonObj = HttpUtilities.getJsonObjectFromUrl(myUrl);
+            maxPageNum = new Integer(jsonObj.getInt("total_pages"));
+        } catch (Exception e) {
+            e.getMessage();
+            e.printStackTrace();
+        }
+
+        return maxPageNum;
+    }// end getMaxNumPagePopular()
+
 
 
 
