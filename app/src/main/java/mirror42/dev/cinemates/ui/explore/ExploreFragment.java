@@ -11,8 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import mirror42.dev.cinemates.MainFragmentDirections;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.ui.home.HomeFragmentDirections;
+import mirror42.dev.cinemates.ui.login.LoginFragmentDirections;
 
 
 public class ExploreFragment extends Fragment implements View.OnClickListener{
@@ -25,6 +29,12 @@ public class ExploreFragment extends Fragment implements View.OnClickListener{
     private View view;
     public ExploreFragment() {
         // Required empty public constructor
+    }
+
+    public enum MovieCategory{
+        POPULAR,
+        UPCOMINGS,
+        LATEST
     }
 
     @Override
@@ -73,22 +83,21 @@ public class ExploreFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if(v.getId() == buttonUpcomings.getId()){
-            final Toast toast = Toast.makeText(getContext(), "upcoming", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+
+            MainFragmentDirections.ActionMainFragmentToAllMoviesForTypeFragment action = MainFragmentDirections.actionMainFragmentToAllMoviesForTypeFragment(MovieCategory.UPCOMINGS);
+            Navigation.findNavController(view).navigate(action);
 
         }else  if(v.getId() == buttonLatest.getId()){
-            final Toast toast = Toast.makeText(getContext(), "Latest", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+
+            MainFragmentDirections.ActionMainFragmentToAllMoviesForTypeFragment action = MainFragmentDirections.actionMainFragmentToAllMoviesForTypeFragment(MovieCategory.LATEST);
+            Navigation.findNavController(view).navigate(action);
+
         }else if(v.getId() == buttonPopular.getId()){
 
-            final Toast toast = Toast.makeText(getContext(), "popular", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            MainFragmentDirections.ActionMainFragmentToAllMoviesForTypeFragment action = MainFragmentDirections.actionMainFragmentToAllMoviesForTypeFragment(MovieCategory.POPULAR);
+            Navigation.findNavController(view).navigate(action);
         }
     }
-
 
 
     private void initViews(View view){

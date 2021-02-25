@@ -23,6 +23,9 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_main_fragment_to_allMoviesForTypeFragment"
+            app:destination="@id/allMoviesForTypeFragment" />
     </fragment>
     <fragment
         android:id="@+id/search_fragment"
@@ -267,4 +270,13 @@
         android:name="mirror42.dev.cinemates.ui.privacyPolicy.PrivacyPolicyFragment"
         android:label="Privacy policy"
         tools:layout="@layout/fragment_privacy_policy" />
+    <fragment
+        android:id="@+id/allMoviesForTypeFragment"
+        android:name="mirror42.dev.cinemates.ui.viewAllMovies.AllMoviesForTypeFragment"
+        android:label="Tutti i film "
+        tools:layout="@layout/fragment_all_movies_for_type" >
+        <argument
+            android:name="MovieCategory"
+            app:argType="mirror42.dev.cinemates.ui.explore.ExploreFragment$MovieCategory" />
+    </fragment>
 </navigation>

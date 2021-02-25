@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- firebase -->
+    <string name="viewAllMovie_page_firebase_viewAllMovie">view all movie page</string>
+</resources>
