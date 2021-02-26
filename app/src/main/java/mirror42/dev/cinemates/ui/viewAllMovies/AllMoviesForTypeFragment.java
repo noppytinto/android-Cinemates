@@ -6,23 +6,40 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.MainActivity;
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.adapter.RecyclerAdapterViewAllMovieForType;
+import mirror42.dev.cinemates.adapter.RecyclerViewClickListener;
+import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.model.search.MovieSearchResult;
 import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.ui.explore.ExploreFragment;
+import mirror42.dev.cinemates.ui.home.HomeFragmentDirections;
+import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
+import mirror42.dev.cinemates.ui.search.SearchFragment;
+import mirror42.dev.cinemates.ui.search.SearchFragmentDirections;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
-public class AllMoviesForTypeFragment extends Fragment {
+public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickListener {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -30,13 +47,22 @@ public class AllMoviesForTypeFragment extends Fragment {
     private ExploreFragment.MovieCategory movieCategoryToLoad;
 
     private AllMoviesForTypeViewModel allMovieViewModel;
+    private NotificationsViewModel notificationsViewModel;
+    private LoginViewModel loginViewModel;
+
+    private RecyclerAdapterViewAllMovieForType recycleAdapter;
+    private RecyclerView recyclerView;
 
     int currentPage = 1;
     Integer maxPage;
 
     private ArrayList<Movie> movies = new ArrayList<Movie>();
+
     private View view;
     private TextView title;
+    private TextView pageLoadedInfo;
+    private Button loadMoreButton;
+    private ProgressBar spinner;
 
 
 
@@ -69,9 +95,20 @@ public class AllMoviesForTypeFragment extends Fragment {
         firebaseAnalytics.logScreenEvent(this, getString(R.string.viewAllMovie_page_firebase_viewAllMovie), getContext());
 
         title = view.findViewById(R.id.textView_title_allMovieForTypeFragment);
+        spinner = view.findViewById(R.id.progressBar_AllMoviesForTypeFragment);
+        pageLoadedInfo = view.findViewById(R.id.textView_pageLoaded_allMovieForTypeFragment);
+        loadMoreButton= view.findViewById(R.id.button_AllMoviesForTypeFragment_viewAll);
+        loadMoreButton.setOnClickListener(this);
 
         initCategoryMovie();
         setTitleSearch();
+        initRecycleView();
+
+        showLoadingSpinner(true);
+
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
         allMovieViewModel = new ViewModelProvider(this).get(AllMoviesForTypeViewModel.class);
         allMovieViewModel.getObservableDownloadMaxPageStatus().observe(getViewLifecycleOwner(), downloadMaxPageStatus -> {
@@ -80,7 +117,6 @@ public class AllMoviesForTypeFragment extends Fragment {
                 case SUCCESS:
                     maxPage = allMovieViewModel.getMaxPage();
                     setMovies();
-                    showCenteredToast("ecco le pagine caricate" + maxPage );
                 break;
                 case FAILED:
                     Log.v(TAG, "massimo numero pagine per categoria di film non estratto impossibile continuare ad operare sulla pagina");
@@ -92,11 +128,15 @@ public class AllMoviesForTypeFragment extends Fragment {
 
             switch (downloadSearchResultStatus) {
                 case SUCCESS:
-                    showCenteredToast("bravissimo film cricati");
-                    movies = allMovieViewModel.getSearchResult();
+                    ArrayList<Movie> currentMovie = allMovieViewModel.getSearchResult();
+                    movies.addAll(currentMovie);
+                    showLoadingSpinner(false);
+                    recycleAdapter.loadNewData(movies);
+                    pageLoadedInfo.setText("Pagine:" + currentPage + "/" + maxPage);
                     break;
                 case FAILED:
-                    Log.v(TAG, "Errore caricamernto film");
+                    showLoadingSpinner(false);
+                    showCenteredToast("Caricamento film fallito");
                     break;
             }
         });
@@ -104,6 +144,19 @@ public class AllMoviesForTypeFragment extends Fragment {
         allMovieViewModel.findMaxPage(movieCategoryToLoad);
     }
 
+    @Override
+    public void onClick(View v) {
+        showLoadingSpinner(true);
+        if(v.getId() == loadMoreButton.getId()){
+            User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
+            checkForNewNotifications(loggedUser);
+            currentPage++;
+            setMovies();
+        }
+    }
+
+
+    //--------------------------------------------------My methods
 
     private void initCategoryMovie(){
         try {
@@ -134,11 +187,67 @@ public class AllMoviesForTypeFragment extends Fragment {
             showCenteredToast("Ci dispiace non ci sono più film da caricare per la categoria indicata");
     }
 
+    private void  initRecycleView(){
+
+        // recycle
+        recyclerView = (RecyclerView)  view.findViewById(R.id.recyclerView_AllMoviesForTypeFragment);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                Movie itemSelected = (Movie)  recycleAdapter.getMovie(position);
+                firebaseAnalytics.logSelectedViewAllMovie(itemSelected, "selected movie in search tab", this, getContext());
+                Movie mv = new Movie();
+                mv.setTmdbID(itemSelected.getTmdbID());
+                NavGraphDirections.AnywhereToMovieDetailsFragment action = SearchFragmentDirections.anywhereToMovieDetailsFragment(mv);
+                NavHostFragment.findNavController(AllMoviesForTypeFragment.this).navigate(action);
+
+            }
+        };
+
+        recycleAdapter = new RecyclerAdapterViewAllMovieForType(new ArrayList<Movie>() ,view.getContext() ,listener  );
+        recyclerView.setAdapter(recycleAdapter);
+
+    }
 
     public void showCenteredToast(String message) {
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void showLoadingSpinner(boolean show) {
+        if(show) spinner.setVisibility(View.VISIBLE);
+        else spinner.setVisibility(View.GONE);
+    }
+
+    private void checkForNewNotifications(User loggedUser) {
+        if(loggedUser!=null) {
+            notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
+                switch (status) {
+                    case NOTIFICATIONS_FETCHED: {
+                        notificationsViewModel.checkForNewNotifications(getContext());
+                    }
+                    break;
+                    case GOT_NEW_NOTIFICATIONS: {
+                        ((MainActivity) requireActivity()).activateNotificationsIcon();
+                    }
+                    break;
+                    case NO_NOTIFICATIONS:
+//                        deactivateNotificationsIcon();
+                        break;
+                    case ALL_NOTIFICATIONS_READ:
+                        ((MainActivity) requireActivity()).deactivateNotificationsIcon();
+                        break;
+                }
+            });
+            try {
+                notificationsViewModel.fetchNotifications(loggedUser, getContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
