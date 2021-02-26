@@ -51,6 +51,8 @@ public class PersonalProfileFragment extends Fragment implements
     private TextView usernameTextView;
     private TextView textViewResendEmailMessage;
     private Button buttonLogout;
+    private Button buttonDeleteImage;
+    private Button buttonSaveImage;
     private Button buttonResendEmail;
     private Button buttonChangePassword;
     private RemoteConfigServer remoteConfigServer;
@@ -66,6 +68,7 @@ public class PersonalProfileFragment extends Fragment implements
     private FollowingViewModel followingViewModel;
     private FollowersViewModel followersViewModel;
     private Uri localImageUri;
+    private String oldImage;
     private LinearProgressIndicator uploadProgressIndicator;
     private static boolean additionalActivationMailSent;
 
@@ -100,6 +103,8 @@ public class PersonalProfileFragment extends Fragment implements
         usernameTextView = view.findViewById(R.id.textView_personalProfileFragment_username);
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
+        buttonSaveImage = view.findViewById(R.id.button_saveNewImage_personalProfileFragment);
+        buttonDeleteImage = view.findViewById(R.id.button_Delete_NewImage);
         buttonChangePassword = view.findViewById(R.id.button_personalProfileFragment_changePassword);
         buttonCustomLists = view.findViewById(R.id.button_personalProfileFragment_customLists);
         subscribedListsButton = view.findViewById(R.id.button_personalProfileFragment_subscribedLists);
@@ -127,6 +132,11 @@ public class PersonalProfileFragment extends Fragment implements
         followingButton.setOnClickListener(this);
         profilePicture.setOnClickListener(this);
         buttonResendEmail.setOnClickListener(this);
+        buttonSaveImage.setOnClickListener(this);
+        buttonDeleteImage.setOnClickListener(this);
+
+        buttonDeleteImage.setVisibility(View.GONE);
+        buttonSaveImage.setVisibility(View.GONE);
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -168,7 +178,7 @@ public class PersonalProfileFragment extends Fragment implements
                         User user = loginViewModel.getLoggedUser();
                         String profilePicturePath = user.getProfilePicturePath();
                         ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
-
+                        oldImage = profilePicturePath;
 
                         textViewEmail.setText(user.getEmail());
                         fullNameTextView.setText(user.getFullName());
@@ -317,6 +327,17 @@ public class PersonalProfileFragment extends Fragment implements
             NavDirections followersFragment =
                     PersonalProfileFragmentDirections.actionPersonalProfileFragmentToFollowingFragment(loginViewModel.getLoggedUser().getUsername());
             Navigation.findNavController(v).navigate(followersFragment);
+        }else if(v.getId() == buttonSaveImage.getId() ){
+            changeImageToServer();
+        }else if(v.getId() == buttonDeleteImage.getId()){
+            showUploadProgressIndicator();
+            usernameTextView.setVisibility(View.VISIBLE);
+            buttonDeleteImage.setVisibility(View.GONE);
+            buttonSaveImage.setVisibility(View.GONE);
+            ImageUtilities.loadCircularImageInto(oldImage, profilePicture, getContext());
+            loginViewModel.getLoggedUser().setProfilePictureURL(oldImage);
+            hideUploadProgressIndicator();
+            showCenteredToast("Cambio immagine annullato");
         }
     }
 
@@ -347,6 +368,29 @@ public class PersonalProfileFragment extends Fragment implements
 
     //----------------------------------------------------------------------- METHODS
 
+    private void changeImageToServer(){
+        personalProfileViewModel.getUpdateImageToServer().observe(getViewLifecycleOwner(), changeImageToServerResult->{
+
+
+            switch(changeImageToServerResult){
+
+                case SUCCESS:
+                    hideUploadProgressIndicator();
+                    usernameTextView.setVisibility(View.VISIBLE);
+                    buttonDeleteImage.setVisibility(View.GONE);
+                    buttonSaveImage.setVisibility(View.GONE);
+                    showCenteredToast( "Perfetto Cambio immagine completo");
+                    break;
+
+                case FAILED:
+                    showCenteredToast( "cambio immagine profilo NON riuscito");
+                    break;
+            }
+        });
+
+        showUploadProgressIndicator();
+        personalProfileViewModel.changeProfileImageToServer(loginViewModel.getLoggedUser(), personalProfileViewModel.getImageName());
+    }
     void imageChooser() {
         personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
             hideUploadProgressIndicator();
@@ -359,7 +403,10 @@ public class PersonalProfileFragment extends Fragment implements
                             .circleCrop() //4
                             .into(profilePicture); //8
                     loginViewModel.updateProfileImageUrl(personalProfileViewModel.getImageName());
-                    showCenteredToast( "cambio immagine profilo riuscito ");
+                    usernameTextView.setVisibility(View.GONE);
+                    buttonDeleteImage.setVisibility(View.VISIBLE);
+                    buttonSaveImage.setVisibility(View.VISIBLE);
+                    showCenteredToast( "Cliccare su salva per rendere permanete il cambiamento ");
                 }
                 break;
                 case FAILED:

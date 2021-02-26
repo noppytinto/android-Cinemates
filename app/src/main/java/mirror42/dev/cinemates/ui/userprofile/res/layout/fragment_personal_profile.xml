@@ -16,6 +16,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <Button
+                android:id="@+id/button_saveNewImage_personalProfileFragment"
+                style="@style/Cinemates.Button.Rectangular"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="12dp"
+                android:text="Salva"
+                android:textSize="8sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture" />
+
+            <Button
+                android:id="@+id/button_Delete_NewImage"
+                style="@style/Cinemates.Button.Rectangular.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="32dp"
+                android:text="Annulla"
+                android:textSize="8sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_saveNewImage_personalProfileFragment" />
+
             <View
                 android:id="@+id/divider_personalProfileFragment"
                 android:layout_width="1dp"
@@ -44,15 +67,14 @@
                 android:id="@+id/textView_personalProfileFragment_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginStart="52dp"
                 android:fontFamily="@font/poppins"
                 android:text="@mario"
                 android:textAlignment="textStart"
                 android:textColor="@color/light_blue"
                 android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="@+id/imageView_personalProfileFragment_profilePicture"
-                app:layout_constraintStart_toStartOf="@+id/imageView_personalProfileFragment_profilePicture"
-                app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_Delete_NewImage" />
 
             <TextView
                 android:id="@+id/textView_personalProfileFragment_fullName"
@@ -123,8 +145,6 @@
                 app:srcCompat="@drawable/icon_user_primary_blue" />
 
 
-
-
             <Button
                 android:id="@+id/button_personalProfileFragment_logout"
                 style="@style/Cinemates.Button.Rounded.Outlined"
@@ -159,10 +179,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="161dp"
                 android:layout_marginStart="55dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="56dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView_personalProfileFragment_username"
                 tools:visibility="visible" />

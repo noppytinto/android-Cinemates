@@ -42,6 +42,7 @@ public class PersonalProfileViewModel extends ViewModel {
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private MutableLiveData<ChangeImageResult> changeImageResult;
+    private MutableLiveData<ChangeImageResult> changeImageToServerResult;
     private MutableLiveData<FetchStatus> fetchStatus;
     private String imageName;
 
@@ -61,6 +62,7 @@ public class PersonalProfileViewModel extends ViewModel {
     public PersonalProfileViewModel() {
         this.user = new MutableLiveData<>();
         changeImageResult = new MutableLiveData<>(ChangeImageResult.NONE);
+        changeImageToServerResult = new MutableLiveData<>(ChangeImageResult.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
@@ -76,6 +78,15 @@ public class PersonalProfileViewModel extends ViewModel {
 
     public void setResetStatus(ChangeImageResult changeImageResult) {
         this.changeImageResult.postValue(changeImageResult);
+    }
+
+
+    public LiveData<ChangeImageResult> getUpdateImageToServer() {
+        return changeImageToServerResult;
+    }
+
+    public void setUpdateImageToServer(ChangeImageResult changeImageToServerResult) {
+        this.changeImageToServerResult.postValue(changeImageToServerResult);
     }
 
     public LiveData<FetchStatus> getFetchStatus() {
@@ -134,7 +145,8 @@ public class PersonalProfileViewModel extends ViewModel {
 
                                 // getting name from uri
 
-                                changeProfileImageToServer(user, randomImageName);
+                                setResetStatus(ChangeImageResult.SUCCESS);
+                                //changeProfileImageToServer(user, randomImageName);
                             }
 
                             @Override
@@ -163,14 +175,14 @@ public class PersonalProfileViewModel extends ViewModel {
         };
     }
 
-    private void changeProfileImageToServer(User user, String imageName){
+    public void changeProfileImageToServer(User user, String imageName){
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_update_profile_picture"; // vedi se è corretto
         try{
             HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             RequestBody requestBody = new FormBody.Builder()
                     .add("email",user.getEmail())
-                    .add("picture_path",imageName+".png")
+                    .add("picture_path",imageName)
                     .build();
             Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,user.getAccessToken());
 
@@ -179,7 +191,7 @@ public class PersonalProfileViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     Log.v(TAG,"cambio immagine fallito");
-                    setResetStatus(ChangeImageResult.FAILED);
+                    setUpdateImageToServer(ChangeImageResult.FAILED);
                 }
 
                 @Override
@@ -191,7 +203,7 @@ public class PersonalProfileViewModel extends ViewModel {
                             String responseData = response.body().toString();
                             Log.v(TAG,"Tutto ok cambio immagine profilo avvenuto con successo");
                             user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
-                            setResetStatus(ChangeImageResult.SUCCESS);
+                            setUpdateImageToServer(ChangeImageResult.SUCCESS);
                         }else{
                             Log.v(TAG,"cambio immagine profilo fallito");
                             setResetStatus(ChangeImageResult.FAILED);
