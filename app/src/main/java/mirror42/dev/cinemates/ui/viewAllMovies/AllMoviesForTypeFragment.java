@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -47,8 +49,6 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     private ExploreFragment.MovieCategory movieCategoryToLoad;
 
     private AllMoviesForTypeViewModel allMovieViewModel;
-    private NotificationsViewModel notificationsViewModel;
-    private LoginViewModel loginViewModel;
 
     private RecyclerAdapterViewAllMovieForType recycleAdapter;
     private RecyclerView recyclerView;
@@ -75,6 +75,7 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -82,6 +83,15 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_all_movies_for_type, container, false);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem userIcon = menu.getItem(1);
+        MenuItem notifyIcon = menu.getItem(0);
+        userIcon.setVisible(false);
+        notifyIcon.setVisible(false);
     }
 
     @Override
@@ -105,10 +115,6 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
         initRecycleView();
 
         showLoadingSpinner(true);
-
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
         allMovieViewModel = new ViewModelProvider(this).get(AllMoviesForTypeViewModel.class);
         allMovieViewModel.getObservableDownloadMaxPageStatus().observe(getViewLifecycleOwner(), downloadMaxPageStatus -> {
@@ -148,8 +154,6 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     public void onClick(View v) {
         showLoadingSpinner(true);
         if(v.getId() == loadMoreButton.getId()){
-            User loggedUser = loginViewModel.getObservableLoggedUser().getValue();
-            checkForNewNotifications(loggedUser);
             currentPage++;
             setMovies();
         }
@@ -222,32 +226,6 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
         else spinner.setVisibility(View.GONE);
     }
 
-    private void checkForNewNotifications(User loggedUser) {
-        if(loggedUser!=null) {
-            notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
-                switch (status) {
-                    case NOTIFICATIONS_FETCHED: {
-                        notificationsViewModel.checkForNewNotifications(getContext());
-                    }
-                    break;
-                    case GOT_NEW_NOTIFICATIONS: {
-                        ((MainActivity) requireActivity()).activateNotificationsIcon();
-                    }
-                    break;
-                    case NO_NOTIFICATIONS:
-//                        deactivateNotificationsIcon();
-                        break;
-                    case ALL_NOTIFICATIONS_READ:
-                        ((MainActivity) requireActivity()).deactivateNotificationsIcon();
-                        break;
-                }
-            });
-            try {
-                notificationsViewModel.fetchNotifications(loggedUser, getContext());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
 }
