@@ -53,7 +53,7 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     private RecyclerAdapterViewAllMovieForType recycleAdapter;
     private RecyclerView recyclerView;
 
-    int currentPage = 1;
+    int currentPage;
     Integer maxPage;
 
     private ArrayList<Movie> movies = new ArrayList<Movie>();
@@ -154,7 +154,6 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     public void onClick(View v) {
         showLoadingSpinner(true);
         if(v.getId() == loadMoreButton.getId()){
-            currentPage++;
             setMovies();
         }
     }
@@ -185,8 +184,10 @@ public class AllMoviesForTypeFragment extends Fragment  implements View.OnClickL
     }
 
     private void setMovies(){
-        if(maxPage >= currentPage)
-             allMovieViewModel.searchMovie(currentPage, movieCategoryToLoad);
+        if(maxPage > currentPage){
+            currentPage++;
+            allMovieViewModel.searchMovie(currentPage, movieCategoryToLoad);
+        }
         else
             showCenteredToast("Ci dispiace non ci sono più film da caricare per la categoria indicata");
     }
