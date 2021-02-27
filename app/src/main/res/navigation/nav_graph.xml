@@ -106,6 +106,9 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_loginFragment_to_googleLoginFragment"
+            app:destination="@id/googleLoginFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -279,4 +282,9 @@
             android:name="MovieCategory"
             app:argType="mirror42.dev.cinemates.ui.explore.ExploreFragment$MovieCategory" />
     </fragment>
+    <fragment
+        android:id="@+id/googleLoginFragment"
+        android:name="mirror42.dev.cinemates.ui.login.GoogleLoginFragment"
+        android:label="Accedi con Google"
+        tools:layout="@layout/fragment_google_login" />
 </navigation>
