@@ -30,5 +30,15 @@
     <string name="login_page_no_email_error">inserire mail!</string>
     <string name="login_page_no_password_error">inserire password!!</string>
 
+    <!--      GOOGLE LOGIN     -->
+    <string name="googleLogin_page_title_access">sembra che queste informazione username ed email siano già connesso ad un account clicca su continua per accedere a tutti i contenuti.</string>
+    <string name="googleLogin_page_title_registration">,benvenuto su Cinemates20.\nSembra che tu non abbia ancora un account completa i campi e registrati per poter accedere aicontenuti.</string>
+    <string name="googleLogin_page_title_back">Ci dispiace ma l\'account inserito esiste già</string>
+
+
+    <string name="googleLogin_page_button_login">Continua</string>
+    <string name="googleLogin_page_button_Registration">Registrati</string>
+    <string name="googleLogin_page_button_back">Torna indietro</string>
+
 
 </resources>
