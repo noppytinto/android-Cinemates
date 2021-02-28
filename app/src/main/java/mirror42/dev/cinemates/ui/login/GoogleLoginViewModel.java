@@ -5,13 +5,13 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.work.Operation;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
-import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -31,6 +31,8 @@ public class GoogleLoginViewModel extends ViewModel {
     private final String TAG = this.getClass().getSimpleName();
     private MutableLiveData<ResultOperation> userCollisionCheckResult;
     private MutableLiveData<ResultOperation> externalUser;
+    private MutableLiveData<ResultOperation> registerUserResult;
+    private MutableLiveData<ResultOperation> loginUserResult;
     private RemoteConfigServer remoteConfigServer;
 
 
@@ -45,9 +47,12 @@ public class GoogleLoginViewModel extends ViewModel {
         REGISTRATION
     }
 
+
     public GoogleLoginViewModel(){
         userCollisionCheckResult = new MutableLiveData<>(ResultOperation.NONE);
         externalUser = new MutableLiveData<>(ResultOperation.NONE);
+        registerUserResult = new MutableLiveData<>(ResultOperation.NONE);
+        loginUserResult = new MutableLiveData<>(ResultOperation.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
 
@@ -68,6 +73,24 @@ public class GoogleLoginViewModel extends ViewModel {
 
     public LiveData<ResultOperation> getExternalUser() {
         return externalUser;
+    }
+
+
+    public void postRegisterUserResult(ResultOperation registerUserResult) {
+        this.registerUserResult.postValue(registerUserResult);
+    }
+
+    public LiveData<ResultOperation> getRegisterUserResult() {
+        return registerUserResult;
+    }
+
+    // getter and setter
+    public void postLoginUserResult(ResultOperation loginUserResult) {
+        this.loginUserResult.postValue(loginUserResult);
+    }
+
+    public LiveData<ResultOperation> getLoginUserResult() {
+        return loginUserResult;
     }
 
 
@@ -187,6 +210,145 @@ public class GoogleLoginViewModel extends ViewModel {
         }catch(Exception e){
             e.printStackTrace();
             postExternalUser(ResultOperation.FAILED);
+        }
+    }
+
+    public void insertUserWithGoogleCredential(User user) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+        final String dbFunction = "fn_register_new_user_google";
+        try{
+            HttpUrl httpUrl = new HttpUrl.Builder()
+                    .scheme("https")
+                    .host(remoteConfigServer.getAzureHostName())
+                    .addPathSegments(remoteConfigServer.getPostgrestPath())
+                    .addPathSegment(dbFunction)
+                    .build();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("mail",user.getEmail())
+                    .add("username",user.getUsername())
+                    .add("firstname",user.getFirstName())
+                    .add("lastname",user.getLastName())
+                    .add("birthday",MyUtilities.convertStringDateToStringSqlDate(user.getBirthDate()))
+                    .add("promo", String.valueOf(user.getPromo()))
+                    .add("analytics",  String.valueOf(user.getAnalytics()))
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,remoteConfigServer.getGuestToken());
+
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.v(TAG,"errore nel trovare l'utente");
+                    postRegisterUserResult(ResultOperation.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    try{
+                        if(response.isSuccessful()) {
+                            Log.d(TAG, "postgrest success");
+                            try(ResponseBody responseBody = response.body()) {
+                                boolean res = Boolean.parseBoolean(responseBody.string());
+                                if(res) {
+                                    Log.v(TAG,"Tutto ok utente inserito");
+                                    selectUserInfo(user, OperationTypeWithGoogle.REGISTRATION);
+                                }else
+                                    postRegisterUserResult(ResultOperation.FAILED);
+
+                            } catch (Exception e) {
+                                Log.d(TAG, "error postgrest");
+                                e.printStackTrace();
+                            }
+
+                        }else{
+                            Log.v(TAG,"errore nel trovare l'utente");
+                            postRegisterUserResult(ResultOperation.FAILED);
+                        }
+
+
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        postRegisterUserResult(ResultOperation.FAILED);
+                    }
+
+                }
+            });
+        }catch(Exception e){
+            e.printStackTrace();
+            postRegisterUserResult(ResultOperation.FAILED);
+        }
+    }
+
+    public void selectUserInfo(User user, OperationTypeWithGoogle op ){
+
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+
+        try {
+            // generating url request
+            final String dbFunction = "login_google";
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("mail", user.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, remoteConfigServer.getGuestToken());
+
+            // performing http request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    if (op == OperationTypeWithGoogle.REGISTRATION)
+                        postRegisterUserResult(ResultOperation.FAILED);
+                    else
+                        postLoginUserResult(ResultOperation.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            if( ! responseData.equals("null")) {
+                                JSONObject jsonObject = new JSONObject(responseData);
+
+                                user.setAccessToken(jsonObject.getString("AccessToken"));
+                                user.setFollowersCount(jsonObject.getInt("followers_count"));
+                                user.setFollowingCount(jsonObject.getInt("following_count"));
+                                user.setBirthDate(jsonObject.getString("BirthDate"));
+                                user.setAnalytics(jsonObject.getBoolean("Analytics"));
+                                user.setUsername(jsonObject.getString("Username"));
+                                if (op == OperationTypeWithGoogle.REGISTRATION)
+                                    postRegisterUserResult(ResultOperation.SUCCESS);
+                                else
+                                    postLoginUserResult(ResultOperation.SUCCESS);
+                            }
+                        }
+                        else{
+                            if (op == OperationTypeWithGoogle.REGISTRATION)
+                                postRegisterUserResult(ResultOperation.FAILED);
+                            else
+                                postLoginUserResult(ResultOperation.FAILED);
+                        }
+
+
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        if (op == OperationTypeWithGoogle.REGISTRATION)
+                            postRegisterUserResult(ResultOperation.FAILED);
+                        else
+                            postLoginUserResult(ResultOperation.FAILED);
+                    }
+                }
+            });
+        }catch(Exception e) {
+            e.printStackTrace();
+            if (op == OperationTypeWithGoogle.REGISTRATION)
+                postRegisterUserResult(ResultOperation.FAILED);
+            else
+                postLoginUserResult(ResultOperation.FAILED);
         }
     }
 

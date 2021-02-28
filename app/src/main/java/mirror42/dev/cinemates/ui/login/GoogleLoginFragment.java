@@ -43,7 +43,6 @@ import java.util.Random;
 
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 
@@ -185,21 +184,26 @@ public class GoogleLoginFragment extends Fragment implements
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
         if (acct != null) {
             googleUser = new User();
-            Random rand = new Random();
-            int randomSerialUsername = rand.nextInt(10000) + rand.nextInt(100);
-            String serialUsername = Integer.toString(randomSerialUsername);
+
 
             String personGivenName = acct.getGivenName();
-            String username = personGivenName + serialUsername;
             String personFamilyName = acct.getFamilyName();
             String personEmail = acct.getEmail();
-            Uri personPhoto = acct.getPhotoUrl();
 
-            googleUser.setUsername(username);
+            Uri personPhoto = acct.getPhotoUrl();
+            String profileImage = String.valueOf(personPhoto);
+
+            if(profileImage != null)
+                googleUser.setProfilePictureURL(String.valueOf(personPhoto));
+            else
+                googleUser.setProfilePictureURL("no_image");
+
             googleUser.setFirstName(personGivenName);
             googleUser.setLastName(personFamilyName);
-            googleUser.setProfilePictureURL(String.valueOf(personPhoto));
+
             googleUser.setEmail(personEmail);
+            googleUser.setExternalUser(true);
+            googleUser.setPassword("no_pass");
 
             revokeAccess();
 
@@ -307,22 +311,78 @@ public class GoogleLoginFragment extends Fragment implements
     }
 
     private void doRegistrationOrLogin(){
+
+
         if(typeOperation == GoogleLoginViewModel.OperationTypeWithGoogle.LOGIN){
-            //gestisco con viewMOdel il login
+
+            googleLoginViewModel.getLoginUserResult().observe(getViewLifecycleOwner(), loginUserResult->{
+                if(loginUserResult == GoogleLoginViewModel.ResultOperation.SUCCESS){
+
+                    User userToPass = new User(
+                            googleUser.getUsername(), googleUser.getPassword() , googleUser.getEmail(),
+                            googleUser.getFirstName(), googleUser.getLastName(), googleUser.getBirthDate(),
+                            googleUser.getProfilePicturePath(), googleUser.getAccessToken(),googleUser.getAnalytics());
+                    userToPass.setFollowingCount(googleUser.getFollowingCount());
+                    userToPass.setFollowersCount(googleUser.getFollowersCount());
+
+                    loginViewModel.setUser(userToPass);
+                    loginViewModel.setLoginResult(LoginViewModel.LoginResult.SUCCESS);
+
+
+
+                    NavController navController = Navigation.findNavController(view);
+                    navController.popBackStack();
+                    navController.navigate(R.id.personalProfileFragment);
+                }else{
+                    showCenteredToast("Ci dispiace non è stato possibile effettuare il login ");
+                }
+            });
+
+            googleLoginViewModel.selectUserInfo(googleUser,typeOperation );
         }else if (typeOperation == GoogleLoginViewModel.OperationTypeWithGoogle.REGISTRATION ){
-            checkTermsAndConditionsCheckBox();
-            //gestisco con viewModel la registrazione
+
+            if(checkTermsAndConditionsCheckBox()){
+
+                googleLoginViewModel.getRegisterUserResult().observe(getViewLifecycleOwner(), registerUserResult->{
+                if(registerUserResult == GoogleLoginViewModel.ResultOperation.SUCCESS){
+                 //qui lavoro con loginVIewMOdel!!!!
+                    showCenteredToast(googleUser.getAccessToken());
+                }else{
+                    showCenteredToast("Ci dispiace non è stato possibile effettuare la registrazione ");
+                }
+            });
+
+                setUserInfoForRegistration();
+                googleLoginViewModel.insertUserWithGoogleCredential(googleUser);
+            }
         }
     }
 
-    private void checkTermsAndConditionsCheckBox(){
+    private void setUserInfoForRegistration(){
+
+        googleUser.setAnalytics(checkBoxAnalytics.isChecked());
+        googleUser.setPromo(checkBoxPromo.isChecked());
+
+        googleUser.setBirthDate(editTextBirthDate.getText().toString());
+
+        Random rand = new Random();
+        int randomSerialUsername = rand.nextInt(10000) + rand.nextInt(100);
+
+        String serialUsername = Integer.toString(randomSerialUsername);
+        String username = googleUser.getFirstName() + serialUsername;
+        googleUser.setUsername(username);
+    }
+
+    private boolean checkTermsAndConditionsCheckBox(){
 
         if( ! checkBoxTermsAndConditions.isChecked()) {
             checkBoxTermsAndConditions.setTextColor(getResources().getColor(R.color.red));
             showCenteredToast("accettare condizioni e termini");
+            return false;
         }
         else {
             checkBoxTermsAndConditions.setTextColor(getResources().getColor(R.color.light_blue));
+            return true;
         }
     }
 
