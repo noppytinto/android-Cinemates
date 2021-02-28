@@ -107,6 +107,9 @@ dependencies {
     implementation "androidx.work:work-rxjava2:$work_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"
 
+    //google api auth
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
 
 
 

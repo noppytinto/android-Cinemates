@@ -76,7 +76,6 @@ public class GoogleLoginViewModel extends ViewModel {
     public void checkUserCollision(String username, String email) {
         HttpUrl httpUrl = null;
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
-
         final String dbFunction = "fn_check_user_collision_ignore_active";
         try {
             httpUrl = new HttpUrl.Builder()
@@ -131,8 +130,6 @@ public class GoogleLoginViewModel extends ViewModel {
     }// end checkUserCollision()
 
     public void checkExternalUser(String email){
-        postExternalUser(ResultOperation.FAILED);
-        /*
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_check_external_user";
         try{
@@ -190,11 +187,7 @@ public class GoogleLoginViewModel extends ViewModel {
         }catch(Exception e){
             e.printStackTrace();
             postExternalUser(ResultOperation.FAILED);
-        }*/
+        }
     }
 
-
-
-
-
-}
+}// end class

@@ -1,6 +1,7 @@
 package mirror42.dev.cinemates.ui.login;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,9 +23,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
@@ -36,6 +44,10 @@ public class LoginFragment extends Fragment  implements
         View.OnClickListener,
         CompoundButton.OnCheckedChangeListener{
     private final String TAG = getClass().getSimpleName();
+
+    private GoogleSignInClient mGoogleSignInClient;
+    private int RC_SIGN_IN = 0;
+
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText editTextEmail;
@@ -43,6 +55,7 @@ public class LoginFragment extends Fragment  implements
     private TextView textViewResetPassword;
     private Button buttonStandardLogin;
     private Button buttonSignUp;
+    private Button buttonLoginGoogle;
     private CheckBox checkBoxRememberMe;
     private LoginViewModel loginViewModel;
     private View view;
@@ -53,12 +66,33 @@ public class LoginFragment extends Fragment  implements
 
 
 
+
+
     //---------------------------------------------------------------------- ANDROID METHODS
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+       // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(),gso);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleGoogleAccess(task);
+        }
     }
 
     @Override
@@ -80,10 +114,12 @@ public class LoginFragment extends Fragment  implements
         remoteConfigServer = RemoteConfigServer.getInstance();
         buttonSignUp = view.findViewById(R.id.button_loginFragment_signUp);
         textViewResetPassword = view.findViewById(R.id.textView_loginFragment_resetPassword);
+        buttonLoginGoogle = view.findViewById(R.id.button_loginFragment_googleLogin);
 
         // setting listeners
         buttonStandardLogin.setOnClickListener(this);
         buttonSignUp.setOnClickListener(this);
+        buttonLoginGoogle.setOnClickListener(this);
         checkBoxRememberMe.setOnCheckedChangeListener(this);
         textViewResetPassword.setOnClickListener(this);
         //
@@ -216,12 +252,31 @@ public class LoginFragment extends Fragment  implements
         }
         else if(v.getId() == textViewResetPassword.getId()){
             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_resetPasswordFragment);
+        }else if (v.getId() == buttonLoginGoogle.getId()){
+            accessWithGoogle();
         }
     }// end onClick()
 
 
 
     //-------------------------------------------------------------------------------- MY METHODS
+
+    private void accessWithGoogle(){
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleGoogleAccess(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            // Signed in successfully, show authenticated UI.
+            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_googleLoginFragment);
+        } catch (ApiException e) {
+            Log.v(TAG, "google access:failed code=" + e.getStatusCode());
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
 
     private void showProgressDialog() {
         //notes: Declare progressDialog before so you can use .hide() later!

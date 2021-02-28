@@ -1,5 +1,7 @@
 package mirror42.dev.cinemates.ui.login;
 
+import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -31,8 +39,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Locale;
+import java.util.Random;
 
 import mirror42.dev.cinemates.R;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
@@ -40,7 +50,6 @@ import mirror42.dev.cinemates.utilities.MyUtilities;
 public class GoogleLoginFragment extends Fragment implements
         View.OnClickListener,
         CompoundButton.OnCheckedChangeListener{
-
 
     private View view;
     private TextView title;
@@ -59,11 +68,10 @@ public class GoogleLoginFragment extends Fragment implements
     private GoogleLoginViewModel googleLoginViewModel;
     private LoginViewModel loginViewModel;
 
-    private GoogleLoginViewModel.OperationTypeWithGoogle typeOperation; // va settato dopo i controlli da fare con fabrizio tipo email presente se si allora vedi se puoi fare login se no registrati!!;
+    private GoogleLoginViewModel.OperationTypeWithGoogle typeOperation;
 
-    private String localImage = "";
-    private String username = "test1111";
-    private String email="test11@gmail.com";
+    private User googleUser;
+    private GoogleSignInClient mGoogleSignInClient;
 
     public GoogleLoginFragment() {
         // Required empty public constructor
@@ -72,7 +80,16 @@ public class GoogleLoginFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setHasOptionsMenu(true);
+
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
     }
 
     @Override
@@ -97,16 +114,13 @@ public class GoogleLoginFragment extends Fragment implements
         firebaseAnalytics.logScreenEvent(this, "Google login page", getContext());
 
         this.view = view;
-        initElements();
 
-        buttonContinue.setOnClickListener(this);
-        buttonDatePicker.setOnClickListener(this);
-        privacyPolicy.setOnClickListener(this);
+        initElements();
+        initListener();
+
+        setUserWithGoogleInfo();
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        loginViewModel.getLoggedUser();
-        // qui devo gestire i dati carica l'immagine e l'utente preso da google!!!!
-        // dopo aver caricato i dati prima di mostrarli fai i controlli per username e ed email  s.substring(0, s.indexOf("@"));
 
         showUploadProgressIndicator();
         googleLoginViewModel =  new ViewModelProvider(this).get(GoogleLoginViewModel.class);
@@ -115,7 +129,7 @@ public class GoogleLoginFragment extends Fragment implements
                 typeOperation = GoogleLoginViewModel.OperationTypeWithGoogle.REGISTRATION;
                 prepareRegistration();
             }else
-                googleLoginViewModel.checkExternalUser(email);
+                googleLoginViewModel.checkExternalUser(googleUser.getEmail());
         });
 
         googleLoginViewModel.getExternalUser().observe(getViewLifecycleOwner(), externalUser->{
@@ -127,9 +141,9 @@ public class GoogleLoginFragment extends Fragment implements
             }
         });
 
-        googleLoginViewModel.checkUserCollision( username,  email);
-
+        googleLoginViewModel.checkUserCollision(googleUser.getUsername(), googleUser.getEmail());
     }
+
 
     @Override
     public void onClick(View v) {
@@ -167,12 +181,47 @@ public class GoogleLoginFragment extends Fragment implements
 
     //-----------------------------------------------------------------MY METHODS
 
+    private void setUserWithGoogleInfo() {
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (acct != null) {
+            googleUser = new User();
+            Random rand = new Random();
+            int randomSerialUsername = rand.nextInt(10000) + rand.nextInt(100);
+            String serialUsername = Integer.toString(randomSerialUsername);
+
+            String personGivenName = acct.getGivenName();
+            String username = personGivenName + serialUsername;
+            String personFamilyName = acct.getFamilyName();
+            String personEmail = acct.getEmail();
+            Uri personPhoto = acct.getPhotoUrl();
+
+            googleUser.setUsername(username);
+            googleUser.setFirstName(personGivenName);
+            googleUser.setLastName(personFamilyName);
+            googleUser.setProfilePictureURL(String.valueOf(personPhoto));
+            googleUser.setEmail(personEmail);
+
+            revokeAccess();
+
+        }
+    }
+
+    private void revokeAccess() {
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+    }
 
     private void prepareRegistration(){
         setImageProfile();
-        buttonContinue.setVisibility(View.VISIBLE);
+
+        title.setText("Ciao " + googleUser.getUsername() +  " "+ getString(R.string.googleLogin_page_title_registration));
+
         profilePicture.setVisibility(View.VISIBLE);
-        title.setText("Ciao " + username +  " "+ getString(R.string.googleLogin_page_title_registration));
         buttonDatePicker.setVisibility(View.VISIBLE);
         textInputLayoutBirthDate.setVisibility(View.VISIBLE);
 
@@ -181,14 +230,17 @@ public class GoogleLoginFragment extends Fragment implements
         checkBoxAnalytics.setVisibility(View.VISIBLE);
         checkBoxPromo.setVisibility(View.VISIBLE);
         checkBoxTermsAndConditions.setVisibility(View.VISIBLE);
+
+        buttonContinue.setVisibility(View.VISIBLE);
         buttonContinue.setText(getString(R.string.googleLogin_page_button_Registration));
+
         hideUploadProgressIndicator();
     }
 
     private void prepareLogin(){
 
         setImageProfile();
-        title.setText("Ciao " + username + "," + getString(R.string.googleLogin_page_title_access));
+        title.setText("Ciao " + googleUser.getUsername() + "," + getString(R.string.googleLogin_page_title_access));
 
         buttonContinue.setVisibility(View.VISIBLE);
         profilePicture.setVisibility(View.VISIBLE);
@@ -201,6 +253,7 @@ public class GoogleLoginFragment extends Fragment implements
         checkBoxAnalytics.setVisibility(View.GONE);
         checkBoxPromo.setVisibility(View.GONE);
         checkBoxTermsAndConditions.setVisibility(View.GONE);
+
         hideUploadProgressIndicator();
     }
 
@@ -221,7 +274,7 @@ public class GoogleLoginFragment extends Fragment implements
 
     private void  setImageProfile(){
         Glide.with(this)  //2
-                .load(R.drawable.icon_user_dark_blue) //3
+                .load(googleUser.getProfilePicturePath()) //3
                 .fallback(R.drawable.broken_image)
                 .placeholder(R.drawable.icon_user_dark_blue)
                 .circleCrop() //4
@@ -245,6 +298,12 @@ public class GoogleLoginFragment extends Fragment implements
 
         uploadProgressIndicator = view.findViewById(R.id.progressIndicator_googleLogin);
         profilePicture =  view.findViewById(R.id.imageView_googleLogin_profilePicture);
+    }
+
+    private void initListener(){
+        buttonContinue.setOnClickListener(this);
+        buttonDatePicker.setOnClickListener(this);
+        privacyPolicy.setOnClickListener(this);
     }
 
     private void doRegistrationOrLogin(){
@@ -281,8 +340,5 @@ public class GoogleLoginFragment extends Fragment implements
 
         uploadProgressIndicator.setVisibility(View.GONE);
     }
-
-
-
-
+    
 }

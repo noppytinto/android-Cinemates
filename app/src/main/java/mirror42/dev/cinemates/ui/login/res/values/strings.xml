@@ -13,7 +13,7 @@
 
     <string name="login_page_email_demo">noto42@outlook.com</string>
     <string name="login_page_password_demo">aaaaaaa</string>
-
+    <string name="login_page_googlelogin">Accedi</string>
     <!-- firebase -->
     <string name="login_page_firebase_login_page">Login page</string>
     <string name="login_page_firebase_standard_login_method">email + password</string>

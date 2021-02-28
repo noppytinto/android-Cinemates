@@ -94,12 +94,24 @@
         style="@style/Cinemates.Button.Rounded"
         android:layout_width="159dp"
         android:layout_height="60dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="12dp"
         android:text="@string/login_page_login"
-        app:layout_constraintBottom_toTopOf="@+id/button_loginFragment_signUp"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
         app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
+
+    <Button
+        android:id="@+id/button_loginFragment_googleLogin"
+        style="@style/Cinemates.Button.Rounded.Outlined"
+        android:layout_width="159dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/login_page_googlelogin"
+        app:layout_constraintBottom_toTopOf="@+id/button_loginFragment_signUp"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
+        app:layout_constraintTop_toBottomOf="@+id/button_loginFragment_standardLogin"
+        app:layout_constraintVertical_bias="0.0" />
 
     <CheckBox
         android:id="@+id/checkBox_loginFragment_rememberMe"
