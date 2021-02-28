@@ -15,6 +15,7 @@ public class User implements Serializable, Parcelable {
     private String firstName;
     private String lastName;
     private String birthDate;
+    private boolean isExternalUser;
     private String profilePicturePath;
     private String accessToken;
     private boolean promo;

@@ -57,6 +57,7 @@ public class GoogleLoginFragment extends Fragment implements
     private LinearProgressIndicator uploadProgressIndicator;
 
     private GoogleLoginViewModel googleLoginViewModel;
+    private LoginViewModel loginViewModel;
 
     private GoogleLoginViewModel.OperationTypeWithGoogle typeOperation; // va settato dopo i controlli da fare con fabrizio tipo email presente se si allora vedi se puoi fare login se no registrati!!;
 
@@ -102,6 +103,8 @@ public class GoogleLoginFragment extends Fragment implements
         buttonDatePicker.setOnClickListener(this);
         privacyPolicy.setOnClickListener(this);
 
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        loginViewModel.getLoggedUser();
         // qui devo gestire i dati carica l'immagine e l'utente preso da google!!!!
         // dopo aver caricato i dati prima di mostrarli fai i controlli per username e ed email  s.substring(0, s.indexOf("@"));
 
