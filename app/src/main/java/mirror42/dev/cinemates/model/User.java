@@ -15,7 +15,7 @@ public class User implements Serializable, Parcelable {
     private String firstName;
     private String lastName;
     private String birthDate;
-    private boolean isExternalUser;
+    private boolean isExternalUser = false;
     private String profilePicturePath;
     private String accessToken;
     private boolean promo;
@@ -83,6 +83,9 @@ public class User implements Serializable, Parcelable {
     //----------------------------------------------- GETTERS/SETTERS
 
 
+    public boolean getIsExternalUser() {
+        return isExternalUser;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -123,6 +126,10 @@ public class User implements Serializable, Parcelable {
     public void setBirthDate(String birthDate) {
 
         this.birthDate = birthDate;
+    }
+
+    public void setExternalUser(boolean externalUser) {
+        isExternalUser = externalUser;
     }
 
     public void setUsername(String username) {
