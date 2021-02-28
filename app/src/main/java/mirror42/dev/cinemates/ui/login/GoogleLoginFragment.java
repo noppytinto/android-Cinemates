@@ -223,7 +223,7 @@ public class GoogleLoginFragment extends Fragment implements
     private void prepareRegistration(){
         setImageProfile();
 
-        title.setText("Ciao " + googleUser.getUsername() +  " "+ getString(R.string.googleLogin_page_title_registration));
+        title.setText("Ciao " + googleUser.getFirstName()+" "+googleUser.getLastName() +  " "+ getString(R.string.googleLogin_page_title_registration));
 
         profilePicture.setVisibility(View.VISIBLE);
         buttonDatePicker.setVisibility(View.VISIBLE);
@@ -244,7 +244,7 @@ public class GoogleLoginFragment extends Fragment implements
     private void prepareLogin(){
 
         setImageProfile();
-        title.setText("Ciao " + googleUser.getUsername() + "," + getString(R.string.googleLogin_page_title_access));
+        title.setText("Ciao " + googleUser.getFirstName() + " " + googleUser.getLastName()  + "," + getString(R.string.googleLogin_page_title_access));
 
         buttonContinue.setVisibility(View.VISIBLE);
         profilePicture.setVisibility(View.VISIBLE);
@@ -312,7 +312,6 @@ public class GoogleLoginFragment extends Fragment implements
 
     private void doRegistrationOrLogin(){
 
-
         if(typeOperation == GoogleLoginViewModel.OperationTypeWithGoogle.LOGIN){
 
             googleLoginViewModel.getLoginUserResult().observe(getViewLifecycleOwner(), loginUserResult->{
@@ -324,11 +323,10 @@ public class GoogleLoginFragment extends Fragment implements
                             googleUser.getProfilePicturePath(), googleUser.getAccessToken(),googleUser.getAnalytics());
                     userToPass.setFollowingCount(googleUser.getFollowingCount());
                     userToPass.setFollowersCount(googleUser.getFollowersCount());
+                    userToPass.setExternalUser(true);
 
                     loginViewModel.setUser(userToPass);
                     loginViewModel.setLoginResult(LoginViewModel.LoginResult.SUCCESS);
-
-
 
                     NavController navController = Navigation.findNavController(view);
                     navController.popBackStack();
@@ -345,8 +343,20 @@ public class GoogleLoginFragment extends Fragment implements
 
                 googleLoginViewModel.getRegisterUserResult().observe(getViewLifecycleOwner(), registerUserResult->{
                 if(registerUserResult == GoogleLoginViewModel.ResultOperation.SUCCESS){
-                 //qui lavoro con loginVIewMOdel!!!!
-                    showCenteredToast(googleUser.getAccessToken());
+                    User userToPass = new User(
+                            googleUser.getUsername(), googleUser.getPassword() , googleUser.getEmail(),
+                            googleUser.getFirstName(), googleUser.getLastName(), googleUser.getBirthDate(),
+                            googleUser.getProfilePicturePath(), googleUser.getAccessToken(),googleUser.getAnalytics());
+                    userToPass.setFollowingCount(googleUser.getFollowingCount());
+                    userToPass.setFollowersCount(googleUser.getFollowersCount());
+                    userToPass.setExternalUser(true);
+
+                    loginViewModel.setUser(userToPass);
+                    loginViewModel.setLoginResult(LoginViewModel.LoginResult.SUCCESS);
+
+                    NavController navController = Navigation.findNavController(view);
+                    navController.popBackStack();
+                    navController.navigate(R.id.personalProfileFragment);
                 }else{
                     showCenteredToast("Ci dispiace non è stato possibile effettuare la registrazione ");
                 }

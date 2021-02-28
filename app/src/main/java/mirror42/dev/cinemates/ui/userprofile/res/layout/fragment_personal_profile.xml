@@ -164,6 +164,7 @@
                 style="@style/Cinemates.Button.Rounded.Outlined"
                 android:layout_width="200dp"
                 android:layout_height="60dp"
+                android:visibility="visible"
                 android:layout_marginStart="105dp"
                 android:layout_marginTop="80dp"
                 android:layout_marginEnd="106dp"

@@ -125,13 +125,22 @@ public class PersonalProfileFragment extends Fragment implements
 
         // setting listeners
         buttonLogout.setOnClickListener(this);
-        buttonChangePassword.setOnClickListener(this);
+
         buttonCustomLists.setOnClickListener(this);
         subscribedListsButton.setOnClickListener(this);
         followersButton.setOnClickListener(this);
         followingButton.setOnClickListener(this);
-        profilePicture.setOnClickListener(this);
+        User user = loginViewModel.getLoggedUser();
+
+        if(!loginViewModel.getLoggedUser().getIsExternalUser()) {
+            profilePicture.setOnClickListener(this);
+            buttonChangePassword.setOnClickListener(this);
+        }
+
+
+
         buttonResendEmail.setOnClickListener(this);
+
         buttonSaveImage.setOnClickListener(this);
         buttonDeleteImage.setOnClickListener(this);
 
@@ -233,7 +242,11 @@ public class PersonalProfileFragment extends Fragment implements
         listLabel.setVisibility(View.VISIBLE);
         followersButton.setVisibility(View.VISIBLE);
         followingButton.setVisibility(View.VISIBLE);
-        buttonChangePassword.setVisibility(View.VISIBLE);
+
+        if(!loginViewModel.getLoggedUser().getIsExternalUser())
+            buttonChangePassword.setVisibility(View.VISIBLE);
+        else
+            buttonChangePassword.setVisibility(View.GONE);
         buttonCustomLists.setVisibility(View.VISIBLE);
         subscribedListsButton.setVisibility(View.VISIBLE);
         includePersonalProfileContent.setVisibility(View.VISIBLE);
