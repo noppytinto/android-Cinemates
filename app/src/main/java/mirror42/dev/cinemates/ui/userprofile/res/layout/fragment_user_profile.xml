@@ -153,19 +153,19 @@
         </androidx.core.widget.NestedScrollView>
 
 
-        <include
-            android:id="@+id/include_userProfileFragment_requestPrompt"
-            layout="@layout/layout_request_prompt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="visible" />
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/include_userProfileFragment_requestPrompt"
+        layout="@layout/layout_request_prompt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/button_userProfileFragment_follow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/button_userProfileFragment_follow"

@@ -378,6 +378,12 @@ public class PostViewModel extends ViewModel {
                             owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                             cm.setOwner(owner);
+                            try {
+                                if(owner.getUsername().equals(loggedUser.getUsername()))
+                                    cm.setIsMine(true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             cm.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
                             cm.setText(jsonDBobj.getString("Text"));
                             cm.setId(jsonDBobj.getLong("Id_Reaction"));
