@@ -127,7 +127,7 @@ public class GoogleLoginFragment extends Fragment implements
             if(userCollisionCheckResult == GoogleLoginViewModel.ResultOperation.SUCCESS){
                 typeOperation = GoogleLoginViewModel.OperationTypeWithGoogle.REGISTRATION;
                 prepareRegistration();
-            }else
+            }else if(userCollisionCheckResult == GoogleLoginViewModel.ResultOperation.FAILED)
                 googleLoginViewModel.checkExternalUser(googleUser.getEmail());
         });
 
@@ -135,7 +135,7 @@ public class GoogleLoginFragment extends Fragment implements
             if(externalUser == GoogleLoginViewModel.ResultOperation.SUCCESS){
                 typeOperation = GoogleLoginViewModel.OperationTypeWithGoogle.LOGIN;
                 prepareLogin();
-            }else{
+            }else  if(externalUser == GoogleLoginViewModel.ResultOperation.FAILED){
                 prepareLoginError();
             }
         });
@@ -196,8 +196,7 @@ public class GoogleLoginFragment extends Fragment implements
             if(profileImage != null)
                 googleUser.setProfilePictureURL(String.valueOf(personPhoto));
             else
-                googleUser.setProfilePictureURL("no_image");
-
+                googleUser.setProfilePictureURL("");
             googleUser.setFirstName(personGivenName);
             googleUser.setLastName(personFamilyName);
 
@@ -205,6 +204,8 @@ public class GoogleLoginFragment extends Fragment implements
             googleUser.setExternalUser(true);
             googleUser.setPassword("no_pass");
 
+            int index = personEmail.indexOf('@');
+            googleUser.setUsername(personEmail.substring(0,index));
             revokeAccess();
 
         }
@@ -331,7 +332,7 @@ public class GoogleLoginFragment extends Fragment implements
                     NavController navController = Navigation.findNavController(view);
                     navController.popBackStack();
                     navController.navigate(R.id.personalProfileFragment);
-                }else{
+                }else if(loginUserResult == GoogleLoginViewModel.ResultOperation.FAILED) {
                     showCenteredToast("Ci dispiace non è stato possibile effettuare il login ");
                 }
             });
@@ -357,7 +358,7 @@ public class GoogleLoginFragment extends Fragment implements
                     NavController navController = Navigation.findNavController(view);
                     navController.popBackStack();
                     navController.navigate(R.id.personalProfileFragment);
-                }else{
+                }else if (registerUserResult == GoogleLoginViewModel.ResultOperation.FAILED){
                     showCenteredToast("Ci dispiace non è stato possibile effettuare la registrazione ");
                 }
             });
@@ -374,13 +375,6 @@ public class GoogleLoginFragment extends Fragment implements
         googleUser.setPromo(checkBoxPromo.isChecked());
 
         googleUser.setBirthDate(editTextBirthDate.getText().toString());
-
-        Random rand = new Random();
-        int randomSerialUsername = rand.nextInt(10000) + rand.nextInt(100);
-
-        String serialUsername = Integer.toString(randomSerialUsername);
-        String username = googleUser.getFirstName() + serialUsername;
-        googleUser.setUsername(username);
     }
 
     private boolean checkTermsAndConditionsCheckBox(){
