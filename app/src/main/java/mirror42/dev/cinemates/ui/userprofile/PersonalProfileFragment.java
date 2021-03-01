@@ -133,11 +133,6 @@ public class PersonalProfileFragment extends Fragment implements
         followingButton.setOnClickListener(this);
         User user = loginViewModel.getLoggedUser();
 
-        if(!loginViewModel.getLoggedUser().getIsExternalUser()) {
-            profilePicture.setOnClickListener(this);
-            buttonChangePassword.setOnClickListener(this);
-        }
-
 
 
         buttonResendEmail.setOnClickListener(this);
@@ -244,10 +239,13 @@ public class PersonalProfileFragment extends Fragment implements
         followersButton.setVisibility(View.VISIBLE);
         followingButton.setVisibility(View.VISIBLE);
 
-        if(!loginViewModel.getLoggedUser().getIsExternalUser())
+        if(!loginViewModel.getLoggedUser().getIsExternalUser()) {
+            profilePicture.setOnClickListener(this);
+            buttonChangePassword.setOnClickListener(this);
             buttonChangePassword.setVisibility(View.VISIBLE);
-        else
+        }else
             buttonChangePassword.setVisibility(View.GONE);
+
         buttonCustomLists.setVisibility(View.VISIBLE);
         subscribedListsButton.setVisibility(View.VISIBLE);
         includePersonalProfileContent.setVisibility(View.VISIBLE);
