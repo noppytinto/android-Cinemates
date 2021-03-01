@@ -65,7 +65,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/poppins"
                     android:text="@mario"
-                    android:textAlignment="textStart"
+                    android:textAlignment="center"
                     android:textColor="@color/light_blue"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="@+id/imageView_userProfileFragment_profilePicture"
