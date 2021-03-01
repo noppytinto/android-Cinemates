@@ -282,6 +282,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                         hideFollowRequestPrompt();
                         showCenteredToast("richiesta accettata");
                         followStatusMessage.setVisibility(View.VISIBLE);
+                        loginViewModel.getLoggedUser().setFollowersCount(loginViewModel.getLoggedUser().getFollowersCount()+ 1);
                     }
                     break;
                     case FAILED: {
