@@ -32,9 +32,9 @@
     <string name="login_page_no_password_error">inserire password!!</string>
 
     <!--      GOOGLE LOGIN     -->
-    <string name="googleLogin_page_title_access">Sembra che tu sia già in possesso di un account: clicca su continua per accedere a tutti i contenuti.</string>
+    <string name="googleLogin_page_title_access">sembra che tu sia già in possesso di un account: clicca su continua per accedere a tutti i contenuti.</string>
     <string name="googleLogin_page_title_registration">, benvenuto su Cinemates20.\nSembra che tu non abbia ancora un account: completa i campi e registrati per poter accedere a tutti i contenuti.</string>
-    <string name="googleLogin_page_title_back">Ci dispiace, ma le credenziali con cui stai cercando di accedere corrispondono già ad un account. \n</string>
+    <string name="googleLogin_page_title_back">Ci dispiace, ma le credenziali con cui stai cercando di accedere corrispondono già ad un account.\nSe non ricordi la tua password, torna indietro ed avvia la procedura di recupero password.\n</string>
 
 
     <string name="googleLogin_page_button_login">Continua</string>
