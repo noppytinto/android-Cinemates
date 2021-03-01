@@ -36,6 +36,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
+import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 import static android.app.Activity.RESULT_OK;
@@ -392,6 +393,13 @@ public class PersonalProfileFragment extends Fragment implements
                     usernameTextView.setVisibility(View.VISIBLE);
                     buttonDeleteImage.setVisibility(View.GONE);
                     buttonSaveImage.setVisibility(View.GONE);
+
+                    if( MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext())){
+                        remoteConfigServer = RemoteConfigServer.getInstance();
+                        MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
+                                MyUtilities.convertUserInJSonString(loginViewModel.getLoggedUser()), getContext());
+                    }
+
                     showCenteredToast( "Perfetto Cambio immagine completo");
                     break;
 
