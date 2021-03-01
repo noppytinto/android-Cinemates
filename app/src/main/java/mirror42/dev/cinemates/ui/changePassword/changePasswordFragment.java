@@ -28,6 +28,7 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
+import mirror42.dev.cinemates.utilities.RemoteConfigServer;
 
 
 public class changePasswordFragment extends Fragment implements
@@ -51,6 +52,7 @@ public class changePasswordFragment extends Fragment implements
 
     private ChangePasswordViewModel changePasswordViewModel;
     private LoginViewModel loginViewModel;
+    private RemoteConfigServer  remoteConfigServer;
 
     private FirebaseAnalytics firebaseAnalytics;
 
@@ -83,6 +85,8 @@ public class changePasswordFragment extends Fragment implements
         firebaseAnalytics = FirebaseAnalytics.getInstance();
         firebaseAnalytics.logScreenEvent(this, getString(R.string.changePassword_page_firebase_changePassword), getContext());
 
+        remoteConfigServer = RemoteConfigServer.getInstance();
+
         initViews(view);
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -91,6 +95,12 @@ public class changePasswordFragment extends Fragment implements
         changePasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), resetResult -> {
             if(resetResult == ChangePasswordViewModel.ResetResult.SUCCESS){
                 showCenteredToast( "Cambio password completo ");
+                if( MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext())){
+                    remoteConfigServer = RemoteConfigServer.getInstance();
+                    MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
+                            MyUtilities.convertUserInJSonString(loginViewModel.getLoggedUser()), getContext());
+                }
+
                 NavController navController = Navigation.findNavController(view);
                 navController.popBackStack();
                 navController.navigate(R.id.personalProfileFragment);

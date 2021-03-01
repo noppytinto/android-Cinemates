@@ -88,6 +88,7 @@ public class ChangePasswordViewModel extends ViewModel {
                         if(response.isSuccessful()) {
                             String responseData = response.body().toString();
                             Log.v(TAG,"cambio avvenuto");
+                            userLogged.setPassword(passwordHide);
                             updateToken(userLogged);
                         }else{
                             Log.v(TAG,"mail non trovata ");
