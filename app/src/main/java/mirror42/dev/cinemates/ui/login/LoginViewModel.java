@@ -230,7 +230,7 @@ public class LoginViewModel extends ViewModel {
     }// end loadPendingUserBasicData()
 
     public void updateProfileImageUrl(String imageName) {
-        loggedUser.getValue().setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
+        loggedUser.getValue().setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName);
 
     }
 

@@ -231,6 +231,7 @@ public class PersonalProfileFragment extends Fragment implements
             Navigation.findNavController(v).navigate(followersFragment);
         }
         else if (v.getId() == buttonSaveImage.getId()) {
+            hideChangePictureButtons();
             uploadImage();
         }
         else if (v.getId() == buttonAbortImageChange.getId()) {
@@ -336,7 +337,6 @@ public class PersonalProfileFragment extends Fragment implements
         uploadProgressIndicator.setVisibility(View.GONE);
     }
 
-
     private void loadSocialStatistics() {
         int followersCount = loginViewModel.getLoggedUser().getFollowersCount();
         int followingCount = loginViewModel.getLoggedUser().getFollowingCount();
@@ -383,18 +383,20 @@ public class PersonalProfileFragment extends Fragment implements
         includeAccountActivationView.setVisibility(View.GONE);
     }
 
-
     private void uploadImage() {
         showUploadProgressIndicator();
 
-        personalProfileViewModel.getUploadToCloudinaryStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
-            switch (changeImageResult) {
+        personalProfileViewModel.getUploadToCloudinaryStatus().observe(getViewLifecycleOwner(), uploadStatus -> {
+            switch (uploadStatus) {
                 case SUCCESS: {
                     // then upload to remote DB
                     changeImageToServer();
                 }
                 break;
                 case FAILED:
+                    hideUploadProgressIndicator();
+                    hideChangePictureButtons();
+                    restoreOldProfilePicture();
                     showCenteredToast("cambio immagine profilo NON riuscito");
                     break;
             }
@@ -411,7 +413,7 @@ public class PersonalProfileFragment extends Fragment implements
                     if (MyUtilities.deletFile(remoteConfigServer.getCinematesData(), requireContext())) {
                         remoteConfigServer = RemoteConfigServer.getInstance();
                         MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
-                                MyUtilities.convertUserInJSonString(loginViewModel.getLoggedUser()), getContext());
+                                MyUtilities.convertUserInJSonString(loginViewModel.getLoggedUser()), requireContext());
                     }
 
                     loginViewModel.updateProfileImageUrl(personalProfileViewModel.getImageName());
@@ -421,11 +423,12 @@ public class PersonalProfileFragment extends Fragment implements
                 case FAILED:
                     hideUploadProgressIndicator();
                     hideChangePictureButtons();
+                    restoreOldProfilePicture();
                     showCenteredToast("cambio immagine profilo NON riuscito");
                     break;
             }
         });
-        personalProfileViewModel.changeProfilePictureToServer(loginViewModel.getLoggedUser(), personalProfileViewModel.getImageName());
+        personalProfileViewModel.changeProfilePictureToServer(loginViewModel.getLoggedUser());
     }
 
     private void showProfilePicturePreview() {
@@ -515,7 +518,6 @@ public class PersonalProfileFragment extends Fragment implements
 //            }
 //        }
 //    }
-
 
     private String getRealPathFromUri(Uri imageUri) {
         Cursor cursor = null;

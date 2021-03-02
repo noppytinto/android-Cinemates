@@ -47,14 +47,11 @@ public class PersonalProfileViewModel extends ViewModel {
     private String imageName;
 
 
-
     public enum UploadStatus {
         FAILED,
         SUCCESS,
         IDLE
     }
-
-
 
 
     //----------------------------------------------------------------- CONSTRUCTORS
@@ -67,7 +64,6 @@ public class PersonalProfileViewModel extends ViewModel {
         mAuth = FirebaseAuth.getInstance();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
-
 
 
     //----------------------------------------------------------------- GETTERS/SETTERS
@@ -102,7 +98,7 @@ public class PersonalProfileViewModel extends ViewModel {
 
     //----------------------------------------------------------------- METHODS
 
-    public void uploadImageToCloudinary(User user, Uri localImageUri, Context context){
+    public void uploadImageToCloudinary(User user, Uri localImageUri, Context context) {
         try {
             Runnable task = createUploadImageToCloudinaryTask(user, localImageUri, context);
             ThreadManager t = ThreadManager.getInstance();
@@ -112,9 +108,9 @@ public class PersonalProfileViewModel extends ViewModel {
         }
     }
 
-    private Runnable createUploadImageToCloudinaryTask(User user, Uri localImageUri, Context context){
+    private Runnable createUploadImageToCloudinaryTask(User user, Uri localImageUri, Context context) {
         // uploading promo image to the cloud
-        return ()-> {
+        return () -> {
 
 //            try {
 //                imageName = DocumentFile.fromSingleUri(context, localImageUri).getName();
@@ -124,7 +120,7 @@ public class PersonalProfileViewModel extends ViewModel {
 //            }
 
             String randomImageName = UUID.randomUUID().toString();
-            imageName = randomImageName;
+            imageName = randomImageName + ".png";
 
             try {
                 String requestId = MediaManager.get().upload(localImageUri)
@@ -150,7 +146,7 @@ public class PersonalProfileViewModel extends ViewModel {
 
                             @Override
                             public void onError(String requestId, ErrorInfo error) {
-                                Log.v(TAG,"upload su cloudinary non riuscito");
+                                Log.v(TAG, "upload su cloudinary non riuscito");
                                 setUploadToCloudinaryStatus(UploadStatus.FAILED);
                             }
 
@@ -168,66 +164,59 @@ public class PersonalProfileViewModel extends ViewModel {
 //                imageName = (String) uploadResult.get("public_id");
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.v(TAG,"upload su cloudinary non riuscito");
+                Log.v(TAG, "upload su cloudinary non riuscito");
                 setUploadToCloudinaryStatus(UploadStatus.FAILED);
             }
         };
     }
 
-    public void changeProfilePictureToServer(User user, String imageName){
+    public void changeProfilePictureToServer(User user) {
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_update_profile_picture"; // vedi se è corretto
-        try{
+        try {
             HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
             RequestBody requestBody = new FormBody.Builder()
-                    .add("email",user.getEmail())
-                    .add("picture_path",imageName)
+                    .add("email", user.getEmail())
+                    .add("picture_path", imageName)
                     .build();
-            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl,requestBody,user.getAccessToken());
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, user.getAccessToken());
 
             Call call = httpClient.newCall(request);
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    Log.v(TAG,"cambio immagine fallito");
+                    Log.v(TAG, "cambio immagine fallito");
                     setUpdateImageToServerStatus(UploadStatus.FAILED);
                 }
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
-                    try{
-                        Log.v(TAG,"response :" + response);
-                        if(response.isSuccessful()) {
+                    try {
+                        Log.v(TAG, "response :" + response);
+                        if (response.isSuccessful()) {
                             String responseData = response.body().toString();
-                            Log.v(TAG,"Tutto ok cambio immagine profilo avvenuto con successo");
-                            user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
+                            Log.v(TAG, "Tutto ok cambio immagine profilo avvenuto con successo");
+                            user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName);
                             setUpdateImageToServerStatus(UploadStatus.SUCCESS);
-                        }else{
-                            Log.v(TAG,"cambio immagine profilo fallito");
+                        } else {
+                            Log.v(TAG, "cambio immagine profilo fallito");
                             setUploadToCloudinaryStatus(UploadStatus.FAILED);
                         }
 
 
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                         setUploadToCloudinaryStatus(UploadStatus.FAILED);
                     }
 
                 }
             });
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             setUploadToCloudinaryStatus(UploadStatus.FAILED);
         }
     }
-
-
-
-
-
-
-
 
 
 }// UserProfileViewModel class
