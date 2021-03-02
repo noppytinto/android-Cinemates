@@ -268,8 +268,11 @@ public class SearchViewModel extends ViewModel {
                                 userSearchResult.setUsername(jsonDBobj.getString("Username"));
                                 userSearchResult.setFirstName(jsonDBobj.getString("Name"));
                                 userSearchResult.setLastName(jsonDBobj.getString("LastName"));
-                                userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() +
-                                        jsonDBobj.getString("ProfileImage"));
+                                userSearchResult.setIsExternalUser(jsonDBobj.getBoolean("ExternalAccount"));
+                                if(userSearchResult.getIsExternalUser())
+                                    userSearchResult.setProfilePictureUrl(jsonDBobj.getString("ProfileImage"));
+                                else
+                                    userSearchResult.setProfilePictureUrl(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                                 result.add(userSearchResult);
                             }// for

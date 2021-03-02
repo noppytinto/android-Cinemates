@@ -7,6 +7,7 @@ public class UserSearchResult extends SearchResult{
     private String firstName;
     private String lastName;
     private String username;
+    private boolean isExternalUser;
 
 
     public UserSearchResult() {
@@ -21,6 +22,12 @@ public class UserSearchResult extends SearchResult{
         this.profilePictureUrl = profilePictureUrl;
     }
 
+    public boolean getIsExternalUser(){
+        return isExternalUser;
+    }
+    public void setIsExternalUser(boolean isExternalUser){
+        this.isExternalUser = isExternalUser;
+    }
     public String getFirstName() {
         return firstName;
     }
