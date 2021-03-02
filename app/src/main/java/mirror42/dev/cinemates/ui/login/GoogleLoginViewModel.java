@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.userprofile.PersonalProfileViewModel;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -319,6 +320,7 @@ public class GoogleLoginViewModel extends ViewModel {
                                 user.setBirthDate(jsonObject.getString("BirthDate"));
                                 user.setAnalytics(jsonObject.getBoolean("Analytics"));
                                 user.setUsername(jsonObject.getString("Username"));
+                                changeProfilePictureToServer(user);
                                 if (op == OperationTypeWithGoogle.REGISTRATION)
                                     postRegisterUserResult(ResultOperation.SUCCESS);
                                 else
@@ -349,6 +351,49 @@ public class GoogleLoginViewModel extends ViewModel {
                 postRegisterUserResult(ResultOperation.FAILED);
             else
                 postLoginUserResult(ResultOperation.FAILED);
+        }
+    }
+
+    private void changeProfilePictureToServer(User user) {
+        final OkHttpClient httpClient = OkHttpSingleton.getClient();
+        final String dbFunction = "fn_update_profile_picture"; // vedi se è corretto
+        try {
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("email", user.getEmail())
+                    .add("picture_path", user.getProfilePicturePath())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, user.getAccessToken());
+
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.v(TAG, "cambio immagine fallito");
+
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    try {
+                        Log.v(TAG, "response :" + response);
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().toString();
+                            Log.v(TAG, "Tutto ok cambio immagine profilo avvenuto con successo");
+                        } else {
+                            Log.v(TAG, "cambio immagine profilo fallito");
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

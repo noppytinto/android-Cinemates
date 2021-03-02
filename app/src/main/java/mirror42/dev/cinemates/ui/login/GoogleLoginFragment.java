@@ -196,7 +196,7 @@ public class GoogleLoginFragment extends Fragment implements
             if(profileImage != null)
                 googleUser.setProfilePictureURL(String.valueOf(personPhoto));
             else
-                googleUser.setProfilePictureURL("");
+                googleUser.setProfilePictureURL("No_image");
             googleUser.setFirstName(personGivenName);
             googleUser.setLastName(personFamilyName);
 

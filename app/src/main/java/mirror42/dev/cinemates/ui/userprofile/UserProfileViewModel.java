@@ -200,7 +200,11 @@ public class UserProfileViewModel extends ViewModel {
         user.setFirstName(jsonObject.getString("Name"));
         user.setLastName(jsonObject.getString("LastName"));
         user.setBirthDate(jsonObject.getString("BirthDate"));
-        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        user.setExternalUser(jsonObject.getBoolean("ExternalAccount"));
+        if(user.getIsExternalUser())
+            user.setProfilePictureURL(jsonObject.getString("ProfileImage"));
+        else
+            user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
         int followersCount = jsonObject.getInt("followers_count");
         int followingCount = jsonObject.getInt("following_count");
         user.setFollowersCount(followersCount);
