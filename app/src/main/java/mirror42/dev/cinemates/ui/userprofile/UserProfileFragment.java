@@ -18,14 +18,17 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
 import mirror42.dev.cinemates.MainActivity;
+import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
@@ -70,9 +73,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
         followStatusMessage = view.findViewById(R.id.textView_userProfileFragment_message);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_userProfileFragment);
-
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-
         buttonSendFollow = view.findViewById(R.id.button_userProfileFragment_follow);
         buttonAcceptFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_accept);
         buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
@@ -84,20 +84,37 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         buttonAcceptFollow.setOnClickListener(this);
         buttonDeclineFollow.setOnClickListener(this);
         buttonCustomLists.setOnClickListener(this);
+        followersButton.setOnClickListener(this);
+        followingButton.setOnClickListener(this);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
         followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
-        followersButton.setOnClickListener(this);
-        followingButton.setOnClickListener(this);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
             String username = args.getUsername();
+            String currentLoggedUsername = loginViewModel.getLoggedUser().getUsername();
 
-            if(username!=null || username.isEmpty()) {
-                fetchUserProfileData(username);
+            if(username.equals(currentLoggedUsername)) {
+                NavDirections personalProfileFragment =
+                        NavGraphDirections.actionGlobalPersonalProfileFragment();
+                navigateTo(personalProfileFragment, true);
+            }
+            else {
+                if(username!=null || username.isEmpty()) {
+                    fetchUserProfileData(username);
+                }
             }
         }
+    }
+
+    private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
+        if(direction==null) return;
+
+        NavController navController = NavHostFragment.findNavController(this);
+        if (removeFromBackStack) navController.popBackStack();
+        navController.navigate(direction);
     }
 
     private void loadSocialStatistics() {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="change_password">Cambia password</string>
+    <string name="change_password">cambia password</string>
     <string name="change_password_newPassword">Nuova password</string>
 
     <string name="passwordHelper">La password deve contenere almeno 6 caratteri</string>

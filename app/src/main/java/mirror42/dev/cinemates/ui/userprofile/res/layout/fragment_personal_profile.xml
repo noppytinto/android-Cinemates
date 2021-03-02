@@ -16,27 +16,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/textView_personalProfileFragment_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="Impostazioni"
+                android:textAlignment="textStart"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@+id/divider_personalProfileFragment_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_subscribedLists"
+                app:layout_constraintVertical_bias="1.0" />
+
             <Button
                 android:id="@+id/button_saveNewImage_personalProfileFragment"
                 style="@style/Cinemates.Button.Rectangular"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="12dp"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
                 android:text="Salva"
-                android:textSize="8sp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/imageView_personalProfileFragment_profilePicture"
+                app:layout_constraintStart_toStartOf="@+id/imageView_personalProfileFragment_profilePicture"
                 app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture" />
 
             <Button
                 android:id="@+id/button_Delete_NewImage"
                 style="@style/Cinemates.Button.Rectangular.Outlined"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="32dp"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:text="Annulla"
-                android:textSize="8sp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/button_saveNewImage_personalProfileFragment"
+                app:layout_constraintStart_toStartOf="@+id/button_saveNewImage_personalProfileFragment"
                 app:layout_constraintTop_toBottomOf="@+id/button_saveNewImage_personalProfileFragment" />
 
             <View
@@ -67,6 +84,7 @@
                 android:id="@+id/textView_personalProfileFragment_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/poppins"
                 android:text="@mario"
                 android:textAlignment="center"
@@ -80,7 +98,7 @@
                 android:id="@+id/textView_personalProfileFragment_fullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
+                android:layout_marginStart="24dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Mario Rossi"
                 android:textAlignment="textStart"
@@ -95,7 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="125dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:text="liste che seguo"
                 app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_myLists"
@@ -107,7 +125,8 @@
                 android:id="@+id/textView_personalProfileFragment_label1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
                 android:fontFamily="@font/poppins_semibold"
                 android:text="Liste"
                 android:textAlignment="textStart"
@@ -115,7 +134,7 @@
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/include_personalProfileFragment_myLists"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/include_personalProfileFragment_accountVerification" />
 
             <TextView
@@ -145,34 +164,9 @@
                 app:srcCompat="@drawable/icon_user_primary_blue" />
 
 
-            <Button
-                android:id="@+id/button_personalProfileFragment_logout"
-                style="@style/Cinemates.Button.Rounded.Outlined"
-                android:layout_width="200dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="105dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="106dp"
-                android:text="@string/logout"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_changePassword" />
 
-            <Button
-                android:id="@+id/button_personalProfileFragment_changePassword"
-                style="@style/Cinemates.Button.Rounded.Outlined"
-                android:layout_width="200dp"
-                android:layout_height="60dp"
-                android:visibility="visible"
-                android:layout_marginStart="105dp"
-                android:layout_marginTop="80dp"
-                android:layout_marginEnd="106dp"
-                android:text="@string/change_password"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button_personalProfileFragment_subscribedLists" />
+
+
 
             <include
                 android:id="@+id/include_personalProfileFragment_accountVerification"
@@ -208,7 +202,7 @@
                 android:layout_width="0dp"
                 android:layout_height="125dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:text="@string/custom_lists"
                 app:layout_constraintEnd_toEndOf="@+id/include_personalProfileFragment_myLists"
@@ -239,6 +233,65 @@
                 app:layout_constraintStart_toStartOf="@+id/imageView_personalProfileFragment_profilePicture"
                 app:layout_constraintTop_toBottomOf="@+id/imageView_personalProfileFragment_profilePicture"
                 tools:visibility="visible" />
+
+
+            <Button
+                android:id="@+id/button_personalProfileFragment_changePassword"
+                style="@style/Cinemates.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:letterSpacing="0.05"
+                android:paddingStart="15dp"
+                android:text="@string/change_password"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textColor="@color/light_blue"
+                android:textSize="14sp"
+                app:icon="@drawable/lock"
+                app:iconPadding="15dp"
+                app:iconTint="@color/light_blue"
+                app:layout_constraintBottom_toTopOf="@+id/divider_personalProfileFragment_3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/button_personalProfileFragment_logout"
+                style="@style/Cinemates.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:letterSpacing="0.05"
+                android:paddingStart="15dp"
+                android:text="@string/logout"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textColor="@color/light_blue"
+                android:textSize="14sp"
+                app:icon="@drawable/ic_back_arrow_light_blue"
+                app:iconPadding="15dp"
+                app:iconTint="@color/light_blue"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                android:id="@+id/divider_personalProfileFragment_2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/divider_toolbar"
+                app:layout_constraintBottom_toTopOf="@+id/button_personalProfileFragment_changePassword"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                android:id="@+id/divider_personalProfileFragment_3"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/divider_toolbar"
+                app:layout_constraintBottom_toTopOf="@+id/button_personalProfileFragment_logout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

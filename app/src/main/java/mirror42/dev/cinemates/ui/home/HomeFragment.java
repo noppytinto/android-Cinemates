@@ -276,13 +276,10 @@ public class HomeFragment extends Fragment implements
     public void onPostOwnerAreaClicked(int position) {
         Post itemSelected = recyclerAdapterPost.getPost(position);
         String postOwnerUsername = itemSelected.getOwner().getUsername();
-        String currentLoggedUsername = loginViewModel.getLoggedUser().getUsername();
 
-        if( ! postOwnerUsername.equals(currentLoggedUsername)) {
-            NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
-                    NavGraphDirections.actionGlobalUserProfileFragment(postOwnerUsername);
-            NavHostFragment.findNavController(HomeFragment.this).navigate(userProfileFragment);
-        }
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                NavGraphDirections.actionGlobalUserProfileFragment(postOwnerUsername);
+        NavHostFragment.findNavController(HomeFragment.this).navigate(userProfileFragment);
     }
 
     private void checkForNewNotifications(User loggedUser) {

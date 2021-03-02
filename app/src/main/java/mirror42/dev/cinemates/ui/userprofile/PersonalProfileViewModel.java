@@ -41,17 +41,17 @@ public class PersonalProfileViewModel extends ViewModel {
     private RemoteConfigServer remoteConfigServer;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    private MutableLiveData<ChangeImageResult> changeImageResult;
-    private MutableLiveData<ChangeImageResult> changeImageToServerResult;
+    private MutableLiveData<UploadStatus> uploadToCloudinaryStatus;
+    private MutableLiveData<UploadStatus> changeImageToServerResult;
     private MutableLiveData<FetchStatus> fetchStatus;
     private String imageName;
 
 
 
-    public enum ChangeImageResult {
+    public enum UploadStatus {
         FAILED,
         SUCCESS,
-        NONE
+        IDLE
     }
 
 
@@ -61,8 +61,8 @@ public class PersonalProfileViewModel extends ViewModel {
 
     public PersonalProfileViewModel() {
         this.user = new MutableLiveData<>();
-        changeImageResult = new MutableLiveData<>(ChangeImageResult.NONE);
-        changeImageToServerResult = new MutableLiveData<>(ChangeImageResult.NONE);
+        uploadToCloudinaryStatus = new MutableLiveData<>(UploadStatus.IDLE);
+        changeImageToServerResult = new MutableLiveData<>(UploadStatus.IDLE);
         remoteConfigServer = RemoteConfigServer.getInstance();
         mAuth = FirebaseAuth.getInstance();
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
@@ -72,20 +72,19 @@ public class PersonalProfileViewModel extends ViewModel {
 
     //----------------------------------------------------------------- GETTERS/SETTERS
 
-    public LiveData<ChangeImageResult> getResetStatus() {
-        return changeImageResult;
+    public LiveData<UploadStatus> getUploadToCloudinaryStatus() {
+        return uploadToCloudinaryStatus;
     }
 
-    public void setResetStatus(ChangeImageResult changeImageResult) {
-        this.changeImageResult.postValue(changeImageResult);
+    public void setUploadToCloudinaryStatus(UploadStatus uploadStatus) {
+        this.uploadToCloudinaryStatus.postValue(uploadStatus);
     }
 
-
-    public LiveData<ChangeImageResult> getUpdateImageToServer() {
+    public LiveData<UploadStatus> getUpdateImageToServerStatus() {
         return changeImageToServerResult;
     }
 
-    public void setUpdateImageToServer(ChangeImageResult changeImageToServerResult) {
+    public void setUpdateImageToServerStatus(UploadStatus changeImageToServerResult) {
         this.changeImageToServerResult.postValue(changeImageToServerResult);
     }
 
@@ -103,9 +102,9 @@ public class PersonalProfileViewModel extends ViewModel {
 
     //----------------------------------------------------------------- METHODS
 
-    public void changeProfilePicture(User user, Uri localImageUri, Context context){
+    public void uploadImageToCloudinary(User user, Uri localImageUri, Context context){
         try {
-            Runnable task = uploadImageAsync(user, localImageUri, context);
+            Runnable task = createUploadImageToCloudinaryTask(user, localImageUri, context);
             ThreadManager t = ThreadManager.getInstance();
             t.runTaskInPool(task);
         } catch (Exception e) {
@@ -113,17 +112,17 @@ public class PersonalProfileViewModel extends ViewModel {
         }
     }
 
-    private Runnable uploadImageAsync(User user, Uri localImageUri, Context context){
+    private Runnable createUploadImageToCloudinaryTask(User user, Uri localImageUri, Context context){
         // uploading promo image to the cloud
         return ()-> {
 
-            try {
+//            try {
 //                imageName = DocumentFile.fromSingleUri(context, localImageUri).getName();
 //                imageName = imageName.toLowerCase();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             String randomImageName = UUID.randomUUID().toString();
             imageName = randomImageName;
 
@@ -145,14 +144,14 @@ public class PersonalProfileViewModel extends ViewModel {
 
                                 // getting name from uri
 
-                                setResetStatus(ChangeImageResult.SUCCESS);
+                                setUploadToCloudinaryStatus(UploadStatus.SUCCESS);
                                 //changeProfileImageToServer(user, randomImageName);
                             }
 
                             @Override
                             public void onError(String requestId, ErrorInfo error) {
                                 Log.v(TAG,"upload su cloudinary non riuscito");
-                                setResetStatus(ChangeImageResult.FAILED);
+                                setUploadToCloudinaryStatus(UploadStatus.FAILED);
                             }
 
                             @Override
@@ -170,12 +169,12 @@ public class PersonalProfileViewModel extends ViewModel {
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.v(TAG,"upload su cloudinary non riuscito");
-                setResetStatus(ChangeImageResult.FAILED);
+                setUploadToCloudinaryStatus(UploadStatus.FAILED);
             }
         };
     }
 
-    public void changeProfileImageToServer(User user, String imageName){
+    public void changeProfilePictureToServer(User user, String imageName){
         final OkHttpClient httpClient = OkHttpSingleton.getClient();
         final String dbFunction = "fn_update_profile_picture"; // vedi se è corretto
         try{
@@ -191,7 +190,7 @@ public class PersonalProfileViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     Log.v(TAG,"cambio immagine fallito");
-                    setUpdateImageToServer(ChangeImageResult.FAILED);
+                    setUpdateImageToServerStatus(UploadStatus.FAILED);
                 }
 
                 @Override
@@ -203,23 +202,23 @@ public class PersonalProfileViewModel extends ViewModel {
                             String responseData = response.body().toString();
                             Log.v(TAG,"Tutto ok cambio immagine profilo avvenuto con successo");
                             user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + imageName + ".png");
-                            setUpdateImageToServer(ChangeImageResult.SUCCESS);
+                            setUpdateImageToServerStatus(UploadStatus.SUCCESS);
                         }else{
                             Log.v(TAG,"cambio immagine profilo fallito");
-                            setResetStatus(ChangeImageResult.FAILED);
+                            setUploadToCloudinaryStatus(UploadStatus.FAILED);
                         }
 
 
                     }catch(Exception e){
                         e.printStackTrace();
-                        setResetStatus(ChangeImageResult.FAILED);
+                        setUploadToCloudinaryStatus(UploadStatus.FAILED);
                     }
 
                 }
             });
         }catch(Exception e){
             e.printStackTrace();
-            setResetStatus(ChangeImageResult.FAILED);
+            setUploadToCloudinaryStatus(UploadStatus.FAILED);
         }
     }
 

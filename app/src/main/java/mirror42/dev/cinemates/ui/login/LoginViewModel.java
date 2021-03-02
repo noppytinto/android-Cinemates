@@ -204,8 +204,14 @@ public class LoginViewModel extends ViewModel {
                         JSONObject jsonObject = new JSONObject(document.getData());
                         String email = jsonObject.getString("email");
                         String profilePicturePath = jsonObject.getString("profilePicturePath");
+                        String firstName = jsonObject.getString("firstname");
+                        String lastName = jsonObject.getString("lastname");
+                        String username = jsonObject.getString("username");
 
                         basicPendingUser = new User(email, remoteConfigServer.getCloudinaryDownloadBaseUrl() + profilePicturePath);
+                        basicPendingUser.setFirstName(firstName);
+                        basicPendingUser.setLastName(lastName);
+                        basicPendingUser.setUsername(username);
 
                     } catch (JSONException e) {
                         e.printStackTrace();

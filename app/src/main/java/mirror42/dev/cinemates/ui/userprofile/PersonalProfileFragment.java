@@ -29,6 +29,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import mirror42.dev.cinemates.R;
@@ -52,7 +53,7 @@ public class PersonalProfileFragment extends Fragment implements
     private TextView usernameTextView;
     private TextView textViewResendEmailMessage;
     private Button buttonLogout;
-    private Button buttonDeleteImage;
+    private Button buttonAbortImageChange;
     private Button buttonSaveImage;
     private Button buttonResendEmail;
     private Button buttonChangePassword;
@@ -60,7 +61,7 @@ public class PersonalProfileFragment extends Fragment implements
     private LoginViewModel loginViewModel;
     private View includeAccountActivationView;
     private View includePersonalProfileContent;
-//    private NotificationsViewModel notificationsViewModel;
+    //    private NotificationsViewModel notificationsViewModel;
     private Button buttonCustomLists;
     private Button subscribedListsButton;
     private Button followersButton;
@@ -69,9 +70,10 @@ public class PersonalProfileFragment extends Fragment implements
     private FollowingViewModel followingViewModel;
     private FollowersViewModel followersViewModel;
     private Uri localImageUri;
-    private String oldImage;
+    private String oldImageUrl;
     private LinearProgressIndicator uploadProgressIndicator;
     private static boolean additionalActivationMailSent;
+    private View changePassworDivider;
 
     private static int PICK_IMAGE = 30;
     private final int PERMISSION_CODE = 5;
@@ -105,7 +107,7 @@ public class PersonalProfileFragment extends Fragment implements
         textViewResendEmailMessage = view.findViewById(R.id.textView_userProfileFragment_resendEmailMessage);
         buttonLogout = view.findViewById(R.id.button_personalProfileFragment_logout);
         buttonSaveImage = view.findViewById(R.id.button_saveNewImage_personalProfileFragment);
-        buttonDeleteImage = view.findViewById(R.id.button_Delete_NewImage);
+        buttonAbortImageChange = view.findViewById(R.id.button_Delete_NewImage);
         buttonChangePassword = view.findViewById(R.id.button_personalProfileFragment_changePassword);
         buttonCustomLists = view.findViewById(R.id.button_personalProfileFragment_customLists);
         subscribedListsButton = view.findViewById(R.id.button_personalProfileFragment_subscribedLists);
@@ -117,31 +119,24 @@ public class PersonalProfileFragment extends Fragment implements
         includePersonalProfileContent = view.findViewById(R.id.include_personalProfileFragment_myLists);
         buttonResendEmail = view.findViewById(R.id.button_personalProfileFragment_resendEmail);
         uploadProgressIndicator = view.findViewById(R.id.progressIndicator_personalProfileFragment);
+        changePassworDivider = view.findViewById(R.id.divider_personalProfileFragment_2);
 
 //        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-        personalProfileViewModel =  new ViewModelProvider(this).get(PersonalProfileViewModel.class);  // on view created
+        personalProfileViewModel = new ViewModelProvider(this).get(PersonalProfileViewModel.class);  // on view created
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
         followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
 
         // setting listeners
         buttonLogout.setOnClickListener(this);
-
         buttonCustomLists.setOnClickListener(this);
         subscribedListsButton.setOnClickListener(this);
         followersButton.setOnClickListener(this);
         followingButton.setOnClickListener(this);
-        User user = loginViewModel.getLoggedUser();
-
-
-
         buttonResendEmail.setOnClickListener(this);
-
         buttonSaveImage.setOnClickListener(this);
-        buttonDeleteImage.setOnClickListener(this);
-
-        buttonDeleteImage.setVisibility(View.GONE);
-        buttonSaveImage.setVisibility(View.GONE);
+        buttonAbortImageChange.setOnClickListener(this);
+        hideChangePictureButtons();
 
         //
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
@@ -159,6 +154,121 @@ public class PersonalProfileFragment extends Fragment implements
         checkLoginStatus();
 //        observeNotifications();
     }// end onActivityCreated()
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == buttonLogout.getId()) {
+            new MaterialAlertDialogBuilder(getContext())
+                    .setTitle("Sei sicuro?")
+                    .setNegativeButton("No", (dialog, which) -> {
+//                        showCenteredToast("operazione annullata");
+                    })
+                    .setPositiveButton("Si", (dialog, which) -> {
+                        loginViewModel.deleteLoggedUserLocalData(getContext());
+
+                        //
+                        NavController navController = Navigation.findNavController(v);
+                        navController.popBackStack();
+                        navController.navigate(R.id.loginFragment);
+                    })
+                    .show();
+
+        }
+        else if (v.getId() == buttonResendEmail.getId()) {
+            // checking if email verification has been clicked
+            boolean accountEnabled = loginViewModel.checkEmailVerificationState();
+            if (!accountEnabled) {
+                // insert into postgrest database
+                // and show new user profile page
+                if (additionalActivationMailSent) {
+                    showCenteredToast("email attivazione gia' rininviata");
+                    buttonResendEmail.setText("Email attivazione rinviata!");
+                    buttonResendEmail.setEnabled(false);
+                } else {
+                    loginViewModel.resendVerificationEmail();
+                    showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
+                    buttonResendEmail.setText("Email attivazione rinviata!");
+                    buttonResendEmail.setEnabled(false);
+                    additionalActivationMailSent = true;
+                }
+
+            }
+        }
+        else if (v.getId() == buttonChangePassword.getId()) {
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.changePasswordFragment);
+
+        }
+        else if (v.getId() == buttonCustomLists.getId()) {
+            String fetchMode = "fetch_my_custom_lists";
+            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
+            NavDirections customListBrowserFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
+            Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }
+        else if (v.getId() == subscribedListsButton.getId()) {
+            String fetchMode = "fetch_subscribed_lists";
+            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
+
+            NavDirections customListBrowserFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
+            Navigation.findNavController(v).navigate(customListBrowserFragment);
+        }
+        else if (v.getId() == profilePicture.getId()) {
+//            pickImageFromGallery(v);
+            backupOldProfilePicture();
+            showChangePictureButtons();
+            showImagePicker();
+        }
+        else if (v.getId() == followersButton.getId()) {
+            NavDirections followersFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToFollowersFragment(loginViewModel.getLoggedUser().getUsername());
+            Navigation.findNavController(v).navigate(followersFragment);
+        }
+        else if (v.getId() == followingButton.getId()) {
+            NavDirections followersFragment =
+                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToFollowingFragment(loginViewModel.getLoggedUser().getUsername());
+            Navigation.findNavController(v).navigate(followersFragment);
+        }
+        else if (v.getId() == buttonSaveImage.getId()) {
+            uploadImage();
+        }
+        else if (v.getId() == buttonAbortImageChange.getId()) {
+            hideChangePictureButtons();
+            hideUploadProgressIndicator();
+            restoreOldProfilePicture();
+            showCenteredToast("cambio immagine annullato");
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.menu_item_login);
+        if (item != null)
+            item.setVisible(false);
+
+        checkForNewNotifications();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
+        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
+            try {
+                localImageUri = data.getData();
+                showProfilePicturePreview();
+//                showCenteredToast("clicca su SALVA per rendere permanete il cambiamento");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+
+    //----------------------------------------------------------------------- METHODS
 
     private void observeNotifications() {
 //        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
@@ -183,28 +293,28 @@ public class PersonalProfileFragment extends Fragment implements
                         User user = loginViewModel.getLoggedUser();
                         String profilePicturePath = user.getProfilePicturePath();
                         ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
-                        oldImage = profilePicturePath;
 
                         textViewEmail.setText(user.getEmail());
                         fullNameTextView.setText(user.getFullName());
                         usernameTextView.setText("@" + user.getUsername());
                         loadSocialStatistics();
-                    }  catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case IS_PENDING_USER: {
                     hideLoggedUserContent();
                     showPendingUserContent();
-
                     // get pending-user basic data
                     User user = loginViewModel.getPendingUser();
-                    if(user!=null) {
+                    if (user != null) {
                         try {
-                            String profilePicturePath = user.getProfilePicturePath();
-
-                            ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, getContext());
                             textViewEmail.setText(user.getEmail());
+                            fullNameTextView.setText(user.getFullName());
+                            usernameTextView.setText("@" + user.getUsername());
+
+                            String profilePicturePath = user.getProfilePicturePath();
+                            ImageUtilities.loadCircularImageInto(profilePicturePath, profilePicture, requireContext());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -218,11 +328,11 @@ public class PersonalProfileFragment extends Fragment implements
         });
     }
 
-    private void showUploadProgressIndicator(){
+    private void showUploadProgressIndicator() {
         uploadProgressIndicator.setVisibility(View.VISIBLE);
     }
 
-    private void hideUploadProgressIndicator(){
+    private void hideUploadProgressIndicator() {
         uploadProgressIndicator.setVisibility(View.GONE);
     }
 
@@ -239,16 +349,17 @@ public class PersonalProfileFragment extends Fragment implements
         followersButton.setVisibility(View.VISIBLE);
         followingButton.setVisibility(View.VISIBLE);
 
-        if(!loginViewModel.getLoggedUser().getIsExternalUser()) {
+        if (!loginViewModel.getLoggedUser().getIsExternalUser()) {
             profilePicture.setOnClickListener(this);
             buttonChangePassword.setOnClickListener(this);
             buttonChangePassword.setVisibility(View.VISIBLE);
-        }else
+        } else
             buttonChangePassword.setVisibility(View.GONE);
 
         buttonCustomLists.setVisibility(View.VISIBLE);
         subscribedListsButton.setVisibility(View.VISIBLE);
         includePersonalProfileContent.setVisibility(View.VISIBLE);
+        changePassworDivider.setVisibility(View.VISIBLE);
 
     }
 
@@ -261,179 +372,93 @@ public class PersonalProfileFragment extends Fragment implements
         subscribedListsButton.setVisibility(View.GONE);
         includePersonalProfileContent.setVisibility(View.GONE);
         includeAccountActivationView.setVisibility(View.GONE);
-
+        changePassworDivider.setVisibility(View.GONE);
     }
 
     private void showPendingUserContent() {
         includeAccountActivationView.setVisibility(View.VISIBLE);
-
     }
 
     private void hidePendingUserContent() {
         includeAccountActivationView.setVisibility(View.GONE);
-
     }
 
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == buttonLogout.getId()) {
-            loginViewModel.deleteLoggedUserLocalData(getContext());
+    private void uploadImage() {
+        showUploadProgressIndicator();
 
-            //
-            NavController navController = Navigation.findNavController(v);
-            navController.popBackStack();
-            navController.navigate(R.id.loginFragment);
-        }
-        else if(v.getId() == buttonResendEmail.getId()) {
-            // checking if email verification has been clicked
-            boolean accountEnabled = loginViewModel.checkEmailVerificationState();
-            if( ! accountEnabled) {
-                // insert into postgrest database
-                // and show new user profile page
-                if(additionalActivationMailSent) {
-                    showCenteredToast("email attivazione gia' rininviata");
-                    buttonResendEmail.setText("Email attivazione rinviata!");
-                    buttonResendEmail.setEnabled(false);
+        personalProfileViewModel.getUploadToCloudinaryStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
+            switch (changeImageResult) {
+                case SUCCESS: {
+                    // then upload to remote DB
+                    changeImageToServer();
                 }
-                else {
-                    loginViewModel.resendVerificationEmail();
-                    showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
-                    buttonResendEmail.setText("Email attivazione rinviata!");
-                    buttonResendEmail.setEnabled(false);
-                    additionalActivationMailSent = true;
-                }
-
+                break;
+                case FAILED:
+                    showCenteredToast("cambio immagine profilo NON riuscito");
+                    break;
             }
-        }
-        else if(v.getId() == buttonChangePassword.getId()){
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.changePasswordFragment);
-
-        }
-        else if(v.getId() == buttonCustomLists.getId()){
-            String fetchMode = "fetch_my_custom_lists";
-            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
-            NavDirections customListBrowserFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
-            Navigation.findNavController(v).navigate(customListBrowserFragment);
-        }
-        else if(v.getId() == subscribedListsButton.getId()){
-            String fetchMode = "fetch_subscribed_lists";
-            String ownerUsername = loginViewModel.getLoggedUser().getUsername();
-
-            NavDirections customListBrowserFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToCustomListBrowserFragment(fetchMode, ownerUsername);
-            Navigation.findNavController(v).navigate(customListBrowserFragment);
-        }
-        else if(v.getId() == profilePicture.getId()){
-//            pickImageFromGallery(v);
-            imageChooser();
-        }
-        else if(v.getId() == followersButton.getId()){
-            NavDirections followersFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToFollowersFragment(loginViewModel.getLoggedUser().getUsername());
-            Navigation.findNavController(v).navigate(followersFragment);
-        }
-        else if(v.getId() == followingButton.getId()){
-            NavDirections followersFragment =
-                    PersonalProfileFragmentDirections.actionPersonalProfileFragmentToFollowingFragment(loginViewModel.getLoggedUser().getUsername());
-            Navigation.findNavController(v).navigate(followersFragment);
-        }else if(v.getId() == buttonSaveImage.getId() ){
-            changeImageToServer();
-        }else if(v.getId() == buttonDeleteImage.getId()){
-            showUploadProgressIndicator();
-            usernameTextView.setVisibility(View.VISIBLE);
-            buttonDeleteImage.setVisibility(View.GONE);
-            buttonSaveImage.setVisibility(View.GONE);
-            ImageUtilities.loadCircularImageInto(oldImage, profilePicture, getContext());
-            loginViewModel.getLoggedUser().setProfilePictureURL(oldImage);
-            hideUploadProgressIndicator();
-            showCenteredToast("Cambio immagine annullato");
-        }
+        });
+        personalProfileViewModel.uploadImageToCloudinary(loginViewModel.getLoggedUser(), localImageUri, requireContext());
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem item = menu.findItem(R.id.menu_item_login);
-        if(item!=null)
-            item.setVisible(false);
-
-        checkForNewNotifications();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data); //get the image’s file location
-        if(requestCode==SELECT_PICTURE && resultCode==RESULT_OK){
-            try {
-                showUploadProgressIndicator();
-                localImageUri = data.getData();
-                personalProfileViewModel.changeProfilePicture(loginViewModel.getLoggedUser(), localImageUri, requireContext());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    //----------------------------------------------------------------------- METHODS
-
-    private void changeImageToServer(){
-        personalProfileViewModel.getUpdateImageToServer().observe(getViewLifecycleOwner(), changeImageToServerResult->{
-
-
-            switch(changeImageToServerResult){
-
+    private void changeImageToServer() {
+        personalProfileViewModel.getUpdateImageToServerStatus().observe(getViewLifecycleOwner(), changeImageToServerResult -> {
+            switch (changeImageToServerResult) {
                 case SUCCESS:
                     hideUploadProgressIndicator();
-                    usernameTextView.setVisibility(View.VISIBLE);
-                    buttonDeleteImage.setVisibility(View.GONE);
-                    buttonSaveImage.setVisibility(View.GONE);
-
-                    if( MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext())){
+                    hideChangePictureButtons();
+                    if (MyUtilities.deletFile(remoteConfigServer.getCinematesData(), requireContext())) {
                         remoteConfigServer = RemoteConfigServer.getInstance();
                         MyUtilities.encryptFile(remoteConfigServer.getCinematesData(),
                                 MyUtilities.convertUserInJSonString(loginViewModel.getLoggedUser()), getContext());
                     }
 
-                    showCenteredToast( "Perfetto Cambio immagine completo");
-                    break;
-
-                case FAILED:
-                    showCenteredToast( "cambio immagine profilo NON riuscito");
-                    break;
-            }
-        });
-
-        showUploadProgressIndicator();
-        personalProfileViewModel.changeProfileImageToServer(loginViewModel.getLoggedUser(), personalProfileViewModel.getImageName());
-    }
-    void imageChooser() {
-        personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
-            hideUploadProgressIndicator();
-            switch (changeImageResult) {
-                case SUCCESS: {
-                    Glide.with(this)  //2
-                            .load(localImageUri) //3
-                            .fallback(R.drawable.broken_image)
-                            .placeholder(R.drawable.icon_user_dark_blue)
-                            .circleCrop() //4
-                            .into(profilePicture); //8
                     loginViewModel.updateProfileImageUrl(personalProfileViewModel.getImageName());
-                    usernameTextView.setVisibility(View.GONE);
-                    buttonDeleteImage.setVisibility(View.VISIBLE);
-                    buttonSaveImage.setVisibility(View.VISIBLE);
-                    showCenteredToast( "Cliccare su salva per rendere permanete il cambiamento ");
-                }
-                break;
+
+                    showCenteredToast("cambio immagine completato");
+                    break;
                 case FAILED:
-                    showCenteredToast( "cambio immagine profilo NON riuscito");
+                    hideUploadProgressIndicator();
+                    hideChangePictureButtons();
+                    showCenteredToast("cambio immagine profilo NON riuscito");
                     break;
             }
         });
+        personalProfileViewModel.changeProfilePictureToServer(loginViewModel.getLoggedUser(), personalProfileViewModel.getImageName());
+    }
 
+    private void showProfilePicturePreview() {
+        Glide.with(this)  //2
+                .load(localImageUri) //3
+                .fallback(R.drawable.icon_user_dark_blue)
+                .placeholder(R.drawable.icon_user_dark_blue)
+                .circleCrop() //4
+                .into(profilePicture); //8
+    }
+
+    private void backupOldProfilePicture() {
+        oldImageUrl = loginViewModel.getLoggedUser().getProfilePicturePath();
+    }
+
+    private void restoreOldProfilePicture() {
+        ImageUtilities.loadCircularImageInto(oldImageUrl, profilePicture, getContext());
+        loginViewModel.getLoggedUser().setProfilePictureURL(oldImageUrl);
+    }
+
+    private void showChangePictureButtons() {
+        usernameTextView.setVisibility(View.GONE);
+        buttonAbortImageChange.setVisibility(View.VISIBLE);
+        buttonSaveImage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideChangePictureButtons() {
+        usernameTextView.setVisibility(View.VISIBLE);
+        buttonAbortImageChange.setVisibility(View.GONE);
+        buttonSaveImage.setVisibility(View.GONE);
+    }
+
+    void showImagePicker() {
         // create an instance of the
         // intent of the type image
         Intent i = new Intent();
@@ -492,50 +517,50 @@ public class PersonalProfileFragment extends Fragment implements
 //    }
 
 
-    private String getRealPathFromUri(Uri imageUri){
+    private String getRealPathFromUri(Uri imageUri) {
         Cursor cursor = null;
-        cursor = requireActivity().getContentResolver().query(imageUri, null,  null, null, null);
-        if(cursor==null) {
+        cursor = requireActivity().getContentResolver().query(imageUri, null, null, null, null);
+        if (cursor == null) {
             return imageUri.getPath();
-        }else{
+        } else {
             cursor.moveToFirst();
-            int idx =  cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
     }
 
-    void pickImageFromGallery(View view){
-        personalProfileViewModel.getResetStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
+    void pickImageFromGallery(View view) {
+        personalProfileViewModel.getUploadToCloudinaryStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
             switch (changeImageResult) {
                 case SUCCESS: {
                     Glide.with(this)  //2
                             .load(localImageUri) //3
-                            .fallback(R.drawable.broken_image)
+                            .fallback(R.drawable.icon_user_dark_blue)
                             .placeholder(R.drawable.icon_user_dark_blue)
                             .circleCrop() //4
                             .into(profilePicture); //8
 
-                    showCenteredToast( "cambio immagine profilo riuscito ");
+                    showCenteredToast("cambio immagine profilo riuscito ");
                 }
-                    break;
+                break;
                 case FAILED:
-                    showCenteredToast( "cambio immagine profilo NON riuscito");
+                    showCenteredToast("cambio immagine profilo NON riuscito");
                     break;
             }
         });
         requestPermission();
     }
 
-    private void requestPermission(){
-        if(ContextCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+    private void requestPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             accessTheGallery();
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
         }
     }
 
-    public void accessTheGallery(){
+    public void accessTheGallery() {
         Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         i.setType("image/*");
         startActivityForResult(i, SELECT_PICTURE);
@@ -557,8 +582,6 @@ public class PersonalProfileFragment extends Fragment implements
 //            }
 //        }
     }
-
-
 
 
 }// end PersonalProfileFragment class
