@@ -558,7 +558,11 @@ public class HomeViewModel extends ViewModel {
         user.setUsername(jsonObject.getString("Username"));
         user.setFirstName(jsonObject.getString("Name"));
         user.setLastName(jsonObject.getString("LastName"));
-        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+        user.setExternalUser(jsonObject.getBoolean("ExternalAccount"));
+        if(user.getIsExternalUser())
+            user.setProfilePictureURL(jsonObject.getString("ProfileImage"));
+        else
+            user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
         return user;
     }
 
