@@ -1,6 +1,8 @@
 package mirror42.dev.cinemates.ui.search;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -96,7 +98,6 @@ public class SearchFragment extends Fragment implements
         firebaseAnalytics = FirebaseAnalytics.getInstance();
         searchType = SearchResult.SearchType.UNIVERSAL;
 
-        //
         initRecycleView(view);
     }
 
@@ -196,7 +197,7 @@ public class SearchFragment extends Fragment implements
     public void onCheckedChanged(ChipGroup group, int checkedId) {
         //NOTE: checkedId is -1 if no chip is checked
         searchViewModel.resetPreviousSearchTerm(); // if the filter has been changed, then reset previous search term
-
+        textInputLayout.setError(null);
         if(checkedId == R.id.chip_searchFragment_movie) {
             searchType = SearchType.MOVIE;
             textInputLayout.setHint("Cerca film");
@@ -258,7 +259,7 @@ public class SearchFragment extends Fragment implements
 
     private void autoSearch(String searchQuery) {
         currentSearchTerm = searchQuery;
-
+        textInputLayout.setError(null);
         try {
             showLoadingSpinner(true);
             searchViewModel.search(currentSearchTerm, searchType);
