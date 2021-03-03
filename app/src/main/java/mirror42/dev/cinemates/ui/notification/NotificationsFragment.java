@@ -46,6 +46,7 @@ public class NotificationsFragment extends Fragment implements
     private RecyclerView recyclerView;
     private LoginViewModel loginViewModel;
     private CircularProgressIndicator progressIndicator;
+    private View includeMessageForEmptyPage;
 
 
 
@@ -70,6 +71,7 @@ public class NotificationsFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_notificationsFragment);
         progressIndicator = view.findViewById(R.id.progressIndicator_notificationsFragment);
+        includeMessageForEmptyPage = view.findViewById(R.id.include_notifications_empty);
         initRecyclerView(view);
     }
 
@@ -85,6 +87,10 @@ public class NotificationsFragment extends Fragment implements
                 case NOTIFICATIONS_FETCHED: {
                     hideProgressIndicator();
                     if(notifications!=null) {
+                        if(notifications.isEmpty())
+                            showMessageForEmptyPage();
+                        else
+                            hideMessageForEmptyPage();
                         updateUI(notifications);
                         notificationsViewModel.setNotificationsAsOld(notifications, getContext());
                     }
@@ -96,11 +102,18 @@ public class NotificationsFragment extends Fragment implements
                     break;
                 case NO_NOTIFICATIONS:
                     hideProgressIndicator();
+                    if(notifications==null||notifications.isEmpty()) {
+                        showMessageForEmptyPage();
+                    }
                     break;
                 case ALL_NOTIFICATIONS_READ:
+
                     break;
                 case NOTIFICATION_DELETED: {
                     showCenteredToast("notifica eliminata");
+                    if(notifications==null||notifications.isEmpty()) {
+                        showMessageForEmptyPage();
+                    }
                     // delete from local DB
                     long notificationID = notificationsViewModel.getCurrentNotificationID();
                     notificationsViewModel.deleteNotificationFromLocalDB(notificationID, getContext());
@@ -143,6 +156,16 @@ public class NotificationsFragment extends Fragment implements
 
 
     //--------------------------------------------------------------------------------------- MY METHODS
+
+
+    private void showMessageForEmptyPage(){
+        includeMessageForEmptyPage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyPage(){
+        includeMessageForEmptyPage.setVisibility(View.GONE);
+    }
+
 
     @Override
     public void onFollowRequestNotificationClicked(int position) {

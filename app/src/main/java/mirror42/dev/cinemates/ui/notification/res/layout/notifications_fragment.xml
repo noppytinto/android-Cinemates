@@ -6,25 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".ui.notification.NotificationsFragment">
 
+    <include
+        android:id="@+id/include_notifications_empty"
+        layout="@layout/layout_empty_notifications_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout_notificationsFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/include_notifications_empty">
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_notificationFragment"
             android:layout_width="0dp"
-            android:layout_height="0dp" >
+            android:layout_height="0dp">
 
         </androidx.recyclerview.widget.RecyclerView>
 
