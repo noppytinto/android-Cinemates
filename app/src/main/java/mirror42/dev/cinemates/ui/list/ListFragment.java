@@ -66,7 +66,7 @@ public class ListFragment extends Fragment implements
     private User listOwner;
     private boolean deleteAllowed;
     private View emptyDefaultListMessage;
-    private TextView bannerDeleteFilm;
+    private TextView bannerDeleteMovie;
 
 
 
@@ -195,7 +195,7 @@ public class ListFragment extends Fragment implements
         progressIndicator = view.findViewById(R.id.progressIndicator_listFragment);
 
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
-        bannerDeleteFilm = view.findViewById(R.id.message_delete_movie);
+        bannerDeleteMovie = view.findViewById(R.id.textView_listFragment_deleteMessage);
         textViewListName = view.findViewById(R.id.textView_listFragment_listName);
         textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -285,12 +285,12 @@ public class ListFragment extends Fragment implements
 
     private void allowDeleteMovies() {
         deleteAllowed = true;
-        bannerDeleteFilm.setVisibility(View.VISIBLE);
+        bannerDeleteMovie.setVisibility(View.VISIBLE);
     }
 
     private void disallowDeleteMovies() {
         deleteAllowed = false;
-        bannerDeleteFilm.setVisibility(View.GONE);
+        bannerDeleteMovie.setVisibility(View.GONE);
     }
 
     private void setListNameAndDescription(MoviesList list) {
@@ -427,12 +427,14 @@ public class ListFragment extends Fragment implements
         public void onDestroyActionMode(ActionMode mode) {
             recyclerAdapterMoviesList.clearSelections();
             actionMode = null;
+            bannerDeleteMovie.setText("Tieni premuto su un elemento per modificare la lista.");
         }
     }
 
     private void enableActionMode(int position) {
         if (actionMode == null) {
             actionMode = ((MainActivity)getActivity()).startSupportActionMode(actionModeCallback);
+            bannerDeleteMovie.setText("Seleziona gli elementi da eliminare.");
         }
         toggleSelection(position);
     }
@@ -490,11 +492,6 @@ public class ListFragment extends Fragment implements
 
         // and notify recycler
         recyclerAdapterMoviesList.notifyDataSetChanged();
-
-
-//        if (recyclerAdapterMoviesList.getItemCount() == 0)
-//            fab.setVisibility(View.VISIBLE);
-
         actionMode = null;
     }
 
