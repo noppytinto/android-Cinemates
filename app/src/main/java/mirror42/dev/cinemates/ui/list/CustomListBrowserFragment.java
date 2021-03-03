@@ -27,9 +27,11 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterCustomLists;
+import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.ui.userprofile.FollowersFragment;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
@@ -267,6 +269,16 @@ public class CustomListBrowserFragment extends Fragment
             NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(listFragment);
         }
         else showCenteredToast("impossibile aprire lista");
+    }
+
+    @Override
+    public void imageClicked(String username) {
+
+        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                NavGraphDirections.actionGlobalUserProfileFragment(username);
+        NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(userProfileFragment);
+
+
     }
 
     private void moveRecyclerToBottom() {
