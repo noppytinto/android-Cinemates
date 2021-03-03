@@ -39,7 +39,7 @@
 
     <include
         android:id="@+id/include_homeFragment"
-        layout="@layout/layout_home_welcom_post"
+        layout="@layout/layout_home_welcome_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
