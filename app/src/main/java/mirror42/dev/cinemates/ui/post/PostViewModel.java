@@ -379,8 +379,11 @@ public class PostViewModel extends ViewModel {
                             owner.setFirstName(jsonDBobj.getString("Name"));
                             owner.setLastName(jsonDBobj.getString("LastName"));
                             owner.setUsername(jsonDBobj.getString("Username"));
-                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
-
+                            owner.setExternalUser(jsonDBobj.getBoolean("ExternalAccount"));
+                            if(owner.getIsExternalUser())
+                                owner.setProfilePictureURL(jsonDBobj.getString("ProfileImage"));
+                            else
+                                owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
                             cm.setOwner(owner);
                             try {
                                 if(owner.getUsername().equals(loggedUser.getUsername()))
@@ -437,7 +440,11 @@ public class PostViewModel extends ViewModel {
                             owner.setFirstName(jsonDBobj.getString("Name"));
                             owner.setLastName(jsonDBobj.getString("LastName"));
                             owner.setUsername(jsonDBobj.getString("Username"));
-                            owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
+                            owner.setExternalUser(jsonDBobj.getBoolean("ExternalAccount"));
+                            if(owner.getIsExternalUser())
+                                owner.setProfilePictureURL(jsonDBobj.getString("ProfileImage"));
+                            else
+                                owner.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("ProfileImage"));
 
                             l.setOwner(owner);
                             l.setPublishDateMillis(jsonDBobj.getLong("Publish_Date"));
