@@ -49,6 +49,7 @@ import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 
 
+
 public class SearchFragment extends Fragment implements
         View.OnClickListener,
         ChipGroup.OnCheckedChangeListener,
@@ -114,8 +115,8 @@ public class SearchFragment extends Fragment implements
                 }
                 break;
                 default:
-                    textInputLayout.setHint("Cerca tutto");
-                    searchType = SearchType.UNIVERSAL; // reset filters
+                    textInputLayout.setHint("Cerca film");
+                    searchType = SearchType.MOVIE; // reset filters
                     chipUsersFilter.setVisibility(View.GONE);
             }
         });
