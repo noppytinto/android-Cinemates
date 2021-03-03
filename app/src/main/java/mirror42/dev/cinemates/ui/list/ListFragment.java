@@ -66,6 +66,7 @@ public class ListFragment extends Fragment implements
     private User listOwner;
     private boolean deleteAllowed;
     private View emptyDefaultListMessage;
+    private TextView bannerDeleteFilm;
 
 
 
@@ -194,6 +195,7 @@ public class ListFragment extends Fragment implements
         progressIndicator = view.findViewById(R.id.progressIndicator_listFragment);
 
         isPrivateSwitch = view.findViewById(R.id.switch_listFragment_isPrivate);
+        bannerDeleteFilm = view.findViewById(R.id.message_delete_movie);
         textViewListName = view.findViewById(R.id.textView_listFragment_listName);
         textViewListDescription = view.findViewById(R.id.textView_listFragment_description);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
@@ -283,10 +285,12 @@ public class ListFragment extends Fragment implements
 
     private void allowDeleteMovies() {
         deleteAllowed = true;
+        bannerDeleteFilm.setVisibility(View.VISIBLE);
     }
 
     private void disallowDeleteMovies() {
         deleteAllowed = false;
+        bannerDeleteFilm.setVisibility(View.GONE);
     }
 
     private void setListNameAndDescription(MoviesList list) {
