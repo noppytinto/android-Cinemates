@@ -382,7 +382,12 @@ public class CustomListBrowserViewModel extends ViewModel {
         user.setUsername(jsonObject.getString("Username"));
         user.setFirstName(jsonObject.getString("owner_first_name"));
         user.setLastName(jsonObject.getString("LastName"));
-        user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
+
+        user.setExternalUser(jsonObject.getBoolean("ExternalAccount"));
+        if(user.getIsExternalUser())
+            user.setProfilePictureURL(jsonObject.getString("ProfileImage"));
+        else
+            user.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonObject.getString("ProfileImage"));
         return user;
     }
 

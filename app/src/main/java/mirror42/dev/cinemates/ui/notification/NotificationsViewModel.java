@@ -167,7 +167,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
@@ -233,7 +237,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
@@ -300,7 +308,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
@@ -367,7 +379,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
@@ -436,7 +452,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
@@ -503,7 +523,11 @@ public class NotificationsViewModel extends ViewModel {
                             sender.setFirstName(jsonDBobj.getString("sender_fname"));
                             sender.setLastName(jsonDBobj.getString("sender_lname"));
                             sender.setUsername(jsonDBobj.getString("sender_username"));
-                            sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
+                            sender.setExternalUser(jsonDBobj.getBoolean("is_external"));
+                            if(sender.getIsExternalUser())
+                                sender.setProfilePictureURL(jsonDBobj.getString("profile_picture_path"));
+                            else
+                                sender.setProfilePictureURL(remoteConfigServer.getCloudinaryDownloadBaseUrl() + jsonDBobj.getString("profile_picture_path"));
                             notification.setId(jsonDBobj.getLong("Id_Notification"));
                             notification.setIsNew(true);
                             notification.setSender(sender);
