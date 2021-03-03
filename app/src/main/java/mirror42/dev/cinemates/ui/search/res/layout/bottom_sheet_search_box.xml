@@ -41,6 +41,7 @@
         app:layout_constraintStart_toEndOf="@+id/textView_searchFragment_chipGroupLabel"
         app:layout_constraintTop_toBottomOf="@+id/editTextLayout_searchFragment"
         app:singleLine="true"
+        app:selectionRequired="true"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
@@ -77,7 +78,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:hint="@string/search_all"
+        android:hint="@string/search_movies"
         android:textColorHint="@color/light_blue"
         app:boxStrokeColor="@color/search_outlined_box_states"
         app:boxStrokeWidth="2dp"

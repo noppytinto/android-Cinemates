@@ -25,15 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_searchFragment_title" />
 
-    <include
-        android:id="@+id/include_searchFragment_searchBox"
-        layout="@layout/bottom_sheet_search_box"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:elevation="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+
 
     <TextView
         android:id="@+id/textView_searchFragment_title"
@@ -63,28 +55,41 @@
         tools:visibility="visible" />
 
     <include
-        android:id="@+id/welcome_message_searchFragment"
+        android:id="@+id/include_searchFragment_welcomeMessage"
         layout="@layout/layout_search_welcome_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/include_searchFragment_searchBox"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/imageView_searchFragment_icVeryDissatisfied"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="150dp"
+        android:minHeight="150dp"
         android:src="@drawable/ic_very_dissatisfied"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/include_searchFragment_searchBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_searchFragment_title"
         tools:visibility="visible" />
+
+    <include
+        android:id="@+id/include_searchFragment_searchBox"
+        layout="@layout/bottom_sheet_search_box"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

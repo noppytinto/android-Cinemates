@@ -150,14 +150,14 @@ public class SearchViewModel extends ViewModel {
             }
                 break;
             case UNIVERSAL: {
-                //TODO:
-                Runnable searchMoviesTask = createSearchMoviesTask(searchTerm, PAGE_1);
-                ThreadManager t = ThreadManager.getInstance();
-                try {
-                    t.runTaskInPool(searchMoviesTask);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                //TODO:
+//                Runnable searchMoviesTask = createSearchMoviesTask(searchTerm, PAGE_1);
+//                ThreadManager t = ThreadManager.getInstance();
+//                try {
+//                    t.runTaskInPool(searchMoviesTask);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
                 break;
         }

@@ -1,8 +1,6 @@
 package mirror42.dev.cinemates.ui.search;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -99,7 +97,7 @@ public class SearchFragment extends Fragment implements
         chipGroup.setOnCheckedChangeListener(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance();
         searchType = SearchType.MOVIE;
-        welcomeMessage = view.findViewById(R.id.welcome_message_searchFragment);
+        welcomeMessage = view.findViewById(R.id.include_searchFragment_welcomeMessage);
         veryDissatisfiedIcon = view.findViewById(R.id.imageView_searchFragment_icVeryDissatisfied);
         initRecycleView(view);
     }
@@ -220,11 +218,6 @@ public class SearchFragment extends Fragment implements
             searchType = SearchType.USER;
             textInputLayout.setHint("Cerca utente");
         }
-        else {
-            searchType = SearchType.UNIVERSAL;
-            textInputLayout.setHint("Cerca tutto");
-        }
-
     }// end onCheckedChanged()
 
 

@@ -148,7 +148,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
                 .into(holder.imageViewProfilePicture); //8
 
         holder.textViewFullName.setText(searchResult.getFullName());
-        holder.textViewDepartment.setText(translateDepartment(searchResult.getDepartment()));
+        holder.textViewDepartment.setText(searchResult.getDepartment());
         holder.textViewKnownFor.setText(searchResult.getKnwonForAsString());
     }
 

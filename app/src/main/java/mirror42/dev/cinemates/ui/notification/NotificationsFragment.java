@@ -102,12 +102,7 @@ public class NotificationsFragment extends Fragment implements
                     break;
                 case NO_NOTIFICATIONS:
                     hideProgressIndicator();
-                    if(notifications==null||notifications.isEmpty()) {
-                        showMessageForEmptyPage();
-                    }
-                    break;
-                case ALL_NOTIFICATIONS_READ:
-
+                    showMessageForEmptyPage();
                     break;
                 case NOTIFICATION_DELETED: {
                     showCenteredToast("notifica eliminata");
