@@ -296,13 +296,17 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             userProfileViewModel.getHisSendFollowStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                 switch (taskStatus) {
                     case HIS_FOLLOW_REQUEST_HAS_BEEN_ACCEPTED: {
-                        hideFollowRequestPrompt();
                         showCenteredToast("richiesta accettata");
                         followStatusMessage.setVisibility(View.VISIBLE);
-                        loginViewModel.getLoggedUser().setFollowersCount(loginViewModel.getLoggedUser().getFollowersCount()+ 1);
+
+                        // update counter
+                        int followersCount = profileOwner.getFollowingCount() + 1;
+                        followingButton.setText("Seguiti\n" + followersCount);
+                        userProfileViewModel.setHisFollowStatus(UserProfileViewModel.FollowStatus.HIS_FOLLOW_REQUEST_IS_NOT_PENDING);
                     }
                     break;
                     case FAILED: {
+                        hideFollowRequestPrompt();
                         showCenteredToast("operazione annullata");
 
                     }

@@ -126,6 +126,12 @@ public class LoginViewModel extends ViewModel {
 
     //----------------------------------------------------------------------- METHODS
 
+    public boolean rememberMeExists() {
+        return rememberMeExists;
+
+    }
+
+
     public void login(String email, String password) {
         //do login
 //        Task<AuthResult> loginTask = mAuth.signInWithEmailAndPassword(email, password);

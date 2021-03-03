@@ -32,6 +32,8 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
     private LoginViewModel loginViewModel;
     private RecyclerView recyclerView;
     private RecyclerAdapterUsersList recyclerAdapterUsersList;
+    private int personalFollowerCounter;
+    private boolean modifyPersonalFollowerCounterAllowed;
 
     public static FollowersFragment newInstance() {
         return new FollowersFragment();
@@ -78,6 +80,21 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
         }
     }
 
+    public int getPersonalFollowerCounter() {
+        return personalFollowerCounter;
+    }
+
+    public void setPersonalFollowerCounter(int personalFollowerCounter) {
+        this.personalFollowerCounter = personalFollowerCounter;
+    }
+
+    public boolean isModifyPersonalFollowerCounterAllowed() {
+        return modifyPersonalFollowerCounterAllowed;
+    }
+
+    public void setModifyPersonalFollowerCounterAllowed(boolean modifyPersonalFollowerCounterAllowed) {
+        this.modifyPersonalFollowerCounterAllowed = modifyPersonalFollowerCounterAllowed;
+    }
 
     private void initRecyclerView(View view, boolean showRemoveUserButton) {
         // defining Recycler view
@@ -163,4 +180,11 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
+    public void fetchFollowerCount() {
+
+    }
+
+
+
 }// end FollowersFragment class

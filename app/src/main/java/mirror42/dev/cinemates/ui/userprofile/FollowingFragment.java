@@ -96,6 +96,7 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                     ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();
                     if(following!=null || following.size()>0) {
                         recyclerAdapterUsersList.loadNewData(following);
+
                     }
                 }
                 break;

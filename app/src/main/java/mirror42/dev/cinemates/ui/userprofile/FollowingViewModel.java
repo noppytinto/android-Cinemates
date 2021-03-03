@@ -33,7 +33,8 @@ public class FollowingViewModel extends ViewModel {
     private MutableLiveData<ArrayList<User>> following;
     private RemoteConfigServer remoteConfigServer;
     private MutableLiveData<TaskStatus> taskStatus;
-
+    private MutableLiveData<Integer> followingCount;
+    private MutableLiveData<FetchStatus> followingCountFetchStatus;
 
 
     //------------------------------------------------------------------------ CONSTRUCTORS
@@ -43,7 +44,8 @@ public class FollowingViewModel extends ViewModel {
         following = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
         taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
-
+        followingCount = new MutableLiveData<>();
+        followingCountFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
 
 
@@ -74,6 +76,23 @@ public class FollowingViewModel extends ViewModel {
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus.postValue(taskStatus);
     }
+
+    public LiveData<FetchStatus> getObservableFollowingCountFetchStatus() {
+        return followingCountFetchStatus;
+    }
+
+    public void setFollowingCountFetchStatus(FetchStatus fetchStatus) {
+        this.followingCountFetchStatus.postValue(fetchStatus);
+    }
+
+    public LiveData<Integer> getObservableFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(Integer value) {
+        this.followingCount.postValue(value);
+    }
+
 
 
 
@@ -208,6 +227,61 @@ public class FollowingViewModel extends ViewModel {
         }
 
     }// end removeFollowing()
+
+    public void fetchFollowingCount(String targetUsername, User loggedUser) {
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_select_following_count";
+            //
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_username", targetUsername)
+                    .add("requester_email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setFollowingCountFetchStatus(FetchStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            // if response is true
+                            if ( ! responseData.equals("-1")) {
+                                int result = Integer.parseInt(responseData);
+                                setFollowingCount(result);
+                                setFollowingCountFetchStatus(FetchStatus.SUCCESS);
+                            }
+
+                        } // if response is unsuccessful
+                        else {
+                            setFollowingCountFetchStatus(FetchStatus.FAILED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setFollowingCountFetchStatus(FetchStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setFollowingCountFetchStatus(FetchStatus.FAILED);
+        }
+
+    }// end fetchFollowingCount()
+
+
 
 
 }// end FollowingViewModel class

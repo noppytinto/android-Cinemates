@@ -338,10 +338,37 @@ public class PersonalProfileFragment extends Fragment implements
     }
 
     private void loadSocialStatistics() {
-        int followersCount = loginViewModel.getLoggedUser().getFollowersCount();
-        int followingCount = loginViewModel.getLoggedUser().getFollowingCount();
-        followingButton.setText("Seguiti\n" + followingCount);
-        followersButton.setText("Follower\n" + followersCount);
+        User loggedUser = loginViewModel.getLoggedUser();
+
+        followersViewModel.getObservableFollowersCountFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    int count = followersViewModel.getObservableFollowersCount().getValue();
+                    followersButton.setText("Follower\n" + count);
+                    loggedUser.setFollowersCount(count);
+                }
+                break;
+                case FAILED:
+                    break;
+            }
+        });
+
+        followingViewModel.getObservableFollowingCountFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    int count = followingViewModel.getObservableFollowingCount().getValue();
+                    followingButton.setText("Seguiti\n" + count);
+                    loggedUser.setFollowersCount(count);
+                }
+                break;
+                case FAILED:
+                    break;
+            }
+        });
+
+        followersViewModel.fetchFollowersCount(loggedUser.getUsername(), loggedUser);
+        followingViewModel.fetchFollowingCount(loggedUser.getUsername(), loggedUser);
+
     }
 
     private void showLoggedUserContent() {

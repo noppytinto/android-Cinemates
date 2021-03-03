@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     rememberMeExists = false;
                     break;
                 case REMEMBER_ME_EXISTS: {
-                    User user = loginViewModel.getObservableLoggedUser().getValue();
+                    User user = loginViewModel.getLoggedUser();
                     try{
                         firebaseAnalytics.setUserConsent(user.getAnalytics());
                     }catch(Exception e){

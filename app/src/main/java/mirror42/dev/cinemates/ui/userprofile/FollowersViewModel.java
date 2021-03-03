@@ -33,6 +33,8 @@ public class FollowersViewModel extends ViewModel {
     private MutableLiveData<FetchStatus> fetchStatus;
     private RemoteConfigServer remoteConfigServer;
     private MutableLiveData<TaskStatus> taskStatus;
+    private MutableLiveData<Integer> followersCount;
+    private MutableLiveData<FetchStatus> followersCountFetchStatus;
 
 
     //------------------------------------------------------------------------ CONSTRUCTORS
@@ -42,7 +44,8 @@ public class FollowersViewModel extends ViewModel {
         followers = new MutableLiveData<>();
         remoteConfigServer = RemoteConfigServer.getInstance();
         taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
-
+        followersCount = new MutableLiveData<>();
+        followersCountFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
     }
 
 
@@ -75,8 +78,26 @@ public class FollowersViewModel extends ViewModel {
     }
 
 
-    //------------------------------------------------------------------------ METHODS
+    public LiveData<FetchStatus> getObservableFollowersCountFetchStatus() {
+        return followersCountFetchStatus;
+    }
 
+    public void setFollowersCountFetchStatus(FetchStatus fetchStatus) {
+        this.followersCountFetchStatus.postValue(fetchStatus);
+    }
+
+    public LiveData<Integer> getObservableFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(Integer value) {
+        this.followersCount.postValue(value);
+    }
+
+
+
+
+    //------------------------------------------------------------------------ METHODS
 
     public void fetchFollowers(String targetUsername, User loggedUser) {
         try {
@@ -206,6 +227,59 @@ public class FollowersViewModel extends ViewModel {
         }
 
     }// end removeFollower()
+
+    public void fetchFollowersCount(String targetUsername, User loggedUser) {
+        try {
+            // build httpurl and request for remote db
+            final String dbFunction = "fn_select_followers_count";
+            //
+            HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
+            final OkHttpClient httpClient = OkHttpSingleton.getClient();
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("target_username", targetUsername)
+                    .add("requester_email", loggedUser.getEmail())
+                    .build();
+            Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, loggedUser.getAccessToken());
+
+            // performing request
+            Call call = httpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setFollowersCountFetchStatus(FetchStatus.FAILED);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        // check responses
+                        if (response.isSuccessful()) {
+                            String responseData = response.body().string();
+
+                            // if response is true
+                            if ( ! responseData.equals("-1")) {
+                                int result = Integer.parseInt(responseData);
+                                setFollowersCount(result);
+                                setFollowersCountFetchStatus(FetchStatus.SUCCESS);
+                            }
+
+                        } // if response is unsuccessful
+                        else {
+                            setFollowersCountFetchStatus(FetchStatus.FAILED);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setFollowersCountFetchStatus(FetchStatus.FAILED);
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        setFollowersCountFetchStatus(FetchStatus.FAILED);
+        }
+
+    }// end fetchFollowersCount()
 
 
 

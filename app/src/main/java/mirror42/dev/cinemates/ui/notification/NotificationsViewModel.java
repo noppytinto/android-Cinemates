@@ -64,6 +64,7 @@ public class NotificationsViewModel extends ViewModel {
         GOT_NEW_NOTIFICATIONS,
         ALL_NOTIFICATIONS_READ,
         NO_NOTIFICATIONS,
+        NO_NEW_NOTIFICATIONS,
         NOTIFICATION_DELETED,
         NOTIFICATION_NOT_DELETED,
         IDLE
@@ -728,7 +729,7 @@ public class NotificationsViewModel extends ViewModel {
             if(gotNewNotifications)
                 setNotificationsStatus(NotificationsStatus.GOT_NEW_NOTIFICATIONS);
             else
-                setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
+                setNotificationsStatus(NotificationsStatus.NO_NEW_NOTIFICATIONS);
         };
 
 
