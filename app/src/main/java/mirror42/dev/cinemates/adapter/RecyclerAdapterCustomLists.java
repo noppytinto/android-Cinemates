@@ -29,7 +29,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
     public interface CustomListCoverListener {
         void onCoverClicked(int position);
-        void imageClicked(String username);
+        void imageClicked(int position);
     }
 
 
@@ -168,7 +168,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
             ownerUsername = itemView.findViewById(R.id.textView_customListCover_username);
 
             containter.setOnClickListener(v -> listener.onCoverClicked(getAdapterPosition()));
-            profilePicture.setOnClickListener(v->listener.imageClicked(ownerUsername.getText().toString()));
+            profilePicture.setOnClickListener(v->listener.imageClicked(getAdapterPosition()));
         }
 
     }

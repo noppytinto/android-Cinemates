@@ -272,10 +272,11 @@ public class CustomListBrowserFragment extends Fragment
     }
 
     @Override
-    public void imageClicked(String username) {
+    public void imageClicked(int position) {
 
+        User userOwner = recyclerAdapterCustomLists.getList(position).getOwner();
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
-                NavGraphDirections.actionGlobalUserProfileFragment(username);
+                NavGraphDirections.actionGlobalUserProfileFragment(userOwner.getUsername());
         NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(userProfileFragment);
 
 
