@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,7 +74,8 @@ public class SearchFragment extends Fragment implements
     private RecyclerView recyclerView;
     private ProgressBar spinner;
     private SerialDisposable searchSubscription;
-
+    private View welcomeMessage;
+    private ImageView veryDissatisfiedIcon;
 
 
     //------------------------------------------------------------------------ ANDROID METHODS
@@ -96,8 +98,9 @@ public class SearchFragment extends Fragment implements
         buttonSearch.setOnClickListener(this);
         chipGroup.setOnCheckedChangeListener(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance();
-        searchType = SearchResult.SearchType.UNIVERSAL;
-
+        searchType = SearchType.MOVIE;
+        welcomeMessage = view.findViewById(R.id.welcome_message_searchFragment);
+        veryDissatisfiedIcon = view.findViewById(R.id.imageView_searchFragment_icVeryDissatisfied);
         initRecycleView(view);
     }
 
@@ -125,13 +128,16 @@ public class SearchFragment extends Fragment implements
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getObservableDownloadStatus().observe(getViewLifecycleOwner(), downloadStatus -> {
-            textViewTitle.setVisibility(View.VISIBLE);
+
             showLoadingSpinner(false);
 
             switch (downloadStatus) {
                 case SUCCESS: {
                     ArrayList<SearchResult> searchResults = searchViewModel.getSearchResultList();
                     if (searchResults != null && searchResults.size()>0) {
+                        hideWelcomeMessage();
+                        hideVeryDissatisfiedIcon();
+                        showTextViewTitle();
                         textViewTitle.setText("Risultati per: " + currentSearchTerm);
                         recyclerAdapterSearchPage.loadNewData(searchResults);
                     }
@@ -139,6 +145,9 @@ public class SearchFragment extends Fragment implements
                     break;
                 case NO_RESULT:
                     recyclerAdapterSearchPage.loadNewData(null);
+                    hideWelcomeMessage();
+                    showTextViewTitle();
+                    showVeryDissatisfiedIcon();
                     textViewTitle.setText("Nessun risultato per: " + currentSearchTerm);
                     showCenteredToast("Nessun risultato per: " + currentSearchTerm);
                     break;
@@ -149,6 +158,7 @@ public class SearchFragment extends Fragment implements
         });
 
 
+        hideTextViewTitle();
 
 
         //
@@ -222,6 +232,30 @@ public class SearchFragment extends Fragment implements
 
 
     //------------------------------------------------------------------------ MY METHODS
+
+    private void showWelcomeMessage(){
+        welcomeMessage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideWelcomeMessage(){
+        welcomeMessage.setVisibility(View.GONE);
+    }
+
+    private void showVeryDissatisfiedIcon(){
+        veryDissatisfiedIcon.setVisibility(View.VISIBLE);
+    }
+
+    private void hideVeryDissatisfiedIcon(){
+        veryDissatisfiedIcon.setVisibility(View.GONE);
+    }
+
+    private void showTextViewTitle(){
+        textViewTitle.setVisibility(View.VISIBLE);
+    }
+
+    private void hideTextViewTitle(){
+        textViewTitle.setVisibility(View.GONE);
+    }
 
     private void initRecycleView(View view) {
         // defining Recycler view
