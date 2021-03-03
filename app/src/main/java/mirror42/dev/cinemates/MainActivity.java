@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
         NavigationUI.setupActionBarWithNavController(this, navController);
         // init firebase analytics
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance();
-        firebaseAnalytics.setUserConsent(true); //TODO: fetch user consensus from DB
         //init okhttp
         OkHttpSingleton.getInstance(getApplicationContext());
         notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
@@ -96,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
             switch (loginResult) {
                 case SUCCESS: {
                     User user = loginViewModel.getObservableLoggedUser().getValue();
+                    try{
+                        firebaseAnalytics.setUserConsent(user.getAnalytics());
+                    }catch(Exception e){
+
+                    }
+
                     String profilePicturePath = user.getProfilePicturePath();
                     ImageUtilities.loadCircularImageInto(profilePicturePath, loginMenuItem, this);
                     invalidateOptionsMenu();
@@ -110,6 +115,11 @@ public class MainActivity extends AppCompatActivity implements RemoteConfigServe
                     break;
                 case REMEMBER_ME_EXISTS: {
                     User user = loginViewModel.getObservableLoggedUser().getValue();
+                    try{
+                        firebaseAnalytics.setUserConsent(user.getAnalytics());
+                    }catch(Exception e){
+
+                    }
                     checkForNewNotifications(user);
                     rememberMeExists = true;
                     invalidateOptionsMenu();
