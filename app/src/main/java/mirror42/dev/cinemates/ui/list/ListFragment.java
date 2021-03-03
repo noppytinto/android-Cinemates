@@ -104,6 +104,7 @@ public class ListFragment extends Fragment implements
 
             //
             if(currentList.isEmpty()) {
+                bannerDeleteMovie.setVisibility(View.GONE);
                 emptyDefaultListMessage.setVisibility(View.VISIBLE);
             }
             else {
@@ -295,6 +296,7 @@ public class ListFragment extends Fragment implements
 
     private void setListNameAndDescription(MoviesList list) {
         MoviesList.ListType listType = list.getListType();
+        bannerDeleteMovie.setVisibility(View.VISIBLE);
 
         switch (listType) {
             case WL:
