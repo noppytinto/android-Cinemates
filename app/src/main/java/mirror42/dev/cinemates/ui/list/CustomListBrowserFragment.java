@@ -31,7 +31,6 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.userprofile.FollowersFragment;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
@@ -47,6 +46,10 @@ public class CustomListBrowserFragment extends Fragment
     private boolean isPrivate;
     private boolean areNotMyLists;
     private CircularProgressIndicator progressIndicator;
+    private View emptyMessageCustomList;
+    private View emptyMessageSubList;
+    private View emptyMessagePublicList;
+
 
 
 
@@ -71,6 +74,9 @@ public class CustomListBrowserFragment extends Fragment
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
         progressIndicator = view.findViewById(R.id.progressIndicator_customListBrowser);
+        emptyMessageCustomList = view.findViewById(R.id.customListBrowser_emptyMessage_customList);
+        emptyMessageSubList = view.findViewById(R.id.customListBrowser_emptyMessage_subList);
+        emptyMessagePublicList = view.findViewById(R.id.customListBrowser_emptyMessage_otherUserList);
 
         if(getArguments()!=null) {
             CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
@@ -98,6 +104,7 @@ public class CustomListBrowserFragment extends Fragment
                 areNotMyLists = false;
                 initRecycleView(view, areNotMyLists);
                 initForFetchModeMyCustomLists();
+                hideEmptyMessageSubList();
             }
             break;
             case "fetch_subscribed_lists": {
@@ -105,6 +112,7 @@ public class CustomListBrowserFragment extends Fragment
                 ((MainActivity)requireActivity()).setToolbarTitle("Liste che seguo");
                 initRecycleView(view, areNotMyLists);
                 initForFetchModeSubscribedLists();
+                hideEmptyMessageCustomList();
             }
             break;
             case "fetch_public_lists": {
@@ -126,10 +134,24 @@ public class CustomListBrowserFragment extends Fragment
                     hideProgressIndicator();
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
+                        if(lists.isEmpty()){
+                            showEmptyMessagePublicList();
+                            hideEmptyMessageSubList();
+                            hideEmptyMessageCustomList();
+                        }
+                        else{
+                            hideEmptyMessageSubList();
+                            hideEmptyMessageCustomList();
+                            hideEmptyMessagePublicList();
+                        }
+
                         recyclerAdapterCustomLists.loadNewData(lists);
                     }
                 }
                 case NOT_EXISTS:
+                    hideEmptyMessagePublicList();
+                    hideEmptyMessageCustomList();
+                    hideEmptyMessageSubList();
                 case FAILED:
                     hideProgressIndicator();
                     break;
@@ -148,10 +170,23 @@ public class CustomListBrowserFragment extends Fragment
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
                         recyclerAdapterCustomLists.loadNewData(lists);
+                        if(lists.isEmpty()){
+                            showEmptyMessageCustomList();
+                            hideEmptyMessageSubList();
+                            hideEmptyMessagePublicList();
+                        }
+                        else{
+                            hideEmptyMessageCustomList();
+                            hideEmptyMessageSubList();
+                            hideEmptyMessagePublicList();
+                        }
                     }
                 }
                 break;
                 case NOT_EXISTS:
+                    showEmptyMessageCustomList();
+                    hideEmptyMessageSubList();
+                    hideEmptyMessagePublicList();
                 case FAILED:
                     hideProgressIndicator();
                     break;
@@ -185,10 +220,22 @@ public class CustomListBrowserFragment extends Fragment
                     ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
                     if(lists!=null) {
                         recyclerAdapterCustomLists.loadNewData(lists);
+                        if(lists.isEmpty()){
+                            showEmptyMessageSubList();
+                            hideEmptyMessageCustomList();
+                            hideEmptyMessagePublicList();
+                        }else{
+                            hideEmptyMessageSubList();
+                            hideEmptyMessageCustomList();
+                            hideEmptyMessagePublicList();
+                        }
                     }
                 }
                 break;
                 case NOT_EXISTS:
+                    showEmptyMessageSubList();
+                    hideEmptyMessageCustomList();
+                    hideEmptyMessagePublicList();
                 case FAILED:
                     hideProgressIndicator();
                     break;
@@ -216,6 +263,30 @@ public class CustomListBrowserFragment extends Fragment
 
 
     //------------------------------------------------------------- MY METHODS
+
+    private void showEmptyMessageCustomList(){
+        emptyMessageCustomList.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyMessageCustomList(){
+        emptyMessageCustomList.setVisibility(View.GONE);
+    }
+
+    private void showEmptyMessageSubList(){
+        emptyMessageSubList.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyMessageSubList(){
+        emptyMessageSubList.setVisibility(View.GONE);
+    }
+
+    private void showEmptyMessagePublicList(){
+        emptyMessagePublicList.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyMessagePublicList(){
+        emptyMessagePublicList.setVisibility(View.GONE);
+    }
 
     private void initRecycleView(View view, boolean areNotMyLists) {
         // defining Recycler view

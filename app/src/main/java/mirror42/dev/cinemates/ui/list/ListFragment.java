@@ -65,6 +65,8 @@ public class ListFragment extends Fragment implements
     private boolean navigatedToMovieDetailsFragment;
     private User listOwner;
     private boolean deleteAllowed;
+    private View emptyDefaultListMessage;
+
 
 
 
@@ -90,6 +92,7 @@ public class ListFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
@@ -100,10 +103,11 @@ public class ListFragment extends Fragment implements
 
             //
             if(currentList.isEmpty()) {
-                // TODO: show information image
+                emptyDefaultListMessage.setVisibility(View.VISIBLE);
             }
             else {
                 populateList(currentList);
+                emptyDefaultListMessage.setVisibility(View.GONE);
             }
         }
     }
@@ -199,7 +203,7 @@ public class ListFragment extends Fragment implements
         recommendButton.setOnClickListener(this);
         subscribeButton.setOnClickListener(this);
         unsubscribeButton.setOnClickListener(this);
-
+        emptyDefaultListMessage = view.findViewById(R.id.listFragment_empty_default_list_message);
         //
         initRecyclerView(view);
 

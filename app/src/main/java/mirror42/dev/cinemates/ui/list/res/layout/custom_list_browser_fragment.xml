@@ -52,4 +52,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/recyclerView_customListBrowser"
         tools:visibility="visible" />
+
+    <include
+        android:id="@+id/customListBrowser_emptyMessage_customList"
+        layout="@layout/layout_empty_custom_lists_message"
+        android:layout_width="355dp"
+        android:layout_height="354dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <include
+        android:id="@+id/customListBrowser_emptyMessage_subList"
+        layout="@layout/layout_empty_sub_lists_message"
+        android:layout_width="417dp"
+        android:layout_height="384dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <include
+        android:id="@+id/customListBrowser_emptyMessage_otherUserList"
+        layout="@layout/layout_empty_users_custom_lists_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
