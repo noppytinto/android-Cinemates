@@ -207,7 +207,7 @@ public class changePasswordFragment extends Fragment implements
         final String passwordHide = MyUtilities.SHA256encrypt(editTextActualPassword.getText().toString());
 
         if( ! passwordHide.equals(loginViewModel.getLoggedUser().getPassword())) {
-            textInputLayoutActualPassword.setError(getString(R.string.passwords_dont_match));
+            textInputLayoutActualPassword.setError(getString(R.string.password_wrong));
             return false;
         }
         else {

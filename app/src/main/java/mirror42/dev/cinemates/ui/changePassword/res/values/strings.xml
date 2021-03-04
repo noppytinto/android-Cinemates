@@ -3,6 +3,8 @@
     <string name="change_password">cambia password</string>
     <string name="change_password_newPassword">Nuova password</string>
 
+    <string name="password_wrong">La password non è corretta</string>
+
     <string name="passwordHelper">La password deve contenere almeno 6 caratteri</string>
     <string name="change_password_text">Salve, in questa pagina viene data l\'opportunità di cambiare la propria password</string>
 
