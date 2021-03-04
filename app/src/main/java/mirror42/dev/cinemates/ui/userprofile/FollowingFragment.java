@@ -32,6 +32,8 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
     private LoginViewModel loginViewModel;
     private RecyclerView recyclerView;
     private RecyclerAdapterUsersList recyclerAdapterUsersList;
+    private View includeMessageForEmptyFollowingPage;
+    private View includeMessageForOthersEmptyFollowingPage;
 
     public static FollowingFragment newInstance() {
         return new FollowingFragment();
@@ -61,6 +63,8 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
         super.onViewCreated(view, savedInstanceState);
         followingViewModel = new ViewModelProvider(requireActivity()).get(FollowingViewModel.class);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        includeMessageForEmptyFollowingPage = view.findViewById(R.id.include_empty_following_fragment);
+        includeMessageForOthersEmptyFollowingPage = view.findViewById(R.id.include_empty_others_following_fragment);
 
         if(getArguments() != null) {
             FollowingFragmentArgs args = FollowingFragmentArgs.fromBundle(getArguments());
@@ -90,6 +94,8 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
 
 
     private void fetchFollowers(String username) {
+        hideMessageForEmptyFollowingPage();
+        hideMessageForEmptyOthersFollowingPage();
         followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case FOLLOWING_FETCHED: {
@@ -101,7 +107,11 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                 }
                 break;
                 case NO_FOLLOWING:
-                    showCenteredToast("lista vuota");
+                    if(username.equals(loginViewModel.getLoggedUser().getUsername()))
+                        showMessageForEmptyFollowingPage();
+                    else
+                        showMessageForEmptyOthersFollowingPage();
+                    //showCenteredToast("lista vuota");
                     break;
                 case FOLLOWING_FETCH_FAILED:
                     showCenteredToast("impossibile caricare utenti!");
@@ -156,6 +166,24 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                 })
                 .show();
     }
+
+
+    private void showMessageForEmptyFollowingPage(){
+        includeMessageForEmptyFollowingPage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyFollowingPage(){
+        includeMessageForEmptyFollowingPage.setVisibility(View.GONE);
+    }
+
+    private void showMessageForEmptyOthersFollowingPage(){
+        includeMessageForOthersEmptyFollowingPage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyOthersFollowingPage(){
+        includeMessageForOthersEmptyFollowingPage.setVisibility(View.GONE);
+    }
+
 
     public void showCenteredToast(String message) {
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);

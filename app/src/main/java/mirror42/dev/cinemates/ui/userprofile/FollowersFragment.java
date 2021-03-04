@@ -34,6 +34,8 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
     private RecyclerAdapterUsersList recyclerAdapterUsersList;
     private int personalFollowerCounter;
     private boolean modifyPersonalFollowerCounterAllowed;
+    private View includeMessageForEmptyFollowersPage;
+    private View includeMessageForOthersEmptyFollowersPage;
 
     public static FollowersFragment newInstance() {
         return new FollowersFragment();
@@ -63,6 +65,8 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
         super.onViewCreated(view, savedInstanceState);
         followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        includeMessageForEmptyFollowersPage = view.findViewById(R.id.include_empty_followers_fragment);
+        includeMessageForOthersEmptyFollowersPage = view.findViewById(R.id.include_empty_others_followers_fragment);
 
 
         if(getArguments() != null) {
@@ -108,6 +112,8 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
 
 
     private void fetchFollowers(String username) {
+        hideMessageForEmptyFollowersPage();
+        hideMessageForEmptyOthersFollowersPage();
         followersViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case FOLLOWERS_FETCHED: {
@@ -118,7 +124,11 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
                 }
                 break;
                 case NO_FOLLOWERS:
-                    showCenteredToast("lista vuota");
+                    if(username.equals(loginViewModel.getLoggedUser().getUsername()))
+                        showMessageForEmptyFollowersPage();
+                    else
+                        showMessageForEmptyOthersFollowersPage();
+                    //showCenteredToast("lista vuota");
                 break;
                 case FOLLOWERS_FETCH_FAILED:
                     showCenteredToast("impossibile caricare utenti!");
@@ -173,6 +183,23 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
                 .show();
 
 
+    }
+
+
+    private void showMessageForEmptyFollowersPage(){
+        includeMessageForEmptyFollowersPage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyFollowersPage(){
+        includeMessageForEmptyFollowersPage.setVisibility(View.GONE);
+    }
+
+    private void showMessageForEmptyOthersFollowersPage(){
+        includeMessageForOthersEmptyFollowersPage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyOthersFollowersPage(){
+        includeMessageForOthersEmptyFollowersPage.setVisibility(View.GONE);
     }
 
     public void showCenteredToast(String message) {
