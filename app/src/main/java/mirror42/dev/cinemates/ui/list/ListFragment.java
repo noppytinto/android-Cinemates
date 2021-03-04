@@ -66,7 +66,9 @@ public class ListFragment extends Fragment implements
     private User listOwner;
     private boolean deleteAllowed;
     private View emptyDefaultListMessage;
+    private View emptyCustomListMessage;
     private TextView bannerDeleteMovie;
+    private boolean myList;
 
 
 
@@ -99,17 +101,24 @@ public class ListFragment extends Fragment implements
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentList = args.getList();
             listOwner = currentList.getOwner();
+            myList = false;
             //
             setupListAppearance(currentList);
 
             //
             if(currentList.isEmpty()) {
+                if(myList) {
+                    emptyDefaultListMessage.setVisibility(View.VISIBLE);
+                }
+                else {
+                    emptyCustomListMessage.setVisibility(View.VISIBLE);
+                }
                 bannerDeleteMovie.setVisibility(View.GONE);
-                emptyDefaultListMessage.setVisibility(View.VISIBLE);
             }
             else {
                 populateList(currentList);
                 emptyDefaultListMessage.setVisibility(View.GONE);
+                emptyCustomListMessage.setVisibility(View.GONE);
             }
         }
     }
@@ -207,6 +216,7 @@ public class ListFragment extends Fragment implements
         subscribeButton.setOnClickListener(this);
         unsubscribeButton.setOnClickListener(this);
         emptyDefaultListMessage = view.findViewById(R.id.listFragment_empty_default_list_message);
+        emptyCustomListMessage = view.findViewById(R.id.listFragment_empty_custom_list_message);
         //
         initRecyclerView(view);
 
@@ -252,6 +262,7 @@ public class ListFragment extends Fragment implements
             User loggerUser = loginViewModel.getLoggedUser();
             User listOwner = list.getOwner();
             if(loggerUser.getUsername().equals(listOwner.getUsername())) {
+                myList = true;
                 showIsPrivateSwitchButton();
                 allowDeleteMovies();
                 if(((CustomList)currentList).isPrivate()) {
