@@ -60,7 +60,6 @@ public class ListFragment extends Fragment implements
     private Button subscribeButton;
     private Button unsubscribeButton;
     private CircularProgressIndicator progressIndicator;
-
     private SwitchMaterial isPrivateSwitch;
     private TextView textViewListName;
     private TextView textViewListDescription;
@@ -102,32 +101,26 @@ public class ListFragment extends Fragment implements
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentList = args.getList();
 
-            if(currentList==null) {
-                // ignore
-            }
-            else {
+            if(currentList != null) {
                 listOwner = currentList.getOwner();
                 listType = currentList.getListType();
-                User loggedUser = loginViewModel.getLoggedUser();
-                if(listOwner==null) {
-                    listIsMine = true;
+
+                //
+                if(listOwner!=null) {
+                    User loggedUser = loginViewModel.getLoggedUser();
+                    listIsMine = loggedUser.getUsername().equals(listOwner.getUsername());
                 }
                 else {
-                    listIsMine = loggedUser.getUsername().equals(listOwner.getUsername());
+                    listIsMine = true;
                 }
 
                 //
                 setupListAppearance(currentList);
 
                 //
-                if(currentList.isEmpty()) {
-                    // ignore
-                }
-                else {
-                    populateList(currentList);
-                }
+                if(currentList.isEmpty()) {} // ignore
+                else populateList(currentList);
             }
-
         }
     }// end onActivityCreated()
 
@@ -144,7 +137,6 @@ public class ListFragment extends Fragment implements
         if( ! navigatedToMovieDetailsFragment)
             showMainToolbar();
     }
-
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -249,49 +241,48 @@ public class ListFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterMoviesList);
     }
 
-
     private void setupListAppearance(MoviesList list) {
         //
         setListNameAndDescription(list);
+
+        //
+        if(listIsMine) allowDeleteMovies();
+        else disallowDeleteMovies();
 
         // setup buttons
         if(listType == MoviesList.ListType.CL) {
             // check list ownership
             if(listIsMine) {
                 showIsPrivateSwitchButton();
-                allowDeleteMovies();
-                if(((CustomList)currentList).isPrivate()) {
+                if(((CustomList)currentList).isPrivate())
                     isPrivateSwitch.setChecked(true);
-                }
-                else {
-                    showRecommendButton();
-                }
+                else showRecommendButton();
             }
             else {
-                // check wheter i'm subscibed or not
-                disallowDeleteMovies();
-                User loggerUser = loginViewModel.getLoggedUser();
-                listViewModel.checkMySubscriptionToThisList((CustomList) currentList, loggerUser);
-                listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-                    switch (taskStatus) {
-                        case ALREADY_SUBSCRIBED:
-                            hideSubscribeButton();
-                            showUnubscribeButton();
-                            break;
-                        case NOT_SUBSCRIBED:
-                            showSubscribeButton();
-                            hideUnsubscribeButton();
-                            break;
-                        case SUBSCRIPTION_CHECK_FAILED:
-                            showCenteredToast("errore controllo iscrizione!");
-                            break;
-                    }
-                });
+                checkListSubscription();
             }
         }
     }
 
-
+    private void checkListSubscription() {
+        User loggerUser = loginViewModel.getLoggedUser();
+        listViewModel.checkMySubscriptionToThisList((CustomList) currentList, loggerUser);
+        listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            switch (taskStatus) {
+                case ALREADY_SUBSCRIBED:
+                    hideSubscribeButton();
+                    showUnubscribeButton();
+                    break;
+                case NOT_SUBSCRIBED:
+                    showSubscribeButton();
+                    hideUnsubscribeButton();
+                    break;
+                case SUBSCRIPTION_CHECK_FAILED:
+                    showCenteredToast("errore controllo iscrizione!");
+                    break;
+            }
+        });
+    }
 
     private void setListNameAndDescription(MoviesList list) {
         // setup banner and empty message
@@ -305,12 +296,9 @@ public class ListFragment extends Fragment implements
                 hideEmptyMessage();
             }
         else {
-            if(list.isEmpty()) {
-                showEmptyMessageUserList();
-            }
-            else {
-                hideEmptyMessage();
-            }
+            if(list.isEmpty()) showEmptyMessageUserList();
+            else hideEmptyMessage();
+
             bannerDeleteMovie.setVisibility(View.GONE);
         }
 
@@ -340,6 +328,31 @@ public class ListFragment extends Fragment implements
     private void populateList(MoviesList list) {
         ArrayList<Movie> movies = list.getMovies();
         recyclerAdapterMoviesList.loadNewData(movies);
+    }
+
+    private void navigateToMovieDetailsFragment(Movie targetMovie) {
+        navigatedToMovieDetailsFragment = true;
+        NavGraphDirections.AnywhereToMovieDetailsFragment
+                movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(targetMovie);
+        NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
+    }
+
+    private void setPrivate(boolean value) {
+        CustomList newList = new CustomList((CustomList) currentList);
+        newList.setIsPrivate(value);
+        // TODO: add setName/setDescription, if you want to change them
+
+        listViewModel.updateCustomListDetails((CustomList) currentList, newList, loginViewModel.getLoggedUser());
+    }
+
+    public void showRecommendListDialog() {
+        DialogFragment newFragment = new RecommendListDialogFragment(this, ((CustomList)currentList).getName());
+        newFragment.show(requireActivity().getSupportFragmentManager(), "RecommendListDialogFragment");
+    }
+
+    @Override
+    public void onRecommendButtonOnDialogClicked() {
+
     }
 
     @Override
@@ -373,33 +386,6 @@ public class ListFragment extends Fragment implements
             enableActionMode(position);
     }
 
-    private void navigateToMovieDetailsFragment(Movie targetMovie) {
-        navigatedToMovieDetailsFragment = true;
-        NavGraphDirections.AnywhereToMovieDetailsFragment
-                movieDetailsFragment = ExploreFragmentDirections.anywhereToMovieDetailsFragment(targetMovie);
-        NavHostFragment.findNavController(this).navigate(movieDetailsFragment);
-    }
-
-    private void setPrivate(boolean value) {
-        CustomList newList = new CustomList((CustomList) currentList);
-        newList.setIsPrivate(value);
-        // TODO: add setName/setDescription, if you want to change them
-
-        listViewModel.updateCustomListDetails((CustomList) currentList, newList, loginViewModel.getLoggedUser());
-    }
-
-    public void showRecommendListDialog() {
-        DialogFragment newFragment = new RecommendListDialogFragment(this, ((CustomList)currentList).getName());
-        newFragment.show(requireActivity().getSupportFragmentManager(), "RecommendListDialogFragment");
-    }
-
-    @Override
-    public void onRecommendButtonOnDialogClicked() {
-
-    }
-
-
-
 
 
     //---------------------------------------------------- action mode
@@ -420,27 +406,14 @@ public class ListFragment extends Fragment implements
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
-
                 case R.id.menuItem_listMenu_delete:
                     // delete all the selected rows
                     deleteItems();
                     mode.finish();
                     return true;
-
-//                case R.id.action_color:
-//                    updateColoredRows();
-//                    mode.finish();
-//                    return true;
-
                 case R.id.menuItem_listMenu_selectAll:
                     selectAll();
                     return true;
-
-//                case R.id.action_refresh:
-//                    populateDataAndSetAdapter();
-//                    mode.finish();
-//                    return true;
-
                 default:
                     return false;
             }
@@ -527,30 +500,36 @@ public class ListFragment extends Fragment implements
                 hideEmptyMessage();
             }
         else {
-            if(listIsEmpty) {
-                showEmptyMessageUserList();
-            }
-            else {
-                hideEmptyMessage();
-            }
+            if(listIsEmpty) showEmptyMessageUserList();
+            else hideEmptyMessage();
             bannerDeleteMovie.setVisibility(View.GONE);
         }
     } // end deleteItems()
 
 
+
+
     //----------------------------------------------------
+
     private void showRecommendButton() {recommendButton.setVisibility(View.VISIBLE);}
+
     private void hideRecommendButton() {recommendButton.setVisibility(View.GONE);}
+
     private void showIsPrivateSwitchButton() {isPrivateSwitch.setVisibility(View.VISIBLE);}
+
     private void hideIsPrivateSwitchButton() {isPrivateSwitch.setVisibility(View.GONE);}
+
     private void showSubscribeButton() {subscribeButton.setVisibility(View.VISIBLE);}
+
     private void hideSubscribeButton() {subscribeButton.setVisibility(View.GONE);}
+
     private void showUnubscribeButton() {unsubscribeButton.setVisibility(View.VISIBLE);}
+
     private void hideUnsubscribeButton() {unsubscribeButton.setVisibility(View.GONE);}
 
     public void hideMainToolbar() {
         try {
-            ((MainActivity) getActivity()).hideToolbar();
+            ((MainActivity) requireActivity()).hideToolbar();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -558,7 +537,7 @@ public class ListFragment extends Fragment implements
 
     public void showMainToolbar() {
         try {
-            ((MainActivity) getActivity()).showToolbar();
+            ((MainActivity) requireActivity()).showToolbar();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -586,7 +565,6 @@ public class ListFragment extends Fragment implements
         ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
     }
 
-
     private void showProgressIndicator() {
         progressIndicator.setVisibility(View.VISIBLE);
     }
@@ -594,7 +572,6 @@ public class ListFragment extends Fragment implements
     private void hideProgressIndicator() {
         progressIndicator.setVisibility(View.GONE);
     }
-
 
     private void allowDeleteMovies() {
         deleteAllowed = true;

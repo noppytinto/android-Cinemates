@@ -85,10 +85,10 @@ public class ListCoverViewModel extends ViewModel {
 
     //----------------------------------------------------------------------------- METHODS
 
-    public void fetchList(User loggedUser, MoviesList.ListType listType) {
+    public void fetchMyList(User loggedUser, MoviesList.ListType listType) {
         switch (listType) {
             case WL: {
-                Runnable task = createFetchWatchlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Runnable task = createFetchWatchlistTask(loggedUser.getUsername(), loggedUser.getAccessToken());
                 ThreadManager t = ThreadManager.getInstance();
                 try {
                     t.runTaskInPool(task);
@@ -98,7 +98,7 @@ public class ListCoverViewModel extends ViewModel {
             }
                 break;
             case FV: {
-                Runnable task = createFetchFavourites(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Runnable task = createFetchFavourites(loggedUser.getUsername(), loggedUser.getAccessToken());
                 ThreadManager t = ThreadManager.getInstance();
                 try {
                     t.runTaskInPool(task);
@@ -108,7 +108,7 @@ public class ListCoverViewModel extends ViewModel {
             }
                 break;
             case WD: {
-                Runnable task = createFetchWatchedlistTask(loggedUser.getEmail(), loggedUser.getAccessToken());
+                Runnable task = createFetchWatchedlistTask(loggedUser.getUsername(), loggedUser.getAccessToken());
                 ThreadManager t = ThreadManager.getInstance();
                 try {
                     t.runTaskInPool(task);
@@ -120,7 +120,42 @@ public class ListCoverViewModel extends ViewModel {
         }
     }
 
-    private Runnable createFetchWatchlistTask(String email, String token) {
+    public void fetchOtherUserList(String username, User loggedUser, MoviesList.ListType listType) {
+        switch (listType) {
+            case WL: {
+                Runnable task = createFetchWatchlistTask(username, loggedUser.getAccessToken());
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
+            case FV: {
+                Runnable task = createFetchFavourites(username, loggedUser.getAccessToken());
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
+            case WD: {
+                Runnable task = createFetchWatchedlistTask(username, loggedUser.getAccessToken());
+                ThreadManager t = ThreadManager.getInstance();
+                try {
+                    t.runTaskInPool(task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
+        }
+    }
+
+    private Runnable createFetchWatchlistTask(String username, String token) {
         return ()-> {
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
@@ -129,7 +164,7 @@ public class ListCoverViewModel extends ViewModel {
                 final String dbFunction = "fn_select_essential_list";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("email", email)
+                        .add("username", username)
                         .add("list_type", "WL")
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
@@ -184,7 +219,7 @@ public class ListCoverViewModel extends ViewModel {
         };
     }// end createFetchWatchlistTask()
 
-    private Runnable createFetchFavourites(String email, String token) {
+    private Runnable createFetchFavourites(String username, String token) {
         return ()-> {
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
@@ -193,7 +228,7 @@ public class ListCoverViewModel extends ViewModel {
                 final String dbFunction = "fn_select_essential_list";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("email", email)
+                        .add("username", username)
                         .add("list_type", "FV")
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);
@@ -248,7 +283,7 @@ public class ListCoverViewModel extends ViewModel {
         };
     } // end createFetchFavourites()
 
-    private Runnable createFetchWatchedlistTask(String email, String token) {
+    private Runnable createFetchWatchedlistTask(String username, String token) {
         return ()-> {
             final OkHttpClient httpClient = OkHttpSingleton.getClient();
 
@@ -257,7 +292,7 @@ public class ListCoverViewModel extends ViewModel {
                 final String dbFunction = "fn_select_essential_list";
                 HttpUrl httpUrl = HttpUtilities.buildHttpURL(dbFunction);
                 RequestBody requestBody = new FormBody.Builder()
-                        .add("email", email)
+                        .add("username", username)
                         .add("list_type", "WD")
                         .build();
                 Request request = HttpUtilities.buildPostgresPOSTrequest(httpUrl, requestBody, token);

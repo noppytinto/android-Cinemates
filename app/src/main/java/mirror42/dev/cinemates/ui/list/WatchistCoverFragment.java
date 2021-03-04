@@ -38,33 +38,54 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
     private MoviesList list;
     private CardView cardView;
     private LinearProgressIndicator progressIndicator;
-
+    private String targetUsername;
+    private boolean isMyList;
 
 
     //--------------------------------------------------------------------------------------- ANDROID METHODS
+    public static WatchistCoverFragment newInstance() {
+        return new WatchistCoverFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.layout_essential_list_cover, container, false);
+        return inflater.inflate(R.layout.fragment_essential_list_cover, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
-        cardView = view.findViewById(R.id.cardView_essentialListCover);
-        cardView.setOnClickListener(this);
-        progressIndicator = view.findViewById(R.id.progressIndicator_essentialListCover);
+        init(view);
+        observeFetchListTask();
 
-        // setup list appearance
-        TextView listTitle = view.findViewById(R.id.textView_essentialListCover_title);
-        listTitle.setText("Watchlist");
-        listTitle.setTextColor(getResources().getColor(R.color.netflix_red));
+        //
+        isMyList = true;
+        if(getArguments()!=null) {
+            isMyList = (boolean) getArguments().getSerializable("list_ownership");
+            targetUsername = (String) getArguments().getSerializable("list_owner_username");
 
-        //2
-        listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);
+            if(isMyList) fetcMyList();
+            else fetOtherUserList(targetUsername);
+        }
+        else {
+            if(isMyList) fetcMyList();
+        }
+
+    }// end onViewCreated()
+
+
+
+    //--------------------------------------------------------------------------------------- METHODS
+    
+    private void observeFetchListTask() {
         listCoverViewModel.getObservableWatchlist().observe(getViewLifecycleOwner(), watchlist -> {
             progressIndicator.setVisibility(View.GONE);
             if(watchlist!=null) {
@@ -76,26 +97,52 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
                 //                showCenteredToast("errore caricamento Watchlist");
             }
         });
-
-        //
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+    }
+    
+    private void fetOtherUserList(String targetUsername) {
         loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
             switch (loginResult) {
-                case SUCCESS: case REMEMBER_ME_EXISTS: {
+                case SUCCESS:
+                case REMEMBER_ME_EXISTS: {
                     User loggedUser = loginViewModel.getLoggedUser();
                     if(loggedUser!=null) {
-                        listCoverViewModel.fetchList(loggedUser, MoviesList.ListType.WL);
+                        listCoverViewModel.fetchOtherUserList(targetUsername, loggedUser, MoviesList.ListType.WL);
                     }
                 }
                 break;
             }
         });
+    }
 
-    }// end onViewCreated()
+    private void fetcMyList() {
+        loginViewModel.getObservableLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+            switch (loginResult) {
+                case SUCCESS:
+                case REMEMBER_ME_EXISTS: {
+                    User loggedUser = loginViewModel.getLoggedUser();
+                    if(loggedUser!=null) {
+                        listCoverViewModel.fetchMyList(loggedUser, MoviesList.ListType.WL);
+                    }
+                }
+                break;
+            }
+        });
+    }
 
+    private void init(View view) {
+        cardView = view.findViewById(R.id.cardView_essentialListCover);
+        cardView.setOnClickListener(this);
+        progressIndicator = view.findViewById(R.id.progressIndicator_essentialListCover);
 
+        // setup list appearance
+        TextView listTitle = view.findViewById(R.id.textView_essentialListCover_title);
+        listTitle.setText("Watchlist");
+        listTitle.setTextColor(getResources().getColor(R.color.netflix_red));
 
-    //--------------------------------------------------------------------------------------- METHODS
+        //
+        listCoverViewModel = new ViewModelProvider(this).get(ListCoverViewModel.class);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+    }
 
     private void setCover(ArrayList<Movie> moviesList) {
         ImageView thumbnail_1 = view.findViewById(R.id.imageView_essentialListCover_1);
@@ -125,6 +172,16 @@ public class WatchistCoverFragment extends Fragment implements View.OnClickListe
 
         if(viewId == R.id.cardView_essentialListCover) {
             if(list!=null && list.getMovies() != null && list.getMovies().size()>0) {
+                User owner = new User();
+                if( ! isMyList) {
+                    owner.setUsername(targetUsername);
+                    list.setOwner(owner);
+                }
+                else {
+                    owner.setUsername(loginViewModel.getLoggedUser().getUsername());
+                    list.setOwner(owner);
+                }
+
                 NavGraphDirections.ActionGlobalListFragment listFragment =
                         NavGraphDirections.actionGlobalListFragment(list, "", "");
                 NavHostFragment.findNavController(WatchistCoverFragment.this).navigate(listFragment);

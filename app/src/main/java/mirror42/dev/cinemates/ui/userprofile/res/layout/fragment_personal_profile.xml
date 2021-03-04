@@ -185,7 +185,7 @@
 
             <include
                 android:id="@+id/include_personalProfileFragment_myLists"
-                layout="@layout/personal_profile_essential_lists"
+                layout="@layout/layout_essential_lists"
                 android:layout_width="358dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"

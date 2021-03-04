@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDeepLinkBuilder;
@@ -31,6 +33,9 @@ import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.model.User;
+import mirror42.dev.cinemates.ui.list.FavouritesListCoverFragment;
+import mirror42.dev.cinemates.ui.list.WatchedListCoverFragment;
+import mirror42.dev.cinemates.ui.list.WatchistCoverFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.ui.notification.NotificationsViewModel;
 
@@ -55,6 +60,12 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private FollowersViewModel followersViewModel;
     private Button followersButton;
     private Button followingButton;
+    private FrameLayout watchlistCover;
+    private FrameLayout favoritesListCover;
+    private FrameLayout watchedListCover;
+    private TextView listLabel;
+
+
 
 
     //-------------------------------------------------------------------------- ANDROID METHODS
@@ -68,28 +79,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        imageViewProfilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
-        textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
-        textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
-        followStatusMessage = view.findViewById(R.id.textView_userProfileFragment_message);
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_userProfileFragment);
-        buttonSendFollow = view.findViewById(R.id.button_userProfileFragment_follow);
-        buttonAcceptFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_accept);
-        buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
-        followRequestPrompt = view.findViewById(R.id.include_userProfileFragment_requestPrompt);
-        buttonCustomLists = view.findViewById(R.id.button_userProfileFragment_customLists);
-        followersButton = view.findViewById(R.id.button_userProfileFragment_followers);
-        followingButton = view.findViewById(R.id.button_userProfileFragment_following);
-        buttonSendFollow.setOnClickListener(this);
-        buttonAcceptFollow.setOnClickListener(this);
-        buttonDeclineFollow.setOnClickListener(this);
-        buttonCustomLists.setOnClickListener(this);
-        followersButton.setOnClickListener(this);
-        followingButton.setOnClickListener(this);
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
-        followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
+        init(view);
 
         if(getArguments() != null) {
             UserProfileFragmentArgs args = UserProfileFragmentArgs.fromBundle(getArguments());
@@ -97,9 +87,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             String currentLoggedUsername = loginViewModel.getLoggedUser().getUsername();
 
             if(username.equals(currentLoggedUsername)) {
-                NavDirections personalProfileFragment =
-                        NavGraphDirections.actionGlobalPersonalProfileFragment();
-                navigateTo(personalProfileFragment, true);
+                navigateToPersonalProfileFragment();
             }
             else {
                 if(username!=null || username.isEmpty()) {
@@ -108,160 +96,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             }
         }
     }
-
-    private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
-        if(direction==null) return;
-
-        NavController navController = NavHostFragment.findNavController(this);
-        if (removeFromBackStack) navController.popBackStack();
-        navController.navigate(direction);
-    }
-
-    private void loadSocialStatistics() {
-        int followersCount = profileOwner.getFollowersCount();
-        int followingCount = profileOwner.getFollowingCount();
-        followingButton.setText("Seguiti\n" + followingCount);
-        followersButton.setText("Follower\n" + followersCount);
-    }
-
-
-    private void fetchUserProfileData(String username) {
-        userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
-        userProfileViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case SUCCESS: {
-                    profileOwner = userProfileViewModel.getObservableFetchedUser().getValue();
-                    String profilePictureUrl = profileOwner.getProfilePicturePath();
-                    try {
-                        Glide.with(requireContext())
-                                .load(profilePictureUrl)
-                                .fallback(R.drawable.icon_user_dark_blue)
-                                .placeholder(R.drawable.icon_user_dark_blue)
-                                .circleCrop()
-                                .into(imageViewProfilePicture);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    textViewfullName.setText(profileOwner.getFullName());
-                    textViewusername.setText("@" + profileOwner.getUsername());
-
-                    startCheckOperations();
-                    loadSocialStatistics();
-                }
-                    break;
-                case FAILED:
-                    break;
-            }
-        });
-        userProfileViewModel.fetchUserProfileData(username, loginViewModel.getLoggedUser());
-    }// fetchUserProfileData()
-
-    private void startCheckOperations() {
-        if (currentUserIsLogged()) {
-            enableSwipeDownToRefresh();
-
-            userProfileViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
-                switch (followStatus) {
-                    case I_FOLLOW_HIM: {
-                        buttonSendFollow.setVisibility(View.GONE);
-//                        showCenteredToast("sei un suo follower");
-                    }
-                    break;
-                    case I_DONT_FOLLOW_HIM: {
-                        buttonSendFollow.setVisibility(View.VISIBLE);
-//                        showCenteredToast("NON sei un suo follower");
-
-                        //
-                        userProfileViewModel.checkMyFollowIsPending(
-                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                                profileOwner.getUsername(),
-                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-                    }
-                    break;
-                    case MY_FOLLOW_REQUEST_IS_PENDING: {
-                        buttonSendFollow.setVisibility(View.VISIBLE);
-                        buttonSendFollow.setEnabled(false);
-                        buttonSendFollow.setText("Richiesta inviata");
-                    }
-                    break;
-                    case MY_FOLLOW_REQUEST_IS_NOT_PENDING: {
-                        buttonSendFollow.setVisibility(View.VISIBLE);
-                    }
-                    break;
-                    case REQUEST_SENT_SUCCESSFULLY: {
-                        buttonSendFollow.setVisibility(View.VISIBLE);
-                        buttonSendFollow.setEnabled(false);
-                        buttonSendFollow.setText("Richiesta inviata");
-                        showCenteredToast("richiesta inviata");
-                    }
-                    break;
-                    case FAILED: {
-                        showCenteredToast("operazione annullata");
-                    }
-                    break;
-                    default:
-                }
-            });
-
-            userProfileViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
-                switch (followStatus) {
-                    case HE_FOLLOWS_ME: {
-                        followStatusMessage.setVisibility(View.VISIBLE);
-                    }
-                    break;
-                    case HE_DOESNT_FOLLOW_ME: {
-                        followStatusMessage.setVisibility(View.GONE);
-
-                        userProfileViewModel.checkHisFollowIsPending(
-                                profileOwner.getUsername(),
-                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-                    }
-                    break;
-                    case HIS_FOLLOW_REQUEST_IS_PENDING: {
-                        showFollowRequestPrompt();
-                        followStatusMessage.setVisibility(View.GONE);
-                    }
-                    break;
-                    case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
-                        hideFollowRequestPrompt();
-                    }
-                    break;
-                    case FAILED: {
-                        showCenteredToast("operazione annullata");
-
-                    }
-                    break;
-                    default:
-
-                }
-            });
-            checkFollowStatus();
-        }
-    }// end startCheckOperations()
-
-    private void checkIFollowHim() {
-        userProfileViewModel.checkIfollowHim(
-                profileOwner.getUsername(),
-                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-    }
-
-    private void checkHeFollowsMe() {
-        userProfileViewModel.checkHeFollowsMe(
-                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
-                profileOwner.getUsername(),
-                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
-    }
-
-    private void checkFollowStatus() {
-        if(currentUserIsLogged()) {
-            checkIFollowHim();
-            checkHeFollowsMe();
-        }
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -359,8 +193,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     UserProfileFragmentDirections.actionUserProfileFragmentToFollowingFragment(profileOwner.getUsername());
             Navigation.findNavController(v).navigate(followersFragment);
         }
-
-    }
+    }// end onClick()
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
@@ -368,6 +201,96 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         checkForNewNotifications();
     }
 
+
+
+
+
+    //-------------------------------------------------------------------------- MY METHODS
+
+    private void setupListCovers() {
+        Bundle arguments = new Bundle();
+        boolean isMyList = false;
+        String profileOwnerUsername = profileOwner.getUsername();
+        arguments.putSerializable("list_ownership", isMyList);
+        arguments.putSerializable("list_owner_username", profileOwnerUsername);
+
+        Fragment watchistCoverFragment = WatchistCoverFragment.newInstance();
+        watchistCoverFragment.setArguments(arguments);
+        displayFragment(watchistCoverFragment, R.id.container_userProfile_watchListCover);
+
+        Fragment favoritesCoverFragment = FavouritesListCoverFragment.newInstance();
+        favoritesCoverFragment.setArguments(arguments);
+        displayFragment(favoritesCoverFragment, R.id.container_userProfile_favoritesListCover);
+
+        Fragment watchedCoverFragment = WatchedListCoverFragment.newInstance();
+        watchistCoverFragment.setArguments(arguments);
+        displayFragment(watchedCoverFragment, R.id.container_userProfile_watchedListCover);
+    }
+
+    private void displayFragment(Fragment targetFragment, int containerId) {
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack if needed
+        transaction.replace(containerId, targetFragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+
+    private void init(View view) {
+        imageViewProfilePicture = view.findViewById(R.id.imageView_userProfileFragment_profilePicture);
+        textViewfullName = view.findViewById(R.id.textView_userProfileFragment_fullName);
+        textViewusername = view.findViewById(R.id.textView_userProfileFragment_username);
+        followStatusMessage = view.findViewById(R.id.textView_userProfileFragment_message);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_userProfileFragment);
+        buttonSendFollow = view.findViewById(R.id.button_userProfileFragment_follow);
+        buttonAcceptFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_accept);
+        buttonDeclineFollow = view.findViewById(R.id.include_userProfileFragment_requestPrompt).findViewById(R.id.button_requestPromptLayout_decline);
+        followRequestPrompt = view.findViewById(R.id.include_userProfileFragment_requestPrompt);
+        buttonCustomLists = view.findViewById(R.id.button_userProfileFragment_customLists);
+        followersButton = view.findViewById(R.id.button_userProfileFragment_followers);
+        followingButton = view.findViewById(R.id.button_userProfileFragment_following);
+        watchlistCover = view.findViewById(R.id.container_userProfile_watchListCover);
+        favoritesListCover = view.findViewById(R.id.container_userProfile_favoritesListCover);
+        watchedListCover = view.findViewById(R.id.container_userProfile_watchedListCover);
+        listLabel = view.findViewById(R.id.textView_userProfileFragment_listLabel);
+
+        buttonSendFollow.setOnClickListener(this);
+        buttonAcceptFollow.setOnClickListener(this);
+        buttonDeclineFollow.setOnClickListener(this);
+        buttonCustomLists.setOnClickListener(this);
+        followersButton.setOnClickListener(this);
+        followingButton.setOnClickListener(this);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        followingViewModel = new ViewModelProvider(this).get(FollowingViewModel.class);
+        followersViewModel = new ViewModelProvider(this).get(FollowersViewModel.class);
+
+    }
+
+    private void navigateToPersonalProfileFragment() {
+        NavDirections personalProfileFragment =
+                NavGraphDirections.actionGlobalPersonalProfileFragment();
+        navigateTo(personalProfileFragment, true);
+    }
+
+    private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
+        if(direction==null) return;
+
+        NavController navController = NavHostFragment.findNavController(this);
+        if (removeFromBackStack) navController.popBackStack();
+        navController.navigate(direction);
+    }
+
+    private void loadSocialStatistics() {
+        int followersCount = profileOwner.getFollowersCount();
+        int followingCount = profileOwner.getFollowingCount();
+        followingButton.setText("Seguiti\n" + followingCount);
+        followersButton.setText("Follower\n" + followersCount);
+    }
 
     private void enableSwipeDownToRefresh() {
         /*
@@ -386,9 +309,145 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         });
     }
 
+    private void fetchUserProfileData(String username) {
+        userProfileViewModel = new ViewModelProvider(this).get(UserProfileViewModel.class);
+        userProfileViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    profileOwner = userProfileViewModel.getObservableFetchedUser().getValue();
+                    String profilePictureUrl = profileOwner.getProfilePicturePath();
+                    try {
+                        Glide.with(requireContext())
+                                .load(profilePictureUrl)
+                                .fallback(R.drawable.icon_user_dark_blue)
+                                .placeholder(R.drawable.icon_user_dark_blue)
+                                .circleCrop()
+                                .into(imageViewProfilePicture);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
+                    textViewfullName.setText(profileOwner.getFullName());
+                    textViewusername.setText("@" + profileOwner.getUsername());
 
-    //-------------------------------------------------------------------------- MY METHODS
+                    startCheckOperations();
+                    loadSocialStatistics();
+                }
+                break;
+                case FAILED:
+                    break;
+            }
+        });
+        userProfileViewModel.fetchUserProfileData(username, loginViewModel.getLoggedUser());
+    }// fetchUserProfileData()
+
+    private void startCheckOperations() {
+        if (currentUserIsLogged()) {
+            enableSwipeDownToRefresh();
+
+            userProfileViewModel.getMyFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
+                switch (followStatus) {
+                    case I_FOLLOW_HIM: {
+                        buttonSendFollow.setVisibility(View.GONE);
+                        showLists();
+                        setupListCovers();
+                    }
+                    break;
+                    case I_DONT_FOLLOW_HIM: {
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+//                        showCenteredToast("NON sei un suo follower");
+
+                        //
+                        userProfileViewModel.checkMyFollowIsPending(
+                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                                profileOwner.getUsername(),
+                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+                        hideLists();
+                    }
+                    break;
+                    case MY_FOLLOW_REQUEST_IS_PENDING: {
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setEnabled(false);
+                        buttonSendFollow.setText("Richiesta inviata");
+                    }
+                    break;
+                    case MY_FOLLOW_REQUEST_IS_NOT_PENDING: {
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                    case REQUEST_SENT_SUCCESSFULLY: {
+                        buttonSendFollow.setVisibility(View.VISIBLE);
+                        buttonSendFollow.setEnabled(false);
+                        buttonSendFollow.setText("Richiesta inviata");
+                        showCenteredToast("richiesta inviata");
+                    }
+                    break;
+                    case FAILED: {
+                        showCenteredToast("operazione annullata");
+                    }
+                    break;
+                    default:
+                }
+            });
+
+            userProfileViewModel.getHisFollowStatus().observe(getViewLifecycleOwner(), followStatus -> {
+                switch (followStatus) {
+                    case HE_FOLLOWS_ME: {
+                        followStatusMessage.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                    case HE_DOESNT_FOLLOW_ME: {
+                        followStatusMessage.setVisibility(View.GONE);
+
+                        userProfileViewModel.checkHisFollowIsPending(
+                                profileOwner.getUsername(),
+                                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+                    }
+                    break;
+                    case HIS_FOLLOW_REQUEST_IS_PENDING: {
+                        showFollowRequestPrompt();
+                        followStatusMessage.setVisibility(View.GONE);
+                    }
+                    break;
+                    case HIS_FOLLOW_REQUEST_IS_NOT_PENDING: {
+                        hideFollowRequestPrompt();
+                    }
+                    break;
+                    case FAILED: {
+                        showCenteredToast("operazione annullata");
+
+                    }
+                    break;
+                    default:
+
+                }
+            });
+            checkFollowStatus();
+        }
+    }// end startCheckOperations()
+
+    private void checkIFollowHim() {
+        userProfileViewModel.checkIfollowHim(
+                profileOwner.getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+    }
+
+    private void checkHeFollowsMe() {
+        userProfileViewModel.checkHeFollowsMe(
+                loginViewModel.getObservableLoggedUser().getValue().getUsername(),
+                profileOwner.getUsername(),
+                loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
+    }
+
+    private void checkFollowStatus() {
+        if(currentUserIsLogged()) {
+            checkIFollowHim();
+            checkHeFollowsMe();
+        }
+    }
+
 
     private void showFollowRequestPrompt() {
         followRequestPrompt.setVisibility(View.VISIBLE);
@@ -453,6 +512,22 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         notificationManager.notify(0, builder.build());
 
 
+    }
+
+    private void showLists() {
+        listLabel.setVisibility(View.VISIBLE);
+        buttonCustomLists.setVisibility(View.VISIBLE);
+        watchlistCover.setVisibility(View.VISIBLE);
+        favoritesListCover.setVisibility(View.VISIBLE);
+        watchedListCover.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLists() {
+        listLabel.setVisibility(View.GONE);
+        buttonCustomLists.setVisibility(View.GONE);
+        watchlistCover.setVisibility(View.GONE);
+        favoritesListCover.setVisibility(View.GONE);
+        watchedListCover.setVisibility(View.GONE);
     }
 
 }// end UserProfileFragment class

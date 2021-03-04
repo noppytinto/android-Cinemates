@@ -39,14 +39,10 @@ public class WatchlistPostFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        imageViewProfile = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
-        textViewFullname = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_username);
-        textViewPublishDate = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
-        imageViewPoster = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.imageview_movieThumbnail);
-        textViewMovieTitle = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieTitle);
-        textViewMovieOverview = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieOverview);
-        textPostDescription = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_description);
+        //
+        init(view);
 
+        //
         if(getArguments()!=null) {
             WatchlistPost post = (WatchlistPost) getArguments().getSerializable("watchlist_post_data");
             String posterURL = post.getMovie().getPosterURL();
@@ -87,5 +83,15 @@ public class WatchlistPostFragment extends Fragment {
         }
     }
 
+    private void init(View view) {
+        imageViewProfile = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.imageView_postOwnerLayout_profilePicture);
+        textViewFullname = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_username);
+        textViewPublishDate = view.findViewById(R.id.include_watchlistPostFragment_owner).findViewById(R.id.textView_postOwnerLayout_publishDate);
+        imageViewPoster = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.imageview_movieThumbnail);
+        textViewMovieTitle = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieTitle);
+        textViewMovieOverview = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_movieOverview);
+        textPostDescription = view.findViewById(R.id.include_watchlistPostFragment_content).findViewById(R.id.textView_contentListPost_description);
+
+    }
 
 }// end WatchlistPostFragment class

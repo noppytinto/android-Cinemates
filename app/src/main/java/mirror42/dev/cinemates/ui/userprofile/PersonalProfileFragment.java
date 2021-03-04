@@ -1,12 +1,8 @@
 package mirror42.dev.cinemates.ui.userprofile;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -80,6 +74,9 @@ public class PersonalProfileFragment extends Fragment implements
 
     private PersonalProfileViewModel personalProfileViewModel;
     private final int SELECT_PICTURE = 200;
+
+
+
 
     //----------------------------------------------------------------------- ANDROID METHODS
 
@@ -270,6 +267,30 @@ public class PersonalProfileFragment extends Fragment implements
 
 
     //----------------------------------------------------------------------- METHODS
+
+//    private void setupListCovers() {
+//        Bundle arguments = new Bundle();
+//        boolean isMyList = true;
+//        arguments.putSerializable("list_ownership", isMyList);
+//
+//        Fragment watchistCoverFragment = WatchistCoverFragment.newInstance();
+//        watchistCoverFragment.setArguments(arguments);
+//        displayFragment(watchistCoverFragment);
+//
+//    }
+//
+//    private void displayFragment(Fragment targetFragment) {
+//        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+//
+//        // Replace whatever is in the fragment_container view with this fragment,
+//        // and add the transaction to the back stack if needed
+//        transaction.replace(R.id.container_personalProfile_watchListCover, targetFragment);
+//        transaction.addToBackStack(null);
+//
+//        // Commit the transaction
+//        transaction.commit();
+//    }
+
 
     private void observeNotifications() {
 //        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), status -> {
@@ -498,101 +519,6 @@ public class PersonalProfileFragment extends Fragment implements
         // pass the constant to compare it
         // with the returned requestCode
         startActivityForResult(Intent.createChooser(i, "Select Picture"), SELECT_PICTURE);
-    }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (resultCode == RESULT_OK) {
-//
-//            // compare the resultCode with the
-//            // SELECT_PICTURE constant
-//            if (requestCode == SELECT_PICTURE) {
-//                // Get the url of the image from data
-//                Uri selectedImageUri = data.getData();
-//                if (null != selectedImageUri) {
-//                    // update the preview image in the layout
-//
-//                    filePath = "-";
-//                    try {
-////                        Log.d(TAG, "onActivityResult: " + getPath(selectedImageUri));
-//                        filePath = RealPathUtil.getRealPath(requireContext(), selectedImageUri);
-//
-//                        if(filePath==null || filePath.isEmpty()) {
-//                            personalProfileViewModel.setResetStatus(PersonalProfileViewModel.ChangeImageResult.FAILED);
-//                            return;
-//                        }
-//
-//                        // load thumbnail
-//                        try {
-//                            Glide.with(this)  //2
-//                                    .load(filePath) //3
-//                                    .fallback(R.drawable.broken_image)
-//                                    .placeholder(R.drawable.broken_image)
-//                                    .circleCrop() //4
-//                                    .into(profilePicture); //8
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        personalProfileViewModel.changeProfileImage(loginViewModel.getLoggedUser(), filePath);
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-    private String getRealPathFromUri(Uri imageUri) {
-        Cursor cursor = null;
-        cursor = requireActivity().getContentResolver().query(imageUri, null, null, null, null);
-        if (cursor == null) {
-            return imageUri.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-    }
-
-    void pickImageFromGallery(View view) {
-        personalProfileViewModel.getUploadToCloudinaryStatus().observe(getViewLifecycleOwner(), changeImageResult -> {
-            switch (changeImageResult) {
-                case SUCCESS: {
-                    Glide.with(this)  //2
-                            .load(localImageUri) //3
-                            .fallback(R.drawable.icon_user_dark_blue)
-                            .placeholder(R.drawable.icon_user_dark_blue)
-                            .circleCrop() //4
-                            .into(profilePicture); //8
-
-                    showCenteredToast("cambio immagine profilo riuscito ");
-                }
-                break;
-                case FAILED:
-                    showCenteredToast("cambio immagine profilo NON riuscito");
-                    break;
-            }
-        });
-        requestPermission();
-    }
-
-    private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            accessTheGallery();
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CODE);
-        }
-    }
-
-    public void accessTheGallery() {
-        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        i.setType("image/*");
-        startActivityForResult(i, SELECT_PICTURE);
     }
 
     public void showCenteredToast(String message) {
