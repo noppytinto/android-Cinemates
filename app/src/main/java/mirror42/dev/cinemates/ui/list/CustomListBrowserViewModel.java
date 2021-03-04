@@ -35,7 +35,7 @@ public class CustomListBrowserViewModel extends ViewModel {
     private final String TAG = this.getClass().getSimpleName();
     private MutableLiveData<ArrayList<CustomList>> customLists;
     private MutableLiveData<TaskStatus> taskStatus;
-    private MutableLiveData<FetchStatus> fetchStatus;
+    private MutableLiveData<FetchStatus> myCustomListsfetchStatus;
     private RemoteConfigServer remoteConfigServer;
     private MutableLiveData<FetchStatus> publicFetchStatus;
     private MutableLiveData<FetchStatus> subscribedFetchStatus;
@@ -48,7 +48,7 @@ public class CustomListBrowserViewModel extends ViewModel {
     public CustomListBrowserViewModel() {
         customLists = new MutableLiveData<>();
         taskStatus = new MutableLiveData<>(TaskStatus.IDLE);
-        fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
+        myCustomListsfetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         publicFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         subscribedFetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
 
@@ -79,12 +79,12 @@ public class CustomListBrowserViewModel extends ViewModel {
         this.taskStatus.postValue(taskStatus);
     }
 
-    public LiveData<FetchStatus> getObservableFetchStatus() {
-        return fetchStatus;
+    public LiveData<FetchStatus> getObservableMyCustomListsFetchStatus() {
+        return myCustomListsfetchStatus;
     }
 
-    public void setFetchStatus(FetchStatus fetchStatus) {
-        this.fetchStatus.postValue(fetchStatus);
+    public void setMyCustomListsfetchStatus(FetchStatus myCustomListsfetchStatus) {
+        this.myCustomListsfetchStatus.postValue(myCustomListsfetchStatus);
     }
 
     public LiveData<FetchStatus> getObservablePublicFetchStatus() {
@@ -205,7 +205,7 @@ public class CustomListBrowserViewModel extends ViewModel {
                 try (Response response = httpClient.newCall(request).execute()) {
                     if (!response.isSuccessful()) {
                         setCustomLists(null);
-                        setFetchStatus(FetchStatus.FAILED);
+                        setMyCustomListsfetchStatus(FetchStatus.FAILED);
                     }
 
                     //
@@ -224,26 +224,26 @@ public class CustomListBrowserViewModel extends ViewModel {
 
                         // once finished set result
                         setCustomLists(customLists);
-                        setFetchStatus(FetchStatus.SUCCESS);
+                        setMyCustomListsfetchStatus(FetchStatus.SUCCESS);
 
                     }
                     // if response contains no data
                     else {
                         setCustomLists(null);
-                        setFetchStatus(FetchStatus.NOT_EXISTS);
+                        setMyCustomListsfetchStatus(FetchStatus.NOT_EXISTS);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     setCustomLists(null);
-                    setFetchStatus(FetchStatus.FAILED);
+                    setMyCustomListsfetchStatus(FetchStatus.FAILED);
                 }
 
 
             } catch (Exception e) {
                 e.printStackTrace();
                 setCustomLists(null);
-                setFetchStatus(FetchStatus.FAILED);
+                setMyCustomListsfetchStatus(FetchStatus.FAILED);
             }
         };
     }// end createFetchMyCustomListsTask()

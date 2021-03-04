@@ -123,28 +123,17 @@
 
 
     <include
-        android:id="@+id/listFragment_empty_default_list_message"
-        layout="@layout/layout_empty_default_list_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/include_listFragment_emptyMessage"
+        layout="@layout/layout_empty_message"
+        android:layout_width="340dp"
+        android:layout_height="350dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <include
-        android:id="@+id/listFragment_empty_custom_list_message"
-        layout="@layout/layout_empty_custom_list_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
 
     <TextView
@@ -157,10 +146,9 @@
         android:textAlignment="center"
         android:textColor="@color/light_blue"
         android:textSize="12sp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -176,4 +164,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

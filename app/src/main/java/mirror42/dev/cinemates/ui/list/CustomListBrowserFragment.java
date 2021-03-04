@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +32,7 @@ import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
@@ -46,12 +48,8 @@ public class CustomListBrowserFragment extends Fragment
     private boolean isPrivate;
     private boolean areNotMyLists;
     private CircularProgressIndicator progressIndicator;
-    private View emptyMessageCustomList;
-    private View emptyMessageSubList;
-    private View emptyMessagePublicList;
-
-
-
+    private ImageView imageViewEmptyMessage;
+    private View includeEmptyMessage;
 
 
     //------------------------------------------------------------- ANDROID METHODS
@@ -74,9 +72,8 @@ public class CustomListBrowserFragment extends Fragment
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
         progressIndicator = view.findViewById(R.id.progressIndicator_customListBrowser);
-        emptyMessageCustomList = view.findViewById(R.id.customListBrowser_emptyMessage_customList);
-        emptyMessageSubList = view.findViewById(R.id.customListBrowser_emptyMessage_subList);
-        emptyMessagePublicList = view.findViewById(R.id.customListBrowser_emptyMessage_otherUserList);
+        imageViewEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage).findViewById(R.id.imageView_emptyMessage);
+        includeEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage);
 
         if(getArguments()!=null) {
             CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
@@ -86,15 +83,6 @@ public class CustomListBrowserFragment extends Fragment
             setUpFragment(fetchMode, profileOwnerUsername, view);
 
         }
-
-    }
-
-    private void showProgressIndicator() {
-        progressIndicator.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressIndicator() {
-        progressIndicator.setVisibility(View.GONE);
     }
 
     private void setUpFragment(String fetchMode, String profileOwnerUsername, View view) {
@@ -104,7 +92,6 @@ public class CustomListBrowserFragment extends Fragment
                 areNotMyLists = false;
                 initRecycleView(view, areNotMyLists);
                 initForFetchModeMyCustomLists();
-                hideEmptyMessageSubList();
             }
             break;
             case "fetch_subscribed_lists": {
@@ -112,7 +99,6 @@ public class CustomListBrowserFragment extends Fragment
                 ((MainActivity)requireActivity()).setToolbarTitle("Liste che seguo");
                 initRecycleView(view, areNotMyLists);
                 initForFetchModeSubscribedLists();
-                hideEmptyMessageCustomList();
             }
             break;
             case "fetch_public_lists": {
@@ -131,29 +117,21 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
-                    hideProgressIndicator();
-                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                    if(lists!=null) {
-                        if(lists.isEmpty()){
-                            showEmptyMessagePublicList();
-                            hideEmptyMessageSubList();
-                            hideEmptyMessageCustomList();
+                        hideProgressIndicator();
+                        hideEmptyMessage();
+                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                        if(lists!=null) {
+                            recyclerAdapterCustomLists.loadNewData(lists);
                         }
-                        else{
-                            hideEmptyMessageSubList();
-                            hideEmptyMessageCustomList();
-                            hideEmptyMessagePublicList();
-                        }
-
-                        recyclerAdapterCustomLists.loadNewData(lists);
                     }
-                }
+                    break;
                 case NOT_EXISTS:
-                    hideEmptyMessagePublicList();
-                    hideEmptyMessageCustomList();
-                    hideEmptyMessageSubList();
+                    hideProgressIndicator();
+                    showEmptyMessagePublicList();
+                    break;
                 case FAILED:
                     hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
                     break;
             }
         });
@@ -163,32 +141,24 @@ public class CustomListBrowserFragment extends Fragment
     private void initForFetchModeMyCustomLists() {
         buttonAdd.setOnClickListener(this);
         customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        customListBrowserViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+        customListBrowserViewModel.getObservableMyCustomListsFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
-                    hideProgressIndicator();
-                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                    if(lists!=null) {
-                        recyclerAdapterCustomLists.loadNewData(lists);
-                        if(lists.isEmpty()){
-                            showEmptyMessageCustomList();
-                            hideEmptyMessageSubList();
-                            hideEmptyMessagePublicList();
-                        }
-                        else{
-                            hideEmptyMessageCustomList();
-                            hideEmptyMessageSubList();
-                            hideEmptyMessagePublicList();
+                        hideProgressIndicator();
+                        hideEmptyMessage();
+                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                        if(lists!=null) {
+                            recyclerAdapterCustomLists.loadNewData(lists);
                         }
                     }
-                }
-                break;
+                    break;
                 case NOT_EXISTS:
+                    hideProgressIndicator();
                     showEmptyMessageCustomList();
-                    hideEmptyMessageSubList();
-                    hideEmptyMessagePublicList();
+                    break;
                 case FAILED:
                     hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
                     break;
             }
         });
@@ -216,28 +186,21 @@ public class CustomListBrowserFragment extends Fragment
         customListBrowserViewModel.getObservableSubscribedFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
-                    hideProgressIndicator();
-                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                    if(lists!=null) {
-                        recyclerAdapterCustomLists.loadNewData(lists);
-                        if(lists.isEmpty()){
-                            showEmptyMessageSubList();
-                            hideEmptyMessageCustomList();
-                            hideEmptyMessagePublicList();
-                        }else{
-                            hideEmptyMessageSubList();
-                            hideEmptyMessageCustomList();
-                            hideEmptyMessagePublicList();
+                        hideProgressIndicator();
+                        hideEmptyMessage();
+                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                        if(lists!=null) {
+                            recyclerAdapterCustomLists.loadNewData(lists);
                         }
                     }
-                }
-                break;
+                    break;
                 case NOT_EXISTS:
                     showEmptyMessageSubList();
-                    hideEmptyMessageCustomList();
-                    hideEmptyMessagePublicList();
+                    hideProgressIndicator();
+                    break;
                 case FAILED:
                     hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
                     break;
             }
         });
@@ -264,30 +227,6 @@ public class CustomListBrowserFragment extends Fragment
 
     //------------------------------------------------------------- MY METHODS
 
-    private void showEmptyMessageCustomList(){
-        emptyMessageCustomList.setVisibility(View.VISIBLE);
-    }
-
-    private void hideEmptyMessageCustomList(){
-        emptyMessageCustomList.setVisibility(View.GONE);
-    }
-
-    private void showEmptyMessageSubList(){
-        emptyMessageSubList.setVisibility(View.VISIBLE);
-    }
-
-    private void hideEmptyMessageSubList(){
-        emptyMessageSubList.setVisibility(View.GONE);
-    }
-
-    private void showEmptyMessagePublicList(){
-        emptyMessagePublicList.setVisibility(View.VISIBLE);
-    }
-
-    private void hideEmptyMessagePublicList(){
-        emptyMessagePublicList.setVisibility(View.GONE);
-    }
-
     private void initRecycleView(View view, boolean areNotMyLists) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_customListBrowser);
@@ -302,11 +241,6 @@ public class CustomListBrowserFragment extends Fragment
         newFragment.show(requireActivity().getSupportFragmentManager(), "CustomListDialogFragment");
     }
 
-    public void showCenteredToast(String message) {
-        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
 
     @Override
     public void onPositiveButtonClicked(String listName, String listDescription, boolean isChecked) {
@@ -359,6 +293,41 @@ public class CustomListBrowserFragment extends Fragment
         }
     }
 
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
+
+    public void showCenteredToast(String message) {
+        final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    private void showEmptyMessageCustomList(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_custom_lists_message;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+    private void hideEmptyMessage(){
+        includeEmptyMessage.setVisibility(View.GONE);
+    }
+
+    private void showEmptyMessageSubList(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_sub_lists_message;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+    private void showEmptyMessagePublicList(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_users_custom_lists_message;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
 
 
 

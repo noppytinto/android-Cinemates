@@ -5,19 +5,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_homeMessagePost"
-        android:layout_width="367dp"
-        android:layout_height="335dp"
-        android:layout_marginStart="32dp"
+        android:id="@+id/cardView_emptyMessage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/dark_blue"
         app:cardCornerRadius="7dp"
         app:cardElevation="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,16 +25,20 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageView_homeMessagePost_profilePicture"
-                android:layout_width="305dp"
-                android:layout_height="308dp"
+                android:id="@+id/imageView_emptyMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:padding="1dp"
                 android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/empty_sub_lists_message" />
+                app:srcCompat="@drawable/empty_custom_lists_message" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -171,6 +171,16 @@ public class RecyclerAdapterMoviesList extends RecyclerView.Adapter<RecyclerAdap
         notifyDataSetChanged();
     }
 
+    public boolean listIsEmpty() {
+        int itemCount = getItemCount();
+
+        if(itemCount==0)
+            return true;
+        else
+            return false;
+    }
+
+
 
     //---------------------------------------------------------------------- VIEWHOLDERS
     class MovieCardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {

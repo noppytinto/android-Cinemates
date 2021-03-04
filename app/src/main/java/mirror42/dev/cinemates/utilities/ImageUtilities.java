@@ -43,6 +43,19 @@ public class ImageUtilities {
         }
     }
 
+    public static void loadRectangularImageInto(int drawableId, ImageView imageView, Context context) {
+        try {
+            Glide.with(context)  //2
+                    .load(drawableId) //3
+                    .fallback(R.drawable.broken_image)
+                    .placeholder(R.drawable.placeholder_image)
+                    .fitCenter() //4
+                    .into(imageView); //8
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void loadCircularImageInto(String imageUrl, MenuItem menuItem, Context context) {
         try {
             Glide.with(context)  //2

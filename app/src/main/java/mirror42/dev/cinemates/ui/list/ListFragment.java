@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import mirror42.dev.cinemates.ui.dialog.RecommendListDialogFragment;
 import mirror42.dev.cinemates.ui.explore.ExploreFragmentDirections;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 public class ListFragment extends Fragment implements
         RecyclerAdapterMoviesList.ClickAdapterListener,
@@ -65,11 +67,11 @@ public class ListFragment extends Fragment implements
     private boolean navigatedToMovieDetailsFragment;
     private User listOwner;
     private boolean deleteAllowed;
-    private View emptyDefaultListMessage;
-    private View emptyCustomListMessage;
     private TextView bannerDeleteMovie;
-    private boolean myList;
-
+    private boolean listIsMine;
+    private View includeEmptyMessage;
+    private ImageView imageViewEmptyMessage;
+    private MoviesList.ListType listType;
 
 
 
@@ -95,33 +97,39 @@ public class ListFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
         //
         if(getArguments() != null) {
             ListFragmentArgs args = ListFragmentArgs.fromBundle(getArguments());
             currentList = args.getList();
-            listOwner = currentList.getOwner();
-            myList = false;
-            //
-            setupListAppearance(currentList);
 
-            //
-            if(currentList.isEmpty()) {
-                if(myList) {
-                    emptyDefaultListMessage.setVisibility(View.VISIBLE);
-                }
-                else {
-                    emptyCustomListMessage.setVisibility(View.VISIBLE);
-                }
-                bannerDeleteMovie.setVisibility(View.GONE);
+            if(currentList==null) {
+                // ignore
             }
             else {
-                populateList(currentList);
-                emptyDefaultListMessage.setVisibility(View.GONE);
-                emptyCustomListMessage.setVisibility(View.GONE);
+                listOwner = currentList.getOwner();
+                listType = currentList.getListType();
+                User loggedUser = loginViewModel.getLoggedUser();
+                if(listOwner==null) {
+                    listIsMine = true;
+                }
+                else {
+                    listIsMine = loggedUser.getUsername().equals(listOwner.getUsername());
+                }
+
+                //
+                setupListAppearance(currentList);
+
+                //
+                if(currentList.isEmpty()) {
+                    // ignore
+                }
+                else {
+                    populateList(currentList);
+                }
             }
+
         }
-    }
+    }// end onActivityCreated()
 
     @Override
     public void onResume() {
@@ -215,8 +223,8 @@ public class ListFragment extends Fragment implements
         recommendButton.setOnClickListener(this);
         subscribeButton.setOnClickListener(this);
         unsubscribeButton.setOnClickListener(this);
-        emptyDefaultListMessage = view.findViewById(R.id.listFragment_empty_default_list_message);
-        emptyCustomListMessage = view.findViewById(R.id.listFragment_empty_custom_list_message);
+        imageViewEmptyMessage = view.findViewById(R.id.include_listFragment_emptyMessage).findViewById(R.id.imageView_emptyMessage);
+        includeEmptyMessage = view.findViewById(R.id.include_listFragment_emptyMessage);
         //
         initRecyclerView(view);
 
@@ -241,28 +249,15 @@ public class ListFragment extends Fragment implements
         recyclerView.setAdapter(recyclerAdapterMoviesList);
     }
 
-    private void showProgressIndicator() {
-        progressIndicator.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressIndicator() {
-        progressIndicator.setVisibility(View.GONE);
-    }
-
 
     private void setupListAppearance(MoviesList list) {
-        MoviesList.ListType listType = list.getListType();
-
         //
         setListNameAndDescription(list);
 
         // setup buttons
         if(listType == MoviesList.ListType.CL) {
             // check list ownership
-            User loggerUser = loginViewModel.getLoggedUser();
-            User listOwner = list.getOwner();
-            if(loggerUser.getUsername().equals(listOwner.getUsername())) {
-                myList = true;
+            if(listIsMine) {
                 showIsPrivateSwitchButton();
                 allowDeleteMovies();
                 if(((CustomList)currentList).isPrivate()) {
@@ -275,6 +270,7 @@ public class ListFragment extends Fragment implements
             else {
                 // check wheter i'm subscibed or not
                 disallowDeleteMovies();
+                User loggerUser = loginViewModel.getLoggedUser();
                 listViewModel.checkMySubscriptionToThisList((CustomList) currentList, loggerUser);
                 listViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
                     switch (taskStatus) {
@@ -295,31 +291,45 @@ public class ListFragment extends Fragment implements
         }
     }
 
-    private void allowDeleteMovies() {
-        deleteAllowed = true;
-        bannerDeleteMovie.setVisibility(View.VISIBLE);
-    }
 
-    private void disallowDeleteMovies() {
-        deleteAllowed = false;
-        bannerDeleteMovie.setVisibility(View.GONE);
-    }
 
     private void setListNameAndDescription(MoviesList list) {
-        MoviesList.ListType listType = list.getListType();
-        bannerDeleteMovie.setVisibility(View.VISIBLE);
+        // setup banner and empty message
+        if(listIsMine)
+            if(list.isEmpty()) {
+                bannerDeleteMovie.setVisibility(View.GONE);
+                showEmptyMessageMyList();
+            }
+            else {
+                bannerDeleteMovie.setVisibility(View.VISIBLE);
+                hideEmptyMessage();
+            }
+        else {
+            if(list.isEmpty()) {
+                showEmptyMessageUserList();
+            }
+            else {
+                hideEmptyMessage();
+            }
+            bannerDeleteMovie.setVisibility(View.GONE);
+        }
 
+        //
         switch (listType) {
             case WL:
+                //
                 textViewListName.setText("Watchlist");
                 break;
             case FV:
+                //
                 textViewListName.setText("Preferiti");
                 break;
             case WD:
+                //
                 textViewListName.setText("Visti");
                 break;
             case CL:
+                //
                 textViewListName.setText(((CustomList)list).getName());
                 textViewListDescription.setVisibility(View.VISIBLE);
                 textViewListDescription.setText(((CustomList)list).getDescription());
@@ -480,12 +490,8 @@ public class ListFragment extends Fragment implements
                 actionMode.invalidate();
             }
         } catch (Exception e) {
-            // TODO: handle actionmode null
             e.printStackTrace();
         }
-
-        // todo: else if(true /*TODO: count==selectedITems.size()*/) { }
-
         actionMode = null;
     }
 
@@ -506,7 +512,30 @@ public class ListFragment extends Fragment implements
         // and notify recycler
         recyclerAdapterMoviesList.notifyDataSetChanged();
         actionMode = null;
-    }
+
+        // check empty list
+        boolean listIsEmpty = recyclerAdapterMoviesList.listIsEmpty();
+
+        // setup banner and empty message
+        if(listIsMine)
+            if(listIsEmpty) {
+                bannerDeleteMovie.setVisibility(View.GONE);
+                showEmptyMessageMyList();
+            }
+            else {
+                bannerDeleteMovie.setVisibility(View.VISIBLE);
+                hideEmptyMessage();
+            }
+        else {
+            if(listIsEmpty) {
+                showEmptyMessageUserList();
+            }
+            else {
+                hideEmptyMessage();
+            }
+            bannerDeleteMovie.setVisibility(View.GONE);
+        }
+    } // end deleteItems()
 
 
     //----------------------------------------------------
@@ -539,6 +568,40 @@ public class ListFragment extends Fragment implements
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void hideEmptyMessage(){
+        includeEmptyMessage.setVisibility(View.GONE);
+    }
+
+    private void showEmptyMessageMyList(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_default_list_message;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+    private void showEmptyMessageUserList(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_custom_list_message;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+
+    private void showProgressIndicator() {
+        progressIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressIndicator() {
+        progressIndicator.setVisibility(View.GONE);
+    }
+
+
+    private void allowDeleteMovies() {
+        deleteAllowed = true;
+    }
+
+    private void disallowDeleteMovies() {
+        deleteAllowed = false;
     }
 
 }// end ListFragment class
