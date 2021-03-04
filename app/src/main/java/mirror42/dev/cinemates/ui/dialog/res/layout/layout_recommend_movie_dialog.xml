@@ -27,23 +27,25 @@
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="8dp"
         android:text="annulla"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView_recommendMovieDialogLayout" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <include
-        android:id="@+id/include_empty_followers__movie_dialog_fragment"
-        layout="@layout/layout_empty_followers_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/recyclerView_recommendMovieDialogLayout"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerView_recommendMovieDialogLayout"
-        app:layout_constraintStart_toStartOf="@+id/recyclerView_recommendMovieDialogLayout"
-        app:layout_constraintTop_toTopOf="@+id/recyclerView_recommendMovieDialogLayout" />
+        android:id="@+id/include_recommendMovieDialogLayout_emptyMessage"
+        layout="@layout/layout_empty_message"
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/divider_recommendMovieDialogLayout_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_recommendMovieDialogLayout_title"
+        tools:visibility="visible" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -53,10 +55,12 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/button_recommendMovieDialogLayout_negative"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_recommendMovieDialogLayout_title" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_recommendMovieDialogLayout_title"
+        tools:visibility="gone" />
 
     <View
         android:id="@+id/divider_recommendMovieDialogLayout_1"

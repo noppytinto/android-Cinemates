@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.viewholder.RecyclerAdapterUsersList;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 public class FollowingFragment extends Fragment implements View.OnClickListener, RecyclerAdapterUsersList.ClickAdapterListener {
     private final String TAG = this.getClass().getSimpleName();
@@ -32,8 +34,9 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
     private LoginViewModel loginViewModel;
     private RecyclerView recyclerView;
     private RecyclerAdapterUsersList recyclerAdapterUsersList;
-    private View includeMessageForEmptyFollowingPage;
-    private View includeMessageForOthersEmptyFollowingPage;
+    private View includeEmptyMessage;
+    private ImageView imageViewEmptyMessage;
+    private boolean isMyList;
 
     public static FollowingFragment newInstance() {
         return new FollowingFragment();
@@ -61,24 +64,36 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        followingViewModel = new ViewModelProvider(requireActivity()).get(FollowingViewModel.class);
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        includeMessageForEmptyFollowingPage = view.findViewById(R.id.include_empty_following_fragment);
-        includeMessageForOthersEmptyFollowingPage = view.findViewById(R.id.include_empty_others_following_fragment);
+        init(view);
 
         if(getArguments() != null) {
             FollowingFragmentArgs args = FollowingFragmentArgs.fromBundle(getArguments());
             String username = args.getTargetUsername();
 
             if(username!=null || username.isEmpty()) {
-                if(username.equals(loginViewModel.getLoggedUser().getUsername()))
-                    initRecyclerView(view, true);
-                else
-                    initRecyclerView(view, false);
+                isMyList = username.equals(loginViewModel.getLoggedUser().getUsername());
+
+                if(isMyList) initAsMyList(view);
+                else initAsOthersList(view);
 
                 fetchFollowers(username);
             }
         }
+    }
+
+    private void initAsMyList(View view) {
+        initRecyclerView(view, true);
+    }
+
+    private void initAsOthersList(View view) {
+        initRecyclerView(view, false);
+    }
+
+    private void init(View view) {
+        followingViewModel = new ViewModelProvider(requireActivity()).get(FollowingViewModel.class);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        imageViewEmptyMessage = view.findViewById(R.id.include_followingFragment_emptyMessage).findViewById(R.id.imageView_emptyMessage);
+        includeEmptyMessage = view.findViewById(R.id.include_followingFragment_emptyMessage);
     }
 
 
@@ -94,24 +109,20 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
 
 
     private void fetchFollowers(String username) {
-        hideMessageForEmptyFollowingPage();
-        hideMessageForEmptyOthersFollowingPage();
         followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
             switch (fetchStatus) {
                 case FOLLOWING_FETCHED: {
                     ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();
                     if(following!=null || following.size()>0) {
                         recyclerAdapterUsersList.loadNewData(following);
-
+                        hideEmptyMessage();
                     }
                 }
                 break;
                 case NO_FOLLOWING:
-                    if(username.equals(loginViewModel.getLoggedUser().getUsername()))
-                        showMessageForEmptyFollowingPage();
-                    else
-                        showMessageForEmptyOthersFollowingPage();
-                    //showCenteredToast("lista vuota");
+                    recyclerAdapterUsersList.clearList();
+                    if(isMyList) showMessageForEmptyFollowingPage();
+                    else showMessageForEmptyOthersFollowingPage();
                     break;
                 case FOLLOWING_FETCH_FAILED:
                     showCenteredToast("impossibile caricare utenti!");
@@ -155,7 +166,7 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
             }
         });
 
-        new MaterialAlertDialogBuilder(getContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Smettere di seguire?")
                 .setNegativeButton("No", (dialog, which) -> {
                     showCenteredToast("operazione annullata");
@@ -167,28 +178,26 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                 .show();
     }
 
-
-    private void showMessageForEmptyFollowingPage(){
-        includeMessageForEmptyFollowingPage.setVisibility(View.VISIBLE);
-    }
-
-    private void hideMessageForEmptyFollowingPage(){
-        includeMessageForEmptyFollowingPage.setVisibility(View.GONE);
-    }
-
-    private void showMessageForEmptyOthersFollowingPage(){
-        includeMessageForOthersEmptyFollowingPage.setVisibility(View.VISIBLE);
-    }
-
-    private void hideMessageForEmptyOthersFollowingPage(){
-        includeMessageForOthersEmptyFollowingPage.setVisibility(View.GONE);
-    }
-
-
     public void showCenteredToast(String message) {
         final Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    private void showMessageForEmptyFollowingPage(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_following_list;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+    private void showMessageForEmptyOthersFollowingPage(){
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_others_following_list;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
+    }
+
+    private void hideEmptyMessage(){
+        includeEmptyMessage.setVisibility(View.GONE);
     }
 
 }

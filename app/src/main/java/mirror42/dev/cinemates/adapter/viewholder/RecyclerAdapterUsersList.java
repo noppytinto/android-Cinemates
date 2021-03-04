@@ -97,6 +97,11 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
         notifyDataSetChanged();
     }
 
+    public void clearList() {
+        recyclerList.clear();
+        notifyDataSetChanged();
+    }
+
 
 
     //-------------------------------------------------------------------------------------- VIEWHOLDERS

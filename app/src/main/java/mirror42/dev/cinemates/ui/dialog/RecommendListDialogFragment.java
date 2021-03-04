@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.viewholder.RecyclerAdapterFollowersList;
 import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
+import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 public class RecommendListDialogFragment extends DialogFragment implements View.OnClickListener, RecyclerAdapterFollowersList.FollowerListener {
     private Button negativeButton;
@@ -32,9 +34,9 @@ public class RecommendListDialogFragment extends DialogFragment implements View.
     private RecyclerView recyclerView;
     private RecyclerAdapterFollowersList recyclerAdapterFollowersList;
     private String listName;
-    private View includeMessageForEmptyFollowersDialog;
     private TextView dialogTitle;
-
+    private View includeEmptyMessage;
+    private ImageView imageViewEmptyMessage;
 
     public interface RecommendListDialogListener {
         void onRecommendButtonOnDialogClicked();
@@ -74,14 +76,17 @@ public class RecommendListDialogFragment extends DialogFragment implements View.
         initRecycleView(view);
         negativeButton = view.findViewById(R.id.button_recommendDialogLayout_negative);
         negativeButton.setOnClickListener(this);
-        includeMessageForEmptyFollowersDialog = view.findViewById(R.id.include_empty_followers_dialog_fragment);
-        hideMessageForEmptyFollowersDialog();
         dialogTitle = view.findViewById(R.id.textView_recommendDialogLayout_title);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         recommendListDialogViewModel = new ViewModelProvider(this).get(RecommendListDialogViewModel.class);
+        imageViewEmptyMessage = view.findViewById(R.id.include_recommendListDialogLayout_emptyMessage).findViewById(R.id.imageView_emptyMessage);
+        includeEmptyMessage = view.findViewById(R.id.include_recommendListDialogLayout_emptyMessage);
+
+
         recommendListDialogViewModel.getObservableFetchStatus().observe(this, fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
+                    hideEmptyMessage();
                     dialogTitle.setVisibility(View.VISIBLE);
                     ArrayList<User> followers = recommendListDialogViewModel.getObservableFollowers().getValue();
                     if(followers!=null)
@@ -132,11 +137,13 @@ public class RecommendListDialogFragment extends DialogFragment implements View.
     //------------------------------------------------------------- MY METHODS
 
     private void showMessageForEmptyFollowersDialog(){
-        includeMessageForEmptyFollowersDialog.setVisibility(View.VISIBLE);
+        includeEmptyMessage.setVisibility(View.VISIBLE);
+        final int EMPTY_MESSAGE_IMAGE = R.drawable.empty_followers_list_for_dialog;
+        ImageUtilities.loadRectangularImageInto(EMPTY_MESSAGE_IMAGE, imageViewEmptyMessage, requireContext());
     }
 
-    private void hideMessageForEmptyFollowersDialog(){
-        includeMessageForEmptyFollowersDialog.setVisibility(View.GONE);
+    private void hideEmptyMessage(){
+        includeEmptyMessage.setVisibility(View.GONE);
     }
 
     private void initRecycleView(View view) {
