@@ -146,14 +146,15 @@ public class HomeViewModel extends ViewModel {
                                 e.printStackTrace();
                             }
 
-                            tempResult.add(post);
+                            if(post!=null)
+                                tempResult.add(post);
                         }// for
 
                         // once finished set result
                         setPostsList(tempResult);
                         setFetchStatus(FetchStatus.SUCCESS);
                     }
-                    // if the response is null (no notifications)
+                    // if the response is null (no post)
                     else setFetchStatus(FetchStatus.EMPTY);
                 }
                 // if the response is unsuccesfull
@@ -242,7 +243,7 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
+                // if the response is null (no post)
 //                else setFetchStatus(FetchStatus.EMPTY);
             }
             // if the response is unsuccesfull
@@ -301,7 +302,7 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
+                // if the response is null (no post)
 //                else setFetchStatus(FetchStatus.EMPTY);
             }
             // if the response is unsuccesfull
@@ -360,7 +361,7 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
+                // if the response is null (no post)
 //                else setFetchStatus(FetchStatus.EMPTY);
             }
             // if the response is unsuccesfull
@@ -418,8 +419,8 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
-//                else setFetchStatus(FetchStatus.EMPTY);
+                // if the response is null (no post)
+                else return null;
             }
             // if the response is unsuccesfull
 //            else setFetchStatus(FetchStatus.FAILED);
@@ -479,8 +480,8 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
-//                else setFetchStatus(FetchStatus.EMPTY);
+                // if the response is null (no post)
+                else return null;
             }
             // if the response is unsuccesfull
 //            else setFetchStatus(FetchStatus.FAILED);
@@ -536,7 +537,7 @@ public class HomeViewModel extends ViewModel {
                     // once finished set result
                     return post;
                 }
-                // if the response is null (no notifications)
+                // if the response is null (no post)
 //                else setFetchStatus(FetchStatus.EMPTY);
             }
             // if the response is unsuccesfull
