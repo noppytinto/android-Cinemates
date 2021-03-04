@@ -18,6 +18,7 @@
         android:text="Raccomanda film a:"
         android:textColor="@color/light_blue"
         android:textSize="18sp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,6 +33,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView_recommendMovieDialogLayout" />
+
+    <include
+        android:id="@+id/include_empty_followers__movie_dialog_fragment"
+        layout="@layout/layout_empty_followers_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerView_recommendMovieDialogLayout"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerView_recommendMovieDialogLayout"
+        app:layout_constraintStart_toStartOf="@+id/recyclerView_recommendMovieDialogLayout"
+        app:layout_constraintTop_toTopOf="@+id/recyclerView_recommendMovieDialogLayout" />
 
 
     <androidx.recyclerview.widget.RecyclerView

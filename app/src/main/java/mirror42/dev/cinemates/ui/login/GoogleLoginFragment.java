@@ -245,7 +245,7 @@ public class GoogleLoginFragment extends Fragment implements
     private void prepareLogin(){
 
         setImageProfile();
-        title.setText("Ciao " + googleUser.getFirstName() + " " + googleUser.getLastName()  + "," + getString(R.string.googleLogin_page_title_access));
+        title.setText("Ciao " + googleUser.getFirstName() + " " + googleUser.getLastName()  + ", " + getString(R.string.googleLogin_page_title_access));
 
         buttonContinue.setVisibility(View.VISIBLE);
         profilePicture.setVisibility(View.VISIBLE);

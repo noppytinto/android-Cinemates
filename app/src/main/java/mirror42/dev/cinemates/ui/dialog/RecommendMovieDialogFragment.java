@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +32,8 @@ public class RecommendMovieDialogFragment extends DialogFragment implements View
     private RecyclerView recyclerView;
     private RecyclerAdapterFollowersList recyclerAdapterFollowersList;
     private int movieId;
+    private View includeMessageForEmptyFollowersDialog;
+    private TextView dialogTitle;
 
 
     public interface RecommendMovieDialogListener {
@@ -71,17 +74,23 @@ public class RecommendMovieDialogFragment extends DialogFragment implements View
         initRecycleView(view);
         negativeButton = view.findViewById(R.id.button_recommendMovieDialogLayout_negative);
         negativeButton.setOnClickListener(this);
+        includeMessageForEmptyFollowersDialog = view.findViewById(R.id.include_empty_followers__movie_dialog_fragment);
+        hideMessageForEmptyFollowersDialog();
+        dialogTitle = view.findViewById(R.id.textView_recommendMovieDialogLayout_title);
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         recommendMovieDialogViewModel = new ViewModelProvider(this).get(RecommendMovieDialogViewModel.class);
         recommendMovieDialogViewModel.getObservableFetchStatus().observe(this, fetchStatus -> {
             switch (fetchStatus) {
                 case SUCCESS: {
+                    dialogTitle.setVisibility(View.VISIBLE);
                     ArrayList<User> followers = recommendMovieDialogViewModel.getObservableFollowers().getValue();
                     if(followers!=null)
                         recyclerAdapterFollowersList.loadNewData(followers);
                 }
                 break;
                 case FAILED:
+                    dialogTitle.setVisibility(View.GONE);
+                    showMessageForEmptyFollowersDialog();
                     break;
             }
         });
@@ -121,6 +130,14 @@ public class RecommendMovieDialogFragment extends DialogFragment implements View
 
 
     //------------------------------------------------------------- MY METHODS
+
+    private void showMessageForEmptyFollowersDialog(){
+        includeMessageForEmptyFollowersDialog.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMessageForEmptyFollowersDialog(){
+        includeMessageForEmptyFollowersDialog.setVisibility(View.GONE);
+    }
 
     private void initRecycleView(View view) {
         // defining Recycler view
