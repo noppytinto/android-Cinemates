@@ -22,13 +22,15 @@ import mirror42.dev.cinemates.model.search.SearchResult;
 import mirror42.dev.cinemates.model.search.UserSearchResult;
 
 public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
-    private ArrayList<SearchResult> searchResultList;
+    private ArrayList<SearchResult> recyclerList;
     private final Context context;
     private SearchResultListener listener;
 
     private static final int SEARCH_TYPE_MOVIE = 1;
     private static final int SEARCH_TYPE_USER = 2;
     private static final int SEARCH_TYPE_CAST = 3;
+
+
 
     public interface SearchResultListener {
         void onUserSearchResultClicked(int position, View v);
@@ -40,8 +42,8 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
     //------------------------------------------------------------------------ CONSTRUCTORS
 
-    public RecyclerAdapterSearchPage(ArrayList<SearchResult> searchResultList, Context context, SearchResultListener listener) {
-        this.searchResultList = searchResultList;
+    public RecyclerAdapterSearchPage(ArrayList<SearchResult> recyclerList, Context context, SearchResultListener listener) {
+        this.recyclerList = recyclerList;
         this.context = context;
         this.listener = listener;
     }
@@ -56,7 +58,7 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemViewType(int position) {
-        SearchResult.SearchType searchType = searchResultList.get(position).getResultType();
+        SearchResult.SearchType searchType = recyclerList.get(position).getResultType();
 
         switch (searchType) {
             case MOVIE:
@@ -95,17 +97,17 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(getItemViewType(position) == SEARCH_TYPE_MOVIE) {
-            MovieSearchResult searchResult = (MovieSearchResult) searchResultList.get(position);
+            MovieSearchResult searchResult = (MovieSearchResult) recyclerList.get(position);
             //
             buildMovieSearchResult((MovieSearchResultViewHolder) holder, searchResult);
         }
         else if(getItemViewType(position) == SEARCH_TYPE_USER) {
-            UserSearchResult searchResult = (UserSearchResult) searchResultList.get(position);
+            UserSearchResult searchResult = (UserSearchResult) recyclerList.get(position);
             //
             buildUserSearchResult((UserSearchResultViewHolder) holder, searchResult);
         }
         else if(getItemViewType(position) == SEARCH_TYPE_CAST) {
-            CastSearchResult searchResult = (CastSearchResult) searchResultList.get(position);
+            CastSearchResult searchResult = (CastSearchResult) recyclerList.get(position);
             //
             buildActorSearchResult((CastSearchResultViewHolder) holder, searchResult);
         }
@@ -160,18 +162,18 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-        return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.size() : 0);
+        return ( (recyclerList != null) && (recyclerList.size() != 0) ? recyclerList.size() : 0);
     }
 
     public SearchResult getItem(int position) {
-        return ( (searchResultList != null) && (searchResultList.size() != 0) ? searchResultList.get(position) : null);
+        return ( (recyclerList != null) && (recyclerList.size() != 0) ? recyclerList.get(position) : null);
     }
 
     public void loadNewData(ArrayList<SearchResult> newSearchResultList) {
         if(newSearchResultList==null)
-            searchResultList = new ArrayList<>();
+            recyclerList = new ArrayList<>();
         else
-            searchResultList = newSearchResultList;
+            recyclerList = newSearchResultList;
         notifyDataSetChanged();
     }
 
@@ -219,6 +221,11 @@ public class RecyclerAdapterSearchPage extends RecyclerView.Adapter<RecyclerView
         }
 
         return translated;
+    }
+
+    public void clearList() {
+        if(recyclerList !=null) recyclerList.clear();
+        notifyDataSetChanged();
     }
 
     //------------------------------------------------------------------ VIEWHOLDERS

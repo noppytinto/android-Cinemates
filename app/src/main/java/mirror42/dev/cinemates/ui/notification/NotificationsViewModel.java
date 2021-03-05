@@ -643,7 +643,7 @@ public class NotificationsViewModel extends ViewModel {
                         setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
                     }
                 }, throwable -> {
-                    Log.d(TAG, "fetchNotifications: " + throwable.getMessage());
+                    Log.d(TAG, "fetchNotifications(): " + throwable.getMessage());
                 }));
 
 

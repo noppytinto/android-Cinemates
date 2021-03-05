@@ -104,9 +104,12 @@ public class CustomListBrowserViewModel extends ViewModel {
     }
 
 
+
+
+
     //----------------------------------------------------------------------- METHODS
 
-    public void fetchPublicLists(String targetUsername, User loggedUser) {
+    public void fetchFriendCustomLists(String targetUsername, User loggedUser) {
         Runnable task = createFetchPublicListsTask(loggedUser.getEmail(), loggedUser.getAccessToken(), targetUsername);
         ThreadManager t = ThreadManager.getInstance();
         try {

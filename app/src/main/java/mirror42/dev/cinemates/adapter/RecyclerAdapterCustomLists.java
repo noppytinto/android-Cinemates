@@ -22,7 +22,7 @@ import mirror42.dev.cinemates.model.tmdb.Movie;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
 
 public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAdapterCustomLists.CustomListViewHolder> {
-    private ArrayList<CustomList> customLists;
+    private ArrayList<CustomList> recylcerList;
     private CustomListCoverListener listener;
     private Context context;
     private boolean areNotMyLists;
@@ -36,10 +36,10 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
     //------------------------------------------------------------------- CONSTRUCTORS
 
-    public RecyclerAdapterCustomLists(ArrayList<CustomList> customLists,
+    public RecyclerAdapterCustomLists(ArrayList<CustomList> recylcerList,
                                        Context context,
                                       CustomListCoverListener listener, boolean areNotMyLists) {
-        this.customLists = customLists;
+        this.recylcerList = recylcerList;
         this.context = context;
         this.listener = listener;
         this.areNotMyLists = areNotMyLists;
@@ -59,7 +59,7 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
     @Override
     public void onBindViewHolder(@NonNull CustomListViewHolder holder, int position) {
-        CustomList customList = customLists.get(position);
+        CustomList customList = recylcerList.get(position);
         ArrayList<ImageView> thumbnailsList = new ArrayList<>();
         thumbnailsList.add(holder.thumbnail_1);
         thumbnailsList.add(holder.thumbnail_2);
@@ -100,31 +100,36 @@ public class RecyclerAdapterCustomLists extends RecyclerView.Adapter<RecyclerAda
 
     @Override
     public int getItemCount() {
-        return ( (customLists != null) && (customLists.size() != 0) ? customLists.size() : 0);
+        return ( (recylcerList != null) && (recylcerList.size() != 0) ? recylcerList.size() : 0);
     }
 
-    public CustomList getList(int position) {
-        return ( (customLists != null) && (customLists.size() != 0) ? customLists.get(position) : null);
+    public CustomList getItem(int position) {
+        return ( (recylcerList != null) && (recylcerList.size() != 0) ? recylcerList.get(position) : null);
     }
 
     public void loadNewData(ArrayList<CustomList> newList) {
-        customLists = newList;
+        recylcerList = newList;
         notifyDataSetChanged();
     }
 
     public void addPlaceholderItem(CustomList item) {
-        if(customLists == null)
-            customLists = new ArrayList<>();
+        if(recylcerList == null)
+            recylcerList = new ArrayList<>();
 
-        customLists.add(item);
+        recylcerList.add(item);
         notifyDataSetChanged();
     }
 
     public void removeItem(CustomList item) {
-        customLists.remove(item);
+        recylcerList.remove(item);
         notifyDataSetChanged();
     }
 
+
+    public void clearList() {
+        if(recylcerList != null) recylcerList.clear();
+        notifyDataSetChanged();
+    }
 
 
 

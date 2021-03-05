@@ -69,67 +69,26 @@ public class NotificationsFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        init(view);
+    }
+
+    private void init(@NonNull View view) {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout_notificationsFragment);
         progressIndicator = view.findViewById(R.id.progressIndicator_notificationsFragment);
         includeMessageForEmptyPage = view.findViewById(R.id.include_notifications_empty);
         initRecyclerView(view);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
-        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), notificationsStatust -> {
-            ArrayList<Notification> notifications = notificationsViewModel.getNotifications().getValue();
-
-            switch (notificationsStatust) {
-                case NOTIFICATIONS_FETCHED: {
-                    hideProgressIndicator();
-                    if(notifications!=null) {
-                        if(notifications.isEmpty())
-                            showMessageForEmptyPage();
-                        else
-                            hideMessageForEmptyPage();
-                        updateUI(notifications);
-                        notificationsViewModel.setNotificationsAsOld(notifications, getContext());
-                    }
-                }
-                    break;
-                case GOT_NEW_NOTIFICATIONS: {
-//                    hideProgressIndicator();
-                }
-                    break;
-                case NO_NOTIFICATIONS:
-                    hideProgressIndicator();
-                    showMessageForEmptyPage();
-                    break;
-                case NOTIFICATION_DELETED: {
-                    showCenteredToast("notifica eliminata");
-                    if(notifications==null||notifications.isEmpty()) {
-                        showMessageForEmptyPage();
-                    }
-                    // delete from local DB
-                    long notificationID = notificationsViewModel.getCurrentNotificationID();
-                    notificationsViewModel.deleteNotificationFromLocalDB(notificationID, getContext());
-
-                }
-                    break;
-                case NOTIFICATION_NOT_DELETED: {
-                    showCenteredToast("notifica NON eliminata :(");
-
-                }
-                    break;
-            }
-
-        });
-
 
         // load notifications, only if the user is logged
-        loadNotifications(loginViewModel.getObservableLoggedUser().getValue());
+        fetchNotifications(loginViewModel.getLoggedUser());
 
         enableSwipeDownToRefresh();
-
     }
 
     private void showCenteredToast(String msg) {
@@ -152,7 +111,6 @@ public class NotificationsFragment extends Fragment implements
 
     //--------------------------------------------------------------------------------------- MY METHODS
 
-
     private void showMessageForEmptyPage(){
         includeMessageForEmptyPage.setVisibility(View.VISIBLE);
     }
@@ -160,7 +118,6 @@ public class NotificationsFragment extends Fragment implements
     private void hideMessageForEmptyPage(){
         includeMessageForEmptyPage.setVisibility(View.GONE);
     }
-
 
     @Override
     public void onFollowRequestNotificationClicked(int position) {
@@ -282,11 +239,56 @@ public class NotificationsFragment extends Fragment implements
         NavHostFragment.findNavController(NotificationsFragment.this).navigate(action);
     }
 
-    private void loadNotifications(User loggedUser) {
+    private void fetchNotifications(User loggedUser) {
         if(loggedUser==null) return;
+
+        notificationsViewModel.getNotificationsStatus().observe(getViewLifecycleOwner(), notificationsStatust -> {
+            ArrayList<Notification> notifications = notificationsViewModel.getNotifications().getValue();
+
+            switch (notificationsStatust) {
+                case NOTIFICATIONS_FETCHED: {
+                    hideProgressIndicator();
+                    if(notifications!=null) {
+                        if(notifications.isEmpty()) showMessageForEmptyPage();
+                        else hideMessageForEmptyPage();
+
+                        updateUI(notifications);
+                        notificationsViewModel.setNotificationsAsOld(notifications, getContext());
+                    }
+                }
+                break;
+                case GOT_NEW_NOTIFICATIONS: {
+//                    hideProgressIndicator();
+                }
+                break;
+                case NO_NOTIFICATIONS:
+                    hideProgressIndicator();
+                    showMessageForEmptyPage();
+                    break;
+                case NOTIFICATION_DELETED: {
+                    showCenteredToast("notifica eliminata");
+                    if(notifications==null||notifications.isEmpty()) {
+                        showMessageForEmptyPage();
+                    }
+                    // delete from local DB
+                    long notificationID = notificationsViewModel.getCurrentNotificationID();
+                    notificationsViewModel.deleteNotificationFromLocalDB(notificationID, getContext());
+
+                }
+                break;
+                case NOTIFICATION_NOT_DELETED: {
+                    showCenteredToast("notifica NON eliminata :(");
+
+                }
+                break;
+            }
+
+        });
+
+
         try {
             showProgressIndicator();
-            notificationsViewModel.fetchNotifications(loggedUser, getContext());
+            notificationsViewModel.fetchNotifications(loggedUser, requireContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -333,7 +335,7 @@ public class NotificationsFragment extends Fragment implements
             recyclerAdapterNotifications.clearList();
             if(currentUserIsLogged()) {
                 showProgressIndicator();
-                loadNotifications(loginViewModel.getObservableLoggedUser().getValue());
+                fetchNotifications(loginViewModel.getObservableLoggedUser().getValue());
             }
 
             swipeRefreshLayout.setRefreshing(false);

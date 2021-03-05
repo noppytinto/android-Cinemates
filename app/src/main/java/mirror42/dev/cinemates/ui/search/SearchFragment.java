@@ -114,8 +114,20 @@ public class SearchFragment extends Fragment implements
                     chipUsersFilter.setVisibility(View.VISIBLE);
                     loggedUser = loginViewModel.getLoggedUser();
                     searchViewModel.setLoggedUser(loggedUser);
+                    searchType = SearchType.MOVIE; // reset filters
+                    textInputLayout.setHint("Cerca film");
+                    editTextSearch.setText("");
+                    currentSearchTerm = "";
                 }
                 break;
+                case LOGGED_OUT:
+                    recyclerAdapterSearchPage.clearList();
+                    textInputLayout.setHint("Cerca film");
+                    searchType = SearchType.MOVIE; // reset filters
+                    chipUsersFilter.setVisibility(View.GONE);
+                    editTextSearch.setText("");
+                    currentSearchTerm = "";
+                    break;
                 default:
                     textInputLayout.setHint("Cerca film");
                     searchType = SearchType.MOVIE; // reset filters
@@ -126,9 +138,7 @@ public class SearchFragment extends Fragment implements
         //
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         searchViewModel.getObservableDownloadStatus().observe(getViewLifecycleOwner(), downloadStatus -> {
-
             showLoadingSpinner(false);
-
             switch (downloadStatus) {
                 case SUCCESS: {
                     ArrayList<SearchResult> searchResults = searchViewModel.getSearchResultList();
@@ -155,9 +165,7 @@ public class SearchFragment extends Fragment implements
             }
         });
 
-
         hideTextViewTitle();
-
 
         //
         enableSearchOnTyping(true);
@@ -316,11 +324,13 @@ public class SearchFragment extends Fragment implements
 
     @Override
     public void onUserSearchResultClicked(int position, View v) {
-        UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getItem(position);
+        if(loginViewModel.getLoginResult() != LoginViewModel.LoginResult.LOGGED_OUT) {
+            UserSearchResult itemSelected = (UserSearchResult) recyclerAdapterSearchPage.getItem(position);
 
-        NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
-                NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getUsername());
-        NavHostFragment.findNavController(SearchFragment.this).navigate(userProfileFragment);
+            NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
+                    NavGraphDirections.actionGlobalUserProfileFragment(itemSelected.getUsername());
+            NavHostFragment.findNavController(SearchFragment.this).navigate(userProfileFragment);
+        }
     }
 
     private void showCenteredToast(String msg) {

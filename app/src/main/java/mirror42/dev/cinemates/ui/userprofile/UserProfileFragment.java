@@ -176,7 +176,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     loginViewModel.getObservableLoggedUser().getValue().getAccessToken());
         }
         else if(v.getId() == buttonCustomLists.getId()) {
-            String fetchMode = "fetch_public_lists";
+            String fetchMode = "fetch_friend_lists";
             String ownerUsername = profileOwner.getUsername();
 //
             NavDirections customListBrowserFragment =

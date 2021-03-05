@@ -33,6 +33,7 @@ import mirror42.dev.cinemates.model.list.CustomList;
 import mirror42.dev.cinemates.ui.dialog.CustomListDialogFragment;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
 import mirror42.dev.cinemates.utilities.ImageUtilities;
+import mirror42.dev.cinemates.utilities.MyValues;
 
 public class CustomListBrowserFragment extends Fragment
         implements CustomListDialogFragment.CustomListDialogListener,
@@ -69,143 +70,16 @@ public class CustomListBrowserFragment extends Fragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
-        buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
-        progressIndicator = view.findViewById(R.id.progressIndicator_customListBrowser);
-        imageViewEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage).findViewById(R.id.imageView_emptyMessage);
-        includeEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage);
+        init(view);
 
         if(getArguments()!=null) {
             CustomListBrowserFragmentArgs args = CustomListBrowserFragmentArgs.fromBundle(getArguments());
             String fetchMode = args.getFetchMode();
             String profileOwnerUsername = args.getListOwner();
 
-            setUpFragment(fetchMode, profileOwnerUsername, view);
+            setupView(fetchMode, profileOwnerUsername, view);
 
         }
-    }
-
-    private void setUpFragment(String fetchMode, String profileOwnerUsername, View view) {
-        showProgressIndicator();
-        switch (fetchMode) {
-            case "fetch_my_custom_lists": {
-                areNotMyLists = false;
-                initRecycleView(view, areNotMyLists);
-                initForFetchModeMyCustomLists();
-            }
-            break;
-            case "fetch_subscribed_lists": {
-                areNotMyLists = true;
-                ((MainActivity)requireActivity()).setToolbarTitle("Liste che seguo");
-                initRecycleView(view, areNotMyLists);
-                initForFetchModeSubscribedLists();
-            }
-            break;
-            case "fetch_public_lists": {
-                areNotMyLists = true;
-                ((MainActivity)requireActivity()).setToolbarTitle("Liste di: @" + profileOwnerUsername);
-                initRecycleView(view, areNotMyLists);
-                initForFetchModePublicLists(profileOwnerUsername);
-            }
-            break;
-        }
-    }
-
-    private void initForFetchModePublicLists(String profileOwnerUsername) {
-        buttonAdd.setVisibility(View.GONE);
-        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case SUCCESS: {
-                        hideProgressIndicator();
-                        hideEmptyMessage();
-                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                        if(lists!=null) {
-                            recyclerAdapterCustomLists.loadNewData(lists);
-                        }
-                    }
-                    break;
-                case NOT_EXISTS:
-                    hideProgressIndicator();
-                    showEmptyMessagePublicList();
-                    break;
-                case FAILED:
-                    hideProgressIndicator();
-                    showCenteredToast("caricamento liste fallito");
-                    break;
-            }
-        });
-        customListBrowserViewModel.fetchPublicLists(profileOwnerUsername, loginViewModel.getLoggedUser());
-    }
-
-    private void initForFetchModeMyCustomLists() {
-        buttonAdd.setOnClickListener(this);
-        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        customListBrowserViewModel.getObservableMyCustomListsFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case SUCCESS: {
-                        hideProgressIndicator();
-                        hideEmptyMessage();
-                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                        if(lists!=null) {
-                            recyclerAdapterCustomLists.loadNewData(lists);
-                        }
-                    }
-                    break;
-                case NOT_EXISTS:
-                    hideProgressIndicator();
-                    showEmptyMessageCustomList();
-                    break;
-                case FAILED:
-                    hideProgressIndicator();
-                    showCenteredToast("caricamento liste fallito");
-                    break;
-            }
-        });
-
-        customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
-            switch (taskStatus) {
-                case SUCCESS: {
-                    createCustomListPlaceholder(newListName, newListDescription);
-                    moveRecyclerToBottom();
-                    showCenteredToast("lista creata");
-                    break;
-                }
-                case FAILED: {
-                    showCenteredToast("errore creazione lista");
-                }
-            }
-        });
-
-        customListBrowserViewModel.fetchMyCustomLists(loginViewModel.getLoggedUser());
-    }
-
-    private void initForFetchModeSubscribedLists() {
-        buttonAdd.setVisibility(View.GONE);
-        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
-        customListBrowserViewModel.getObservableSubscribedFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
-            switch (fetchStatus) {
-                case SUCCESS: {
-                        hideProgressIndicator();
-                        hideEmptyMessage();
-                        ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
-                        if(lists!=null) {
-                            recyclerAdapterCustomLists.loadNewData(lists);
-                        }
-                    }
-                    break;
-                case NOT_EXISTS:
-                    showEmptyMessageSubList();
-                    hideProgressIndicator();
-                    break;
-                case FAILED:
-                    hideProgressIndicator();
-                    showCenteredToast("caricamento liste fallito");
-                    break;
-            }
-        });
-
-        customListBrowserViewModel.fetchSubscribedLists(loginViewModel.getLoggedUser());
     }
 
     @Override
@@ -227,18 +101,153 @@ public class CustomListBrowserFragment extends Fragment
 
     //------------------------------------------------------------- MY METHODS
 
+    private void init(View view) {
+        buttonAdd = view.findViewById(R.id.floatingActionButton_customListBrowserFragment_add);
+        progressIndicator = view.findViewById(R.id.progressIndicator_customListBrowser);
+        imageViewEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage).findViewById(R.id.imageView_emptyMessage);
+        includeEmptyMessage = view.findViewById(R.id.include_customListBrowser_emptyMessage);
+        loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+        customListBrowserViewModel = new ViewModelProvider(this).get(CustomListBrowserViewModel.class);
+    }
+
+    private void setupView(String fetchMode, String profileOwnerUsername, View view) {
+        showProgressIndicator();
+        switch (fetchMode) {
+            case "fetch_my_custom_lists": {
+                areNotMyLists = false;
+                initRecycleView(view, areNotMyLists);
+                fetchMyCustomLists();
+            }
+            break;
+            case "fetch_subscribed_lists": {
+                areNotMyLists = true;
+                ((MainActivity)requireActivity()).setToolbarTitle("Liste che seguo");
+                initRecycleView(view, areNotMyLists);
+                fetchSubscribedLists();
+            }
+            break;
+            case "fetch_friend_lists": {
+                //note: "friend" are actually following users
+                areNotMyLists = true;
+                ((MainActivity)requireActivity()).setToolbarTitle("Liste di: @" + profileOwnerUsername);
+                initRecycleView(view, areNotMyLists);
+                fetchFriendCustomLists(profileOwnerUsername);
+            }
+            break;
+        }
+    }
+
+
+    private void fetchMyCustomLists() {
+        buttonAdd.setOnClickListener(this);
+        customListBrowserViewModel.getObservableMyCustomListsFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    hideProgressIndicator();
+                    hideEmptyMessage();
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
+                    }
+                }
+                break;
+                case NOT_EXISTS:
+                    hideProgressIndicator();
+                    showEmptyMessageCustomList();
+                    break;
+                case FAILED:
+                    hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
+                    break;
+            }
+        });
+        customListBrowserViewModel.fetchMyCustomLists(loginViewModel.getLoggedUser());
+    }
+
+    private void fetchSubscribedLists() {
+        buttonAdd.setVisibility(View.GONE);
+        customListBrowserViewModel.getObservableSubscribedFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    hideProgressIndicator();
+                    hideEmptyMessage();
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
+                    }
+
+                    // reset fetch status
+                    customListBrowserViewModel.setSubscribedFetchStatus(MyValues.FetchStatus.IDLE);
+                }
+                break;
+                case NOT_EXISTS:
+                    showEmptyMessageSubList();
+                    hideProgressIndicator();
+                    break;
+                case FAILED:
+                    hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
+                    break;
+            }
+        });
+
+        customListBrowserViewModel.fetchSubscribedLists(loginViewModel.getLoggedUser());
+    }
+
+    private void fetchFriendCustomLists(String profileOwnerUsername) {
+        buttonAdd.setVisibility(View.GONE);
+        customListBrowserViewModel.getObservablePublicFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            switch (fetchStatus) {
+                case SUCCESS: {
+                    hideProgressIndicator();
+                    hideEmptyMessage();
+                    ArrayList<CustomList> lists = customListBrowserViewModel.getCustomList();
+                    if(lists!=null) {
+                        recyclerAdapterCustomLists.loadNewData(lists);
+                    }
+                }
+                break;
+                case NOT_EXISTS:
+                    hideProgressIndicator();
+                    showEmptyMessagePublicList();
+                    break;
+                case FAILED:
+                    hideProgressIndicator();
+                    showCenteredToast("caricamento liste fallito");
+                    break;
+            }
+        });
+        customListBrowserViewModel.fetchFriendCustomLists(profileOwnerUsername, loginViewModel.getLoggedUser());
+    }
+
     private void initRecycleView(View view, boolean areNotMyLists) {
         // defining Recycler view
         recyclerView = view.findViewById(R.id.recyclerView_customListBrowser);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerAdapterCustomLists = new RecyclerAdapterCustomLists(new ArrayList<>(), getContext(), this, areNotMyLists);
+        recyclerAdapterCustomLists = new RecyclerAdapterCustomLists(new ArrayList<>(), requireContext(), this, areNotMyLists);
         recyclerView.setAdapter(recyclerAdapterCustomLists);
+//        recyclerAdapterCustomLists.clearList();
     }
 
     public void showCreateListDialog() {
         DialogFragment newFragment = new CustomListDialogFragment(this);
         newFragment.show(requireActivity().getSupportFragmentManager(), "CustomListDialogFragment");
+
+        customListBrowserViewModel.getObservableTaskStatus().observe(getViewLifecycleOwner(), taskStatus -> {
+            switch (taskStatus) {
+                case SUCCESS: {
+                    createCustomListPlaceholder(newListName, newListDescription);
+                    moveRecyclerToBottom();
+                    hideEmptyMessage();
+                    showCenteredToast("lista creata");
+                    break;
+                }
+                case FAILED: {
+                    showCenteredToast("errore creazione lista");
+                }
+            }
+        });
     }
 
 
@@ -266,7 +275,7 @@ public class CustomListBrowserFragment extends Fragment
 
     @Override
     public void onCoverClicked(int position) {
-        CustomList clickedList = recyclerAdapterCustomLists.getList(position);
+        CustomList clickedList = recyclerAdapterCustomLists.getItem(position);
 
         if(clickedList!=null) {
             NavGraphDirections.ActionGlobalListFragment listFragment =
@@ -279,7 +288,7 @@ public class CustomListBrowserFragment extends Fragment
     @Override
     public void imageClicked(int position) {
 
-        User userOwner = recyclerAdapterCustomLists.getList(position).getOwner();
+        User userOwner = recyclerAdapterCustomLists.getItem(position).getOwner();
         NavGraphDirections.ActionGlobalUserProfileFragment userProfileFragment =
                 NavGraphDirections.actionGlobalUserProfileFragment(userOwner.getUsername());
         NavHostFragment.findNavController(CustomListBrowserFragment.this).navigate(userProfileFragment);

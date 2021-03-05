@@ -107,7 +107,7 @@ public class PostFragment extends Fragment implements
             postViewModel.getObservableFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
                 switch (fetchStatus) {
                     case SUCCESS: {
-                        Toast.makeText(getContext(), "post " + postID + " esiste", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getContext(), "post " + postID + " esiste", Toast.LENGTH_SHORT).show();
                         Post post = postViewModel.getObservablePostFetched().getValue();
                         PostType postType = post.getPostType();
                         Bundle arguments = buildRequiredArguments(post);
