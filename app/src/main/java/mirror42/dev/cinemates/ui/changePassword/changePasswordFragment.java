@@ -16,16 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import mirror42.dev.cinemates.R;
-import mirror42.dev.cinemates.model.User;
 import mirror42.dev.cinemates.ui.login.LoginViewModel;
-import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
 import mirror42.dev.cinemates.utilities.FirebaseAnalytics;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.RemoteConfigServer;
@@ -92,8 +89,8 @@ public class changePasswordFragment extends Fragment implements
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
         changePasswordViewModel =  new ViewModelProvider(this).get(ChangePasswordViewModel.class);
-        changePasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), resetResult -> {
-            if(resetResult == ChangePasswordViewModel.ResetResult.SUCCESS){
+        changePasswordViewModel.getResetStatus().observe(getViewLifecycleOwner(), changePasswordResult -> {
+            if(changePasswordResult == ChangePasswordViewModel.ChangePasswordResult.SUCCESS){
                 showCenteredToast( "Cambio password completo ");
                 if( MyUtilities.deletFile(remoteConfigServer.getCinematesData(), getContext())){
                     remoteConfigServer = RemoteConfigServer.getInstance();
@@ -107,7 +104,7 @@ public class changePasswordFragment extends Fragment implements
 
             }
 
-            else if(resetResult == ChangePasswordViewModel.ResetResult.FAILED)
+            else if(changePasswordResult == ChangePasswordViewModel.ChangePasswordResult.FAILED)
                 showCenteredToast( "Cambio password fallito ");
         });
 

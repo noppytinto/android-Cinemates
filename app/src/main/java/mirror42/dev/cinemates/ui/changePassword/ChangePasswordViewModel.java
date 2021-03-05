@@ -7,14 +7,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
-import mirror42.dev.cinemates.api.mailAPI.JavaMailAPI;
 import mirror42.dev.cinemates.model.User;
-import mirror42.dev.cinemates.ui.resetPassword.ResetPasswordViewModel;
 import mirror42.dev.cinemates.utilities.HttpUtilities;
 import mirror42.dev.cinemates.utilities.MyUtilities;
 import mirror42.dev.cinemates.utilities.OkHttpSingleton;
@@ -31,25 +28,25 @@ import okhttp3.Response;
 public class ChangePasswordViewModel extends ViewModel {
 
     private final String TAG = this.getClass().getSimpleName();
-    private MutableLiveData<ChangePasswordViewModel.ResetResult> resetResult;
+    private MutableLiveData<ChangePasswordResult> resetResult;
     private RemoteConfigServer remoteConfigServer;
 
-    public enum ResetResult {
+    public enum ChangePasswordResult {
         FAILED,
         SUCCESS,
         NONE
     }
     public ChangePasswordViewModel(){
-        resetResult = new MutableLiveData<>(ResetResult.NONE);
+        resetResult = new MutableLiveData<>(ChangePasswordResult.NONE);
         remoteConfigServer = RemoteConfigServer.getInstance();
     }
 
     // getter and setter
-    public void postResetStatus(ResetResult resetResult) {
-        this.resetResult.postValue(resetResult);
+    public void postResetStatus(ChangePasswordResult changePasswordResult) {
+        this.resetResult.postValue(changePasswordResult);
     }
 
-    public LiveData<ResetResult> getResetStatus() {
+    public LiveData<ChangePasswordResult> getResetStatus() {
         return resetResult;
     }
 
@@ -77,7 +74,7 @@ public class ChangePasswordViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     Log.v(TAG,"cambio password fallito");
-                    postResetStatus(ResetResult.FAILED);
+                    postResetStatus(ChangePasswordResult.FAILED);
                 }
 
                 @Override
@@ -92,20 +89,20 @@ public class ChangePasswordViewModel extends ViewModel {
                             updateToken(userLogged);
                         }else{
                             Log.v(TAG,"mail non trovata ");
-                            postResetStatus(ResetResult.FAILED);
+                            postResetStatus(ChangePasswordResult.FAILED);
                         }
 
 
                     }catch(Exception e){
                         e.printStackTrace();
-                        postResetStatus(ResetResult.FAILED);
+                        postResetStatus(ChangePasswordResult.FAILED);
                     }
 
                 }
             });
         }catch(Exception e){
             e.printStackTrace();
-            postResetStatus(ResetResult.FAILED);
+            postResetStatus(ChangePasswordResult.FAILED);
         }
     }
 
@@ -129,7 +126,7 @@ public class ChangePasswordViewModel extends ViewModel {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     Log.v(TAG,"recupero nuovo access token fallito");
-                    postResetStatus(ResetResult.FAILED);
+                    postResetStatus(ChangePasswordResult.FAILED);
                 }
 
                 @Override
@@ -146,27 +143,27 @@ public class ChangePasswordViewModel extends ViewModel {
                                 String accessToken = jsonObject.getString("AccessToken");
                                 Log.v(TAG, "access token recuperato  " + accessToken);
                                 userLogged.setAccessToken(accessToken);
-                                postResetStatus(ResetResult.SUCCESS);
+                                postResetStatus(ChangePasswordResult.SUCCESS);
                             }else{
                                 Log.v(TAG,"errore recupero access token ");
-                                postResetStatus(ResetResult.FAILED);
+                                postResetStatus(ChangePasswordResult.FAILED);
                             }
                         }else{
                             Log.v(TAG,"errore recupero access token ");
-                            postResetStatus(ResetResult.FAILED);
+                            postResetStatus(ChangePasswordResult.FAILED);
                         }
 
 
                     }catch(Exception e){
                         e.printStackTrace();
-                        postResetStatus(ResetResult.FAILED);
+                        postResetStatus(ChangePasswordResult.FAILED);
                     }
 
                 }
             });
         }catch(Exception e){
             e.printStackTrace();
-            postResetStatus(ResetResult.FAILED);
+            postResetStatus(ChangePasswordResult.FAILED);
         }
     }
 
