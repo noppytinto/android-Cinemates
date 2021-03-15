@@ -76,7 +76,7 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
                 if(isMyList) initAsMyList(view);
                 else initAsOthersList(view);
 
-                fetchFollowers(username);
+                fetchFollowings(username);
             }
         }
     }
@@ -108,8 +108,9 @@ public class FollowingFragment extends Fragment implements View.OnClickListener,
     }
 
 
-    private void fetchFollowers(String username) {
+    private void fetchFollowings(String username) {
         followingViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            recyclerAdapterUsersList.clearList();
             switch (fetchStatus) {
                 case FOLLOWING_FETCHED: {
                     ArrayList<User> following = followingViewModel.getObservableFollowing().getValue();

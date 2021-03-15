@@ -109,6 +109,7 @@ public class FollowersFragment extends Fragment implements View.OnClickListener,
 
     private void fetchFollowers(String username) {
         followersViewModel.getFetchStatus().observe(getViewLifecycleOwner(), fetchStatus -> {
+            recyclerAdapterUsersList.clearList();
             switch (fetchStatus) {
                 case FOLLOWERS_FETCHED: {
                     ArrayList<User> followers = followersViewModel.getObservableFollowers().getValue();

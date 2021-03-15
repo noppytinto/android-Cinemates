@@ -98,7 +98,8 @@ public class RecyclerAdapterUsersList extends RecyclerView.Adapter<RecyclerAdapt
     }
 
     public void clearList() {
-        recyclerList.clear();
+        if(recyclerList!=null)
+            recyclerList.clear();
         notifyDataSetChanged();
     }
 
