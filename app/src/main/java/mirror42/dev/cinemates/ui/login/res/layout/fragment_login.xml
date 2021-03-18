@@ -10,21 +10,161 @@
     tools:context=".ui.login.LoginFragment">
 
 
-    <ImageView
-        android:id="@+id/imageView_loginFragment_logo"
-        android:layout_width="211dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/cinemates_logo_extended_no_lights_small"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/button_loginFragment_signUp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView_loginFragment_logo"
+                android:layout_width="197dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="32dp"
+                android:src="@drawable/cinemates_logo_extended_no_lights_small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_loginFragment_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:hint="@string/login_page_email"
+                app:endIconMode="clear_text"
+                app:errorEnabled="true"
+                app:helperText="@string/login_page_test_mail_address"
+                app:helperTextEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView_loginFragment_logo"
+                app:startIconDrawable="@drawable/email_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_loginFragment_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/white" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_loginFragment_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:hint="@string/password"
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_email"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_email"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_email"
+                app:startIconDrawable="@drawable/password_icon_light_blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_loginFragment_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="@color/white" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <Button
+                android:id="@+id/button_loginFragment_standardLogin"
+                style="@style/Cinemates.Button.Rounded"
+                android:layout_width="140dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/login_page_login"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
+                app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
+
+            <Button
+                android:id="@+id/button_loginFragment_googleLogin"
+                style="@style/Cinemates.Button.Rounded.Outlined"
+                android:layout_width="140dp"
+                android:layout_height="50dp"
+                android:text="@string/login_page_googlelogin"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:icon="@drawable/fui_ic_googleg_color_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+            <CheckBox
+                android:id="@+id/checkBox_loginFragment_rememberMe"
+                android:layout_width="197dp"
+                android:layout_height="22dp"
+                android:layout_marginTop="4dp"
+                android:paddingStart="0dp"
+                android:text="Rimani connesso"
+                android:textColor="@color/light_blue"
+                app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
+
+            <ProgressBar
+                android:id="@+id/progresBar_loginFragment"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.156" />
+
+            <TextView
+                android:id="@+id/textView_loginFragment_resetPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="@string/login_page_resetPassword"
+                android:textAlignment="textEnd"
+                android:textColor="@color/light_blue"
+                app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/login_page_access_with_google"
+                android:textColor="@color/light_blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_loginFragment_standardLogin" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <Button
         android:id="@+id/button_loginFragment_signUp"
         style="@style/Cinemates.Button.TextButton"
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         android:layout_margin="0dp"
         android:backgroundTint="@color/light_blue"
         android:insetTop="0dp"
@@ -39,126 +179,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_min="0dp" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_loginFragment_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
-        android:hint="@string/login_page_email"
-        app:endIconMode="clear_text"
-        app:errorEnabled="true"
-        app:helperText="@string/login_page_test_mail_address"
-        app:helperTextEnabled="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_loginFragment_logo"
-        app:startIconDrawable="@drawable/email_icon_light_blue">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_loginFragment_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/white" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_loginFragment_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:hint="@string/password"
-        app:endIconMode="password_toggle"
-        app:errorEnabled="true"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_email"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_email"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_email"
-        app:startIconDrawable="@drawable/password_icon_light_blue">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_loginFragment_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:textColor="@color/white" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-    <Button
-        android:id="@+id/button_loginFragment_standardLogin"
-        style="@style/Cinemates.Button.Rounded"
-        android:layout_width="159dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="12dp"
-        android:text="@string/login_page_login"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox_loginFragment_rememberMe" />
-
-    <Button
-        android:id="@+id/button_loginFragment_googleLogin"
-        style="@style/Cinemates.Button.Rounded.Outlined"
-        android:layout_width="159dp"
-        android:layout_height="60dp"
-        android:text="@string/login_page_googlelogin"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:icon="@drawable/fui_ic_googleg_color_24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <CheckBox
-        android:id="@+id/checkBox_loginFragment_rememberMe"
-        android:layout_width="197dp"
-        android:layout_height="22dp"
-        android:layout_marginTop="4dp"
-        android:paddingStart="0dp"
-        android:text="Rimani connesso"
-        android:textColor="@color/light_blue"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
-
-    <ProgressBar
-        android:id="@+id/progresBar_loginFragment"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.156" />
-
-    <TextView
-        android:id="@+id/textView_loginFragment_resetPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:text="@string/login_page_resetPassword"
-        android:textAlignment="textEnd"
-        android:textColor="@color/light_blue"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout_loginFragment_password"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout_loginFragment_password" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/login_page_access_with_google"
-        android:textColor="@color/light_blue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_loginFragment_standardLogin" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

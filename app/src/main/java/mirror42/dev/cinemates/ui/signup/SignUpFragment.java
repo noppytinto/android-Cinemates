@@ -187,7 +187,7 @@ public class SignUpFragment extends Fragment implements
                     showCenteredToast("Firebase sign-up server:\nVerification email NOT sent");
                     break;
                 case PENDING_USER_COLLISION:
-                    showCenteredToast("Firebase sign-up server:\nemail ancora non approvata\ncontrolla la tua posta\"");
+                    showCenteredToast("email ancora non approvata\ncontrolla la tua posta\"");
                     textInputLayoutEmail.setError("email ancora non approvata, controlla la tua posta");
                     Navigation.findNavController(view).popBackStack();
                     Navigation.findNavController(view).navigate(R.id.main_fragment);
