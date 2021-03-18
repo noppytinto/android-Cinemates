@@ -24,6 +24,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.ArrayList;
 
+import mirror42.dev.cinemates.MainActivity;
 import mirror42.dev.cinemates.NavGraphDirections;
 import mirror42.dev.cinemates.R;
 import mirror42.dev.cinemates.adapter.RecyclerAdapterNotifications;
@@ -52,6 +53,13 @@ public class NotificationsFragment extends Fragment implements
 
 
     //--------------------------------------------------------------------------------------- ANDROID METHODS
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)requireActivity()).showToolbar();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -365,7 +373,6 @@ public class NotificationsFragment extends Fragment implements
 
         return user;
     }
-
 
     private void navigateTo(NavDirections direction, boolean removeFromBackStack) {
         if(direction==null) return;

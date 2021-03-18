@@ -88,7 +88,6 @@ public class NotificationsViewModel extends ViewModel {
         notificationsStatus = new MutableLiveData<>(NotificationsStatus.IDLE);
         fetchStatus = new MutableLiveData<>(FetchStatus.IDLE);
         customList = new MutableLiveData<>();
-        notificationsSubscription = new SerialDisposable();
 
     }
 
@@ -192,7 +191,11 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
                 emitter.onError(e);
@@ -263,7 +266,11 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
                 emitter.onError(e);
@@ -334,7 +341,11 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
                 emitter.onError(e);
@@ -407,7 +418,11 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
                 emitter.onError(e);
@@ -478,10 +493,18 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
-                emitter.onError(e);
+                try {
+                    emitter.onError(e);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             } finally {
                 if (response != null) {
                     response.close();
@@ -549,10 +572,18 @@ public class NotificationsViewModel extends ViewModel {
                 else emitter.onError(new Exception("response unsuccesufull"));
             }
             catch (ConnectException ce) {
-                emitter.onError(ce);
+                try {
+                    emitter.onError(ce);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e) {
-                emitter.onError(e);
+                try {
+                    emitter.onError(e);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             } finally {
                 if (response != null) {
                     response.close();
@@ -632,27 +663,34 @@ public class NotificationsViewModel extends ViewModel {
                 .subscribeOn(Schedulers.from(ThreadManager.getInstance().getExecutor()))
                 .observeOn(AndroidSchedulers.mainThread());
 
-        notificationsSubscription.set(observableNotifications
-                .subscribe(notifications -> {
-                    if(notifications != null && notifications.size()>0) {
-                        saveOnLocalDatabase(notifications, context);
-                        setNotificationsList(notifications);
-                        setNotificationsStatus(NotificationsStatus.NOTIFICATIONS_FETCHED);
-                    }
-                    else {
-                        setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
-                    }
-                }, throwable -> {
-                    Log.d(TAG, "fetchNotifications(): " + throwable.getMessage());
-                }));
+        try {
+//            stopFetchingNotifications();
+            notificationsSubscription = new SerialDisposable();
+
+            notificationsSubscription.set(observableNotifications
+                    .subscribe(notifications -> {
+                        if(notifications != null && notifications.size()>0) {
+                            saveOnLocalDatabase(notifications, context);
+                            setNotificationsList(notifications);
+                            setNotificationsStatus(NotificationsStatus.NOTIFICATIONS_FETCHED);
+                        }
+                        else {
+                            setNotificationsStatus(NotificationsStatus.NO_NOTIFICATIONS);
+                        }
+                    }, throwable -> {
+                        Log.d(TAG, "fetchNotifications(): " + throwable.getMessage());
+                    }));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
 
 
     public void stopFetchingNotifications() {
-//        if(notificationsSubscription!=null && (!notificationsSubscription.isDisposed()))
-//            notificationsSubscription.dispose();
+        if(notificationsSubscription!=null && (!notificationsSubscription.isDisposed()))
+            notificationsSubscription.dispose();
     }
 
     private void handleFetchErrors(Throwable e) {
