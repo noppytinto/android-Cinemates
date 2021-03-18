@@ -183,7 +183,7 @@ public class PersonalProfileFragment extends Fragment implements
                     buttonResendEmail.setEnabled(false);
                 } else {
                     loginViewModel.resendVerificationEmail();
-                    showCenteredToast("Email attivazione riniviata, era esegui un Logout e controlla la posta.");
+                    showCenteredToast("Email attivazione rinviata, ora esegui un logout e controlla la posta.");
                     buttonResendEmail.setText("Email attivazione rinviata!");
                     buttonResendEmail.setEnabled(false);
                     additionalActivationMailSent = true;
