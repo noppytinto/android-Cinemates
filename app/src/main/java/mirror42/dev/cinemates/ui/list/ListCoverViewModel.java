@@ -315,7 +315,7 @@ public class ListCoverViewModel extends ViewModel {
 
                             try {
                                 Movie movie = tmdb.getMoviesDetailsById(movieId);
-                                result.add(movie);
+                                if(movie!=null) result.add(movie);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
