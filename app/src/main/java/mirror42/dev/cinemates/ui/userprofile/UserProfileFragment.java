@@ -223,7 +223,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         displayFragment(favoritesCoverFragment, R.id.container_userProfile_favoritesListCover);
 
         Fragment watchedCoverFragment = WatchedListCoverFragment.newInstance();
-        watchistCoverFragment.setArguments(arguments);
+        watchedCoverFragment.setArguments(arguments);
         displayFragment(watchedCoverFragment, R.id.container_userProfile_watchedListCover);
     }
 
