@@ -1,17 +1,14 @@
 # Cinemates 
 
-Movie andorid app for university SWE exam, with several features:
-- explore movies
-- search movies
-- peronal lists
-- share and subscribe to lists
-- social featues:
-  - news feed
-  - notifications
-  - friends
-  - comments
-  - reactions
-- desktop CRM for handling users
+Developed as a university Software Engineering exam project, Cinemates is a feature-rich Android movie app designed to provide a comprehensive and social movie-watching experience.
+
+Key features include:
+
+- Explore and Search Movies: Browse and find movies with an intuitive interface.
+- Personal Lists: Create, manage, and share personalized movie lists.
+- Social Features: Engage with friends through a dynamic news feed, notifications, comments, and reactions.
+- Community Interaction: Subscribe to friends' lists and share movie recommendations.
+- Desktop CRM: Manage user interactions and profiles efficiently with a desktop Customer Relationship Management system.
 
 ## Stack
 - Android (Java)
